@@ -25,13 +25,14 @@ var webdriver = require('selenium-webdriver'),
     http.createServer(function (request, response) {
         var done = finalhandler(request, response);
         var target = request.url;
-        if (target.indexOf('project/') > -1) {  
+        console.log('target: ' + target);
+        if (target.indexOf('/project') === 0) {  
             request.originalUrl = request.url;
-            request.url = request.url.substring('project/'.length);
+            request.url = request.url.substring('/project'.length);
             serveProject(request, response, done);    
-        } else if (target.indexOf('js/') > -1) {
+        } else if (target.indexOf('/js') === 0) {
             request.originalUrl = request.url;
-            request.url = request.url.substring('js/'.length);
+            request.url = request.url.substring('/js'.length);
             serveJs(request, response, done);
         } else {
             response.writeHeader(200, {"Content-Type": "text/plain" });
