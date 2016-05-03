@@ -2,7 +2,7 @@
   "name": "bedrock",
   "version": "1.0.0",
   "description": "NodeJS test runner for bolt projects",
-  "main": "runner.js",
+  "main": "src/runner.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

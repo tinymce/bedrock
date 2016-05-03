@@ -19,6 +19,11 @@ var webdriver = require('selenium-webdriver'),
     .setFirefoxOptions(/* ... */)
     .build();
 
+
+    var routes = require('./bedrock-routers');
+
+    routes.router();
+
     var serveProject = serveStatic('../../work/tbio/petrie');
     var serveJs = serveStatic('../../work/tools/tunic/src/js');
     var serveThis = serveStatic('./');
