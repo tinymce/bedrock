@@ -79,7 +79,7 @@ var webdriver = require('selenium-webdriver'),
 
     var SINGLE_TEST_TIMEOUT = 4000;
     var ALL_TEST_TIMEOUT = 30000;
-    var KEEP_GOING = undefined;
+    var KEEP_GOING = false;
 
 
     var nextTick = function () {
