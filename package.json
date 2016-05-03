@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "selenium-webdriver": "*"
+    "selenium-webdriver": "*",
+    "finalhandler": "*",
+    "serve-static": "*"
   },
     "devDependencies": {
     "grunt": "*"
