@@ -22,28 +22,29 @@ var webdriver = require('selenium-webdriver'),
 
     var routes = require('./bedrock-routers');
 
-    routes.router();
-
-    var serveProject = serveStatic('../../work/tbio/petrie');
-    var serveJs = serveStatic('../../work/tools/tunic/src/js');
-    var serveThis = serveStatic('./');
+    var projectRouter = routes.routing('/project', '../../tbio/petrie');
+    var jsRouter = routes.routing('/js', '../../tools/tunic/src/js');
 
     var server = http.createServer(function (request, response) {
         var done = finalhandler(request, response);
-        var target = request.url;
-        console.log('target: ' + target);
-        if (target.indexOf('/project') === 0) {  
-            request.originalUrl = request.url;
-            request.url = request.url.substring('/project'.length);
-            serveProject(request, response, done);    
-        } else if (target.indexOf('/js') === 0) {
-            request.originalUrl = request.url;
-            request.url = request.url.substring('/js'.length);
-            serveJs(request, response, done);
-        } else {
-            request.url = '/demo/index.html';
-            serveThis(request, response, done);
-        }
+
+        routes.route([ projectRouter, jsRouter ], request, response, done);
+
+
+        // var target = request.url;
+        // console.log('target: ' + target);
+        // if (target.indexOf('/project') === 0) {  
+        //     request.originalUrl = request.url;
+        //     request.url = request.url.substring('/project'.length);
+        //     serveProject(request, response, done);    
+        // } else if (target.indexOf('/js') === 0) {
+        //     request.originalUrl = request.url;
+        //     request.url = request.url.substring('/js'.length);
+        //     serveJs(request, response, done);
+        // } else {
+        //     request.url = '/demo/index.html';
+        //     serveThis(request, response, done);
+        // }
         
 
         // console.log('response', response);
@@ -125,7 +126,7 @@ var webdriver = require('selenium-webdriver'),
     }, function () {
         allTestsTooLong(new Date().getTime() - allStartTime)();
     });
-    driver.quit().then(function () {
-        server.close();
-    });
+    // driver.quit().then(function () {
+    //     server.close();
+    // });
 
