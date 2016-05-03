@@ -21,6 +21,7 @@ var webdriver = require('selenium-webdriver'),
 
     var serveProject = serveStatic('../../work/tbio/petrie');
     var serveJs = serveStatic('../../work/tools/tunic/src/js');
+    var serveThis = serveStatic('./');
 
     http.createServer(function (request, response) {
         var done = finalhandler(request, response);
@@ -35,9 +36,8 @@ var webdriver = require('selenium-webdriver'),
             request.url = request.url.substring('/js'.length);
             serveJs(request, response, done);
         } else {
-            response.writeHeader(200, {"Content-Type": "text/plain" });
-            response.write('Yo');
-            response.end();
+            request.url = '/demo/index.html';
+            serveThis(request, response, done);
         }
         
 
