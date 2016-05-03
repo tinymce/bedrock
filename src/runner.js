@@ -23,7 +23,7 @@ var webdriver = require('selenium-webdriver'),
     var serveJs = serveStatic('../../work/tools/tunic/src/js');
     var serveThis = serveStatic('./');
 
-    http.createServer(function (request, response) {
+    var server = http.createServer(function (request, response) {
         var done = finalhandler(request, response);
         var target = request.url;
         console.log('target: ' + target);
@@ -115,9 +115,12 @@ var webdriver = require('selenium-webdriver'),
     // driver.get('demo/index.html');
     // driver.findElement(By.name('q')).sendKeys('webdriver');
     // driver.findElement(By.name('btnG')).click();
-    driver.wait(nextTick, 10).then(function (outcome) {
+    driver.wait(nextTick, ALL_TEST_TIMEOUT).then(function (outcome) {
         outcome(driver);
     }, function () {
         allTestsTooLong(new Date().getTime() - allStartTime)();
     });
-    // driver.quit();
+    driver.quit().then(function () {
+        server.close();
+    });
+
