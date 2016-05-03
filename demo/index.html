@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>This</title>
+
+<script>
+  var onLoad = function () {
+  	var counter = 0;
+
+  	var addTest = function (delay) {
+  		return new Promise(function (callback) {
+  			setTimeout(function () {
+  				counter++;
+  				document.querySelector('.progress').innerHTML = counter;
+  				callback();
+  			}, delay);
+  		});
+  	};
+
+  	addTest(2000).then(function () {
+  		return addTest(2000);
+  	}).then(function () {
+      var div = document.createElement('div');
+      div.classList.add('done');
+      document.body.appendChild(div);
+    });
+  };
+</script>
+
+</head>
+
+<body onload="onLoad();">
+Tests <span class="progress">0</span>/<span class="total">2</span>
+<p>Hi</p>
+</body>
+</html>
