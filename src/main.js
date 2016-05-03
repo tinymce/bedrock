@@ -19,16 +19,23 @@ var webdriver = require('selenium-webdriver'),
     .setFirefoxOptions(/* ... */)
     .build();
 
+    var args = process.argv.slice(2);
+    console.log('args', args);
+    
 
     var routes = require('./bedrock-routers');
 
     var projectRouter = routes.routing('/project', '../../tbio/petrie');
     var jsRouter = routes.routing('/js', '../../tools/tunic/src/js');
+    var testRouter = routes.json('/harness', {
+        config: [' th' ],
+        scripts: [ 'hi']
+    });
 
     var server = http.createServer(function (request, response) {
         var done = finalhandler(request, response);
 
-        routes.route([ projectRouter, jsRouter ], request, response, done);
+        routes.route([ testRouter, projectRouter, jsRouter ], request, response, done);
 
 
         // var target = request.url;

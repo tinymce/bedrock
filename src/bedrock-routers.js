@@ -21,6 +21,22 @@
 		};
 	};
 
+	var json = function (prefix, data) {
+		var matches = function (url) {
+			return url.indexOf(prefix) === 0;
+		};
+
+		var go = function (request, response, done) {
+			response.writeHeader(200, { "Content-Type": "application/json" });
+			response.end(JSON.stringify(data));
+		};
+
+		return {
+			matches: matches,
+			go: go
+		};
+	};
+
 	var route = function (routes, request, response, done) {
 		request.originalUrl = request.url;
 		var match = null;
@@ -39,6 +55,7 @@
 
 	module.exports = {
 		routing: routing,
-		route: route
+		route: route,
+		json: json
 	};
 })();
