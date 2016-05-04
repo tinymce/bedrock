@@ -25,10 +25,14 @@ var webdriver = require('selenium-webdriver'),
   .build();
 
   var port = process.env.npm_config_port || 8081;
-  console.log('json.args', process.env.npm_config_flag);
+  console.log('raw', process.env.npm_config_testfiles);
+  var testfiles = process.env.npm_config_testfiles.split(' ');
 
-  var args = process.argv.slice(2);
-  console.log('args', args);
+  console.log('json.args', process.env.npm_config_flag);
+  console.log('testfiles', testfiles);
+
+  // var args = process.argv.slice(2);
+  // console.log('args', args);
   
 
   var routes = require('./core/bedrock-routers');
@@ -41,7 +45,7 @@ var webdriver = require('selenium-webdriver'),
   var cssRouter = routes.routing('/css', 'src/css');
   var testRouter = routes.json('/harness', {
     config: [ 'config/bolt/local.js' ],
-    scripts: args
+    scripts: testfiles
   });
   var fallbackRouter = routes.constant('src/resources/tunic.html');
 
