@@ -40,6 +40,7 @@ var webdriver = require('selenium-webdriver'),
         config: [ 'config/bolt/local.js' ],
         scripts: args
     });
+    var fallbackRouter = routes.constant('src/resources/tunic.html');
 
     var selRouter = routes.effect('/keys', function (data) {
         var actions = [ ];
@@ -60,7 +61,11 @@ var webdriver = require('selenium-webdriver'),
     var server = http.createServer(function (request, response) {
         var done = finalhandler(request, response);
 
-        routes.route([ testRouter, projectRouter, libBoltRouter, libJqRouter, jsRouter, cssRouter, selRouter ], request, response, done);
+        routes.route(
+            [ testRouter, projectRouter, libBoltRouter, libJqRouter, jsRouter, cssRouter, selRouter ],
+            fallbackRouter,
+            request, response, done
+        );
 
     }).listen(8080);
 

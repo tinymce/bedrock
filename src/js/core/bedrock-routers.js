@@ -66,7 +66,7 @@
 		};
 	};
 
-	var route = function (routes, request, response, done) {
+	var route = function (routes, fallback, request, response, done) {
 		request.originalUrl = request.url;
 		var match = null;
 		for (var i in routes) {
@@ -74,18 +74,28 @@
 			if (candidate.matches(request.url) && match === null) match = candidate;
 		}
 
-		if (match === null) {
-			request.url = '/src/resources/tunic.html';
+		var matching = match !== null ? match : fallback;
+		matching.go(request, response, done);
+	};
+
+	var constant = function (url) {
+		var matches = function () { return true; };
+		var go = function (request, response, done) {
+			request.url = url;
 			base(request, response, done);
-		} else {
-			match.go(request, response, done);
-		}
+		};
+
+		return {
+			matches: matches,
+			go: go
+		};
 	};
 
 	module.exports = {
 		routing: routing,
 		route: route,
 		effect: effect,
+		constant: constant,
 		json: json
 	};
 })();
