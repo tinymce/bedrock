@@ -2,10 +2,14 @@ var webdriver = require('selenium-webdriver'),
     chrome = require('selenium-webdriver/chrome'),
     firefox = require('selenium-webdriver/firefox'),
 
+    input=require('selenium-webdriver/lib/input'),
+
     http=require("http"),
     path=require('path'),
     url=require('url'),
     request=require('request'),
+
+
 
     serveStatic=require('serve-static'),
     finalhandler=require('finalhandler'),
@@ -36,7 +40,19 @@ var webdriver = require('selenium-webdriver'),
     });
 
     var selRouter = routes.effect('/keys', function (data) {
-        driver.findElement(By.css(data.selector)).sendKeys(data.keys);
+        var actions = [ ];
+        console.log('data', JSON.stringify(data));
+        for (var i = 0; i < data.keys.length; i++) {
+            var k = data.keys[i];
+            if (k.text) actions.push(k.text);
+            else if (k.combo) {
+                var combo = k.combo;
+                if (combo.ctrlKey) actions.push(input.Key.chord(input.Key.CONTROL, combo.key));
+            }
+        }
+        console.log('actions', actions);
+        var target = driver.findElement(By.css(data.selector));
+        return target.sendKeys.apply(target, actions);
     });
 
     var server = http.createServer(function (request, response) {
