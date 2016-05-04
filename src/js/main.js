@@ -28,12 +28,13 @@ var webdriver = require('selenium-webdriver'),
     console.log('args', args);
     
 
-    var routes = require('./bedrock-routers');
-    var exits = require('./bedrock-exits');
+    var routes = require('./core/bedrock-routers');
+    var exits = require('./core/bedrock-exits');
 
     var projectRouter = routes.routing('/project', '../../tbio/petrie');
-    var jsRouter = routes.routing('/js', '../../../../../ephox/etools/tunic/1.5.0.95/www/js');
-    var cssRouter = routes.routing('/css', '../../../../../ephox/etools/tunic/1.5.0.95/www/css');
+    var jsRouter = routes.routing('/js', 'src/resources');
+    var libJsRouter = routes.routing('/lib/js', './node_modules/@ephox/bolt/lib');
+    var cssRouter = routes.routing('/css', 'src/css');
     var testRouter = routes.json('/harness', {
         config: [ 'config/bolt/local.js' ],
         scripts: args
@@ -58,7 +59,7 @@ var webdriver = require('selenium-webdriver'),
     var server = http.createServer(function (request, response) {
         var done = finalhandler(request, response);
 
-        routes.route([ testRouter, projectRouter, jsRouter, cssRouter, selRouter ], request, response, done);
+        routes.route([ testRouter, projectRouter, libJsRouter, jsRouter, cssRouter, selRouter ], request, response, done);
 
     }).listen(8080);
 

@@ -75,7 +75,7 @@
 		}
 
 		if (match === null) {
-			request.url = '/demo/tunic.html';
+			request.url = '/src/resources/tunic.html';
 			base(request, response, done);
 		} else {
 			match.go(request, response, done);

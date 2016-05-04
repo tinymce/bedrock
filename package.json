@@ -10,7 +10,8 @@
     "selenium-webdriver": "*",
     "finalhandler": "*",
     "serve-static": "*",
-    "request": "*"
+    "request": "*",
+    "@ephox/bolt": "*"
   },
     "devDependencies": {
     "grunt": "*"
