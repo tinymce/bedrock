@@ -46,7 +46,7 @@
 		}
 
 		if (match === null) {
-			request.url = '/demo/index.html';
+			request.url = '/demo/tunic.html';
 			base(request, response, done);
 		} else {
 			match.go(request, response, done);

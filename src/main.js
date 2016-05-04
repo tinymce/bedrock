@@ -26,16 +26,17 @@ var webdriver = require('selenium-webdriver'),
     var routes = require('./bedrock-routers');
 
     var projectRouter = routes.routing('/project', '../../tbio/petrie');
-    var jsRouter = routes.routing('/js', '../../tools/tunic/src/js');
+    var jsRouter = routes.routing('/js', '../../../../../ephox/etools/tunic/1.5.0.95/www/js');
+    var cssRouter = routes.routing('/css', '../../../../../ephox/etools/tunic/1.5.0.95/www/css');
     var testRouter = routes.json('/harness', {
-        config: [' th' ],
-        scripts: [ 'hi']
+        config: [ 'config/bolt/local.js' ],
+        scripts: args
     });
 
     var server = http.createServer(function (request, response) {
         var done = finalhandler(request, response);
 
-        routes.route([ testRouter, projectRouter, jsRouter ], request, response, done);
+        routes.route([ testRouter, projectRouter, jsRouter, cssRouter ], request, response, done);
 
 
         // var target = request.url;
