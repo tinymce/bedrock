@@ -48,6 +48,7 @@ var webdriver = require('selenium-webdriver'),
     var oneTestTooLong = function (testName, elapsed) {
       return function (d) {
         console.log('Test: ' + testName + ' ran too long.');
+        return new Error('Test: ' + testName + ' ran too long.');
       };
     };
 
@@ -55,6 +56,7 @@ var webdriver = require('selenium-webdriver'),
       return function (d) {
         var readable = elapsed / 1000;
         console.log('Tests timed out: ' + elapsed + 'ms');
+        return new Error('Tests timed out: ' + elapsed + 'ms');
       };
     };
 
@@ -66,8 +68,8 @@ var webdriver = require('selenium-webdriver'),
 
     var lastTest = 0;
 
-    var SINGLE_TEST_TIMEOUT = 10000;
-    var ALL_TEST_TIMEOUT = 6000000;
+    var SINGLE_TEST_TIMEOUT = 3000;
+    var ALL_TEST_TIMEOUT = 600000;
     var KEEP_GOING = false;
 
 
@@ -104,12 +106,17 @@ var webdriver = require('selenium-webdriver'),
     // driver.findElement(By.name('q')).sendKeys('webdriver');
     // driver.findElement(By.name('btnG')).click();
     driver.wait(nextTick, ALL_TEST_TIMEOUT).then(function (outcome) {
-        outcome(driver);
+        var result = outcome(driver);
+        driver.quit().then(function () {
+            server.close();
+            if (result instanceof Error) throw result;
+        });
+        
     }, function () {
-        allTestsTooLong(new Date().getTime() - allStartTime)();
+        var result = allTestsTooLong(new Date().getTime() - allStartTime)();
+        driver.quit().then(function () {
+            server.close();
+            throw result;
+        });
+        
     });
-
-    // driver.quit().then(function () {
-    //     server.close();
-    // });
-
