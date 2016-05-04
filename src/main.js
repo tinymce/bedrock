@@ -38,31 +38,6 @@ var webdriver = require('selenium-webdriver'),
 
         routes.route([ testRouter, projectRouter, jsRouter, cssRouter ], request, response, done);
 
-
-        // var target = request.url;
-        // console.log('target: ' + target);
-        // if (target.indexOf('/project') === 0) {  
-        //     request.originalUrl = request.url;
-        //     request.url = request.url.substring('/project'.length);
-        //     serveProject(request, response, done);    
-        // } else if (target.indexOf('/js') === 0) {
-        //     request.originalUrl = request.url;
-        //     request.url = request.url.substring('/js'.length);
-        //     serveJs(request, response, done);
-        // } else {
-        //     request.url = '/demo/index.html';
-        //     serveThis(request, response, done);
-        // }
-        
-
-        // console.log('response', response);
-        // var haha = url.parse(request.url).pathname;
-        // console.log('haha', haha);
-        // var full_path = path.join(process.cwd(),haha);
-        // console.log('full_path', full_path);
-        // response.writeHeader(200, {"Content-Type": "text/plain" });
-        // response.write('Yo');
-        // response.end();
     }).listen(8080);
 
     driver.get('http://localhost:8080/');
@@ -91,8 +66,8 @@ var webdriver = require('selenium-webdriver'),
 
     var lastTest = 0;
 
-    var SINGLE_TEST_TIMEOUT = 4000;
-    var ALL_TEST_TIMEOUT = 30000;
+    var SINGLE_TEST_TIMEOUT = 10000;
+    var ALL_TEST_TIMEOUT = 6000000;
     var KEEP_GOING = false;
 
 
@@ -100,7 +75,6 @@ var webdriver = require('selenium-webdriver'),
         var tick = new Date().getTime();
         var elapsed = tick - allStartTime;
         var testElapsed = tick - testStartTime;
-        console.log('testElapsed: ' + testElapsed);
 
         // I want to check if there is something on the page.
         return driver.wait(until.elementLocated(By.css('div.done')), 1).then(function () {
@@ -134,6 +108,7 @@ var webdriver = require('selenium-webdriver'),
     }, function () {
         allTestsTooLong(new Date().getTime() - allStartTime)();
     });
+
     // driver.quit().then(function () {
     //     server.close();
     // });
