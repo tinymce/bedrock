@@ -15,7 +15,7 @@ var webdriver = require('selenium-webdriver'),
     Condition = webdriver.Condition;
 
     var driver = new webdriver.Builder()
-    .forBrowser('chrome')
+    .forBrowser('firefox')
     .setChromeOptions(/* ... */)
     .setFirefoxOptions(/* ... */)
     .build();
