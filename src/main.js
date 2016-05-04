@@ -120,6 +120,16 @@ var webdriver = require('selenium-webdriver'),
         'method': 'POST',
         'content-type': 'application/json',
         'body': JSON.stringify({ keys: 'keep', selector: '[name="q"]' })
+    }, function (error, response, body) {
+        driver.sleep(1000).then(function () {
+            request('http://localhost:8080/keys', {
+                'method': 'POST',
+                'content-type': 'application/json',
+                'body': JSON.stringify({ keys: '\u0008', selector: '[name="q"]' })
+            }, function (error, response, body) {
+                driver.sleep(1000);
+            });
+        });
     });
 
 
