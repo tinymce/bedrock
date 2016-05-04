@@ -51,23 +51,35 @@ var webdriver = require('selenium-webdriver'),
  
     var oneTestTooLong = function (testName, timer, tick) {
       return function (d) {
-        var elapsed = timer.diff(tick);
-        console.log('Test: ' + testName + ' ran too long.');
-        return new Error('Test: ' + testName + ' ran too long (' + elapsed + ')');
+        return new Promise(function (resolve, reject) {
+            var elapsed = timer.diff(tick);
+            console.log('Test: ' + testName + ' ran too long.');
+            reject('Test: ' + testName + ' ran too long (' + elapsed + ')');    
+        });
       };
     };
 
     var allTestsTooLong = function (timer, tick) {
       return function (d) {
-        var elapsed = timer.diff(tick);
-        console.log('Tests timed out: ' + elapsed + 'ms');
-        return new Error('Tests timed out: ' + elapsed + 'ms');
+        return new Promise(function (resolve, reject) {
+            var elapsed = timer.diff(tick);
+            console.log('Tests timed out: ' + elapsed + 'ms');
+            reject('Tests timed out: ' + elapsed + 'ms');
+        });
       };
     };
 
     var testsDone = function () {
       return function (d) {
-        console.log('tests done');
+        return d.wait(until.elementLocated(By.css('.test.failed')), 1).then(function (_) {
+            return new Promise(function (resolve, reject) {
+                reject('Some tests failed');
+            });
+        }, function () {
+            return new Promise(function (resolve, reject) {
+                resolve('');
+            });         
+        });        
       };
     };
 
@@ -115,15 +127,21 @@ var webdriver = require('selenium-webdriver'),
     };
     
     driver.wait(nextTick, ALL_TEST_TIMEOUT, 'ALL_TEST_TIMEOUT: ' + ALL_TEST_TIMEOUT).then(function (outcome) {
-        var result = outcome(driver);
+        outcome(driver).then(function (result) {
+            driver.sleep(1000);
 
-        driver.sleep(1000);
+            driver.quit().then(function () {
+                server.close();
+            });
+            
+        }, function (err) {
+            driver.sleep(1000);
 
-        driver.quit().then(function () {
-            server.close();
-            if (result instanceof Error) throw result;
-        });
-        
+            driver.quit().then(function () {
+                server.close();
+                throw err;
+            });
+        });        
     }, function (err) {
         console.log('err', err);
         var result = allTestsTooLong('3.' + overallTimer.diff(new Date().getTime()))();
