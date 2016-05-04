@@ -24,6 +24,9 @@ var webdriver = require('selenium-webdriver'),
   .setFirefoxOptions(/* ... */)
   .build();
 
+  var port = process.env.npm_config_port || 8081;
+  console.log('json.args', process.env.npm_config_flag);
+
   var args = process.argv.slice(2);
   console.log('args', args);
   
@@ -67,9 +70,9 @@ var webdriver = require('selenium-webdriver'),
       request, response, done
     );
 
-  }).listen(8080);
+  }).listen(port);
 
-  driver.get('http://localhost:8080/');
+  driver.get('http://localhost:' + port);
 
  
   var oneTestTooLong = function (testName, timer, tick) {
