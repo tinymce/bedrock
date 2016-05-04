@@ -11,7 +11,8 @@
     "finalhandler": "*",
     "serve-static": "*",
     "request": "*",
-    "@ephox/bolt": "*"
+    "@ephox/bolt": "*",
+    "jquery": "*"
   },
     "devDependencies": {
     "grunt": "*"

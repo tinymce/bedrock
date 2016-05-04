@@ -33,7 +33,8 @@ var webdriver = require('selenium-webdriver'),
 
     var projectRouter = routes.routing('/project', '../../tbio/petrie');
     var jsRouter = routes.routing('/js', 'src/resources');
-    var libJsRouter = routes.routing('/lib/js', './node_modules/@ephox/bolt/lib');
+    var libBoltRouter = routes.routing('/lib/bolt', './node_modules/@ephox/bolt/lib');
+    var libJqRouter = routes.routing('/lib/jquery', './node_modules/jquery/dist');
     var cssRouter = routes.routing('/css', 'src/css');
     var testRouter = routes.json('/harness', {
         config: [ 'config/bolt/local.js' ],
@@ -59,7 +60,7 @@ var webdriver = require('selenium-webdriver'),
     var server = http.createServer(function (request, response) {
         var done = finalhandler(request, response);
 
-        routes.route([ testRouter, projectRouter, libJsRouter, jsRouter, cssRouter, selRouter ], request, response, done);
+        routes.route([ testRouter, projectRouter, libBoltRouter, libJqRouter, jsRouter, cssRouter, selRouter ], request, response, done);
 
     }).listen(8080);
 
@@ -103,8 +104,8 @@ var webdriver = require('selenium-webdriver'),
     var lastTest = 0;
     var testName = '(not found)';
 
-    var SINGLE_TEST_TIMEOUT = 30000;
-    var ALL_TEST_TIMEOUT = 600000;
+    var SINGLE_TEST_TIMEOUT = 3000000;
+    var ALL_TEST_TIMEOUT = 60000000;
     var KEEP_GOING = false;
 
     var startTime = new Date().getTime();
