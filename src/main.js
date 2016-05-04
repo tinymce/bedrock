@@ -5,6 +5,7 @@ var webdriver = require('selenium-webdriver'),
     http=require("http"),
     path=require('path'),
     url=require('url'),
+    request=require('request'),
 
     serveStatic=require('serve-static'),
     finalhandler=require('finalhandler'),
@@ -33,14 +34,21 @@ var webdriver = require('selenium-webdriver'),
         scripts: args
     });
 
+    var selRouter = routes.effect('/keys', function (data) {
+        driver.findElement(By.css(data.selector)).sendKeys(data.keys);
+    });
+
     var server = http.createServer(function (request, response) {
         var done = finalhandler(request, response);
 
-        routes.route([ testRouter, projectRouter, jsRouter, cssRouter ], request, response, done);
+        routes.route([ testRouter, projectRouter, jsRouter, cssRouter, selRouter ], request, response, done);
 
     }).listen(8080);
 
     driver.get('http://localhost:8080/');
+
+ 
+    // http.r
 
     var allStartTime = new Date().getTime();
     var testStartTime = new Date().getTime();
@@ -107,10 +115,19 @@ var webdriver = require('selenium-webdriver'),
     // driver.findElement(By.name('btnG')).click();
     driver.wait(nextTick, ALL_TEST_TIMEOUT).then(function (outcome) {
         var result = outcome(driver);
-        driver.quit().then(function () {
-            server.close();
-            if (result instanceof Error) throw result;
-        });
+
+   request('http://localhost:8080/keys', {
+        'method': 'POST',
+        'content-type': 'application/json',
+        'body': JSON.stringify({ keys: 'keep', selector: '[name="q"]' })
+    });
+
+
+
+        // driver.quit().then(function () {
+        //     server.close();
+        //     if (result instanceof Error) throw result;
+        // });
         
     }, function () {
         var result = allTestsTooLong(new Date().getTime() - allStartTime)();

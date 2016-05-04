@@ -9,7 +9,8 @@
   "dependencies": {
     "selenium-webdriver": "*",
     "finalhandler": "*",
-    "serve-static": "*"
+    "serve-static": "*",
+    "request": "*"
   },
     "devDependencies": {
     "grunt": "*"
