@@ -1,13 +1,38 @@
 var extract = function (directories) {
+  // Node
+  process.argv.shift();
+  // File
+  process.argv.shift();
+
+
+  console.log('arv', process.argv);
+  if (process.argv.length < 2)
+    fail_usage(1, 'Not enough arguments, must specify configuration and at least one test file.');
+
+
+  // Read config.
+  var config = process.argv[0];
+  process.argv.shift();
+
+  // Read tests
+  var fs = require('fs');
+
+  if (!fs.existsSync(config) || !fs.statSync(config).isFile())
+    fail(10, 'Could not find config file [' + config + ']');
+
+  var testfiles = process.argv.slice(0);
+
+  testfiles.forEach(function (file) {
+    if (!fs.existsSync(file) || !fs.statSync(file).isFile())
+      fail(20, 'Could not find test file [' + file + ']');
+  });
+
   var factor = 100000000;
 
   return {
-    testfiles: [
-      'src/test/js/browser/projects/docket/ListReaderTest.js'
-    ],
+    testfiles: testfiles,
     projectdir: directories.current,
-    config: 'config/bolt/local.js',
-    port: 8081,
+    config: config,
     overallTimeout: 10 * 60 * 1000 * factor,
     singleTimeout: 30 * 1000 * factor,
     done: 'div.done',

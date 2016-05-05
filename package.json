@@ -1,25 +1,25 @@
 {
-  "name": "bedrock",
+  "name": "@ephox/bedrock",
   "version": "1.0.0",
   "description": "NodeJS test runner for bolt projects",
   "scripts": {
-    "run-selenium": "node src/js/main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "run-selenium": "node src/js/main.js"
   },
   "bin": {
     "bedrock": "./bin/bedrock.js"
   },
   "dependencies": {
-    "selenium-webdriver": "*",
-    "finalhandler": "*",
-    "serve-static": "*",
-    "request": "*",
-    "@ephox/bolt": "*",
-    "jquery": "*"
+    "@ephox/bolt": "^1.6.5",
+    "finalhandler": "^0.4.1",
+    "jquery": "^2.2.3",
+    "openport": "0.0.4",
+    "request": "^2.72.0",
+    "selenium-webdriver": "^2.53.2",
+    "serve-static": "^1.10.2"
   },
   "devDependencies": {
     "grunt": "*"
   },
-  "author": "",
-  "license": "MIT"
+  "author": "Ephox",
+  "license": "BSD-3-Clause"
 }
