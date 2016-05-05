@@ -37,7 +37,7 @@ var webdriver = require('selenium-webdriver'),
   
 
   var routes = require('./core/bedrock-routers');
-  var exits = require('./core/bedrock-exits');
+  var timeouts = require('./core/bedrock-timeouts');
   
   var projectRouter = routes.routing('/project', projectdir);
   var jsRouter = routes.routing('/js', 'src/resources');
@@ -122,8 +122,8 @@ var webdriver = require('selenium-webdriver'),
   var KEEP_GOING = false;
 
   var startTime = new Date().getTime();
-  var overallTimer = exits.timeoutExit(ALL_TEST_TIMEOUT, startTime);
-  var singleTimer = exits.timeoutExit(SINGLE_TEST_TIMEOUT, startTime);
+  var overallTimer = timeouts.timeoutExit(ALL_TEST_TIMEOUT, startTime);
+  var singleTimer = timeouts.timeoutExit(SINGLE_TEST_TIMEOUT, startTime);
 
 
   var nextTick = function () {
