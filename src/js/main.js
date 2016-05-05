@@ -48,6 +48,7 @@ var webdriver = require('selenium-webdriver'),
   var routes = require('./bedrock/route/routes');
   var timeouts = require('./bedrock/loop/timeouts');
   var exits = require('./bedrock/loop/exits');
+  var keys = require('./bedrock/effects/keys');
 
   var routers = [
     routes.routing('/project', settings.projectdir),
@@ -58,26 +59,11 @@ var webdriver = require('selenium-webdriver'),
     routes.json('/harness', {
       config: settings.config,
       scripts: settings.testfiles
-    })
+    }),
+    routes.effect('/keys', keys.executor(driver))
   ];
 
   var fallback = routes.constant('src/resources/tunic.html');
-
-  var selRouter = routes.effect('/keys', function (data) {
-    var actions = [ ];
-    console.log('data', JSON.stringify(data));
-    for (var i = 0; i < data.keys.length; i++) {
-      var k = data.keys[i];
-      if (k.text) actions.push(k.text);
-      else if (k.combo) {
-        var combo = k.combo;
-        if (combo.ctrlKey) actions.push(input.Key.chord(input.Key.CONTROL, combo.key));
-      }
-    }
-    console.log('actions', actions);
-    var target = driver.findElement(By.css(data.selector));
-    return target.sendKeys.apply(target, actions);
-  });
 
   var server = http.createServer(function (request, response) {
     var done = finalhandler(request, response);
