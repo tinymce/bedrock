@@ -1,4 +1,4 @@
-var run = function (settings) {
+var run = function (directories) {
   var webdriver = require('selenium-webdriver'),
     chrome = require('selenium-webdriver/chrome'),
     firefox = require('selenium-webdriver/firefox'),
@@ -26,8 +26,8 @@ var run = function (settings) {
   .build();
 
 
-console.log('settings here', settings);
-  
+  var cli = require('./bedrock/cli/cli');
+  var settings = cli.extract(directories);
 
   var KEEP_GOING = false;
 
@@ -38,10 +38,10 @@ console.log('settings here', settings);
 
   var routers = [
     routes.routing('/project', settings.projectdir),
-    routes.routing('/js', settings.bedrockdir + 'src/resources'),
-    routes.routing('/lib/bolt', settings.bedrockdir + 'node_modules/@ephox/bolt/lib'),
-    routes.routing('/lib/jquery', settings.bedrockdir + 'node_modules/jquery/dist'),
-    routes.routing('/css', settings.bedrockdir + 'src/css'),
+    routes.routing('/js', settings.basedir + 'src/resources'),
+    routes.routing('/lib/bolt', settings.basedir + 'node_modules/@ephox/bolt/lib'),
+    routes.routing('/lib/jquery', settings.basedir + 'node_modules/jquery/dist'),
+    routes.routing('/css', settings.basedir + 'src/css'),
     routes.json('/harness', {
       config: settings.config,
       scripts: settings.testfiles
@@ -49,7 +49,7 @@ console.log('settings here', settings);
     routes.effect('/keys', keys.executor(driver))
   ];
 
-  var fallback = routes.constant(settings.bedrockdir, 'src/resources/tunic.html');
+  var fallback = routes.constant(settings.basedir, 'src/resources/tunic.html');
 
   var server = http.createServer(function (request, response) {
     var done = finalhandler(request, response);
