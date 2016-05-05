@@ -39,17 +39,20 @@ var webdriver = require('selenium-webdriver'),
   var routes = require('./core/bedrock-routers');
   var timeouts = require('./core/bedrock-timeouts');
   var exits = require('./core/bedrock-exits');
-  
-  var projectRouter = routes.routing('/project', projectdir);
-  var jsRouter = routes.routing('/js', 'src/resources');
-  var libBoltRouter = routes.routing('/lib/bolt', './node_modules/@ephox/bolt/lib');
-  var libJqRouter = routes.routing('/lib/jquery', './node_modules/jquery/dist');
-  var cssRouter = routes.routing('/css', 'src/css');
-  var testRouter = routes.json('/harness', {
-    config: [ 'config/bolt/local.js' ],
-    scripts: testfiles
-  });
-  var fallbackRouter = routes.constant('src/resources/tunic.html');
+
+  var routers = [
+    routes.routing('/project', projectdir),
+    routes.routing('/js', 'src/resources'),
+    routes.routing('/lib/bolt', './node_modules/@ephox/bolt/lib'),
+    routes.routing('/lib/jquery', './node_modules/jquery/dist'),
+    routes.routing('/css', 'src/css'),
+    routes.json('/harness', {
+      config: [ 'config/bolt/local.js' ],
+      scripts: testfiles
+    })
+  ];
+
+  var fallback = routes.constant('src/resources/tunic.html');
 
   var selRouter = routes.effect('/keys', function (data) {
     var actions = [ ];
@@ -69,13 +72,7 @@ var webdriver = require('selenium-webdriver'),
 
   var server = http.createServer(function (request, response) {
     var done = finalhandler(request, response);
-
-    routes.route(
-      [ testRouter, projectRouter, libBoltRouter, libJqRouter, jsRouter, cssRouter, selRouter ],
-      fallbackRouter,
-      request, response, done
-    );
-
+    routes.route(routers, fallback, request, response, done);
   }).listen(port);
 
   driver.get('http://localhost:' + port);
