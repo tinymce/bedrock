@@ -24,13 +24,22 @@ var webdriver = require('selenium-webdriver'),
   .setFirefoxOptions(/* ... */)
   .build();
 
-  var port = process.env.npm_config_port || 8081;
-  console.log('raw', process.env.npm_config_testfiles);
-  var testfiles = process.env.npm_config_testfiles.split(' ');
-  var projectdir = process.env.npm_config_projectdir;
-  console.log('projectdir', projectdir);
+  var settings = (function () {
+    var port = process.env.npm_config_port || 8081;
+    console.log('raw', process.env.npm_config_testfiles);
+    var testfiles = process.env.npm_config_testfiles.split(' ');
+    var projectdir = process.env.npm_config_projectdir;
+    console.log('projectdir', projectdir);
 
-  console.log('testfiles', testfiles);
+    console.log('testfiles', testfiles);  
+    return {
+      testfiles: testfiles,
+      projectdir: projectdir,
+      config: 'config/bolt/local.js',
+      port: port
+    };
+  })();
+  
 
   // var args = process.argv.slice(2);
   // console.log('args', args);
@@ -41,14 +50,14 @@ var webdriver = require('selenium-webdriver'),
   var exits = require('./core/bedrock-exits');
 
   var routers = [
-    routes.routing('/project', projectdir),
+    routes.routing('/project', settings.projectdir),
     routes.routing('/js', 'src/resources'),
     routes.routing('/lib/bolt', './node_modules/@ephox/bolt/lib'),
     routes.routing('/lib/jquery', './node_modules/jquery/dist'),
     routes.routing('/css', 'src/css'),
     routes.json('/harness', {
-      config: [ 'config/bolt/local.js' ],
-      scripts: testfiles
+      config: settings.config,
+      scripts: settings.testfiles
     })
   ];
 
@@ -73,9 +82,9 @@ var webdriver = require('selenium-webdriver'),
   var server = http.createServer(function (request, response) {
     var done = finalhandler(request, response);
     routes.route(routers, fallback, request, response, done);
-  }).listen(port);
+  }).listen(settings.port);
 
-  driver.get('http://localhost:' + port);
+  driver.get('http://localhost:' + settings.port);
 
   var lastTest = 0;
   var testName = '(not found)';
