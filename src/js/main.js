@@ -19,7 +19,7 @@ var webdriver = require('selenium-webdriver'),
   Condition = webdriver.Condition;
 
   var driver = new webdriver.Builder()
-  .forBrowser('chrome')
+  .forBrowser('firefox')
   .setChromeOptions(/* ... */)
   .setFirefoxOptions(/* ... */)
   .build();
@@ -27,8 +27,9 @@ var webdriver = require('selenium-webdriver'),
   var port = process.env.npm_config_port || 8081;
   console.log('raw', process.env.npm_config_testfiles);
   var testfiles = process.env.npm_config_testfiles.split(' ');
+  var projectdir = process.env.npm_config_projectdir;
+  console.log('projectdir', projectdir);
 
-  console.log('json.args', process.env.npm_config_flag);
   console.log('testfiles', testfiles);
 
   // var args = process.argv.slice(2);
@@ -37,8 +38,8 @@ var webdriver = require('selenium-webdriver'),
 
   var routes = require('./core/bedrock-routers');
   var exits = require('./core/bedrock-exits');
-
-  var projectRouter = routes.routing('/project', '../../tbio/petrie');
+  
+  var projectRouter = routes.routing('/project', projectdir);
   var jsRouter = routes.routing('/js', 'src/resources');
   var libBoltRouter = routes.routing('/lib/bolt', './node_modules/@ephox/bolt/lib');
   var libJqRouter = routes.routing('/lib/jquery', './node_modules/jquery/dist');
