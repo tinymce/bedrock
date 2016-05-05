@@ -15,7 +15,7 @@
     "@ephox/bolt": "*",
     "jquery": "*"
   },
-    "devDependencies": {
+  "devDependencies": {
     "grunt": "*"
   },
   "author": "",
