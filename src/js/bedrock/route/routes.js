@@ -68,7 +68,6 @@
 
   var route = function (routes, fallback, request, response, done) {
     request.originalUrl = request.url;
-    console.log('Looking for ', request.url);
     var match = null;
     for (var i in routes) {
       var candidate = routes[i];

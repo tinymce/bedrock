@@ -36,19 +36,23 @@ var webdriver = require('selenium-webdriver'),
       testfiles: testfiles,
       projectdir: projectdir,
       config: 'config/bolt/local.js',
-      port: port
+      port: port,
+      overallTimeout: 10 * 60 * 1000,
+      singleTimeout: 30 * 1000,
+      done: 'div.done',
+      progress: '.progress',
+      total: '.total',
+      testName: '.test.running .name',
+      failed: '.test.failed'
     };
   })();
-  
 
-  // var args = process.argv.slice(2);
-  // console.log('args', args);
-  
+  var KEEP_GOING = false;
 
-  var routes = require('./bedrock/route/routes');
-  var timeouts = require('./bedrock/loop/timeouts');
+  var routes = require('./bedrock/route/routes');  
   var exits = require('./bedrock/loop/exits');
   var keys = require('./bedrock/effects/keys');
+  var state = require('./bedrock/loop/state');
 
   var routers = [
     routes.routing('/project', settings.projectdir),
@@ -72,42 +76,28 @@ var webdriver = require('selenium-webdriver'),
 
   driver.get('http://localhost:' + settings.port);
 
-  var lastTest = 0;
-  var testName = '(not found)';
-
-  var SINGLE_TEST_TIMEOUT = 3000000;
-  var ALL_TEST_TIMEOUT = 60000000;
-  var KEEP_GOING = false;
-
-  var startTime = new Date().getTime();
-  var overallTimer = timeouts.timeoutExit(ALL_TEST_TIMEOUT, startTime);
-  var singleTimer = timeouts.timeoutExit(SINGLE_TEST_TIMEOUT, startTime);
-
+  var currentState = state.init({
+    overallTimeout: settings.overallTimeout,
+    singleTimeout: settings.singleTimeout,
+    testName: settings.testName,
+    // done: settings.done,
+    progress: settings.progress,
+    total: settings.total
+  });
 
   var nextTick = function () {
     var tick = new Date().getTime();
 
-    // Firstly, let's check the timers to see if we should be exiting.
-    if (overallTimer.hasExpired(tick)) return exits.allTestsTooLong(overallTimer, tick);
-    else if (singleTimer.hasExpired(tick)) return exits.oneTestTooLong(testName, singleTimer, tick);
+    if (currentState.allTimeout(tick)) return exits.allTestsTooLong(currentState, tick);
+    else if (currentState.testTimeout(tick)) return exits.oneTestTooLong(currentState, tick);
     else {
       // I want to check if there is something on the page.
-      return driver.wait(until.elementLocated(By.css('div.done')), 1).then(function () {
-        return exits.testsDone();
+      return driver.wait(until.elementLocated(By.css(settings.done)), 1).then(function () {
+        return exits.testsDone(settings);
       }, function (err) {
-        return driver.wait(until.elementLocated(By.css('.progress')), 1).getInnerHtml().then(function (html) {
-          var num = parseInt(html, 10);
-          if (lastTest !== num) {
-            singleTimer.reset(tick);
-            lastTest = num;
-          }
-
-          return driver.wait(until.elementLocated(By.css('.test.running .name')), 1).getInnerHtml().then(function (html) {
-            testName = html;
-            return KEEP_GOING;
-          }, function () {
-            return KEEP_GOING;
-          });
+        // We aren't done yet ... so update the current test if necessary.
+        return currentState.update(driver, tick).then(function () {
+          return KEEP_GOING;
         }, function () {
           return KEEP_GOING;
         });
@@ -115,7 +105,7 @@ var webdriver = require('selenium-webdriver'),
     }
   };
   
-  driver.wait(nextTick, ALL_TEST_TIMEOUT, 'ALL_TEST_TIMEOUT: ' + ALL_TEST_TIMEOUT).then(function (outcome) {
+  driver.wait(nextTick, settings.overallTimeout + 100000).then(function (outcome) {
     outcome(driver).then(function (result) {
       driver.sleep(1000);
 
@@ -133,7 +123,7 @@ var webdriver = require('selenium-webdriver'),
     });        
   }, function (err) {
     console.log('err', err);
-    var result = exits.allTestsTooLong('3.' + overallTimer.diff(new Date().getTime()))();
+    var result = exits.allTestsTooLong(currentState, new Date().getTime())();
     driver.quit().then(function () {
       server.close();
       throw result;

@@ -2,20 +2,20 @@ var webdriver = require('selenium-webdriver');
 var By = webdriver.By;
 var until = webdriver.until;
 
-var oneTestTooLong = function (testName, timer, tick) {
+var oneTestTooLong = function (state, tick) {
   return function (driver) {
   return new Promise(function (resolve, reject) {
-    var elapsed = timer.diff(tick);
-    console.log('Test: ' + testName + ' ran too long.');
-    reject('Test: ' + testName + ' ran too long (' + elapsed + ')');    
+    var elapsed = state.singleTimer.diff(tick);
+    console.log('Test: ' + state.currentTest() + ' ran too long.');
+    reject('Test: ' + state.currentTest() + ' ran too long (' + elapsed + ')');    
   });
   };
 };
 
-var allTestsTooLong = function (timer, tick) {
+var allTestsTooLong = function (state, tick) {
   return function (driver) {
   return new Promise(function (resolve, reject) {
-    var elapsed = timer.diff(tick);
+    var elapsed = state.allTimer.diff(tick);
     console.log('Tests timed out: ' + elapsed + 'ms');
     reject('Tests timed out: ' + elapsed + 'ms');
   });
@@ -34,9 +34,9 @@ var noFailures = function () {
   });
 };
 
-var testsDone = function () {
+var testsDone = function (settings) {
   return function (driver) {
-    var testCss = By.css('.test.failed');
+    var testCss = By.css(settings.failed);
     var result = driver.wait(until.elementLocated(testCss), 1);
     return result.then(hasFailures, noFailures);
   };
