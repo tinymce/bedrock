@@ -107,7 +107,7 @@ var run = function (directories) {
         });
       });        
     }, function (err) {
-      console.log('err', err);
+      console.log('Unexpected error while running the testing loop: ' +  err);
       var result = exits.allTestsTooLong(currentState, new Date().getTime())();
       driver.quit().then(function () {
         server.close();

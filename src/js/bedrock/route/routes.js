@@ -12,7 +12,6 @@
 
     var go = function (request, response, done) {
       request.url = request.url.substring(prefix.length);
-      console.log('request.url', request.url);
       router(request, response, done);
     };
 
@@ -46,20 +45,16 @@
     var go = function (request, response, done) {
       var body = '';
       request.on('data', function (data) {
-        console.log('on', data);
-              body += data;
+        body += data;
+      });
 
-          });
-
-          request.on('end', function () {
-        // console.log('request', request);
-        console.log('BODY: [' + body + ']');
+      request.on('end', function () {
         var parsed = JSON.parse(body);
         action(parsed);
         response.writeHeader(200, { "Content-Type": "application/json" });
         response.end(JSON.stringify({}));
       });
-      };
+    };
 
     return {
       matches: matches,
@@ -85,7 +80,6 @@
     var matches = function () { return true; };
     var go = function (request, response, done) {
       request.url = url;
-      console.log('constant.url', url);
       base(request, response, done);
     };
 

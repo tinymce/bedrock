@@ -36,8 +36,6 @@ var scan = function (keys) {
 var execute = function (driver, data) {
   var actions = scan(data.keys);
   var target = driver.findElement(By.css(data.selector));
-  console.log('actions', actions);
-
   return target.sendKeys.apply(target, actions);
 };
 
