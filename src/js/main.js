@@ -45,9 +45,9 @@ var webdriver = require('selenium-webdriver'),
   // console.log('args', args);
   
 
-  var routes = require('./core/bedrock-routers');
-  var timeouts = require('./core/bedrock-timeouts');
-  var exits = require('./core/bedrock-exits');
+  var routes = require('./bedrock/route/routes');
+  var timeouts = require('./bedrock/loop/timeouts');
+  var exits = require('./bedrock/loop/exits');
 
   var routers = [
     routes.routing('/project', settings.projectdir),
