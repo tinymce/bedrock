@@ -1,6 +1,6 @@
 (function () {
   var server = require('serve-static');
-  var base = server('./');
+  
 
   var routing = function (prefix, source) {
     var router = server(source);
@@ -12,6 +12,7 @@
 
     var go = function (request, response, done) {
       request.url = request.url.substring(prefix.length);
+      console.log('request.url', request.url);
       router(request, response, done);
     };
 
@@ -78,10 +79,13 @@
     matching.go(request, response, done);
   };
 
-  var constant = function (url) {
+  var constant = function (root, url) {
+    var base = server(root);
+
     var matches = function () { return true; };
     var go = function (request, response, done) {
       request.url = url;
+      console.log('constant.url', url);
       base(request, response, done);
     };
 

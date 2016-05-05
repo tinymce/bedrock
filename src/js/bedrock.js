@@ -1,22 +1,23 @@
-var webdriver = require('selenium-webdriver'),
-  chrome = require('selenium-webdriver/chrome'),
-  firefox = require('selenium-webdriver/firefox'),
+var run = function (settings) {
+  var webdriver = require('selenium-webdriver'),
+    chrome = require('selenium-webdriver/chrome'),
+    firefox = require('selenium-webdriver/firefox'),
 
-  input=require('selenium-webdriver/lib/input'),
+    input=require('selenium-webdriver/lib/input'),
 
-  http=require("http"),
-  path=require('path'),
-  url=require('url'),
-  request=require('request'),
+    http=require("http"),
+    path=require('path'),
+    url=require('url'),
+    request=require('request'),
 
 
 
-  serveStatic=require('serve-static'),
-  finalhandler=require('finalhandler'),
+    serveStatic=require('serve-static'),
+    finalhandler=require('finalhandler'),
 
-  By = webdriver.By,
-  until = webdriver.until,
-  Condition = webdriver.Condition;
+    By = webdriver.By,
+    until = webdriver.until,
+    Condition = webdriver.Condition;
 
   var driver = new webdriver.Builder()
   .forBrowser('firefox')
@@ -24,28 +25,9 @@ var webdriver = require('selenium-webdriver'),
   .setFirefoxOptions(/* ... */)
   .build();
 
-  var settings = (function () {
-    var port = process.env.npm_config_port || 8081;
-    console.log('raw', process.env.npm_config_testfiles);
-    var testfiles = process.env.npm_config_testfiles.split(' ');
-    var projectdir = process.env.npm_config_projectdir;
-    console.log('projectdir', projectdir);
 
-    console.log('testfiles', testfiles);  
-    return {
-      testfiles: testfiles,
-      projectdir: projectdir,
-      config: 'config/bolt/local.js',
-      port: port,
-      overallTimeout: 10 * 60 * 1000,
-      singleTimeout: 30 * 1000,
-      done: 'div.done',
-      progress: '.progress',
-      total: '.total',
-      testName: '.test.running .name',
-      failed: '.test.failed'
-    };
-  })();
+console.log('settings here', settings);
+  
 
   var KEEP_GOING = false;
 
@@ -56,10 +38,10 @@ var webdriver = require('selenium-webdriver'),
 
   var routers = [
     routes.routing('/project', settings.projectdir),
-    routes.routing('/js', 'src/resources'),
-    routes.routing('/lib/bolt', './node_modules/@ephox/bolt/lib'),
-    routes.routing('/lib/jquery', './node_modules/jquery/dist'),
-    routes.routing('/css', 'src/css'),
+    routes.routing('/js', settings.bedrockdir + 'src/resources'),
+    routes.routing('/lib/bolt', settings.bedrockdir + 'node_modules/@ephox/bolt/lib'),
+    routes.routing('/lib/jquery', settings.bedrockdir + 'node_modules/jquery/dist'),
+    routes.routing('/css', settings.bedrockdir + 'src/css'),
     routes.json('/harness', {
       config: settings.config,
       scripts: settings.testfiles
@@ -67,7 +49,7 @@ var webdriver = require('selenium-webdriver'),
     routes.effect('/keys', keys.executor(driver))
   ];
 
-  var fallback = routes.constant('src/resources/tunic.html');
+  var fallback = routes.constant(settings.bedrockdir, 'src/resources/tunic.html');
 
   var server = http.createServer(function (request, response) {
     var done = finalhandler(request, response);
@@ -130,3 +112,8 @@ var webdriver = require('selenium-webdriver'),
     });
     
   });
+};
+
+module.exports = {
+  run: run
+};
