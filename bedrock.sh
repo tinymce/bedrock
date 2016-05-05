@@ -2,7 +2,7 @@
 
 PROJECT_LOCATION=$PWD
 echo "Project location $PROJECT_LOCATION"
-FILE_LOCATION=$(readlink -f "$0")
+FILE_LOCATION=`(readlink "$0" || printf "%s" "$0")`
 DIR_LOCATION=$(dirname "$FILE_LOCATION")
 
 echo $DIR_LOCATION
