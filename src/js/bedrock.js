@@ -1,33 +1,26 @@
 var run = function (directories) {
-  var webdriver = require('selenium-webdriver'),
-    chrome = require('selenium-webdriver/chrome'),
-    firefox = require('selenium-webdriver/firefox'),
+  var webdriver = require('selenium-webdriver');
+  var chrome = require('selenium-webdriver/chrome');
+  var firefox = require('selenium-webdriver/firefox');
 
-    input=require('selenium-webdriver/lib/input'),
+  var input = require('selenium-webdriver/lib/input');
 
-    http=require("http"),
-    path=require('path'),
-    url=require('url'),
-    request=require('request'),
+  var http = require('http');
+  var finalhandler = require('finalhandler');
 
-
-
-    serveStatic=require('serve-static'),
-    finalhandler=require('finalhandler'),
-
-    By = webdriver.By,
-    until = webdriver.until,
-    Condition = webdriver.Condition;
-
-  var driver = new webdriver.Builder()
-  .forBrowser('firefox')
-  .setChromeOptions(/* ... */)
-  .setFirefoxOptions(/* ... */)
-  .build();
-
-
+  var By = webdriver.By;
+  var until = webdriver.until;
+  var Condition = webdriver.Condition;
+ 
   var cli = require('./bedrock/cli/cli');
   var settings = cli.extract(directories);
+
+  var driver = new webdriver.Builder()
+    .forBrowser('firefox')
+    .setChromeOptions(/* ... */)
+    .setFirefoxOptions(/* ... */)
+    .build();
+
 
   var KEEP_GOING = false;
 

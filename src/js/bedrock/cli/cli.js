@@ -1,12 +1,6 @@
 var extract = function (directories) {
-  // var port = process.env.npm_config_port || 8081;
-  // console.log('raw', process.env.npm_config_testfiles);
-  // var testfiles = process.env.npm_config_testfiles.split(' ');
-  // var projectdir = process.env.npm_config_projectdir;
-  // console.log('projectdir', projectdir);
   var factor = 100000000;
 
-  // console.log('testfiles', testfiles);  
   return {
     testfiles: [
       'src/test/js/browser/projects/docket/ListReaderTest.js'
@@ -38,7 +32,7 @@ var usage = function () {
          'example:\n' +
          '  Run all atomic tests.\n' +
          '\n' +
-         '    bolt test config/bolt/atomic.js $(find src/test/js/atomic -name *Test.js)\n' +
+         '    bedrock config/bolt/atomic.js $(find src/test/js/atomic -name *Test.js)\n' +
          '\n' +
          '\n';
 };
