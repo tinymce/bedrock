@@ -9,5 +9,5 @@ echo "Done"
 
 ARGS=`echo $@ | tr ':' ' '`
 echo $ARGS
-npm "--testfiles=\"$ARGS\"" --basedir="\"$DIR_LOCATION\"" run run-selenium
+(cd $DIR_LOCATION && npm "--testfiles=\"$ARGS\"" --basedir="\"$DIR_LOCATION\"" run run-selenium)
 #npm --testfiles="src/test/js/browser/projects/docket/ListReaderTest.js src/test/js/browser/projects/docket/ListWriterTest.js" --basedir="\"$DIR_LOCATION\"" run run-selenium
