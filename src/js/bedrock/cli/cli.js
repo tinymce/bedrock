@@ -42,6 +42,11 @@ var extract = function (directories) {
   };
 };
 
+// TODO:
+// Version
+// Help 
+// etc.
+
 var usage = function () {
   return 'usage: bedrock CONFIG TEST1 TEST2 ...\n' +
          '\n' +
