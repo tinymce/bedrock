@@ -21,6 +21,7 @@
     };
   };
 
-  exports.timeoutExit = timeoutExit;
-
+  module.exports = {
+    timeoutExit: timeoutExit
+  };
 })();
