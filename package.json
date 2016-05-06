@@ -1,10 +1,11 @@
 {
   "name": "@ephox/bedrock",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "NodeJS test runner for bolt projects",
   "bin": {
     "bedrock-auto": "./bin/bedrock-auto.js",
     "bedrock-remote": "./bin/bedrock-remote.js",
+    "bedrock-sauce": "./bin/bedrock-sauce.js",
     "bedrock": "./bin/bedrock.js"
   },
   "private": true,
@@ -17,6 +18,7 @@
     "openport": "0.0.4",
     "recursive-readdir-sync": "^1.0.6",
     "request": "^2.72.0",
+    "saucelabs": "^1.2.0",
     "selenium-webdriver": "2.47.0",
     "serve-static": "^1.10.2"
   },
