@@ -13,35 +13,49 @@ var upload = function (settings) {
     var path = require('path');
     var async = require('async');
     var readdirSyncRec = require('recursive-readdir-sync');
+    console.log('before');
 
-    console.log('settings', settings);
-
-    return;
-
-    // var s3 = new aws.S3({
-    //   params : {
-    //     Bucket: settings.bucket
-    //   }
-    // });
-
-    var directories = settings.directories;
-
-    var base = path.resolve('.');
-
-
-    var paths = directories.reduce(function (b, dir) {
+    var fileset = settings.directories.reduce(function (rest, dir) {
       console.log('dir', dir);
-      var dirPath = path.resolve(dir);
-      return readdirSyncRec(dirPath).concat(b);
-    }, [ ]).map(function (f) {
-      return {
-        absolute: f,
-        relative: f.substring(base.length)
-      };
+      var d = path.resolve(dir.base);
+      var files = readdirSyncRec(d);
+      return files.map(function (f) {
+        return {
+          input: f,
+          output: dir.prefix + (f.substring(dir.base.length))
+        };
+      });
+    }, []).concat(settings.files);
+
+    var counter = 0;
+
+    var s3 = new aws.S3({
+      params : {
+        Bucket:  settings.bucket
+      }
     });
+    
+    async.map(fileset, function (f, cb) {
 
-    console.log('paths', paths);
-
+      if (fs.lstatSync(f.input).isFile()) {
+        counter++;
+        s3.upload({
+          Key: 'tunic/' + f.output,
+          Body: fs.readFileSync(f.input)
+        }, cb);
+      } else {
+        cb();
+      }
+    }, function (err, results) {
+      console.log('complete', counter);
+      if (err) {
+        console.error(err);
+        reject(err);
+      } else {
+        console.log(results);
+        resolve(results);
+      }        
+    });
   });
 };
 
