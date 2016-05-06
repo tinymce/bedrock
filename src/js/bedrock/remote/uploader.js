@@ -70,7 +70,9 @@ var upload = function (settings) {
         console.error(err);
         reject(err);
       } else {
-        resolve(results);
+        var base = 'http://' + settings.bucket + '.s3-website-us-west-2.amazonaws.com/tunic/' + settings.name;
+        console.log('Base: ', base);
+        resolve(base, results);
       }        
     });
   });

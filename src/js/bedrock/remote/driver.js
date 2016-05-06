@@ -1,24 +1,26 @@
-var webdriver = require('selenium-webdriver');
+/* Settings:
+ *
+ * browser: the name of the browser
+ */
+var create = function (sauceUser, sauceKey, settings) {
+  var webdriver = require('selenium-webdriver');
   var chrome = require('selenium-webdriver/chrome');
   var firefox = require('selenium-webdriver/firefox');
 
-  var input = require('selenium-webdriver/lib/input');
+  console.log('settings', settings.browser);
 
-  var http = require('http');
-  var finalhandler = require('finalhandler');
-
-  var openport = require('openport');
-
-  var By = webdriver.By;
-  var until = webdriver.until;
-  var Condition = webdriver.Condition;
- 
-  var cli = require('./bedrock/cli/cli');
-  var settings = cli.extract(directories);
-
-  var driver = new webdriver.Builder()
-    .forBrowser('firefox')
-    .setChromeOptions(/* ... */)
-    .setFirefoxOptions(/* ... */)
+  return new webdriver.Builder()
+    .withCapabilities({
+      username: sauceUser,
+      accessKey: sauceKey,
+      browserName: 'chrome',
+      platform: 'Windows 10',
+      version: '43.0'
+    })
+    .usingServer('http://' + sauceUser + ':' + sauceKey + '@ondemand.saucelabs.com:80/wd/hub')
     .build();
+};
 
+module.exports = {
+  create: create
+};
