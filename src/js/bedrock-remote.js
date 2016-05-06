@@ -35,7 +35,7 @@ var run = function (directories) {
       link('src/css', 'tunic.css', 'css', 'tunic.css')
     ],
     inline: [
-      { body: '{ "config": "' + settings.config + '", "scripts": [' + settings.testfiles.map(function (s) { return '"' + s + '"'; }).join(', ') + '] }', output: 'harness' }
+      { body: JSON.stringify({ config: settings.config, scripts: settings.testfiles }), output: 'harness' }
     ]
   }).then(function () {
     console.log('Success!');

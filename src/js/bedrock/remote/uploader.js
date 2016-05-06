@@ -29,15 +29,13 @@ var processDirs = function (directories) {
  */
 var upload = function (settings) {
   return new Promise(function (resolve, reject) {
-    
-    
-    console.log('before');
-
     var dirset = processDirs(settings.directories);
     var fileset = settings.files;
     var inlineset = settings.inline;
 
     var all = dirset.concat(fileset).concat(inlineset);
+
+    console.log('Found approximately ' + all.length + ' files to upload (some may be directories)');
 
     var counter = 0;
 
@@ -67,7 +65,7 @@ var upload = function (settings) {
         cb();
       }
     }, function (err, results) {
-      console.log('complete', counter);
+      console.log('Uploaded: ' + counter + ' files.');
       if (err) {
         console.error(err);
         reject(err);
