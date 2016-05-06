@@ -1,3 +1,23 @@
+var aws = require('aws-sdk');
+var fs = require('fs');
+var path = require('path');
+var async = require('async');
+var mime = require('mime');
+var readdirSyncRec = require('recursive-readdir-sync');
+
+var processDirs = function (directories) {
+  return directories.reduce(function (rest, dir) {
+    var d = path.resolve(dir.base);
+    var files = readdirSyncRec(d);
+    return files.map(function (f) {
+      return {
+        input: f,
+        output: dir.prefix + (f.substring(dir.base.length))
+      };
+    });
+  }, []);
+};
+
 /*
  * Settings
  *
@@ -5,27 +25,19 @@
  * bucket: name of S3 bucket
  * directories: list of top-level directories to upload, (format: ??)
  * files: the list of files to upload (format: ??)
+ * name: subdirectory to put on th bucket.
  */
 var upload = function (settings) {
   return new Promise(function (resolve, reject) {
-    var aws = require('aws-sdk');
-    var fs = require('fs');
-    var path = require('path');
-    var async = require('async');
-    var readdirSyncRec = require('recursive-readdir-sync');
+    
+    
     console.log('before');
 
-    var fileset = settings.directories.reduce(function (rest, dir) {
-      console.log('dir', dir);
-      var d = path.resolve(dir.base);
-      var files = readdirSyncRec(d);
-      return files.map(function (f) {
-        return {
-          input: f,
-          output: dir.prefix + (f.substring(dir.base.length))
-        };
-      });
-    }, []).concat(settings.files);
+    var dirset = processDirs(settings.directories);
+    var fileset = settings.files;
+    var inlineset = settings.inline;
+
+    var all = dirset.concat(fileset).concat(inlineset);
 
     var counter = 0;
 
@@ -35,13 +47,21 @@ var upload = function (settings) {
       }
     });
     
-    async.map(fileset, function (f, cb) {
-
-      if (fs.lstatSync(f.input).isFile()) {
+    async.map(all, function (f, cb) {      
+      if (f.body !== undefined) {
         counter++;
         s3.upload({
-          Key: 'tunic/' + f.output,
-          Body: fs.readFileSync(f.input)
+          Key: 'tunic/' + settings.name + '/' + f.output,
+          Body: f.body,
+          ContentType: f.contentType
+        }, cb);
+      }
+      else if (fs.lstatSync(f.input).isFile()) {        
+        counter++;
+        s3.upload({
+          Key: 'tunic/' + settings.name + '/' + f.output,
+          Body: f.body !== undefined ? f.body : fs.readFileSync(f.input),
+          ContentType: f.contentType !== undefined ? f.contentType : mime.lookup(f.input)
         }, cb);
       } else {
         cb();
@@ -52,7 +72,6 @@ var upload = function (settings) {
         console.error(err);
         reject(err);
       } else {
-        console.log(results);
         resolve(results);
       }        
     });

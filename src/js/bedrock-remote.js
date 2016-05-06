@@ -12,26 +12,38 @@ var run = function (directories) {
     return link('node_modules/@ephox/bolt/lib', filename, 'lib/bolt', filename);
   };
 
+  // {
+  //     config: settings.config,
+  //     scripts: settings.testfiles
+  //   }
+
   uploader.upload({
     bucket: 'tbio-testing',
+    name: 'hack',
     directories: [
       { prefix: 'project', base: settings.projectdir }
     ],
     files: [
       link('src/resources', 'runner.js', 'js', 'runner.js'),
-      link('src/resources', 'tunic.html', '', 'index.html'),
+      { input: settings.basedir + 'src/resources/tunic.html', output: 'index.html' },
       boltlink('kernel.js'),
       boltlink('loader.js'),
       boltlink('module.js'),
       boltlink('test.js'),
       link('node_modules/jquery/dist', 'jquery.min.js', 'lib/jquery', 'jquery.min.js'),
+      { input: settings.basedir + 'src/css/tunic.css', output: 'css/tunic.css' },
       link('src/css', 'tunic.css', 'css', 'tunic.css')
+    ],
+    inline: [
+      { body: '{ "config": "' + settings.config + '", "scripts": [' + settings.testfiles.map(function (s) { return '"' + s + '"'; }).join(', ') + '] }', output: 'harness' }
     ]
   }).then(function () {
     console.log('Success!');
   }, function (err) {
     console.error('Error', err, err.stack);
   });
+
+  // var randomFolder = EXPIRY_SUBFOLDER + project.getCanonicalFile.getName + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date)
  //  var fallback = routes.constant(settings.basedir, 'src/resources/tunic.html');
 
   // TODO: Change to remote driver.
