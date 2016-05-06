@@ -1,11 +1,12 @@
 var webdriver = require('selenium-webdriver');
 // var input = require('../../../../node_modules/selenium-webdriver/lib/input');
 var By = webdriver.By;
+var Key = webdriver.Key;
 
 var NO_ACTION = null;
 
 var scanCombo = function (combo) {
-  if (combo.ctrlKey) return input.Key.chord(input.Key.CONTROL, combo.key);
+  if (combo.ctrlKey) return Key.chord(Key.CONTROL, combo.key);
   else return NO_ACTION;
 };
 
