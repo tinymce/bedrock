@@ -1,5 +1,5 @@
 var webdriver = require('selenium-webdriver');
-var input = require('selenium-webdriver/lib/input');
+// var input = require('../../../../node_modules/selenium-webdriver/lib/input');
 var By = webdriver.By;
 
 var NO_ACTION = null;

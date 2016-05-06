@@ -1,14 +1,14 @@
 (function () {
   var server = require('serve-static');
   
+  var prefixMatch = function (prefix) {
+    return function (url) {
+      return url.indexOf(prefix) === 0;
+    };
+  };
 
   var routing = function (prefix, source) {
     var router = server(source);
-
-
-    var matches = function (url) {
-      return url.indexOf(prefix) === 0;
-    };
 
     var go = function (request, response, done) {
       request.url = request.url.substring(prefix.length);
@@ -16,32 +16,24 @@
     };
 
     return {
-      matches: matches,
+      matches: prefixMatch(prefix),
       go: go
     };
   };
 
   var json = function (prefix, data) {
-    var matches = function (url) {
-      return url.indexOf(prefix) === 0;
-    };
-
     var go = function (request, response, done) {
       response.writeHeader(200, { "Content-Type": "application/json" });
       response.end(JSON.stringify(data));
     };
 
     return {
-      matches: matches,
+      matches: prefixMatch(prefix),
       go: go
     };
   };
 
   var effect = function (prefix, action) {
-    var matches = function (url) {
-      return url.indexOf(prefix) === 0;
-    };
-
     var go = function (request, response, done) {
       var body = '';
       request.on('data', function (data) {
@@ -57,7 +49,36 @@
     };
 
     return {
-      matches: matches,
+      matches: prefixMatch(prefix),
+      go: go
+    };
+  };
+  
+  var constant = function (root, url) {
+    var base = server(root);
+
+    var matches = function () { return true; };
+    var go = function (request, response, done) {
+      request.url = url;
+      base(request, response, done);
+    };
+
+    return {
+      matches: prefixMatch(root),
+      go: go
+    };
+  };
+
+  var unsupported = function (root, label) {
+    var go = function (request, response, done) {
+      response.writeHeader(404, { "Content-Type": "application/json" });
+      response.end(JSON.stringify({
+        error: label
+      }));
+    };
+
+    return {
+      matches: prefixMatch(root),
       go: go
     };
   };
@@ -74,26 +95,13 @@
     matching.go(request, response, done);
   };
 
-  var constant = function (root, url) {
-    var base = server(root);
-
-    var matches = function () { return true; };
-    var go = function (request, response, done) {
-      request.url = url;
-      base(request, response, done);
-    };
-
-    return {
-      matches: matches,
-      go: go
-    };
-  };
 
   module.exports = {
-    routing: routing,
-    route: route,
+    routing: routing,    
     effect: effect,
     constant: constant,
-    json: json
+    unsupported: unsupported,
+    json: json,
+    route: route
   };
 })();

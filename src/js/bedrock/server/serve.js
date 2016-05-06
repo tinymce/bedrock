@@ -1,0 +1,62 @@
+/*
+ * Settings:
+ *
+ * projectdir: project directory (what you are testing)
+ * basedir: the directory of bedrock
+ * config: the name of the config file 
+ * testfiles: the test files to test (an array)
+ * driver: (optional). Required for supporting keys 
+ */
+var start = function (settings, f) {
+
+console.log('settings', settings);
+  var http = require('http');
+  var finalhandler = require('finalhandler');
+
+  var openport = require('openport');
+
+  var KEEP_GOING = false;
+
+  var routes = require('./routes');  
+  var keys = require('./keyeffects');
+  
+  var routers = [
+    routes.routing('/project', settings.projectdir),
+    routes.routing('/js', settings.basedir + 'src/resources'),
+    routes.routing('/lib/bolt', settings.basedir + 'node_modules/@ephox/bolt/lib'),
+    routes.routing('/lib/jquery', settings.basedir + 'node_modules/jquery/dist'),
+    routes.routing('/css', settings.basedir + 'src/css'),
+    routes.json('/harness', {
+      config: settings.config,
+      scripts: settings.testfiles
+    }),
+    settings.driver !== null ? routes.effect('/keys', keys.executor(settings.driver)) : routes.unsupported('/keys', 'Keys API not supported without webdriver running. Use bedrock-auto to get this feature.')
+  ];
+
+  var fallback = routes.constant(settings.basedir, 'src/resources/tunic.html');
+
+  openport.find({
+    startingPort: 8000,
+    endingPort: 20000
+  }, function (err, port) {
+    if (err) { console.log(err); return; }
+
+    console.log('Starting bedrock server on http://localhost:' + port);
+
+    var server = http.createServer(function (request, response) {
+      var done = finalhandler(request, response);
+      routes.route(routers, fallback, request, response, done);
+    }).listen(port);
+
+    f({
+      port: port,
+      server: server
+    }, function () {
+      server.close();
+    });
+  }); 
+};
+
+module.exports = {
+  start: start
+};

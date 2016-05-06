@@ -2,10 +2,9 @@
   "name": "@ephox/bedrock",
   "version": "1.0.1",
   "description": "NodeJS test runner for bolt projects",
-  "scripts": {
-    "run-selenium": "node src/js/main.js"
-  },
   "bin": {
+    "bedrock-auto": "./bin/bedrock-auto.js",
+    "bedrock-remote": "./bin/bedrock-remote.js",
     "bedrock": "./bin/bedrock.js"
   },
   "dependencies": {

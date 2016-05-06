@@ -25,9 +25,15 @@ var init = function (settings) {
     return testName;
   };
 
+  var parseHtml = function (driver, selector) {
+    return driver.wait(until.elementLocated(By.css(selector)), 1).then(function (elem) {
+      return elem.getInnerHtml();
+    });
+  };
+
   var update = function (driver, tick) {
     // Firstly, let's see if the test number has changed.
-    return driver.wait(until.elementLocated(By.css(settings.progress)), 1).getInnerHtml().then(function (html) {
+    return parseHtml(driver, settings.progress).then(function (html) {
       var num = parseInt(html, 10);
       if (lastTest !== num) {
         singleTimer.reset(tick);
@@ -35,7 +41,7 @@ var init = function (settings) {
       }
 
       // Now, let's update the test name if we can.
-      return driver.wait(until.elementLocated(By.css(settings.testName)), 1).getInnerHtml().then(function (html) {
+      return parseHtml(driver, settings.testName).then(function (html) {
         testName = html;
         return testName;
       });
