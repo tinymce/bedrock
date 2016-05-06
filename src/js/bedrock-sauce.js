@@ -28,7 +28,7 @@ var run = function (directories) {
   var uploads = require('./bedrock/remote/project-uploads');
 
 // Use when avoiding uploading.
-//var base = 'http://tbio-testing.s3-website-us-west-2.amazonaws.com/tunic/sauce';
+// var base = 'http://tbio-testing.s3-website-us-west-2.amazonaws.com/tunic/sauce';
 
   var targets = uploads.choose('sauce', settings);
   return uploader.upload(targets).then(function (base, uploadData) {
