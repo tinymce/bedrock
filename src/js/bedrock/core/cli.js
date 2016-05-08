@@ -38,6 +38,7 @@ var extract = function (directories) {
     total: '.total',
     testName: '.test.running .name',
     failed: '.test.failed',
+    results: 'textarea.results',
     basedir: directories.bin + '/../'
   };
 };

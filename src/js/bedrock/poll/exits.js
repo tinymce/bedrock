@@ -22,23 +22,13 @@ var allTestsTooLong = function (state, tick) {
   };
 };
 
-var hasFailures = function () {
-  return new Promise(function (resolve, reject) {
-    reject('Some tests failed');
-  });
-};
-
-var noFailures = function () {
-  return new Promise(function (resolve, reject) {
-    resolve('');
-  });
-};
-
 var testsDone = function (settings) {
   return function (driver) {
     var testCss = By.css(settings.failed);
-    var result = driver.wait(until.elementLocated(testCss), 1);
-    return result.then(hasFailures, noFailures);
+    var resultsCss = By.css(settings.results);
+    return driver.wait(until.elementLocated(resultsCss), 1).then(function (res) {
+      return res.getInnerHtml();
+    });
   };
 };
 
@@ -47,3 +37,12 @@ module.exports = {
   allTestsTooLong: allTestsTooLong,
   testsDone: testsDone
 };
+
+
+// {
+//   "results":
+//   [
+//     {"name":"RunOperationTest","file":"project/src/test/js/browser/projects/newt/RunOperationTest.js","passed":true,"time":"0.084s"}
+//   ],
+//   "time":"6.6759s"
+// }

@@ -1,3 +1,19 @@
+  var shutdown = function (promise, driver, done) {
+    promise.then(function () {
+      // All good, so continue.
+      driver.sleep(1000);
+      driver.quit().then(function () {
+        done();
+      });
+    }, function (err) {
+      driver.sleep(1000);
+      driver.quit().then(function (done) {
+        done();
+        throw err;
+      });
+    });
+  };
+
 var run = function (directories) {
   var driver = require('./bedrock/auto/driver').create({
     browser: 'chrome'
@@ -7,6 +23,7 @@ var run = function (directories) {
 
   var cli = require('./bedrock/core/cli');
   var poll = require('./bedrock/poll/poll');
+  var reporter = require('./bedrock/core/reporter');
 
   var settings = cli.extract(directories);
 
@@ -19,25 +36,11 @@ var run = function (directories) {
   };
 
   serve.start(serveSettings, function (service, done) {
-    console.log('started on port: ', service.port);
-
+    console.log('Hosted bedrock at http://localhost:' + service.port);
     driver.get('http://localhost:' + service.port);
 
-    poll.loop(driver, settings).then(function (result) {
-      driver.sleep(1000);
-
-      driver.quit().then(function () {
-        done();
-      });
-        
-    }, function (err) {
-      driver.sleep(1000);
-
-      driver.quit().then(function () {
-        done();
-        throw err;
-      });
-    });
+    var result = poll.loop(driver, settings).then(reporter.write);
+    shutdown(result, driver, done);
   });
 };
 
