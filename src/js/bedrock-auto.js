@@ -1,5 +1,6 @@
   var shutdown = function (promise, driver, done) {
-    promise.then(function () {
+    promise.then(function (res) {
+      console.log('anything', res);
       // All good, so continue.
       driver.sleep(1000);
       driver.quit().then(function () {
