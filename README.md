@@ -69,11 +69,9 @@ e.g. run tests on SauceLabs with the job name: saucelabspower
 
 
 
-WebDriver Support (2.47.0*)
-==========
+## WebDriver Support (2.47.0*)
 
-Firefox
---------
+### Firefox
 
 Browser: firefox
 
@@ -81,8 +79,7 @@ Installation:
 
 * Works out of the box.
 
-Chrome
--------
+### Chrome
 
 Browser: chrome
 
@@ -90,8 +87,7 @@ Installation:
 
 * Install ChromeDriver onto your path. The link from (https://www.npmjs.com/package/selenium-webdriver) worked.
 
-Safari
-------
+### Safari
 
 Browser: safari
 
@@ -105,8 +101,7 @@ Installation:
 3. Navigate to org/openqa/selenium
 4. Double click "SafariDriver.safariextz"
 
-Internet Explorer
--------------
+### Internet Explorer
 
 Browser: ie
 
@@ -115,8 +110,7 @@ Installation:
 1. Download http://selenium-release.storage.googleapis.com/2.53/IEDriverServer_x64_2.53.1.zip
 2. Put the file IEDriverServer.exe onto your path
 
-Edge (2.53.0)
------
+### Edge (2.53.0)
 
 Browser: MicrosoftEdge
 
