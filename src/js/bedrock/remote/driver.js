@@ -17,9 +17,9 @@ var create = function (sauceUser, sauceKey, settings) {
     .withCapabilities({
       username: sauceUser,
       accessKey: sauceKey,
-      browserName: 'iexplore',
+      browserName: 'chrome',
       platform: 'Win10',
-      version: '11'
+      version: 'latest'
     })
     .usingServer('http://' + sauceUser + ':' + sauceKey + '@ondemand.saucelabs.com:80/wd/hub')
     .build();

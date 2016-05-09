@@ -1,27 +1,61 @@
 var XMLWriter = require('xml-writer');
 
-var write = function (raw) {  
-  // var failed = results.filter(function )
-  // TODO: Return a promise.
-  return new Promise(function (resolve, reject) {
-    var data = JSON.parse(raw);
-    var results = data.results;
-    var tests = results.length;
-    var failed = results.filter(function (result) {
-      return result.passed !== true;
-    });
-    var passed = results.filter(function (result) {
-      return result.passed === true;
-    });
+var write = function (settings) {
+  return function (raw) {  
+    // var failed = results.filter(function )
+    // TODO: Return a promise.
+    return new Promise(function (resolve, reject) {
+      var data = JSON.parse(raw);
+      var results = data.results;
+      var tests = results.length;
+      var failed = results.filter(function (result) {
+        return result.passed !== true;
+      });
+      var passed = results.filter(function (result) {
+        return result.passed === true;
+      });
 
-    var w = new XMLWriter();
-    w.startDocument();
-    w.startElement('testsuites').writeAttribute('tests', results.length).writeAttribute('failures', failed.length).writeAttribute('time', data.time).writeAttribute('errors', 0);
-    
-    console.log('w', w.toString());
+      var w = new XMLWriter();
+      w.startDocument();
 
-    resolve(results);
-  });
+      var root = w.startElement('testsuites').
+        writeAttribute('tests', results.length).
+        writeAttribute('failures', failed.length).
+        writeAttribute('time', data.time).
+        writeAttribute('errors', 0);
+
+      var suite = w.startElement('testsuite').writeAttribute('tests', results.length).
+        writeAttribute('name', settings.name).
+        writeAttribute('host', 'localhost').
+        writeAttribute('id', 0).
+        writeAttribute('failures', failed.length).
+        writeAttribute('timestamp', 'TIMESTAMP').
+        writeAttribute('time', data.time);
+
+      results.map(function (res) {
+        var elem = w.startElement('testcase').writeAttribute('name', res.name);
+        if (res.passed !== true) {
+          elem.startElement('failure').writeAttribute('Test FAILED: some failed assert').writeAttribute('type', 'failure').text(res.error).endElement();
+        }
+        elem.endElement();
+      });
+      suite.endElement();
+
+
+      if (settings.sauce !== undefined) root.startElement('system-out').startCData().text('\nSauceOnDemandSessionID=' + settings.sauce.id + ' job-name=' + settings.sauce.job + '\n').endCData().endElement();
+
+
+      root.endElement();
+
+
+
+      //<failure message="Test FAILED: some failed assert" type="failure">{result.error}</failure>
+      
+      console.log('w', w.toString());
+
+      resolve(results);
+    });
+  };
 };
 
 module.exports = {

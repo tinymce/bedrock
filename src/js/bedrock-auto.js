@@ -1,6 +1,5 @@
   var shutdown = function (promise, driver, done) {
     promise.then(function (res) {
-      console.log('anything', res);
       // All good, so continue.
       driver.sleep(1000);
       driver.quit().then(function () {
@@ -15,7 +14,7 @@
     });
   };
 
-var run = function (directories) {
+var run = function (directories) {  
   var driver = require('./bedrock/auto/driver').create({
     browser: 'chrome'
   });
@@ -38,9 +37,11 @@ var run = function (directories) {
 
   serve.start(serveSettings, function (service, done) {
     console.log('Hosted bedrock at http://localhost:' + service.port);
-    driver.get('http://localhost:' + service.port);
-
-    var result = poll.loop(driver, settings).then(reporter.write);
+    var result = driver.get('http://localhost:' + service.port).then(function () {
+      return poll.loop(driver, settings).then(reporter.write({
+        name: 'bedrock-auto-test'
+      }));
+    });
     shutdown(result, driver, done);
   });
 };

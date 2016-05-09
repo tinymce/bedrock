@@ -26,46 +26,55 @@ var run = function (directories) {
   
   var uploader = require('./bedrock/remote/uploader');
   var uploads = require('./bedrock/remote/project-uploads');
+  var reporter = require('./bedrock/core/reporter');
 
 // Use when avoiding uploading.
-// var base = 'http://tbio-testing.s3-website-us-west-2.amazonaws.com/tunic/sauce';
+var base = 'http://tbio-testing.s3-website-us-west-2.amazonaws.com/tunic/sauce';
 
-  var targets = uploads.choose('sauce', settings);
-  return uploader.upload(targets).then(function (base, uploadData) {
+  // var targets = uploads.choose('sauce', settings);
+  // return uploader.upload(targets).then(function (base, uploadData) {
     var driver = require('./bedrock/remote/driver').create(sauceUser, sauceKey, {
       browser: 'chrome'
     });
 
     console.log('Success!');
-    console.log('driver', driver);
-    driver.get(base + '/index.html');
+    // console.log('driver', driver);
+    driver.get(base + '/index.html').then(function () {
 
-    return poll.loop(driver, settings).then(function (result) {
-      console.log('Exiting: ', result);
-      driver.sleep(1000);
-      driver.getSession().then(function (session) {
-        saucelabs.updateJob(session.id_, {
-          name: 'bedrock-test',
-          passed: true
-        }, function () {
-          driver.quit();
-        });        
-      });
-        
-    }, function (err) {
-      console.log('Error', err);
-      driver.sleep(1000);
-      driver.getSession().then(function (session) {
-        saucelabs.updateJob(session.id_, {
-          name: 'bedrock-test',
-          passed: false
-        }, function () {
-          driver.quit().then(function () {
-            throw err;
+      console.log('Base at', base);
+
+      return driver.getSession().then(function (session) {
+        return poll.loop(driver, settings).then(reporter.write({
+          name: 'bedrock-test-suite',
+          sauce: {
+            id: session.id_,
+            job: 'bedrock-test-sauce'
+          }
+        })).then(function (result) {
+          console.log('Exiting: ', result);
+          driver.sleep(1000);        
+          saucelabs.updateJob(session.id_, {
+            name: 'bedrock-test-sauce',
+            passed: true
+          }, function () {
+            driver.quit();
+          });
+            
+        }, function (err) {
+          console.log('Error', err);
+          driver.sleep(1000);
+          saucelabs.updateJob(session.id_, {
+            name: 'bedrock-test-sauce',
+            passed: false
+          }, function () {
+            driver.quit().then(function () {
+              throw err;
+            });
           });
         });
       });
-    });
+    // });
+    // });
   });
 };
 
