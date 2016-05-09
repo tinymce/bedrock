@@ -2,9 +2,15 @@ var run = function (directories) {
   var serve = require('./bedrock/server/serve');
 
   var cli = require('./bedrock/core/cli');
+  var cloption = require('./bedrock/core/cloption');
   var poll = require('./bedrock/poll/poll');
 
-  var settings = cli.extract(process.argv.slice(2), directories);
+  var params = cloption.parse(process.argv.slice(2), [
+    cloption.param('testConfig', '(Filename): the filename for the config file', cloption.validateFile, 'CONFIG_FILE'),
+    cloption.files('testFiles', '{Filename ...} The set of files to test', '{ TEST1 ... }')
+  ], 2, 'Usage');
+
+  var settings = cli.extract(params, directories);
 
   var serveSettings = {
     projectdir: settings.projectdir,

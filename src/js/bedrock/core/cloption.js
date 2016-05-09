@@ -1,41 +1,84 @@
 var fs = require('fs');
 
 /* Really basic command line parsing ... nothing is optional, there are no flags */
-var param = function (name, info, validate) {
-  return function (args, o) {
+var param = function (name, info, validate, short) {
+  var p = function (args, o) {
     var value = args[0];
     validate(name, value);
     args.shift();
     o[name] = value;
   };
+
+  return {
+    p: p,
+    name: name,
+    info: info,
+    short: short
+  };
 };
 
 var parse = function (args, params, num, error) {
   var init = { };
-  if (args.length - params.length < 0) throw new Error('Not enough arguments. ' + error);
+  if (args.length - params.length < 0) usage('blah', params);
   params.map(function (p) {
-    p(args, init);
+    p.p(args, init);
   });
   return init;
 };
 
 var validateFile = function (name, value) {
-  if (!fs.existsSync(value)  && fs.statSync(value).isFile()) throw new Error('Property: ' + name + ' => Value: ' + value + ' was not a file');
+  try {
+    if (!fs.existsSync(value)  && fs.statSync(value).isFile()) throw new Error('Property: ' + name + ' => Value: ' + value + ' was not a file');
+  } catch (err) {
+    throw new Error('Property: ' + name + ' => Value: ' + value + ' was not a file or ' + err);
+  }
 };
 
 var isAny = function (name, value) {
   return true;
 };
 
-var files = function (name, info) {
-  return function (args, o) {
+var files = function (name, info, short) {
+  var p = function (args, o) {
     var set = args.slice(0);
     set.forEach(function (s) {
       validateFile(name + '.', s);
     });
     o[name] = set;
   };
+  return {
+    p: p,
+    name: name,
+    info: info,
+    short: short
+  };
 };
+
+var usage = function (program, params) {
+  var s = 'usage: ' + program + ' ' + params.map(function (p) { return p.short; }).join(' ') + '\n' +
+         '\n' +
+         'arguments:\n\n' +
+         params.map(function (p) {
+          return '  ' + p.short + ': ' + p.info;
+         }).join('\n\n') +
+         '\n';
+  console.error(s);
+  process.exit(-1);
+};
+
+/* jshint node:true */
+var fail_usage = function (code, message) {
+  console.error(message);
+  console.error('');
+  console.error(usage());
+  process.exit(code);
+};
+
+var fail = function (code, message) {
+  console.error(message);
+  process.exit(code);
+};
+
 
 module.exports = {
   parse: parse,
