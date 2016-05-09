@@ -8,7 +8,7 @@
       });
     }, function (err) {
       driver.sleep(1000);
-      driver.quit().then(function (done) {
+      driver.quit().then(function () {
         done();
         throw err;
       });
