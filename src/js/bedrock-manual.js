@@ -4,7 +4,7 @@ var run = function (directories) {
   var cli = require('./bedrock/core/cli');
   var poll = require('./bedrock/poll/poll');
 
-  var settings = cli.extract(directories);
+  var settings = cli.extract(process.argv.slice(2), directories);
 
   var serveSettings = {
     projectdir: settings.projectdir,

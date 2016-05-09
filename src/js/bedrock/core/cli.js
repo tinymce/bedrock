@@ -1,16 +1,11 @@
-var extract = function (directories) {
-  // Node
-  process.argv.shift();
-  // File
-  process.argv.shift();
-
-  if (process.argv.length < 2)
+var extract = function (args, directories) {
+  if (args.length < 2)
     fail_usage(1, 'Not enough arguments, must specify configuration and at least one test file.');
 
 
   // Read config.
-  var config = process.argv[0];
-  process.argv.shift();
+  var config = args[0];
+  args.shift();
 
   // Read tests
   var fs = require('fs');
@@ -18,7 +13,7 @@ var extract = function (directories) {
   if (!fs.existsSync(config) || !fs.statSync(config).isFile())
     fail(10, 'Could not find config file [' + config + ']');
 
-  var testfiles = process.argv.slice(0);
+  var testfiles = args.slice(0);
 
   testfiles.forEach(function (file) {
     if (!fs.existsSync(file) || !fs.statSync(file).isFile())
@@ -45,7 +40,7 @@ var extract = function (directories) {
 
 // TODO:
 // Version
-// Help 
+// Help
 // etc.
 
 var usage = function () {

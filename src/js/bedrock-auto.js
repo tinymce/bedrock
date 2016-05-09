@@ -14,7 +14,7 @@
     });
   };
 
-var run = function (directories) {  
+var run = function (directories) {
   var driver = require('./bedrock/auto/driver').create({
     browser: 'chrome'
   });
@@ -25,7 +25,7 @@ var run = function (directories) {
   var poll = require('./bedrock/poll/poll');
   var reporter = require('./bedrock/core/reporter');
 
-  var settings = cli.extract(directories);
+  var settings = cli.extract(process.argv.slice(2), directories);
 
   var serveSettings = {
     projectdir: settings.projectdir,

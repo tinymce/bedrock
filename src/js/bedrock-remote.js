@@ -1,7 +1,7 @@
 var run = function (directories) {
   var cli = require('./bedrock/core/cli');
-  
-  var settings = cli.extract(directories);
+
+  var settings = cli.extract(process.argv.slice(2), directories);
   var uploader = require('./bedrock/remote/uploader');
   var uploads = require('./bedrock/remote/project-uploads');
 
