@@ -20,9 +20,14 @@ var param = function (name, info, validate, short) {
 var parse = function (args, params, num, error) {
   var init = { };
   if (args.length - params.length < 0) usage('blah', params);
-  params.map(function (p) {
-    p.p(args, init);
-  });
+  try {
+    params.map(function (p) {
+      p.p(args, init);
+    });
+  } catch (err) {
+    console.error(err);
+    usage('blah', params);
+  }
   return init;
 };
 
