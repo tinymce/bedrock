@@ -29,16 +29,15 @@ var run = function (directories) {
   var reporter = require('./bedrock/core/reporter');
 
 // Use when avoiding uploading.
-var base = 'http://tbio-testing.s3-website-us-west-2.amazonaws.com/tunic/sauce';
+// var base = 'http://tbio-testing.s3-website-us-west-2.amazonaws.com/tunic/sauce';
 
-  // var targets = uploads.choose('sauce', settings);
-  // return uploader.upload(targets).then(function (base, uploadData) {
+  var targets = uploads.choose('sauce', settings);
+  return uploader.upload(targets).then(function (base, uploadData) {
     var driver = require('./bedrock/remote/driver').create(sauceUser, sauceKey, {
       browser: 'chrome'
     });
 
     console.log('Success!');
-    // console.log('driver', driver);
     driver.get(base + '/index.html').then(function () {
 
       console.log('Base at', base);
@@ -73,8 +72,7 @@ var base = 'http://tbio-testing.s3-website-us-west-2.amazonaws.com/tunic/sauce';
           });
         });
       });
-    // });
-    // });
+    });
   });
 };
 
