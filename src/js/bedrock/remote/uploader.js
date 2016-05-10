@@ -80,37 +80,3 @@ var upload = function (settings) {
 module.exports = {
   upload: upload
 };
-
-
-// var s3 = new aws.S3({
-//   params : {
-//     Bucket: 'tbio-testing'
-//   }
-// });
-
-// var directories = [
-//   'src',
-//   'node_modules',
-//   'bin'
-// ];
-
-
-
-// console.log('paths', paths);
-
-// var counter = 0;
-// async.map(paths, function (f, cb) {
-//   if (fs.lstatSync(f.absolute).isFile()) {
-//     counter++;
-//     s3.upload({
-//       Key: 'tunic' + f.relative,
-//       Body: fs.readFileSync(f.absolute)
-//     }, cb);
-//   } else {
-//     cb();
-//   }
-// }, function (err, results) {
-//     console.log('complete', counter);
-//     if (err) console.error(err);
-//     console.log(results);
-// });
