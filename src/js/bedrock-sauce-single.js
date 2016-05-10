@@ -57,8 +57,8 @@ var run = function (directories) {
               passed: true
             }, function () {
               driver.quit();
-              process.send({ success: result });
-              resolve();
+              if (process.send) process.send({ success: result });
+              resolve(result);
             });
 
           }, function (err) {
@@ -69,7 +69,7 @@ var run = function (directories) {
               passed: false
             }, function () {
               driver.quit().then(function () {
-                process.send({ failure: err });
+                if (process.send) process.send({ failure: err });
                 reject(err);
               });
             });
