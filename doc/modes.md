@@ -34,9 +34,9 @@ aws_secret_access_key = aaaaaaaaaaaaaaaaaaaaa
 Note, that we have named the profile here. This allows you to have multiple profiles on the same machine. In order to set this profile, you can prefix the bedrock-remote command with
 an AWS_PROFILE declaration. This will be covered in the examples below.
 
-`bedrock-remote {TEST_NAME} {CONFIG_FILE} {TESTS ...}`
+`bedrock-remote {TEST_DIR} {CONFIG_FILE} {TESTS ...}`
 
-e.g. run tests using the default profile in the ~/.aws/credentials file
+e.g. run tests using the default profile in the ~/.aws/credentials file on the subdirectory remote-test-1 of the s3 bucket
 
 `bedrock-remote remote-test-1 config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js.browser/TwoTest.js`
 

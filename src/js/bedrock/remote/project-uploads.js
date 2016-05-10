@@ -1,4 +1,4 @@
-var choose = function (name, settings) {
+var choose = function (name, projectDirs, settings) {
   var link = function (inputDir, inputName, outputDir, outputName) {
     return { input: settings.basedir + inputDir + '/' + inputName, output: outputDir + '/' + outputName };
   };
@@ -7,12 +7,17 @@ var choose = function (name, settings) {
     return link('node_modules/@ephox/bolt/lib', filename, 'lib/bolt', filename);
   };
 
+  var getDirectories = function () {
+    if (projectDirs.length === 1 && projectDirs[0] === "*") return [ { prefix: 'project', base: settings.projectdir } ];
+    else return projectDirs.map(function (d) {
+      return { prefix: 'project/' + d, base: settings.projectdir + '/' + d };
+    });
+  };
+
   return {
     bucket: 'tbio-testing',
     name: name,
-    directories: [
-      { prefix: 'project', base: settings.projectdir }
-    ],
+    directories: getDirectories(),
     files: [
       link('src/resources', 'runner.js', 'js', 'runner.js'),
       { input: settings.basedir + 'src/resources/tunic.html', output: 'index.html' },
