@@ -6,6 +6,7 @@
     "bedrock-auto": "./bin/bedrock-auto.js",
     "bedrock-remote": "./bin/bedrock-remote.js",
     "bedrock-sauce": "./bin/bedrock-sauce.js",
+    "bedrock-sauce-single": "./bin/bedrock-sauce-single.js",
     "bedrock": "./bin/bedrock.js"
   },
   "private": true,
