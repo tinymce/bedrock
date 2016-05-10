@@ -3,6 +3,8 @@ var run = function (directories) {
   var cloption = require('./bedrock/core/cloption');
   var poll = require('./bedrock/poll/poll');
   var SauceLabs = require('saucelabs');
+  var childprocess = require('child_process');
+
   var fs=require('fs');
 
   var rest = process.argv.slice(2);
@@ -15,13 +17,14 @@ var run = function (directories) {
     cloption.files('testFiles', '{Filename ...} The set of files to test', '{ TEST1 ... }')
   ], 6, 'Usage');
 
-  var saucelabs = new SauceLabs({
-    username: params.sauceUser,
-    password: params.sauceKey
-  });
+  // var saucelabs = new SauceLabs({
+  //   username: params.sauceUser,
+  //   password: params.sauceKey
+  // });
 
   var settings = cli.extract(params, directories);
   console.log('settings', settings);
+
 
   var browsers = JSON.parse(fs.readFileSync(params.sauceConfig));
 
@@ -44,8 +47,11 @@ var run = function (directories) {
 
         console.log('Success!');
         return driver.get(base + '/index.html').then(function () {
+          console.log('Went to base', base, 'platform', platform);
           return driver.getSession().then(function (session) {
             console.log('Running with session', session.id_);
+
+      setTimeout(function () {
             saucelabs.updateJob(session.id_, { name: params.sauceJob }, function () {
               console.log('Base at', base);
               poll.loop(driver, settings).then(reporter.write({
@@ -78,6 +84,8 @@ var run = function (directories) {
                 });
               });
             });
+  }, 4000);
+
           });
         });
       }, 10000);
@@ -92,10 +100,19 @@ var run = function (directories) {
   return uploader.upload(targets).then(function (base, uploadData) {
 
     return distribute.sequence(params.sauceConfig, function (b) {
-      return runOnPlatform(base, b);
-    });
-  }).then(function () {
+      return new Promise(function (resolve, reject) {
+        var child = childprocess.fork(directories.bin + '/bedrock-sauce-single.js', [ base, params.sauceJob, b.browser, 'latest', b.os, params.sauceUser, params.sauceKey, params.testConfig ].concat(params.testFiles));
 
+        child.on('message', function (info) {
+          if (info.success) resolve(info.success);
+          else if (info.failure) reject(info.failure);
+          else console.log('unknown message', info);
+        });
+      });
+      // return runOnPlatform(base, b);
+    });
+  }).then(function (res) {
+    console.log('all done', res);
   }, function (err) {
     console.error(err);
   });

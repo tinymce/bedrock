@@ -11,6 +11,6 @@ asynctest(
 
     setTimeout(function () {
       success();
-    }, 2000);
+    }, 5000);
   }
 );
