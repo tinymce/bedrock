@@ -3,13 +3,13 @@
 *Test* mode allows the user to run tests in an automated fashion. Bedrock will spin up the browser tiself (assuming the user has the right [WebDrivers](webdrivers.md) on the path),
 establish a WebDriver connection with this browser and close the browser once the tests have completed.
 
-`bedrock-auto {BROWSER} {CONFIG_FILE} {TESTS ...}`
+`bedrock-auto {SUITE_NAME} {BROWSER} {CONFIG_FILE} {TESTS ...}`
 
 BROWSER: chrome | firefox | safari | edge | ie
 
 e.g. run tests in the project: example1
 
-`bedrock-auto chrome config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js/browser/TwoTest.js`
+`bedrock-auto fake-suite chrome config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js/browser/TwoTest.js`
 
 
 
