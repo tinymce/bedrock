@@ -17,16 +17,17 @@ var param = function (name, info, validate, short) {
   };
 };
 
-var parse = function (args, params, num, error) {
+var parse = function (args, params, program) {
   var init = { };
-  if (args.length - params.length < 0) usage('blah (' + args + ', ' + params.length + ')', params);
+
   try {
+    if (args.length - params.length < 0) throw new Error('Incorrect number of arguments: ' + args.length + '. Required ' + params.length + '+');
     params.map(function (p) {
       p.p(args, init);
     });
   } catch (err) {
     console.error(err);
-    usage('blah', params);
+    usage(program, params);
   }
   return init;
 };
@@ -67,23 +68,10 @@ var usage = function (program, params) {
           return '  ' + p.short + ': ' + p.info;
          }).join('\n\n') +
          '\n';
+  console.error('\n');
   console.error(s);
   process.exit(-1);
 };
-
-/* jshint node:true */
-var fail_usage = function (code, message) {
-  console.error(message);
-  console.error('');
-  console.error(usage());
-  process.exit(code);
-};
-
-var fail = function (code, message) {
-  console.error(message);
-  process.exit(code);
-};
-
 
 module.exports = {
   parse: parse,

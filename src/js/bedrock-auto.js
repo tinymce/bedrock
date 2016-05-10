@@ -15,10 +15,6 @@
   };
 
 var run = function (directories) {
-  var driver = require('./bedrock/auto/driver').create({
-    browser: 'chrome'
-  });
-
   var serve = require('./bedrock/server/serve');
 
   var cli = require('./bedrock/core/cli');
@@ -28,13 +24,17 @@ var run = function (directories) {
 
   var rest = process.argv.slice(2);
   var params = cloption.parse(rest, [
+    cloption.param('suiteName', '(String): Name for the test suite', cloption.isAny, 'SUITE_NAME'),
+    cloption.param('browser', '(String): Browser value: chrome | firefox | safari | ie | MicrosoftEdge', cloption.isAny, 'BROWSER'),
     cloption.param('testConfig', '(Filename): the filename for the config file', cloption.validateFile, 'CONFIG_FILE'),
     cloption.files('testFiles', '{Filename ...} The set of files to test', '{ TEST1 ... }')
-  ], 2, 'Usage');
+  ], 'bedrock-auto');
+
+  var driver = require('./bedrock/auto/driver').create({
+    browser: params.browser
+  });
 
   var settings = cli.extract(params, directories);
-
-  console.log('settings', settings);
 
   var serveSettings = {
     projectdir: settings.projectdir,
@@ -48,7 +48,7 @@ var run = function (directories) {
     console.log('Hosted bedrock at http://localhost:' + service.port);
     var result = driver.get('http://localhost:' + service.port).then(function () {
       return poll.loop(driver, settings).then(reporter.write({
-        name: 'bedrock-auto-test'
+        name: params.suiteName
       }));
     });
     shutdown(result, driver, done);
