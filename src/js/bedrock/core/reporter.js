@@ -1,7 +1,7 @@
 var XMLWriter = require('xml-writer');
 
 var write = function (settings) {
-  return function (raw) {  
+  return function (raw) {
     // var failed = results.filter(function )
     // TODO: Return a promise.
     return new Promise(function (resolve, reject) {
@@ -33,7 +33,7 @@ var write = function (settings) {
         writeAttribute('time', data.time);
 
       results.map(function (res) {
-        var elem = w.startElement('testcase').writeAttribute('name', res.name);
+        var elem = w.startElement('testcase').writeAttribute('name', settings.name + '.' + res.name);
         if (res.passed !== true) {
           elem.startElement('failure').writeAttribute('Test FAILED: some failed assert').writeAttribute('type', 'failure').text(res.error).endElement();
         }
@@ -50,7 +50,7 @@ var write = function (settings) {
 
 
       //<failure message="Test FAILED: some failed assert" type="failure">{result.error}</failure>
-      
+
       console.log('w', w.toString());
 
       resolve(results);

@@ -4,6 +4,7 @@ var run = function (directories) {
   var poll = require('./bedrock/poll/poll');
   var SauceLabs = require('saucelabs');
   var childprocess = require('child_process');
+  var capitalize = require('capitalize');
 
   var fs=require('fs');
 
@@ -31,6 +32,9 @@ var run = function (directories) {
 
   var drivers = require('./bedrock/remote/driver');
 
+  var prettify = function (os, browser, bversion) {
+    return [ capitalize(browser) ].concat(bversion !== 'latest' ? [ bversion ] : [ ]).concat([ capitalize(os) ]).join('.');
+  };
 
   var driver = drivers.create(params.sauceUser, params.sauceKey, {
     browser: params.sauceBrowser,
@@ -44,10 +48,10 @@ var run = function (directories) {
         saucelabs.updateJob(session.id_, { name: params.sauceJob }, function () {
           console.log('Base at', params.base);
           poll.loop(driver, settings).then(reporter.write({
-            name: 'platform',
+            name: prettify(params.sauceOS, params.sauceBrowser, params.sauceBrowserVersion),
             sauce: {
               id: session.id_,
-              job: 'bedrock-test-sauce'
+              job: params.sauceJob
             }
           })).then(function (result) {
             console.log('Exiting: ', result);
