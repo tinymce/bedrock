@@ -13,6 +13,7 @@ var run = function (directories) {
     cloption.param('sauceUser', '(String): the SauceLabs user', cloption.isAny, 'SAUCE_USER'),
     cloption.param('sauceKey', '(String): the SauceLabs key', cloption.isAny, 'SAUCE_KEY'),
     cloption.param('projectDirs', '(String): a comma-separated list of the directories to upload from the *current directory*', cloption.isAny, 'PROJECT_DIRS'),
+    cloption.param('outputDir', '(Filename): Output directory for test file. If it does not exist, it is created.', cloption.isAny, 'OUTPUT_DIR'),
     cloption.param('testConfig', '(Filename): the filename for the config file', cloption.validateFile, 'CONFIG_FILE'),
     cloption.files('testFiles', '{Filename ...} The set of files to test', '{ TEST1 ... }')
   ], 'bedrock-sauce');
@@ -42,7 +43,7 @@ var run = function (directories) {
 
     return distribute.sequence(params.sauceConfig, function (b) {
       return new Promise(function (resolve, reject) {
-        var child = childprocess.fork(directories.bin + '/bedrock-sauce-single.js', [ base, params.sauceJob, b.browser, 'latest', b.os, params.sauceUser, params.sauceKey, params.testConfig ].concat(params.testFiles));
+        var child = childprocess.fork(directories.bin + '/bedrock-sauce-single.js', [ base, params.sauceJob, b.browser, 'latest', b.os, params.sauceUser, params.sauceKey, params.outputDir, params.testConfig ].concat(params.testFiles));
 
         child.on('message', function (info) {
           if (info.success) resolve(info.success);
@@ -52,9 +53,9 @@ var run = function (directories) {
       });
     });
   }).then(function (res) {
-    console.log('all done', res);
+    console.log('SauceLabs Tests complete: ' + params.testFiles.length);
   }, function (err) {
-    console.log('Sauce Error', err);
+    console.log('SauceLabs Error: ', err);
     console.error(err);
   });
 };

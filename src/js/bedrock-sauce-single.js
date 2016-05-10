@@ -17,6 +17,7 @@ var run = function (directories) {
     cloption.param('sauceOS', '(String): the OS for the test', cloption.isAny, 'SAUCE_OS'),
     cloption.param('sauceUser', '(String): the SauceLabs user', cloption.isAny, 'SAUCE_USER'),
     cloption.param('sauceKey', '(String): the SauceLabs key', cloption.isAny, 'SAUCE_KEY'),
+    cloption.param('outputDir', '(Filename): Output directory for test file. If it does not exist, it is created.', cloption.isAny, 'OUTPUT_DIR'),
     cloption.param('testConfig', '(Filename): the filename for the config file', cloption.validateFile, 'CONFIG_FILE'),
     cloption.files('testFiles', '{Filename ...} The set of files to test', '{ TEST1 ... }')
   ], 'sauce-labs-single');
@@ -48,8 +49,10 @@ var run = function (directories) {
     return new Promise(function (resolve, reject) {
       return driver.getSession().then(function (session) {
         saucelabs.updateJob(session.id_, { name: params.sauceJob }, function () {
+          console.log('Starting SauceLabs test (' + detailedName + '): id => ' + session.id_);
           poll.loop(driver, settings).then(reporter.write({
             name: detailedName,
+            output: params.outputDir,
             sauce: {
               id: session.id_,
               job: params.sauceJob
