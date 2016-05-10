@@ -6,6 +6,6 @@ test(
   ],
 
   function () {
-    assert.eq(1, 2);
+    assert.eq(1, 1);
   }
 );

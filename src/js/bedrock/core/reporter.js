@@ -53,7 +53,8 @@ var write = function (settings) {
 
       console.log('w', w.toString());
 
-      resolve(results);
+      if (failed.length > 0) reject(results);
+      else resolve(results);
     });
   };
 };

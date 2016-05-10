@@ -34,30 +34,61 @@ aws_secret_access_key = aaaaaaaaaaaaaaaaaaaaa
 Note, that we have named the profile here. This allows you to have multiple profiles on the same machine. In order to set this profile, you can prefix the bedrock-remote command with
 an AWS_PROFILE declaration. This will be covered in the examples below.
 
-`bedrock-remote {TEST_DIR} {CONFIG_FILE} {TESTS ...}`
+`bedrock-remote {TEST_DIR} {UPLOAD_DIRS} {CONFIG_FILE} {TESTS ...}`
+
+Note, UPLOAD_DIRS is a *comma-separated* list of directories relative to the current directory. Use "*" to include all directories.
 
 e.g. run tests using the default profile in the ~/.aws/credentials file on the subdirectory remote-test-1 of the s3 bucket
 
-`bedrock-remote remote-test-1 config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js.browser/TwoTest.js`
+`bedrock-remote remote-test-1 "src" config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js.browser/TwoTest.js`
 
 e.g. run tests using a non-default profile in the ~/.aws/credentials file
 
-`AWS_PROFILE=bedrock-aws bedrock-remote remote-test-1 config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js.browser/TwoTest.js`
+`AWS_PROFILE=bedrock-aws bedrock-remote remote-test-1 "*" config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js.browser/TwoTest.js`
 
 
 
 ## saucelabs mode (bedrock-sauce)
 
 *SauceLabs* mode is used to run the tests using the automated SauceLabs tool. You will require an account with SauceLabs that will provide you with a SauceID and a SauceKey. The *SauceLabs*
-mode is designed to integrate with the jenkins CI SauceLabs plugin (for test reports), and does not support any other CI tools at this stage. Note, as part of the SauceLabs step, we upload the code to an s3
-bucket (which minimises latency), so you will need to profile your AWS_PROFILE if it is not the default as documented in the *remote mode* section.
+mode is designed to integrate with the jenkins test reporting system, and does not support any other tools at this stage. Note, as part of the SauceLabs step, we upload the code to an s3
+bucket (which minimises latency), so you will need to set your AWS_PROFILE if it is not the default as documented in the *remote mode* section.
 
-`bedrock-sauce {SAUCE_PROJECT} {SAUCE_BROWSERS} {SAUCE_ID} {SAUCE_KEY} {CONFIG_FILE} {TESTS ...}`
+`bedrock-sauce {SAUCE_JOB} {SAUCE_CONFIG} {SAUCE_USER} {SAUCE_KEY} {UPLOAD_DIRS} {CONFIG_FILE} {TESTS ...}`
+
+Note, {SAUCE_CONFIG} is a json file which specifies the platform configuration. These will be farmed off to SauceLabs in parallel. An example saucelabs configuration file:
+
+`sample/saucelabs.js`
+```
+[
+  {
+    "browser": "MicrosoftEdge",
+    "os": "Windows 10"
+  },
+  {
+    "browser": "internet explorer",
+    "browser-version": "11",
+    "os": "Windows 8.1"
+  },
+  {
+    "browser": "firefox",
+    "os": "Windows 8.1"
+  },
+  {
+    "browser": "firefox",
+    "os": "OS X 10.9"
+  },
+  {
+    "browser": "chrome",
+    "os": "Windows 8.1"
+  },
+  {
+    "browser": "chrome",
+    "os": "OS X 10.9"
+  }
+]
+```
 
 e.g. run tests on SauceLabs with the job name: saucelabspower
 
-`bedrock-sauce saucelabspower not-a-real-id not-a-real-key config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js/browser/TwoTest.js`
-
-
-
-`bedrock-sauce {SAUCE_PROJECT} {SAUCE_BROWSERS} not-a-real-id not-a-real-key
+`bedrock-sauce saucelabspower sample/saucelabs.js not-a-real-user not-a-real-key "src,sample" config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js/browser/TwoTest.js`
