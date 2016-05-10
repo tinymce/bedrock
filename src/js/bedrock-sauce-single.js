@@ -19,7 +19,7 @@ var run = function (directories) {
     cloption.param('sauceKey', '(String): the SauceLabs key', cloption.isAny, 'SAUCE_KEY'),
     cloption.param('testConfig', '(Filename): the filename for the config file', cloption.validateFile, 'CONFIG_FILE'),
     cloption.files('testFiles', '{Filename ...} The set of files to test', '{ TEST1 ... }')
-  ], 8, 'Usage');
+  ], 'sauce-labs-single');
 
   var saucelabs = new SauceLabs({
     username: params.sauceUser,

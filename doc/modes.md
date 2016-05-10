@@ -92,3 +92,17 @@ Note, {SAUCE_CONFIG} is a json file which specifies the platform configuration. 
 e.g. run tests on SauceLabs with the job name: saucelabspower
 
 `bedrock-sauce saucelabspower sample/saucelabs.js not-a-real-user not-a-real-key "src,sample" config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js/browser/TwoTest.js`
+
+
+
+
+
+## saucelabs single mode (bedrock-sauce-single)
+
+*SauceLabs Single* mode is used to run a specific platform using the automated SauceLabs tool. You will require an account with SauceLabs that will provide you with a SauceID and a SauceKey. As with the normal SauceLabs mode, we upload the code to an s3 bucket (which minimises latency), so you will need to set your AWS_PROFILE if it is not the default as documented in the *remote mode* section.
+
+`bedrock-sauce-single {REMOTE_BASE} {SAUCE_JOB} {SAUCE_BROWSER} {SAUCE_BROWSER_VERSION} {SAUCE_OS} {SAUCE_USER} {SAUCE_KEY} {CONFIG_FILE} {TESTS ...}`
+
+e.g. run tests on SauceLabs on chrome latest
+
+`bedrock-sauce-single http://where.it.was.uploaded job-name chrome latest "Windows 8.1" not-a-real-user not-a-real-key config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js/browser/TwoTest.js`
