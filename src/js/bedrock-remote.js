@@ -4,15 +4,16 @@ var run = function (directories) {
 
   var rest = process.argv.slice(2);
   var params = cloption.parse(rest, [
+    cloption.param('testDir', '(String): the subdirectory for the s3 bucket', cloption.isAny, 'TEST_DIR'),
     cloption.param('testConfig', '(Filename): the filename for the config file', cloption.validateFile, 'CONFIG_FILE'),
     cloption.files('testFiles', '{Filename ...} The set of files to test', '{ TEST1 ... }')
-  ], 2, 'Usage');
+  ], 'bedrock-remote');
 
   var settings = cli.extract(params, directories);
   var uploader = require('./bedrock/remote/uploader');
   var uploads = require('./bedrock/remote/project-uploads');
 
-  var targets = uploads.choose('hack', settings);
+  var targets = uploads.choose(params.testDir, settings);
   uploader.upload(targets).then(function () {
     console.log('Success!');
   }, function (err) {

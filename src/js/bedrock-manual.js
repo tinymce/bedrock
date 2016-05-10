@@ -8,7 +8,7 @@ var run = function (directories) {
   var params = cloption.parse(process.argv.slice(2), [
     cloption.param('testConfig', '(Filename): the filename for the config file', cloption.validateFile, 'CONFIG_FILE'),
     cloption.files('testFiles', '{Filename ...} The set of files to test', '{ TEST1 ... }')
-  ], 2, 'Usage');
+  ], 'bedrock');
 
   var settings = cli.extract(params, directories);
 
