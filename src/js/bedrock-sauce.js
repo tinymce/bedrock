@@ -5,12 +5,6 @@ var run = function (directories) {
   var SauceLabs = require('saucelabs');
   var fs=require('fs');
 
-  if (process.argv.length < 5) {
-    console.error('CNot enough arguments, must specify user, key, configuration and at least one test file.');
-    process.exit(-1);
-  }
-  console.log('process.argv.length', process.argv);
-
   var rest = process.argv.slice(2);
   var params = cloption.parse(rest, [
     cloption.param('sauceJob', '(String): the name of the SauceLabs job (e.g. bedrock-test)', cloption.isAny, 'SAUCE_JOB'),
@@ -35,52 +29,75 @@ var run = function (directories) {
   var uploads = require('./bedrock/remote/project-uploads');
   var reporter = require('./bedrock/core/reporter');
 
+  var distribute = require('./bedrock/remote/distribute');
+
+  var drivers = require('./bedrock/remote/driver');
+
+  var runOnPlatform = function (base, platform) {
+    return new Promise(function (resolve, reject) {
+      setTimeout(function () {
+
+        var driver = drivers.create(params.sauceUser, params.sauceKey, {
+          browser: platform.browser,
+          os: platform.os
+        });
+
+        console.log('Success!');
+        return driver.get(base + '/index.html').then(function () {
+          return driver.getSession().then(function (session) {
+            console.log('Running with session', session.id_);
+            saucelabs.updateJob(session.id_, { name: params.sauceJob }, function () {
+              console.log('Base at', base);
+              poll.loop(driver, settings).then(reporter.write({
+                name: 'platform',
+                sauce: {
+                  id: session.id_,
+                  job: 'bedrock-test-sauce'
+                }
+              })).then(function (result) {
+                console.log('Exiting: ', result);
+                driver.sleep(1000);
+                saucelabs.updateJob(session.id_, {
+                  name: params.sauceJob,
+                  passed: true
+                }, function () {
+                  driver.quit();
+                  resolve(result);
+                });
+
+              }, function (err) {
+                console.log('Error', err);
+                driver.sleep(1000);
+                saucelabs.updateJob(session.id_, {
+                  name: params.sauceJob,
+                  passed: false
+                }, function () {
+                  driver.quit().then(function () {
+                    reject(err);
+                  });
+                });
+              });
+            });
+          });
+        });
+      }, 10000);
+    });
+  };
+
+
 // Use when avoiding uploading.
 // var base = 'http://tbio-testing.s3-website-us-west-2.amazonaws.com/tunic/sauce';
 
   var targets = uploads.choose(params.sauceJob, settings);
   return uploader.upload(targets).then(function (base, uploadData) {
-    var driver = require('./bedrock/remote/driver').create(params.sauceUser, params.sauceKey, {
-      browser: 'chrome'
+
+    return distribute.sequence(params.sauceConfig, function (b) {
+      return runOnPlatform(base, b);
     });
+  }).then(function () {
 
-    console.log('Success!');
-    driver.get(base + '/index.html').then(function () {
-
-      return driver.getSession().then(function (session) {
-        saucelabs.updateJob(session.id_, { name: params.sauceJob }, function () {
-          console.log('Base at', base);
-          return poll.loop(driver, settings).then(reporter.write({
-            name: 'platform',
-            sauce: {
-              id: session.id_,
-              job: 'bedrock-test-sauce'
-            }
-          })).then(function (result) {
-            console.log('Exiting: ', result);
-            driver.sleep(1000);
-            saucelabs.updateJob(session.id_, {
-              name: params.sauceJob,
-              passed: true
-            }, function () {
-              driver.quit();
-            });
-
-          }, function (err) {
-            console.log('Error', err);
-            driver.sleep(1000);
-            saucelabs.updateJob(session.id_, {
-              name: params.sauceJob,
-              passed: false
-            }, function () {
-              driver.quit().then(function () {
-                throw err;
-              });
-            });
-          });
-        });
-      });
-    });
+  }, function (err) {
+    console.error(err);
   });
 };
 

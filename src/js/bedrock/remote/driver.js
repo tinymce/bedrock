@@ -11,14 +11,12 @@ var create = function (sauceUser, sauceKey, settings) {
   // Browser names: 'microsoftedge', 'chrome', 'safari', 'firefox', 'iexplore'
   // Version: latest
 
-  console.log('settings', settings.browser);
-
   return new webdriver.Builder()
     .withCapabilities({
       username: sauceUser,
       accessKey: sauceKey,
-      browserName: 'chrome',
-      platform: 'Win10',
+      browserName: settings.browser,
+      platform: settings.os,
       version: 'latest'
     })
     .usingServer('http://' + sauceUser + ':' + sauceKey + '@ondemand.saucelabs.com:80/wd/hub')
