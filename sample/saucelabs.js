@@ -1,6 +1,6 @@
 [
   {
-    "browser": "edge",
+    "browser": "MicrosoftEdge",
     "os": "Windows 10"
   },
   {
