@@ -44,8 +44,8 @@ var upload = function (settings) {
         Bucket:  settings.bucket
       }
     });
-    
-    async.map(all, function (f, cb) {      
+
+    async.map(all, function (f, cb) {
       if (f.body !== undefined) {
         counter++;
         s3.upload({
@@ -54,7 +54,7 @@ var upload = function (settings) {
           ContentType: f.contentType
         }, cb);
       }
-      else if (fs.lstatSync(f.input).isFile()) {        
+      else if (fs.lstatSync(f.input).isFile()) {
         counter++;
         s3.upload({
           Key: 'tunic/' + settings.name + '/' + f.output,
@@ -71,9 +71,8 @@ var upload = function (settings) {
         reject(err);
       } else {
         var base = 'http://' + settings.bucket + '.s3-website-us-west-2.amazonaws.com/tunic/' + settings.name;
-        console.log('Base: ', base);
         resolve(base, results);
-      }        
+      }
     });
   });
 };

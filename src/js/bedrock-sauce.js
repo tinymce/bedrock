@@ -18,8 +18,6 @@ var run = function (directories) {
   ], 'bedrock-sauce');
 
   var settings = cli.extract(params, directories);
-  console.log('settings', settings);
-
 
   var browsers = JSON.parse(fs.readFileSync(params.sauceConfig));
 

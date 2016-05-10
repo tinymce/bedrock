@@ -3,13 +3,12 @@
  *
  * projectdir: project directory (what you are testing)
  * basedir: the directory of bedrock
- * config: the name of the config file 
+ * config: the name of the config file
  * testfiles: the test files to test (an array)
- * driver: (optional). Required for supporting keys 
+ * driver: (optional). Required for supporting keys
  */
 var start = function (settings, f) {
 
-console.log('settings', settings);
   var http = require('http');
   var finalhandler = require('finalhandler');
 
@@ -17,9 +16,9 @@ console.log('settings', settings);
 
   var KEEP_GOING = false;
 
-  var routes = require('./routes');  
+  var routes = require('./routes');
   var keys = require('./keyeffects');
-  
+
   var routers = [
     routes.routing('/project', settings.projectdir),
     routes.routing('/js', settings.basedir + 'src/resources'),
@@ -41,8 +40,6 @@ console.log('settings', settings);
   }, function (err, port) {
     if (err) { console.log(err); return; }
 
-    console.log('Starting bedrock server on http://localhost:' + port);
-
     var server = http.createServer(function (request, response) {
       var done = finalhandler(request, response);
       routes.route(routers, fallback, request, response, done);
@@ -54,7 +51,7 @@ console.log('settings', settings);
     }, function () {
       server.close();
     });
-  }); 
+  });
 };
 
 module.exports = {

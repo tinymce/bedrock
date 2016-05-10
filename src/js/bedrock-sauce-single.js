@@ -42,19 +42,19 @@ var run = function (directories) {
     os: params.sauceOS
   });
 
+  var detailedName = prettify(params.sauceOS, params.sauceBrowser, params.sauceBrowserVersion);
+
   driver.get(params.base + '/index.html').then(function () {
     return new Promise(function (resolve, reject) {
       return driver.getSession().then(function (session) {
         saucelabs.updateJob(session.id_, { name: params.sauceJob }, function () {
-          console.log('Base at', params.base);
           poll.loop(driver, settings).then(reporter.write({
-            name: prettify(params.sauceOS, params.sauceBrowser, params.sauceBrowserVersion),
+            name: detailedName,
             sauce: {
               id: session.id_,
               job: params.sauceJob
             }
           })).then(function (result) {
-            console.log('Exiting: ', result);
             driver.sleep(1000);
             saucelabs.updateJob(session.id_, {
               name: params.sauceJob,
@@ -66,7 +66,6 @@ var run = function (directories) {
             });
 
           }, function (err) {
-            console.log('Error', err);
             driver.sleep(1000);
             saucelabs.updateJob(session.id_, {
               name: params.sauceJob,
@@ -82,10 +81,11 @@ var run = function (directories) {
       });
     });
   }).then(function (res) {
-    console.log('Then', res);
+    console.log('Passed SauceLabs test: ' + detailedName);
     process.exit(0);
   }, function (err) {
-    console.log('Err', err);
+    console.log('Failed SauceLabs test: ' + detailedName);
+    console.error(err);
     process.exit(-1);
   });
 };

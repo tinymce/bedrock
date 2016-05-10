@@ -11,8 +11,6 @@ var sequence = function (filename, f) {
     return f(b);
   });
 
-  console.log('promises', promises.map(function (p) { return p.toString(); }));
-
   return Promise.all(promises);
 };
 

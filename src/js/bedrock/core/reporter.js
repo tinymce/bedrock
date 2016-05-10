@@ -1,4 +1,5 @@
 var XMLWriter = require('xml-writer');
+var fs = require('fs');
 
 var write = function (settings) {
   return function (raw) {
@@ -50,10 +51,11 @@ var write = function (settings) {
 
 
       //<failure message="Test FAILED: some failed assert" type="failure">{result.error}</failure>
+      if (!fs.existsSync(settings.output)) fs.mkdirSync(settings.output);
+      var reportFile = settings.output + '/TEST-' + settings.name + '.xml';
+      fs.writeFileSync(reportFile, w.toString());
 
-      console.log('w', w.toString());
-
-      if (failed.length > 0) reject(results);
+      if (failed.length > 0) reject('Some tests failed. See {' + reportFile + '} for details.');
       else resolve(results);
     });
   };

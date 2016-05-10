@@ -22,7 +22,7 @@ var run = function (directories) {
   };
 
   serve.start(serveSettings, function (service, done) {
-    console.log('started on port: ', service.port);
+    console.log('bedrock (manual) available at: http://localhost:' + service.port);
   });
 };
 
