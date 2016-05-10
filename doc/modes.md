@@ -101,7 +101,7 @@ e.g. run tests on SauceLabs with the job name: saucelabspower
 
 *SauceLabs Single* mode is used to run a specific platform using the automated SauceLabs tool. You will require an account with SauceLabs that will provide you with a SauceID and a SauceKey. As with the normal SauceLabs mode, we upload the code to an s3 bucket (which minimises latency), so you will need to set your AWS_PROFILE if it is not the default as documented in the *remote mode* section.
 
-`bedrock-sauce-single {REMOTE_BASE} {SAUCE_JOB} {SAUCE_BROWSER} {SAUCE_BROWSER_VERSION} {SAUCE_OS} {SAUCE_USER} {SAUCE_KEY} {CONFIG_FILE} {TESTS ...}`
+`bedrock-sauce-single {REMOTE_BASE} {SAUCE_JOB} {SAUCE_BROWSER} {SAUCE_BROWSER_VERSION} {SAUCE_OS} {SAUCE_USER} {SAUCE_KEY}`
 
 e.g. run tests on SauceLabs on chrome latest
 
