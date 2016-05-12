@@ -26,7 +26,7 @@ var scan = function (keys) {
   return actions;
 };
 
-/* 
+/*
  JSON API for data: {
    keys: [
      { text :: String } | { combo :: { ctrlKey :: Bool, key :: String } }

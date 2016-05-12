@@ -17,12 +17,27 @@ var param = function (name, info, validate, short) {
   };
 };
 
+var usage = function (program, params) {
+  var shortParams = params.map(function (p) {
+    return p.short;
+  }).join(' ');
+
+  var paramHelp = params.map(function (p) {
+    return '  ' + p.short + ': ' + p.info;
+  }).join('\n\n');
+
+  var output = 'usage: ' + program + ' ' + shortParams + '\n\n' + paramHelp + '\n';
+  console.error('\n');
+  console.error(output);
+  process.exit(-1);
+};
+
 var parse = function (args, params, program) {
   var init = { };
 
   try {
     if (args.length - params.length < 0) throw new Error('Incorrect number of arguments: ' + args.length + '. Required ' + params.length + '+');
-    params.map(function (p) {
+    params.forEach(function (p) {
       p.p(args, init);
     });
   } catch (err) {
@@ -34,13 +49,14 @@ var parse = function (args, params, program) {
 
 var validateFile = function (name, value) {
   try {
-    if (!fs.existsSync(value)  && fs.statSync(value).isFile()) throw new Error('Property: ' + name + ' => Value: ' + value + ' was not a file');
+    // TODO: Switch to access.
+    if (!fs.existsSync(value) && fs.statSync(value).isFile()) throw new Error('Property: ' + name + ' => Value: ' + value + ' was not a file');
   } catch (err) {
     throw new Error('Property: ' + name + ' => Value: ' + value + ' was not a file or ' + err);
   }
 };
 
-var isAny = function (name, value) {
+var isAny = function (/* name, value */) {
   return true;
 };
 
@@ -58,19 +74,6 @@ var files = function (name, info, short) {
     info: info,
     short: short
   };
-};
-
-var usage = function (program, params) {
-  var s = 'usage: ' + program + ' ' + params.map(function (p) { return p.short; }).join(' ') + '\n' +
-         '\n' +
-         'arguments:\n\n' +
-         params.map(function (p) {
-          return '  ' + p.short + ': ' + p.info;
-         }).join('\n\n') +
-         '\n';
-  console.error('\n');
-  console.error(s);
-  process.exit(-1);
 };
 
 module.exports = {
