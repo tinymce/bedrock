@@ -8,13 +8,10 @@
  * driver: (optional). Required for supporting keys
  */
 var start = function (settings, f) {
-
   var http = require('http');
   var finalhandler = require('finalhandler');
 
   var openport = require('openport');
-
-  var KEEP_GOING = false;
 
   var routes = require('./routes');
   var keys = require('./keyeffects');
@@ -29,7 +26,7 @@ var start = function (settings, f) {
       config: settings.config,
       scripts: settings.testfiles
     }),
-    settings.driver !== null ? routes.effect('/keys', keys.executor(settings.driver)) : routes.unsupported('/keys', 'Keys API not supported without webdriver running. Use bedrock-auto to get this feature.')
+    settings.driver === null ? routes.unsupported('/keys', 'Keys API not supported without webdriver running. Use bedrock-auto to get this feature.') : routes.effect('/keys', keys.executor(settings.driver))
   ];
 
   var fallback = routes.constant(settings.basedir, 'src/resources/tunic.html');
@@ -38,7 +35,10 @@ var start = function (settings, f) {
     startingPort: 8000,
     endingPort: 20000
   }, function (err, port) {
-    if (err) { console.log(err); return; }
+    if (err) {
+      console.log('Error looking for open port between 8000 and 20000: ' + err);
+      return;
+    }
 
     var server = http.createServer(function (request, response) {
       var done = finalhandler(request, response);
