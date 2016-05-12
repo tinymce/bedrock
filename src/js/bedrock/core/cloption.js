@@ -49,8 +49,8 @@ var parse = function (args, params, program) {
 
 var validateFile = function (name, value) {
   try {
-    // TODO: Switch to access.
-    if (!fs.existsSync(value) && fs.statSync(value).isFile()) throw new Error('Property: ' + name + ' => Value: ' + value + ' was not a file');
+    fs.accessSync(value);
+    if (!fs.statSync(value).isFile()) throw new Error('Property: ' + name + ' => Value: ' + value + ' was not a file');
   } catch (err) {
     throw new Error('Property: ' + name + ' => Value: ' + value + ' was not a file or ' + err);
   }

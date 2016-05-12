@@ -12,6 +12,7 @@ var extract = function (params, directories) {
     total: '.total',
     testName: '.test.running .name',
     results: 'textarea.results',
+    // TODO: use path.join
     basedir: directories.bin + '/../'
   };
 };

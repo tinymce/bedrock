@@ -54,7 +54,12 @@ var write = function (settings) {
 
       root.endElement();
 
-      if (!fs.existsSync(settings.output)) fs.mkdirSync(settings.output);
+      try {
+        fs.accessSync(settings.output);
+      } catch (err) {
+        fs.mkdirSync(settings.output);
+      }
+
       var reportFile = settings.output + '/TEST-' + settings.name + '.xml';
       fs.writeFileSync(reportFile, w.toString());
 
