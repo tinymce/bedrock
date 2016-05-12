@@ -1,17 +1,20 @@
+var SauceLabs = require('saucelabs');
+
 var create = function (params) {
-  var saucelabs = require('saucelabs')({
+  var saucelabs = new SauceLabs({
     username: params.sauceUser,
     password: params.sauceKey
   });
 
-  var reporter = require('./bedrock/core/reporter');
+  var reporter = require('../core/reporter');
 
   var setJobPassed = function (session, name) {
     return function (result) {
       return new Promise(function (resolve, reject) {
+        console.log('name', name, 'passed');
         saucelabs.updateJob(session.id_, {
           name: name,
-          result: true
+          passed: true
         }, function () {
           resolve(result);
         });
@@ -25,9 +28,9 @@ var create = function (params) {
       return new Promise(function (resolve, reject) {
         saucelabs.updateJob(session.id_, {
           name: name,
-          result: false
+          passed: false
         }, function () {
-          resolve(err);
+          reject(err);
         });
       });
     };

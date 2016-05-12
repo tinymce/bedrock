@@ -36,6 +36,7 @@ var run = function (directories) {
   var detailedName = prettify(params.sauceOS, params.sauceBrowser, params.sauceBrowserVersion);
 
   driver.get(params.base + '/index.html').then(function () {
+    console.log('Starting SauceLabs platform: ' + detailedName);
     var jobResult = jobs.runTest(detailedName, driver, function () {
       return poll.loop(driver, settings);
     });
@@ -52,10 +53,10 @@ var run = function (directories) {
       });
     });
   }).then(function (/* res */) {
-    console.log('Passed SauceLabs test: ' + detailedName);
+    console.log('Passed SauceLabs platform: ' + detailedName);
     process.exit(0);
   }, function (err) {
-    console.log('Failed SauceLabs test: ' + detailedName);
+    console.log('Failed SauceLabs platform: ' + detailedName);
     console.error(err);
     process.exit(-1);
   });

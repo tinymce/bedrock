@@ -28,7 +28,6 @@ var upload = function (settings) {
 
     async.map(fileset, function (f, cb) {
       counter++;
-      console.log('F.Body', f.Key, f.Body);
       s3.upload({
         Key: 'tunic/' + settings.name + '/' + f.Key,
         Body: f.Body,
