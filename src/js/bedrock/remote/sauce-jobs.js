@@ -1,5 +1,4 @@
 var create = function (params) {
-  var poll = require('./bedrock/poll/poll');
   var saucelabs = require('saucelabs')({
     username: params.sauceUser,
     password: params.sauceKey
@@ -12,9 +11,9 @@ var create = function (params) {
       return new Promise(function (resolve, reject) {
         saucelabs.updateJob(session.id_, {
           name: name,
-          result: passed
+          result: true
         }, function () {
-          resolve(reult);
+          resolve(result);
         });
       });
     };
@@ -22,6 +21,7 @@ var create = function (params) {
 
   var setJobFailed = function (session, name) {
     return function (err) {
+      /* eslint no-unused-vars: "off"*/
       return new Promise(function (resolve, reject) {
         saucelabs.updateJob(session.id_, {
           name: name,
@@ -44,20 +44,20 @@ var create = function (params) {
   };
 
   var runTest = function (suiteName, driver, f) {
-    var name = params.sauceJob;
-    var setAsPassed = setJobPassed(session, name);
-    var setAsFailed = setJobFailed(session, name);
-
-    var logResults = reporter.write({
-      name: suiteName,
-      output: params.outputDir,
-      sauce: {
-        id: session.id_,
-        job: params.sauceJob
-      }
-    });
-
     return driver.getSession().then(function (session) {
+      var name = params.sauceJob;
+      var setAsPassed = setJobPassed(session, name);
+      var setAsFailed = setJobFailed(session, name);
+
+      var logResults = reporter.write({
+        name: suiteName,
+        output: params.outputDir,
+        sauce: {
+          id: session.id_,
+          job: params.sauceJob
+        }
+      });
+
       return setName(session, name).then(f).then(logResults).then(setAsPassed, setAsFailed);
     });
   };
@@ -66,7 +66,6 @@ var create = function (params) {
     runTest: runTest
   };
 };
-
 
 module.exports = {
   create: create
