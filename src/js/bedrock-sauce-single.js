@@ -2,11 +2,8 @@ var run = function (directories) {
   var cli = require('./bedrock/core/cli');
   var cloption = require('./bedrock/core/cloption');
   var poll = require('./bedrock/poll/poll');
-  var SauceLabs = require('saucelabs');
-  var childprocess = require('child_process');
   var capitalize = require('capitalize');
-
-  var fs=require('fs');
+  var saucejobs = require('./bedrock/remote/sauce-jobs');
 
   var rest = process.argv.slice(2);
   var params = cloption.parse(rest, [
@@ -20,19 +17,14 @@ var run = function (directories) {
     cloption.param('outputDir', '(Filename): Output directory for test file. If it does not exist, it is created.', cloption.isAny, 'OUTPUT_DIR')
   ], 'sauce-labs-single');
 
-  var saucelabs = new SauceLabs({
-    username: params.sauceUser,
-    password: params.sauceKey
-  });
+  var jobs = saucejobs.create(params);
 
   var settings = cli.extract(params, directories);
-
-  var reporter = require('./bedrock/core/reporter');
 
   var drivers = require('./bedrock/remote/driver');
 
   var prettify = function (os, browser, bversion) {
-    return [ capitalize(browser) ].concat(bversion !== 'latest' ? [ bversion ] : [ ]).concat([ capitalize(os) ]).join('.');
+    return [ capitalize(browser) ].concat(bversion === 'latest' ? [ ] : [ bversion ]).concat([ capitalize(os) ]).join('.');
   };
 
   var driver = drivers.create(params.sauceUser, params.sauceKey, {
@@ -44,44 +36,22 @@ var run = function (directories) {
   var detailedName = prettify(params.sauceOS, params.sauceBrowser, params.sauceBrowserVersion);
 
   driver.get(params.base + '/index.html').then(function () {
-    return new Promise(function (resolve, reject) {
-      return driver.getSession().then(function (session) {
-        saucelabs.updateJob(session.id_, { name: params.sauceJob }, function () {
-          console.log('Starting SauceLabs test (' + detailedName + '): id => ' + session.id_);
-          poll.loop(driver, settings).then(reporter.write({
-            name: detailedName,
-            output: params.outputDir,
-            sauce: {
-              id: session.id_,
-              job: params.sauceJob
-            }
-          })).then(function (result) {
-            driver.sleep(1000);
-            saucelabs.updateJob(session.id_, {
-              name: params.sauceJob,
-              passed: true
-            }, function () {
-              driver.quit();
-              if (process.send) process.send({ success: result });
-              resolve(result);
-            });
+    var jobResult = jobs.runTest(detailedName, driver, function () {
+      return poll.loop(driver, settings);
+    });
 
-          }, function (err) {
-            driver.sleep(1000);
-            saucelabs.updateJob(session.id_, {
-              name: params.sauceJob,
-              passed: false
-            }, function () {
-              driver.quit().then(function () {
-                if (process.send) process.send({ failure: err });
-                reject(err);
-              });
-            });
-          });
-        });
+    return jobResult.then(function (result) {
+      return driver.quit().then(function () {
+        if (process.send) process.send({ success: result });
+        return Promise.resolve(result);
+      });
+    }, function (err) {
+      return driver.quit().then(function () {
+        if (process.send) process.send({ failure: err });
+        return Promise.reject(err);
       });
     });
-  }).then(function (res) {
+  }).then(function (/* res */) {
     console.log('Passed SauceLabs test: ' + detailedName);
     process.exit(0);
   }, function (err) {
@@ -90,7 +60,6 @@ var run = function (directories) {
     process.exit(-1);
   });
 };
-
 
 module.exports = {
   run: run
