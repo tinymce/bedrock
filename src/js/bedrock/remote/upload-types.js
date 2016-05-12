@@ -3,6 +3,14 @@ var readdirSyncRec = require('recursive-readdir-sync');
 var fs = require('fs');
 var path = require('path');
 
+var uploadtype = function (key, body, contentType) {
+  return {
+    Key: key,
+    Body: body,
+    ContentType: contentType
+  };
+};
+
 var filetype = function (source, destination) {
   return {
     isFile: true,
@@ -48,14 +56,6 @@ var scanDir = function (dir) {
 var scanData = function (data) {
   console.log('scanning', data);
   return uploadtype(data.filename, data.content, data.contentType);
-};
-
-var uploadtype = function (key, body, contentType) {
-  return {
-    Key: key,
-    Body: body,
-    ContentType: contentType
-  };
 };
 
 var scan = function (item) {

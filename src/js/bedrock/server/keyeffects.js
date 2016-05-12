@@ -7,13 +7,13 @@ var NO_ACTION = null;
 
 var scanCombo = function (combo) {
   if (combo.ctrlKey) return Key.chord(Key.CONTROL, combo.key);
-  else return NO_ACTION;
+  return NO_ACTION;
 };
 
 var scanItem = function (item) {
   if (item.text) return item.text;
   else if (item.combo) return scanCombo(item.combo);
-  else return NO_ACTION;
+  return NO_ACTION;
 };
 
 var scan = function (keys) {
