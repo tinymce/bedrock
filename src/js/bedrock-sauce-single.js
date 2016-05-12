@@ -29,7 +29,7 @@ var run = function (directories) {
 
   var driver = drivers.create(params.sauceUser, params.sauceKey, {
     browser: params.sauceBrowser,
-    // missing browser version?
+    browserVersion: params.sauceBrowserVersion,
     os: params.sauceOS
   });
 

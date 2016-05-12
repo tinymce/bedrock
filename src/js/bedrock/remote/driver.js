@@ -13,7 +13,7 @@ var create = function (sauceUser, sauceKey, settings) {
       accessKey: sauceKey,
       browserName: settings.browser,
       platform: settings.os,
-      version: 'latest'
+      version: settings.browserVersion
     })
     .usingServer('http://' + sauceUser + ':' + sauceKey + '@ondemand.saucelabs.com:80/wd/hub')
     .build();

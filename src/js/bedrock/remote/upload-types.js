@@ -54,7 +54,6 @@ var scanDir = function (dir) {
 };
 
 var scanData = function (data) {
-  console.log('scanning', data);
   return uploadtype(data.filename, data.content, data.contentType);
 };
 

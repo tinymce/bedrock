@@ -11,7 +11,6 @@ var create = function (params) {
   var setJobPassed = function (session, name) {
     return function (result) {
       return new Promise(function (resolve, reject) {
-        console.log('name', name, 'passed');
         saucelabs.updateJob(session.id_, {
           name: name,
           passed: true

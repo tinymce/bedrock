@@ -31,7 +31,17 @@ var run = function (directories) {
   return uploader.upload(targets).then(function (base/* , uploadData */) {
     return distribute.sequence(params.sauceConfig, function (b) {
       return new Promise(function (resolve, reject) {
-        var child = childprocess.fork(directories.bin + '/bedrock-sauce-single.js', [ base, params.sauceJob, b.browser, 'latest', b.os, params.sauceUser, params.sauceKey, params.outputDir, params.testConfig ].concat(params.testFiles));
+        var child = childprocess.fork(directories.bin + '/bedrock-sauce-single.js', [
+          base,
+          params.sauceJob,
+          b.browser,
+          b['browser-version'] === undefined ? 'latest' : b['browser-version'],
+          b.os,
+          params.sauceUser,
+          params.sauceKey,
+          params.outputDir,
+          params.testConfig
+        ].concat(params.testFiles));
         child.on('message', function (info) {
           if (info.success) resolve(info.success);
           else if (info.failure) reject(info.failure);
@@ -40,7 +50,7 @@ var run = function (directories) {
       });
     });
   }).then(function (/* res */) {
-    console.log('SauceLabs Tests complete: ' + params.testFiles.length);
+    console.log('SauceLabs Tests complete. Number of test files: ' + params.testFiles.length);
   }, function (err) {
     console.log('SauceLabs Error: ', err);
     console.error(err);

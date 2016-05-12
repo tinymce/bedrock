@@ -1,4 +1,4 @@
-var factor = 100000000000;
+var factor = 1;
 
 var extract = function (params, directories) {
   return {
