@@ -11,7 +11,6 @@ var extract = function (params, directories) {
     progress: '.progress',
     total: '.total',
     testName: '.test.running .name',
-    failed: '.test.failed',
     results: 'textarea.results',
     basedir: directories.bin + '/../'
   };
