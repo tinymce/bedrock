@@ -3,7 +3,6 @@ var run = function (directories) {
 
   var cli = require('./bedrock/core/cli');
   var cloption = require('./bedrock/core/cloption');
-  var poll = require('./bedrock/poll/poll');
 
   var params = cloption.parse(process.argv.slice(2), [
     cloption.param('testConfig', '(Filename): the filename for the config file', cloption.validateFile, 'CONFIG_FILE'),
@@ -21,11 +20,10 @@ var run = function (directories) {
     driver: null
   };
 
-  serve.start(serveSettings, function (service, done) {
+  serve.start(serveSettings, function (service/* , done */) {
     console.log('bedrock (manual) available at: http://localhost:' + service.port);
   });
 };
-
 
 module.exports = {
   run: run

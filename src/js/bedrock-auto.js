@@ -1,19 +1,19 @@
-  var shutdown = function (promise, driver, done) {
-    promise.then(function (res) {
-      // All good, so continue.
-      driver.sleep(1000);
-      driver.quit().then(function () {
-        console.log('All tests passed.');
-        done();
-      });
-    }, function (err) {
-      driver.sleep(1000);
-      driver.quit().then(function () {
-        done();
-        throw new Error(err);
-      });
+var shutdown = function (promise, driver, done) {
+  promise.then(function (/* res */) {
+    // All good, so continue.
+    driver.sleep(1000);
+    driver.quit().then(function () {
+      console.log('All tests passed.');
+      done();
     });
-  };
+  }, function (err) {
+    driver.sleep(1000);
+    driver.quit().then(function () {
+      done();
+      throw new Error(err);
+    });
+  });
+};
 
 var run = function (directories) {
   var serve = require('./bedrock/server/serve');
@@ -26,9 +26,9 @@ var run = function (directories) {
   var rest = process.argv.slice(2);
   var params = cloption.parse(rest, [
     cloption.param('suiteName', '(String): Name for the test suite', cloption.isAny, 'SUITE_NAME'),
-    // TODO: Maybe this directory should be deleted each time.
+    // INVESTIGATE: Maybe this directory should be deleted each time.
     cloption.param('outputDir', '(Filename): Output directory for test file. If it does not exist, it is created.', cloption.isAny, 'OUTPUT_DIR'),
-    // TODO: Do validation on the browser name (e.g. cloption.inSet([ '...' ]))
+    // INVESTIGATE: Do validation on the browser name (e.g. cloption.inSet([ '...' ]))
     cloption.param('browser', '(String): Browser value: chrome | firefox | safari | ie | MicrosoftEdge', cloption.isAny, 'BROWSER'),
     cloption.param('testConfig', '(Filename): the filename for the config file', cloption.validateFile, 'CONFIG_FILE'),
     cloption.files('testFiles', '{Filename ...} The set of files to test', '{ TEST1 ... }')
@@ -59,7 +59,6 @@ var run = function (directories) {
     shutdown(result, driver, done);
   });
 };
-
 
 module.exports = {
   run: run

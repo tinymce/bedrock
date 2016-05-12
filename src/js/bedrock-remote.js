@@ -15,13 +15,12 @@ var run = function (directories) {
   var uploads = require('./bedrock/remote/project-uploads');
 
   var targets = uploads.choose(params.testDir, params.projectDirs.split(','), settings);
-  uploader.upload(targets).then(function (base, data) {
+  uploader.upload(targets).then(function (base/* , data */) {
     console.log('Files uploaded. Note, bedrock-remote available at: ' + base);
   }, function (err) {
     console.error('error during bedrock-remote', err, err.stack);
   });
 };
-
 
 module.exports = {
   run: run

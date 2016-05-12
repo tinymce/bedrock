@@ -2,9 +2,7 @@ var run = function (directories) {
   var cli = require('./bedrock/core/cli');
   var cloption = require('./bedrock/core/cloption');
   var childprocess = require('child_process');
-  var dateformat=require('date-format');
-
-  var fs = require('fs');
+  var dateformat = require('date-format');
 
   var rest = process.argv.slice(2);
   var params = cloption.parse(rest, [
@@ -20,31 +18,20 @@ var run = function (directories) {
 
   var settings = cli.extract(params, directories);
 
-  var browsers = JSON.parse(fs.readFileSync(params.sauceConfig));
-
   var uploader = require('./bedrock/remote/uploader');
   var uploads = require('./bedrock/remote/project-uploads');
-  var reporter = require('./bedrock/core/reporter');
-
   var distribute = require('./bedrock/remote/distribute');
-
-  var drivers = require('./bedrock/remote/driver');
-
 
 // Use when avoiding uploading.
 // var base = 'http://tbio-testing.s3-website-us-west-2.amazonaws.com/tunic/sauce';
 
-  // The base directory is based on the sauceJob and the current time.
-  // "yyyyMMddHHmmss")
   var uploadDir = params.sauceJob + dateformat('yyyyMMddhhmmss');
 
   var targets = uploads.choose(uploadDir, params.projectDirs.split(','), settings);
-  return uploader.upload(targets).then(function (base, uploadData) {
-
+  return uploader.upload(targets).then(function (base/* , uploadData */) {
     return distribute.sequence(params.sauceConfig, function (b) {
       return new Promise(function (resolve, reject) {
         var child = childprocess.fork(directories.bin + '/bedrock-sauce-single.js', [ base, params.sauceJob, b.browser, 'latest', b.os, params.sauceUser, params.sauceKey, params.outputDir, params.testConfig ].concat(params.testFiles));
-
         child.on('message', function (info) {
           if (info.success) resolve(info.success);
           else if (info.failure) reject(info.failure);
@@ -52,14 +39,13 @@ var run = function (directories) {
         });
       });
     });
-  }).then(function (res) {
+  }).then(function (/* res */) {
     console.log('SauceLabs Tests complete: ' + params.testFiles.length);
   }, function (err) {
     console.log('SauceLabs Error: ', err);
     console.error(err);
   });
 };
-
 
 module.exports = {
   run: run
