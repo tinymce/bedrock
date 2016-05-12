@@ -1,6 +1,6 @@
 ## test mode (bedrock-auto)
 
-*Test* mode allows the user to run tests in an automated fashion. Bedrock will spin up the browser tiself (assuming the user has the right [WebDrivers](webdrivers.md) on the path),
+*Test* mode allows the user to run tests in an automated fashion. Bedrock will spin up the browser itself (assuming the user has the right [WebDrivers](webdrivers.md) on the path),
 establish a WebDriver connection with this browser and close the browser once the tests have completed.
 
 `bedrock-auto {SUITE_NAME} {BROWSER} {CONFIG_FILE} {TESTS ...}`
