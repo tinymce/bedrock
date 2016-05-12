@@ -1,0 +1,123 @@
+h1 {
+    background: none repeat scroll 0 0 ;
+    border-bottom: 5px solid #507EC0;
+    border-top: 5px solid #507EC0;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+body {
+    font-family: 'Armata', sans-serif;
+    margin: 0px;
+}
+
+.name {
+    margin: 10px;
+}
+
+.error-container {
+    display: block;
+    font-family: monospace;
+    overflow: scroll;
+}
+
+.error-container .error {
+    margin: 20px;
+    border: 1px solid #FFB3B3;
+}
+
+.error-container .delayed {
+    margin-left: 20px;
+    margin-right: 20px;
+    border: 1px solid #40B2FF;
+}
+
+.error-container ins {
+    padding: 2px;
+    background: rgba(10, 250, 10, 0.5);
+    text-decoration: none;
+}
+
+.error-container del {
+    padding: 2px;
+    background: rgba(250, 10, 10, 0.5);
+    text-decoration: none;
+}
+
+div.passed span.error-container {
+    display: none;
+}
+
+.result {
+    display: none;
+}
+
+.time {
+
+}
+
+.done {
+    clear:both;
+    font-size: small;
+    text-align: right;
+    border-top: 3px solid  #507EC0;
+}
+
+.scratch {
+    margin: 0px 10px;
+}
+
+span.testfile {
+    display: block; text-align: right;
+    font-size: small;
+}
+
+div.running {
+    border: 3px dashed #cadbee;
+    border-bottom: 15px solid #cadbee;
+    margin: 5px;
+    clear:both;
+}
+
+div.failed {
+    border: 3px solid #FFB3B3;
+    border-bottom-width: 15px;
+    margin: 5px;
+    clear:both;
+}
+div.passed.hidden {
+    display: none;
+}
+
+div.passed {
+    display: block;
+    float: left;
+    border: 6px solid #AEF5AF;
+    background-color: #AEF5AF;
+    margin: 10px 1px;
+    width: 0px;
+    height: 0px;
+    overflow: hidden;
+}
+div.passed:hover .output {
+    position: absolute;
+    left: 0;
+    width: 99vw;
+    background: white;
+    border: 3px solid #AEF5AF;
+    border-bottom-width: 15px;
+    margin: 15px 5px;
+    z-index: 99999999;
+}
+
+div.delayed {
+    border: 3px solid #40B2FF;
+    border-bottom-width: 15px;
+    margin: 5px;
+    clear: both;
+}
+
+textarea.results {
+    width: 700px;
+    height: 200px;
+}

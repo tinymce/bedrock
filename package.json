@@ -1,17 +1,36 @@
 {
-  "name": "bedrock",
-  "version": "1.0.0",
+  "name": "@ephox/bedrock",
+  "version": "1.1.0",
   "description": "NodeJS test runner for bolt projects",
-  "main": "runner.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "bin": {
+    "bedrock-auto": "./bin/bedrock-auto.js",
+    "bedrock-remote": "./bin/bedrock-remote.js",
+    "bedrock-sauce": "./bin/bedrock-sauce.js",
+    "bedrock-sauce-single": "./bin/bedrock-sauce-single.js",
+    "bedrock": "./bin/bedrock.js"
   },
+  "private": true,
   "dependencies": {
-    "selenium-webdriver": "*"
+    "@ephox/bolt": "^1.6.5",
+    "aws-sdk": "^2.3.9",
+    "capitalize": "^1.0.0",
+    "date-format": "0.0.2",
+    "finalhandler": "^0.4.1",
+    "jquery": "^2.2.3",
+    "mime": "^1.3.4",
+    "openport": "0.0.4",
+    "recursive-readdir-sync": "^1.0.6",
+    "request": "^2.72.0",
+    "saucelabs": "^1.2.0",
+    "selenium-webdriver": "2.47.0",
+    "serve-static": "^1.10.2",
+    "xml-writer": "^1.6.0"
   },
-    "devDependencies": {
+  "devDependencies": {
+    "eslint": "^2.9.0",
+    "eslint-config-google": "^0.5.0",
     "grunt": "*"
   },
-  "author": "",
-  "license": "MIT"
+  "author": "Ephox",
+  "license": "BSD-3-Clause"
 }

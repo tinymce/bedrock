@@ -1,0 +1,10 @@
+* Using webdriver-selenium 2.47.0 (and not any higher) due to SauceLabs restrictions. See: https://wiki.saucelabs.com/display/DOCS/Node.js+Test+Setup+Example.
+
+* Remote running approach
+ - upload everything to an amazon bucket
+ - link to that amazon bucket
+
+ Library: aws-sdk
+
+ 
+
