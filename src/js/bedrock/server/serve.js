@@ -29,7 +29,7 @@ var start = function (settings, f) {
     settings.driver === null ? routes.unsupported('/keys', 'Keys API not supported without webdriver running. Use bedrock-auto to get this feature.') : routes.effect('/keys', keys.executor(settings.driver))
   ];
 
-  var fallback = routes.constant(settings.basedir, 'src/resources/tunic.html');
+  var fallback = routes.constant(settings.basedir, 'src/resources/bedrock.html');
 
   openport.find({
     startingPort: 8000,

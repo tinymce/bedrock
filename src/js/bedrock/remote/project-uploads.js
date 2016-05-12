@@ -39,10 +39,8 @@ var choose = function (name, projectDirs, settings) {
       boltlink('module.js'),
       boltlink('test.js'),
       link('node_modules/jquery/dist', 'jquery.min.js', 'lib/jquery', 'jquery.min.js'),
-      link('src/css', 'tunic.css', 'css', 'tunic.css'),
-
-      uploadtypes.filetype(settings.basedir + 'src/resources/tunic.html', 'index.html'),
-      uploadtypes.filetype(settings.basedir + 'src/css/tunic.css', 'css/tunic.css'),
+      uploadtypes.filetype(settings.basedir + 'src/resources/bedrock.html', 'index.html'),
+      uploadtypes.filetype(settings.basedir + 'src/css/bedrock.css', 'css/bedrock.css'),
       uploadtypes.datatype('harness', JSON.stringify({ config: settings.config, scripts: settings.testfiles }))
     ])
   };

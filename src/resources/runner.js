@@ -2,8 +2,8 @@
 /*jshint jquery:true */
 (function (global) {
   global.ephox = global.ephox || {};
-  global.ephox.tunic = global.ephox.tunic || {};
-  var api = global.ephox.tunic;
+  global.ephox.bedrock = global.ephox.bedrock || {};
+  var api = global.ephox.bedrock;
 
   var testconfig = '';     // set during loadtests, for global config to use.
   var testcount = $('<span />').addClass('total').text(0);       // set during loadtests, for selenium remote test counting
@@ -15,9 +15,9 @@
   var wrapper = ephox.bolt.test.run.wrapper;
   var errors = ephox.bolt.test.report.errors;
 
-  var tunicsource = function () {
+  var bedrocksource = function () {
     return {
-      args: [ function (path) { return path; }, 'ephox.tunic', 'js', function (id) { return id; } ],
+      args: [ function (path) { return path; }, 'ephox.bedrock', 'js', function (id) { return id; } ],
       relativeTo: '',
       type: 'amd'
     };
@@ -25,7 +25,7 @@
 
   var reader = function (done) {
     browser.read('./', 'project/' + testconfig, function (data) {
-      data.sources = [ tunicsource() ].concat(data.sources);
+      data.sources = [ bedrocksource() ].concat(data.sources);
       done(data);
     });
   };
@@ -34,7 +34,7 @@
     var current = $('<span />').addClass('progress').text(0);
     var stop = $('<button />').text('stop').click(function () { cancelTests = true; });
 
-    // WARNING: be careful if changing this, tunic depends on the class names "progress" and "total"
+    // WARNING: be careful if changing this, bedrock depends on the class names "progress" and "total"
     $('document').ready(function () {
       $('body')
         .append($('<div />')
@@ -101,8 +101,8 @@
       var failhtml = function (pre, e) {
         // Provide detailed HTML comparison information
         pre.html('Test failure: ' + e.message +
-          '\nExpected: ' + htmlentities(e.diff.expected) + 
-          '\nActual: ' + htmlentities(e.diff.actual) + 
+          '\nExpected: ' + htmlentities(e.diff.expected) +
+          '\nActual: ' + htmlentities(e.diff.actual) +
           '\n\nHTML Diff: ' + processQUnit(htmlentities(e.diff.comparison)) + '\n\nStack: ' + e.stack);
       };
 
@@ -145,7 +145,7 @@
         marker.text('[delayed]').addClass('delayed');
         // Don't use .text() as it strips out newlines in IE, even when used
         // on a pre tag.
-        error.append('<pre class="delayed">Test incomplete, tunic will perform HTML comparison</pre>');
+        error.append('<pre class="delayed">Test incomplete, bedrock will perform HTML comparison</pre>');
         var testTime = timer.elapsed(starttime);
         time.text(testTime);
 
@@ -192,7 +192,7 @@
 
 
   /*
-   * Alternate tunic hack
+   * Alternate bedrock hack
    *
    * This overrides the test.create system to share modules rather than
    * recreating a fresh module system for each test.
