@@ -1,3 +1,4 @@
+var path = require('path');
 var factor = 1;
 
 var extract = function (params, directories) {
@@ -12,8 +13,7 @@ var extract = function (params, directories) {
     total: '.total',
     testName: '.test.running .name',
     results: 'textarea.results',
-    // TODO: use path.join
-    basedir: directories.bin + '/../'
+    basedir: path.join(directories.bin, '/..')
   };
 };
 
