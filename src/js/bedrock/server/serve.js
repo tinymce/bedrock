@@ -9,6 +9,7 @@
  */
 var start = function (settings, f) {
   var http = require('http');
+  var path = require('path');
   var finalhandler = require('finalhandler');
 
   var openport = require('openport');
@@ -16,15 +17,19 @@ var start = function (settings, f) {
   var routes = require('./routes');
   var keys = require('./keyeffects');
 
+  var testFiles = settings.testfiles.map(function (filePath) {
+    return path.relative(settings.projectdir, filePath);
+  });
+
   var routers = [
     routes.routing('/project', settings.projectdir),
-    routes.routing('/js', settings.basedir + 'src/resources'),
-    routes.routing('/lib/bolt', settings.basedir + 'node_modules/@ephox/bolt/lib'),
-    routes.routing('/lib/jquery', settings.basedir + 'node_modules/jquery/dist'),
-    routes.routing('/css', settings.basedir + 'src/css'),
+    routes.routing('/js', path.join(settings.basedir, 'src/resources')),
+    routes.routing('/lib/bolt', path.join(settings.basedir, 'node_modules/@ephox/bolt/lib')),
+    routes.routing('/lib/jquery', path.join(settings.basedir, 'node_modules/jquery/dist')),
+    routes.routing('/css', path.join(settings.basedir, 'src/css')),
     routes.json('/harness', {
-      config: settings.config,
-      scripts: settings.testfiles
+      config: path.relative(settings.projectdir, settings.config),
+      scripts: testFiles
     }),
     settings.driver === null ? routes.unsupported('/keys', 'Keys API not supported without webdriver running. Use bedrock-auto to get this feature.') : routes.effect('/keys', keys.executor(settings.driver))
   ];
