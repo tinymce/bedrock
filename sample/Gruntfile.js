@@ -2,10 +2,10 @@ module.exports = function(grunt) {
   grunt.initConfig({
     'bedrock-manual': {
       core: {
-        config: '../sample/config.js',
+        config: 'config.js',
         projectdir: '../',
         files: {
-          src: ['../sample/*Test.js']
+          src: ['*Test.js']
         }
       }
     }
