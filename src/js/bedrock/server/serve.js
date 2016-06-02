@@ -43,7 +43,7 @@ var start = function (settings, f) {
     }),
     driverRouter('/keys', 'Keys', keys.executor),
     driverRouter('/mouse', 'Mouse', mouse.executor),
-    routes.effect('/clipboard', clipboard.route(settings.baseDir, settings.projectDir))
+    routes.effect('/clipboard', clipboard.route(settings.basedir, settings.projectdir))
   ];
 
   var fallback = routes.constant(settings.basedir, 'src/resources/bedrock.html');
