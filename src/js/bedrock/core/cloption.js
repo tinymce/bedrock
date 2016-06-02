@@ -41,7 +41,7 @@ var parse = function (args, params, program) {
       p.p(args, init);
     });
   } catch (err) {
-    console.error(err);
+    console.error(err.message !== undefined ? err.message : err);
     usage(program, params);
   }
   return init;

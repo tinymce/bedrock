@@ -22,14 +22,18 @@ var routing = function (prefix, source) {
 
 var json = function (prefix, data) {
   var go = function (request, response/* , done */) {
-    response.writeHeader(200, { "Content-Type": "application/json" });
-    response.end(JSON.stringify(data));
+    concludeJson(response, 200, data);
   };
 
   return {
     matches: prefixMatch(prefix),
     go: go
   };
+};
+
+var concludeJson = function (response, status, info) {
+  response.writeHeader(status, { "Content-Type": "application/json" });
+  response.end(JSON.stringify(info));
 };
 
 var effect = function (prefix, action) {
@@ -41,9 +45,12 @@ var effect = function (prefix, action) {
 
     request.on('end', function () {
       var parsed = JSON.parse(body);
-      action(parsed);
-      response.writeHeader(200, { "Content-Type": "application/json" });
-      response.end(JSON.stringify({}));
+      action(parsed).then(function () {
+        concludeJson(response, 200, {});
+      }, function (err) {
+        console.log('Executing effect failed: \n** ' + body);
+        concludeJson(response, 500, {});
+      });
     });
   };
 
@@ -69,10 +76,7 @@ var constant = function (root, url) {
 
 var unsupported = function (root, label) {
   var go = function (request, response/* , done */) {
-    response.writeHeader(404, { "Content-Type": "application/json" });
-    response.end(JSON.stringify({
-      error: label
-    }));
+    concludeJson(response, 404, { error: label });
   };
 
   return {

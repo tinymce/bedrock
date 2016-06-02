@@ -27,6 +27,8 @@ var testsDone = function (settings) {
     var resultsCss = By.css(settings.results);
     return driver.wait(until.elementLocated(resultsCss), 1).then(function (res) {
       return res.getInnerHtml();
+    }, function (err) {
+      console.error('Debugging: tests completed but no area for test results', err);
     });
   };
 };

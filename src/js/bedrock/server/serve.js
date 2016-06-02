@@ -16,10 +16,19 @@ var start = function (settings, f) {
 
   var routes = require('./routes');
   var keys = require('./keyeffects');
+  var clipboard = require('./clipboardeffects');
 
   var testFiles = settings.testfiles.map(function (filePath) {
     return path.relative(settings.projectdir, filePath);
   });
+
+  var driverRouter = function (url, apiLabel, executor) {
+    var unsupported = routes.unsupported(
+      url,
+      apiLabel + ' API not supported without webdriver running. Use bedrock-auto to get this feature.'
+    );
+    return settings.driver === null ? unsupported : routes.effect(url, executor(settings.driver));
+  };
 
   var routers = [
     routes.routing('/project', settings.projectdir),
@@ -31,7 +40,9 @@ var start = function (settings, f) {
       config: path.relative(settings.projectdir, settings.config),
       scripts: testFiles
     }),
-    settings.driver === null ? routes.unsupported('/keys', 'Keys API not supported without webdriver running. Use bedrock-auto to get this feature.') : routes.effect('/keys', keys.executor(settings.driver))
+    driverRouter('/keys', 'Keys', keys.executor),
+    driverRouter('/mouse', 'Mouse', mouse.executor),
+    routes.effect('/clipboard', clipboard.route(settings.baseDir, settings.projectDir))
   ];
 
   var fallback = routes.constant(settings.basedir, 'src/resources/bedrock.html');

@@ -9,6 +9,7 @@ var shutdown = function (promise, driver, done) {
   }, function (err) {
     driver.sleep(1000);
     driver.quit().then(function () {
+      console.error('********* Unexpected Bedrock Error -> Server Quitting ***********', err);
       done();
       throw new Error(err);
     });
@@ -51,6 +52,7 @@ var run = function (directories) {
   serve.start(serveSettings, function (service, done) {
     console.log('bedrock-auto available at: http://localhost:' + service.port);
     var result = driver.get('http://localhost:' + service.port).then(function () {
+      console.log('\n ... Initial page has loaded ...');
       return poll.loop(driver, settings).then(reporter.write({
         name: params.suiteName,
         output: params.outputDir
