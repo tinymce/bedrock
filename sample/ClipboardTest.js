@@ -9,6 +9,8 @@ asynctest(
     var success = arguments[arguments.length - 2];
     var failure = arguments[arguments.length - 1];
 
+    if (window.fetch === undefined) return failure('This sample only runs on Chrome');
+
     var importClipboard = function (fileName) {
       return fetch('/clipboard', {
         method: 'POST',
