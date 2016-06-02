@@ -26,7 +26,9 @@ var loop = function (driver, settings) {
   var KEEP_GOING = false;
 
   // NOTE: Some drivers (like IE) need a delay otherwise nothing else gets time to execute.
-  var repeatLoop = delay(KEEP_GOING, settings.pollDelay);
+  var repeatLoop = function () {
+    return delay(KEEP_GOING, settings.pollDelay);
+  };
 
   var checkStatus = function (tick) {
     return driver.wait(until.elementLocated(By.css(settings.done)), 1).then(function () {
@@ -34,9 +36,9 @@ var loop = function (driver, settings) {
     }, function (/* err */) {
       // We aren't done yet ... so update the current test if necessary.
       return currentState.update(driver, tick).then(function () {
-        return repeatLoop;
+        return repeatLoop();
       }, function () {
-        return repeatLoop;
+        return repeatLoop();
       });
     });
   };

@@ -48,7 +48,8 @@ var effect = function (prefix, action) {
       action(parsed).then(function () {
         concludeJson(response, 200, {});
       }, function (err) {
-        console.log('Executing effect failed: \n** ' + body);
+        console.error('Executing effect failed: \n** ' + body);
+        console.error('Error: ', err);
         concludeJson(response, 500, {});
       });
     });
