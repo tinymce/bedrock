@@ -16,6 +16,7 @@ var start = function (settings, f) {
 
   var routes = require('./routes');
   var keys = require('./keyeffects');
+  var mouse = require('./mouseeffects');
   var clipboard = require('./clipboardeffects');
 
   var testFiles = settings.testfiles.map(function (filePath) {
