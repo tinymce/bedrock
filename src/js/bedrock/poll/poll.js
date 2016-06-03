@@ -44,20 +44,20 @@ var loop = function (master, driver, settings) {
       });
     }, 'poll');
   };
-  
+
 
   var nextTick = function () {
     var tick = new Date().getTime();
 
     if (currentState.allTimeout(tick)) return exits.allTestsTooLong(currentState, tick);
     else if (currentState.testTimeout(tick)) return exits.oneTestTooLong(currentState, tick);
-    
+
       console.log('<tick>');
       return checkStatus(tick).then(function (t) {
         console.log('</tick>');
         return t;
       });
-    
+
   };
 
   return driver.wait(nextTick, settings.overallTimeout + 100000).then(function (outcome) {
