@@ -11,7 +11,9 @@ var logSauceInfo = function (root, settings) {
 var write = function (settings) {
   return function (raw) {
     return new Promise(function (resolve, reject) {
+      console.log('Prepared', raw);
       var data = JSON.parse(raw);
+      console.log("Parsed JSON", data);
       var results = data.results;
       var failed = results.filter(function (result) {
         return result.passed !== true;

@@ -11,7 +11,13 @@ var start = function (settings, f) {
   var http = require('http');
   var path = require('path');
   var finalhandler = require('finalhandler');
-
+  
+  var pageHasLoaded = false;
+  
+  var markLoaded = function () {
+    pageHasLoaded = true;
+  };
+  
   var openport = require('openport');
 
   var routes = require('./routes');
@@ -22,15 +28,43 @@ var start = function (settings, f) {
   var testFiles = settings.testfiles.map(function (filePath) {
     return path.relative(settings.projectdir, filePath);
   });
+  
+  var delay = function (amount) {
+    return new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        resolve({});
+      }, amount);
+    });
+  };
+  
+  var waitForDriverReady = function (attempts, f) {
+    console.log('trying.  attempts left: ' + attempts, pageHasLoaded);
+    if (pageHasLoaded) {
+      return settings.master.waitForIdle(f, 'effect');
+    }
+    else if (attempts === 0) return Promise.reject('Driver never appeared to be ready');
+    else return delay(2000).then(function () {
+      return waitForDriverReady(attempts - 1, f)
+    });
+  };
 
   var driverRouter = function (url, apiLabel, executor) {
     var unsupported = routes.unsupported(
       url,
       apiLabel + ' API not supported without webdriver running. Use bedrock-auto to get this feature.'
     );
-    return settings.driver === null ? unsupported : routes.effect(url, executor(settings.driver));
+    var effect = function (data) {
+      return waitForDriverReady(300, function () {
+        console.log('Execute effect', data);
+        return executor(settings.driver)(data);
+      });
+      //return waitForDriverReady(300).then(function () {
+      //  return executor(settings.driver)(data);
+      //});
+    };
+    return settings.driver === null ? unsupported : routes.effect(url, effect);
   };
-
+  
   var routers = [
     routes.routing('/project', settings.projectdir),
     routes.routing('/js', path.join(settings.basedir, 'src/resources')),
@@ -64,7 +98,8 @@ var start = function (settings, f) {
 
     f({
       port: port,
-      server: server
+      server: server,
+      markLoaded: markLoaded,
     }, function () {
       server.close();
     });

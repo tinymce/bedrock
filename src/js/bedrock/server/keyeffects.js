@@ -35,9 +35,22 @@ var scan = function (keys) {
  }
  */
 var execute = function (driver, data) {
+  console.log('I am receiving a key effect: \n' + JSON.stringify(data));
   var actions = scan(data.keys);
   var target = driver.findElement(By.css(data.selector));
-  return target.sendKeys.apply(target, actions);
+  return target.sendKeys.apply(target, actions).then(function (x) {
+    return x;
+  }, function (err) {
+    console.log('Silently fail');
+    return Promise.resolve({})
+  }).then(function (v) {
+    return new Promise(function (resolve, reject) {
+      console.log('delaying response ...');
+      setTimeout(function () {
+        resolve(v);
+      }, 1000);
+    });
+  });
 };
 
 var executor = function (driver) {
