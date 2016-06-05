@@ -83,7 +83,7 @@ var create = function () {
   //     });
   //   }
   // };
-  var waitForIdle = function (f, label) {
+  var waitForIdle2 = function (f, label) {
     queue.push({f: f, label: label });
     return waitForQueue().then(function () {
       console.log('Ready for', label, queue);
@@ -94,6 +94,13 @@ var create = function () {
       return f();
     });
   };
+
+
+  var waitForIdle = function (f, label) {
+    return f();
+  };
+
+
 
   var pop = function () {
     if (queue.length === 0) return null;
@@ -130,4 +137,4 @@ var create = function () {
 
 module.exports = {
   create: create
-}
+};
