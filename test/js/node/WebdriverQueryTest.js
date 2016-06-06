@@ -55,10 +55,18 @@ var makeSyncPromise = function (input, amount) {
 
 var makeQuery = function (selector) {
   return driver.wait(until.elementLocated(By.css(selector)), 1000).then(function (elem) {
-
-    console.log('found it: ' + selector);
-  }, function () {
-    console.log('did not find selector: ' + selector);
+    console.log('found it: [' + selector + ']. checking inner html');
+    return elem.getInnerHtml().then(function (html) {
+      console.log('found it: [' + selector + ']: ' + html);
+      return html;
+    }, function (err) {
+      console.error('Error on innerHTML', err);
+      return Promise.reject(err);
+    });
+    // return elem;
+  }, function (err) {
+    console.log('did not find selector: ' + selector, err);
+    // return Promise.reject(err);
   });
 };
 
@@ -86,6 +94,9 @@ var makePromise = function (input, amount) {
 
 makePromise('a', 100);
 makeSyncPromise('a.sync');
+makeQuery('input'),
+makeQuery('div.progress'),
+makeQuery('div.progress'),
 makeQuery('input'),
 makeQuery('div.progress'),
 makePromise('b', 1000);
