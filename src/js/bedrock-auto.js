@@ -53,8 +53,6 @@ var run = function (directories) {
     master: master
   };
 
-  console.log('driver', driver);
-
   serve.start(serveSettings, function (service, done) {
     console.log('bedrock-auto available at: http://localhost:' + service.port);
     var result = driver.get('http://localhost:' + service.port).then(function () {
