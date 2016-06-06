@@ -1,16 +1,11 @@
+var waiter = require('../util/waiter.js');
+
 var create = function () {
 
   var inUse = false;
 
   var queue = [ ];
 
-  var delay = function (v, amount) {
-    return new Promise(function (resolve, reject) {
-      setTimeout(function () {
-        resolve(v);
-      }, amount);
-    });
-  };
 
   // If the queue is empty and we are not "In Use", then this can lock.
 
@@ -23,7 +18,7 @@ var create = function () {
       queue = queue.slice(1);
       return use(first.f, first.label);
     } else {
-      return delay({}, 100).then(function () {
+      return waiter.delay({}, 100).then(function () {
         return doWaitForIdle(identifier, f, label, attempts - 1);
       });
     }
