@@ -13,6 +13,9 @@ var start = function (settings, f) {
   var finalhandler = require('finalhandler');
   var waiter = require('../util/waiter.js');
 
+  // This is a drivermaster. It represents access to the webdriver. It provides
+  // basic locking and unlocking. All promise chains that require webdriver should
+  // use the waitForIdle method.
   var master = settings.master;
 
   var pageHasLoaded = false;
@@ -33,10 +36,9 @@ var start = function (settings, f) {
   });
 
   var waitForDriverReady = function (attempts, f) {
-    console.log('trying.  attempts left: ' + attempts, pageHasLoaded);
-    if (pageHasLoaded) {
-      return master.waitForIdle(f, 'effect');
-    }
+    return master.waitForIdle(f, 'effect');
+    // IE throws errors when functions are used before the driver is ready.
+    if (pageHasLoaded) return master.waitForIdle(f, 'effect');
     else if (attempts === 0) return Promise.reject('Driver never appeared to be ready');
     else return waiter.delay({}, 2000).then(function () {
       return waitForDriverReady(attempts - 1, f);
@@ -50,7 +52,6 @@ var start = function (settings, f) {
     );
     var effect = function (data) {
       return waitForDriverReady(300, function () {
-        console.log('Execute effect', data);
         return executor(settings.driver)(data);
       });
     };
