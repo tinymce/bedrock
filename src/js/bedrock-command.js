@@ -14,7 +14,8 @@ var run = function (directories) {
     cloptions.output,
     cloptions.browser,
     cloptions.config,
-    cloptions.testdir
+    cloptions.testdir,
+    cloptions.files
   ];
 
   var settings = commandLineArgs(definitions);

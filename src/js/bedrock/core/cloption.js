@@ -88,10 +88,12 @@ var files = function (name, info, short) {
   };
 };
 
-var listDirectory = function (name, value) {
-  return readdirSyncRec(value).filter(function (f) {
-    return fs.lstatSync(f).isFile();
-  });
+var listDirectory = function (pattern) {
+  return function (name, value) {
+    return readdirSyncRec(value).filter(function (f) {
+      return f.indexOf(pattern) >-1 && fs.lstatSync(f).isFile();
+    });
+  };
 };
 
 module.exports = {

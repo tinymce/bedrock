@@ -54,6 +54,9 @@
     alias: 'f',
     type: String,
     multiple: true,
+    incompatible: [
+      'testdir'
+    ],
     description: 'The list of files to test',
     validate: cloption.validateFile
   };
@@ -64,19 +67,35 @@
     alias: 'd',
     type: String,
     description: 'The directory containing all the files to test',
-    validate: cloption.listDirectory
+    validate: cloption.listDirectory('Test.js')
+  };
+
+  var validateOne = function (defn, settings) {
+    return defn.validate(defn.name, settings[defn.name]);
+  };
+
+  var validateMany = function (defn, settings) {
+    return settings[defn.name].map(function (f) {
+      return defn.validate(defn.name, f);
+    });
   };
 
   var validate = function (definitions, settings) {
     try {
       definitions.forEach(function (defn) {
         if (defn.required === true && settings[defn.name] === undefined) throw 'Setting: ' + defn.name + ' must be specified.';
+        if (settings[defn.name] !== undefined) {
+          var incompatible = defn.incompatible !== undefined ? defn.incompatible : [];
+          incompatible.forEach(function (n) {
+            if (settings[n] !== undefined) throw 'Setting: ' + defn.name + ' is incompatible with: ' + n;
+          });
+        }
       });
 
       var result = {};
       definitions.forEach(function (defn) {
         if (settings[defn.name] !== undefined) {
-          var newValue = defn.validate(defn.name, settings[defn.name]);
+          var newValue = defn.multiple === true ? validateMany(defn, settings) : validateOne(defn, settings);
           var output = defn.output !== undefined ? defn.output : defn.name;
           result[output] = newValue;
         }
