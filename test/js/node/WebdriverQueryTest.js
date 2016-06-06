@@ -2,13 +2,18 @@ var webdriver = require('selenium-webdriver');
 var By = webdriver.By;
 var until = webdriver.until;
 
+var fs   = require('fs');
+var path = require('path');
+var cwd  = path.join(path.dirname(fs.realpathSync(__filename)));
+console.log('cwd', cwd);
+
 var driver = require('../../../src/js/bedrock/auto/driver').create({
   browser: 'firefox'
 });
 
 driver.manage().timeouts().setScriptTimeout(30000);
 
-driver.get('http://localhost/me/work/van/bedrock/test/js/node/page.html');
+driver.get('file://' + cwd + '/page.html');
 
 var makePromise2 = function (aInput, aAmount) {
   return new Promise(function (resolve, reject) {
