@@ -56,6 +56,15 @@ var validateFile = function (name, value) {
   }
 };
 
+var isOneOf = function (values) {
+  return function (name, value) {
+    if (values.indexOf(value) === -1) throw new Error(
+      'Invalid value for property: ' + name +
+      '. Actual value: ' + value + '\nRequired values: one of ' + JSON.stringify(values)
+    );
+  };
+};
+
 var isAny = function (/* name, value */) {
   return true;
 };
@@ -81,5 +90,6 @@ module.exports = {
   param: param,
   files: files,
   validateFile: validateFile,
-  isAny: isAny
+  isAny: isAny,
+  isOneOf: isOneOf
 };
