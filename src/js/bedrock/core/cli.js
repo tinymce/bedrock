@@ -13,8 +13,7 @@ var extract = function (params, directories) {
     total: '.total',
     testName: '.test.running .name',
     results: 'textarea.results',
-    basedir: path.join(directories.bin, '/..'),
-    pollDelay: 3000
+    basedir: path.join(directories.bin, '/..')
   };
 };
 

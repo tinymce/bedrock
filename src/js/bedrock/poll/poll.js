@@ -3,8 +3,6 @@ var loop = function (master, driver, settings) {
   var exits = require('./exits');
   var webdriver = require('selenium-webdriver');
 
-  var waiter = require('../util/waiter.js');
-
   var By = webdriver.By;
   var until = webdriver.until;
 
@@ -19,11 +17,8 @@ var loop = function (master, driver, settings) {
 
   var KEEP_GOING = false;
 
-  console.log('settings.pollDelay', settings.pollDelay);
-
-  // NOTE: Some drivers (like IE) need a delay otherwise nothing else gets time to execute.
   var repeatLoop = function () {
-    return waiter.delay(KEEP_GOING, settings.pollDelay);
+    return Promise.resolve(KEEP_GOING);
   };
 
   var checkStatus = function (tick) {
@@ -40,23 +35,13 @@ var loop = function (master, driver, settings) {
 
   var nextTick = function () {
     var tick = new Date().getTime();
-
     if (currentState.allTimeout(tick)) return exits.allTestsTooLong(currentState, tick);
     else if (currentState.testTimeout(tick)) return exits.oneTestTooLong(currentState, tick);
-
-      console.log('<tick>');
-      return checkStatus(tick).then(function (t) {
-        console.log('</tick>');
-        return t;
-      });
-
+    return checkStatus(tick);
   };
 
   return driver.wait(nextTick, settings.overallTimeout + 100000).then(function (outcome) {
-    return outcome(driver).then(function (d) {
-      console.log('******OUTCOME********', d);
-      return d;
-    });
+    return outcome(driver);
   }, function (err) {
     console.log('Unexpected error while running the testing loop: ' + err);
     return exits.allTestsTooLong(currentState, new Date().getTime())(driver);

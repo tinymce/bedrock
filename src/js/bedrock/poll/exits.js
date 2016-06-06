@@ -22,49 +22,14 @@ var allTestsTooLong = function (state, tick) {
   };
 };
 
-var delay = function (amount) {
-  return new Promise(function (resolve, reject) {
-    setTimeout(function () {
-      resolve({});
-    }, amount);
-  });
-};
-
 var testsDone = function (settings) {
   return function (driver) {
     var resultsCss = By.css(settings.results);
-    console.log('Bypassing');
-    //return Promise.resolve('{"results": []}');
-    return delay(500).then(function (r) {
-      console.log('Delay result', r);
-      return driver.executeScript(function () {
-        return '{"results": [ { "passed": false }]}';
-      }).then(function (res) {
-        console.log('First IE result', res);
-        return driver.executeScript(function () {
-          return '{"results": [ { "passed": true }]}';
-        }).then(function (res) {
-          console.log('Second IE result', res);
-          return res;
-        });
-      });
-    });
-    
-    
     return driver.wait(until.elementLocated(resultsCss), 1).then(function (res) {
-      console.log('results.css checking', res);
-      return driver.executeScript(function () {
-        throw "Dog's breakfast";
-        return document.querySelector(resultsCss).innerHTML;
-      }).then(function (html) {
-        console.log('dd results.innerHTML', html);
-        return html;
-      }, function (err) {
-        console.log('ERROR *******************');
-        console.log(err);
-      });
+      return res.getInnerHtml();
     }, function (err) {
       console.error('Debugging: tests completed but no area for test results', err);
+      return Promise.reject(err);
     });
   };
 };
