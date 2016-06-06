@@ -1,7 +1,8 @@
 var create = function () {
 
-  // so many problems ....
   var inUse = false;
+
+  var queue = [ ];
 
   var delay = function (v, amount) {
     return new Promise(function (resolve, reject) {
@@ -11,10 +12,35 @@ var create = function () {
     });
   };
 
-  var queue = [ ];
+  // If the queue is empty and we are not "In Use", then this can lock.
+
+
+  var doWaitForIdle = function (identifier) {
+    if (inUse === false && queue.length === 0) return use(f, label);
+    else if (inUse === false && queue[0].identifier === identifier) {
+      var first = queue[0];
+      queue = queue.slice(1);
+      return use(first.f, first.label);
+    } else {
+      return delay({}, 1000).then(function () {
+        return doWaitForIdle(identifier);
+      });
+    }
+  };
 
   // Probably just give up after a while ... or I'll hit a deadlock.
   var waitForIdle = function (f, label) {
+    if (inUse === false && queue.length === 0) return use(f, label);
+    else {
+      var identifier = 's' + new Date().getTime() + Math.floor(Math.random() * 10000);
+      queue = queue.concat({
+        f: f,
+        label: label,
+        identifier: identifier
+      });
+      return doWaitForIdle(identifier);
+    }
+    /*
     console.log('ATTEMPTING LOCK:', label);
     if (inUse === false && queue.length === 0) {
       console.log('Allowing lock because queue empty and idle');
@@ -37,6 +63,7 @@ var create = function () {
         return waitForIdle(f, label);
       });
     }
+    */
   };
 
 
