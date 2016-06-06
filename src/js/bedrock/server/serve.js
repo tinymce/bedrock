@@ -13,6 +13,11 @@ var start = function (settings, f) {
   var finalhandler = require('finalhandler');
   var waiter = require('../util/waiter.js');
 
+  // This is how long to wait before checking if the driver is ready again
+  var pollRate = 2000;
+  // This is how many times to fail the driver check before the process fails
+  var maxInvalidAttempts = 300;
+
   // This is a drivermaster. It represents access to the webdriver. It provides
   // basic locking and unlocking. All promise chains that require webdriver should
   // use the waitForIdle method. Although webdrivers should be sequencing their
@@ -40,11 +45,11 @@ var start = function (settings, f) {
   // responding to commands. If the testing page itself tries to interact with
   // effects before driver.get has returned properly, it throws "UnsupportedOperationErrors"
   // This code is designed to allow the driver.get promise launched in bedrock-auto to
-  // let the server known that it should not be able to respond to effect ajax calls.
+  // let the server known when it is able to use driver when responding to effect ajax calls.
   var waitForDriverReady = function (attempts, f) {
     if (pageHasLoaded) return master.waitForIdle(f, 'effect');
     else if (attempts === 0) return Promise.reject('Driver never appeared to be ready');
-    else return waiter.delay({}, 2000).then(function () {
+    else return waiter.delay({}, pollRate).then(function () {
       return waitForDriverReady(attempts - 1, f);
     });
   };
@@ -55,7 +60,7 @@ var start = function (settings, f) {
       apiLabel + ' API not supported without webdriver running. Use bedrock-auto to get this feature.'
     );
     var effect = function (data) {
-      return waitForDriverReady(300, function () {
+      return waitForDriverReady(maxInvalidAttempts, function () {
         return executor(settings.driver)(data);
       });
     };
