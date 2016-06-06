@@ -1,4 +1,5 @@
   var cloption = require('./cloption.js');
+  var usage = require('command-line-usage');
 
   // Note, this is a blend of the previous hand-rolled cloption approach and
   // the existing npm package: command-line-arguments
@@ -65,6 +66,28 @@
     validate: cloption.listDirectory
   };
 
+  var validate = function (definitions, settings) {
+    try {
+      definitions.forEach(function (defn) {
+        if (defn.required === true && settings[defn.name] === undefined) throw 'Setting: ' + defn.name + ' must be specified.';
+      });
+
+      definitions.forEach(function (defn) {
+        if (settings[defn.name] !== undefined) defn.validate(defn.name, settings[defn.name]);
+      });
+    } catch (err) {
+      console.error('\n** Error processing command line arguments.\n');
+      console.error(err);
+
+      console.error(usage([
+        { header: 'bedrock', content: 'bedrock' },
+        { header: 'Options', optionList: definitions }
+      ]));
+
+      process.exit(0);
+    }
+  };
+
   module.exports = {
     name: name,
     output: output,
@@ -72,5 +95,6 @@
     config: config,
     configTo: configTo,
     files: files,
-    testdir: testdir
+    testdir: testdir,
+    validate: validate
   };
