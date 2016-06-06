@@ -60,6 +60,7 @@
 
   var testdir = {
     name: 'testdir',
+    output: 'files',
     alias: 'd',
     type: String,
     description: 'The directory containing all the files to test',
@@ -72,9 +73,15 @@
         if (defn.required === true && settings[defn.name] === undefined) throw 'Setting: ' + defn.name + ' must be specified.';
       });
 
+      var result = {};
       definitions.forEach(function (defn) {
-        if (settings[defn.name] !== undefined) defn.validate(defn.name, settings[defn.name]);
+        if (settings[defn.name] !== undefined) {
+          var newValue = defn.validate(defn.name, settings[defn.name]);
+          var output = defn.output !== undefined ? defn.output : defn.name;
+          result[output] = newValue;
+        }
       });
+      return result;
     } catch (err) {
       console.error('\n** Error processing command line arguments.\n');
       console.error(err);

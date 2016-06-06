@@ -13,14 +13,15 @@ var run = function (directories) {
     cloptions.name,
     cloptions.output,
     cloptions.browser,
-
+    cloptions.config,
+    cloptions.testdir
   ];
 
   var settings = commandLineArgs(definitions);
 
-  cloptions.validate(definitions, settings);
+  var newSettings = cloptions.validate(definitions, settings);
 
-  console.log('settings', settings);
+  console.log('settings', newSettings);
 
 
 

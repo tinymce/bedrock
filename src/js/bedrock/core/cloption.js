@@ -1,4 +1,5 @@
 var fs = require('fs');
+var readdirSyncRec = require('recursive-readdir-sync');
 
 /* Really basic command line parsing ... nothing is optional, there are no flags */
 var param = function (name, info, validate, short) {
@@ -51,6 +52,7 @@ var validateFile = function (name, value) {
   try {
     fs.accessSync(value);
     if (!fs.statSync(value).isFile()) throw new Error('Property: ' + name + ' => Value: ' + value + ' was not a file');
+    return value;
   } catch (err) {
     throw new Error('Property: ' + name + ' => Value: ' + value + ' was not a file or ' + err);
   }
@@ -62,11 +64,12 @@ var isOneOf = function (values) {
       'Invalid value for property: ' + name +
       '. Actual value: ' + value + '\nRequired values: one of ' + JSON.stringify(values)
     );
+    return value;
   };
 };
 
-var isAny = function (/* name, value */) {
-  return true;
+var isAny = function (name, value) {
+  return value;
 };
 
 var files = function (name, info, short) {
@@ -85,11 +88,18 @@ var files = function (name, info, short) {
   };
 };
 
+var listDirectory = function (name, value) {
+  return readdirSyncRec(value).filter(function (f) {
+    return fs.lstatSync(f).isFile();
+  });
+};
+
 module.exports = {
   parse: parse,
   param: param,
   files: files,
   validateFile: validateFile,
   isAny: isAny,
-  isOneOf: isOneOf
+  isOneOf: isOneOf,
+  listDirectory: listDirectory
 };
