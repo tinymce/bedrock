@@ -5,7 +5,9 @@ var Key = webdriver.Key;
 var NO_ACTION = null;
 
 var scanCombo = function (combo) {
+  // Does not currently support complex key combinations.
   if (combo.ctrlKey) return Key.chord(Key.CONTROL, combo.key);
+  else if (combo.metaKey) return Key.chord(Key.COMMAND, combo.key);
   return NO_ACTION;
 };
 
