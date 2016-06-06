@@ -15,7 +15,8 @@ var start = function (settings, f) {
 
   // This is a drivermaster. It represents access to the webdriver. It provides
   // basic locking and unlocking. All promise chains that require webdriver should
-  // use the waitForIdle method.
+  // use the waitForIdle method. Although webdrivers should be sequencing their
+  // script calls by themselves, IE frequently interleaved them. Not sure why.
   var master = settings.master;
 
   var pageHasLoaded = false;
@@ -35,9 +36,12 @@ var start = function (settings, f) {
     return path.relative(settings.projectdir, filePath);
   });
 
+  // On IE, the webdriver seems to load the page before it's ready to start
+  // responding to commands. If the testing page itself tries to interact with
+  // effects before driver.get has returned properly, it throws "UnsupportedOperationErrors"
+  // This code is designed to allow the driver.get promise launched in bedrock-auto to
+  // let the server known that it should not be able to respond to effect ajax calls.
   var waitForDriverReady = function (attempts, f) {
-    return master.waitForIdle(f, 'effect');
-    // IE throws errors when functions are used before the driver is ready.
     if (pageHasLoaded) return master.waitForIdle(f, 'effect');
     else if (attempts === 0) return Promise.reject('Driver never appeared to be ready');
     else return waiter.delay({}, 2000).then(function () {

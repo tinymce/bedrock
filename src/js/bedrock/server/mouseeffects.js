@@ -1,5 +1,4 @@
 var webdriver = require('selenium-webdriver');
-// var input = require('../../../../node_modules/selenium-webdriver/lib/input');
 var By = webdriver.By;
 
 /*
@@ -15,7 +14,6 @@ var getAction = function (target, type) {
   else if (type === 'click') return driver.actions().mouseMove(target).click();
   else return new Promise.reject('Unknown mouse effect type: ' + type);
 };
-
 
 var execute = function (driver, data) {
   var target = driver.findElement(By.css(data.selector));

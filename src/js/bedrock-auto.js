@@ -40,8 +40,8 @@ var run = function (directories) {
   });
 
   var settings = cli.extract(params, directories);
-  
-  
+
+
   var master = require('./bedrock/server/drivermaster.js').create();
 
   var serveSettings = {
@@ -52,7 +52,7 @@ var run = function (directories) {
     driver: driver,
     master: master
   };
-  
+
   console.log('driver', driver);
 
   serve.start(serveSettings, function (service, done) {
@@ -61,12 +61,10 @@ var run = function (directories) {
       console.log('\n ... Initial page has loaded ...');
       service.markLoaded();
       return poll.loop(master, driver, settings).then(function (data) {
-        console.log('*** LOOP RESULT ***');
-        console.log(data);
         return reporter.write({
           name: params.suiteName,
           output: params.outputDir
-        })(data)
+        })(data);
       });
     });
     shutdown(result, driver, done);
