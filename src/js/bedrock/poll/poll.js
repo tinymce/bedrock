@@ -3,6 +3,8 @@ var loop = function (master, driver, settings) {
   var exits = require('./exits');
   var webdriver = require('selenium-webdriver');
 
+  var waiter = require('../util/waiter.js');
+
   var By = webdriver.By;
   var until = webdriver.until;
 
@@ -15,19 +17,13 @@ var loop = function (master, driver, settings) {
     total: settings.total
   });
 
-  var delay = function (value, amount) {
-    return new Promise(function (resolve, reject) {
-      setTimeout(function () {
-        resolve(value);
-      }, amount);
-    });
-  };
-
   var KEEP_GOING = false;
+
+  console.log('settings.pollDelay', settings.pollDelay);
 
   // NOTE: Some drivers (like IE) need a delay otherwise nothing else gets time to execute.
   var repeatLoop = function () {
-    return delay(KEEP_GOING, settings.pollDelay);
+    return waiter.delay(KEEP_GOING, settings.pollDelay);
   };
 
   var checkStatus = function (tick) {
@@ -36,11 +32,7 @@ var loop = function (master, driver, settings) {
         return exits.testsDone(settings);
       }, function (/* err */) {
         // We aren't done yet ... so update the current test if necessary.
-        return currentState.update(driver, tick).then(function () {
-          return repeatLoop();
-        }, function () {
-          return repeatLoop();
-        });
+        return currentState.update(driver, tick).then(repeatLoop, repeatLoop);
       });
     }, 'poll');
   };
