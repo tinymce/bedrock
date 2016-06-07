@@ -1,5 +1,5 @@
-  var cloption = require('./cloption.js');
   var path = require('path');
+  var extraction = require('./extraction.js');
 
   // Note, this is a blend of the previous hand-rolled cloption approach and
   // the existing npm package: command-line-arguments
@@ -9,7 +9,7 @@
     type: String,
     defaultValue: 'bedrock-run-' + new Date().getTime(),
     description: 'The name of the test run. It is used in reporting data.',
-    validate: cloption.isAny
+    validate: extraction.any
   };
 
   var output = {
@@ -18,7 +18,7 @@
     type: String,
     defaultValue: 'scratch',
     description: 'The destination directory of the test reports',
-    validate: cloption.isAny
+    validate: extraction.any
   };
 
   var browser = {
@@ -27,7 +27,7 @@
     type: String,
     required: true,
     description: 'The name of the browser to launch',
-    validate: cloption.isOneOf([
+    validate: extraction.inSet([
       'ie',
       'firefox',
       'MicrosoftEdge',
@@ -43,7 +43,7 @@
       type: String,
       defaultValue: defaultValue,
       description: 'The location of the bolt config file',
-      validate: cloption.validateFile
+      validate: extraction.file
     };
   };
 
@@ -57,11 +57,8 @@
     required: true,
     type: String,
     multiple: true,
-    incompatible: [
-      'testdir'
-    ],
     description: 'The list of files to test',
-    validate: cloption.validateFile
+    validate: extraction.file
   };
 
   var testdir = {
@@ -73,7 +70,7 @@
     alias: 'd',
     type: String,
     description: 'The directory containing all the files to test',
-    validate: cloption.listDirectory('Test.js')
+    validate: extraction.files('Test.js')
   };
 
   var projectdir = function (directories) {
@@ -82,7 +79,7 @@
       alias: 'p',
       type: String,
       description: 'The base directory to host',
-      validate: cloption.isAny,
+      validate: extraction.any,
       defaultValue: directories.current,
       uncommon: true
     };
@@ -93,17 +90,40 @@
       name: 'basedir',
       type: String,
       description: 'The base directory of the bedrock program',
-      validate: cloption.isAny,
+      validate: extraction.any,
       defaultValue: path.join(directories.bin, '/..'),
       uncommon: true
     };
+  };
+
+  var uploaddirs = {
+    name: 'uploaddirs',
+    alias: 'u',
+    type: String,
+    multiple: true,
+    description: 'The directories (from the project directory) to upload',
+    defaultValue: [ 'src', 'test', 'config', 'lib' ],
+  };
+
+  var bucket = {
+    name: 'bucket',
+    type: String,
+    description: 'The name of the AWS bucket',
+    required: true
+  };
+
+  var remoteurl = {
+    name: 'remoteurl',
+    type: String,
+    description: 'The URL of the uploaded project',
+    required: true
   };
 
   var overallTimeout = {
     name: 'totalTimeout',
     type: Number,
     description: 'The total amount of time the test can take before bedrock times out.',
-    validate: cloption.isAny,
+    validate: extraction.any,
     defaultValue: 10 * 60 * 1000,
     uncommon: true
   };
@@ -112,7 +132,7 @@
     name: 'singleTimeout',
     type: Number,
     description: 'The total amount of time a single test can take before bedrock times out.',
-    validate: cloption.isAny,
+    validate: extraction.any,
     defaultValue: 30 * 1000,
     uncommon: true
   };
@@ -123,7 +143,7 @@
     description: 'The CSS selector representing the state where tests have completed',
     defaultValue: 'div.done',
     uncommon: true,
-    validate: cloption.isAny
+    validate: extraction.any
   };
 
   var progressSelector = {
@@ -132,7 +152,7 @@
     defaultValue: '.progress',
     description: 'The CSS selector representing the element containing the current number of tests run',
     uncommon: true,
-    validate: cloption.isAny
+    validate: extraction.any
   };
 
   var totalSelector = {
@@ -141,7 +161,7 @@
     defaultValue: '.total',
     description: 'The CSS selector representing the element containing the total number of tests',
     uncommon: true,
-    validate: cloption.isAny
+    validate: extraction.any
   };
 
   var testNameSelector = {
@@ -150,7 +170,7 @@
     defaultValue: '.test.running .name',
     description: 'The CSS selector representing the name of the current test',
     uncommon: true,
-    validate: cloption.isAny
+    validate: extraction.any
   };
 
   var resultsSelector = {
@@ -159,18 +179,29 @@
     defaultValue: 'textarea.results',
     description: 'The CSS selector representing the JSON output of running the tests',
     uncommon: true,
-    validate: cloption.isAny
+    validate: extraction.any
   };
 
   module.exports = {
-    name: name,
-    output: output,
-    browser: browser,
+    // All modes testing
     config: config,
     configTo: configTo,
     files: files,
     testdir: testdir,
 
+    // Webdriver testing
+    name: name,
+    output: output,
+    browser: browser,
+
+    // Remote testing
+    uploaddirs: uploaddirs,
+    bucket: bucket,
+
+    // Saucelabs testing
+    remoteurl: remoteurl,
+
+    // Test driver settings
     doneSelector: doneSelector,
     projectdir: projectdir,
     basedir: basedir,

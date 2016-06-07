@@ -10,28 +10,21 @@ var validateMany = function (defn, settings) {
   });
 };
 
-var checkIncompatible = function (defn, settings) {
-  if (settings[defn.name] === undefined) return attempt.passed(defn);
-  var incompatible = defn.incompatible !== undefined ? defn.incompatible : [];
-  var conflicting = incompatible.filter(function (n) {
-    return settings[n] !== undefined;
-  });
-  return conflicting.length > 0 ? attempt.failed({
-    property: defn.name,
-    value: settings[def.name],
-    error: 'custom',
-    label: 'Property [' + defn.name + '] cannot be used in conjunction with: ' + JSON.stringify(conflicting)
-  }) : attempt.passed(defn);
+var validateRequired = function (defn, settings) {
+  var output = defn.output !== undefined ? defn.output : defn.name;
+  return defn.required === true && settings[output] === undefined ? attempt.failed([
+    'The *required* output property [' + defn.output + '] from [' + defn.name + '] must be specified.'
+  ]) : attempt.passed(defn);
 };
 
-var checkRequired = function (defn, settings) {
-  var output = defn.output !== undefined ? defn.output : defn.name;
-  return defn.required === true && settings[output] === undefined ? attempt.failed({
-    property: defn.name,
-    value: settings[defn.name],
-    error: 'custom',
-    label: 'The output property [' + defn.output + '] from [' + defn.name + '] must be specified.'
-  }) : attempt.passed(defn);
+var scanRequired = function (definitions, settings) {
+  var requiredInfo = definitions.map(function (defn) {
+    return validateRequired(defn, settings);
+  });
+  var outcome = attempt.concat(requiredInfo);
+  return attempt.cata(outcome, attempt.failed, function () {
+    return attempt.passed(settings);
+  });
 };
 
 // Returns either a Failure of an array of error messages, or a Success of the settings object
@@ -40,27 +33,20 @@ var scan = function (definitions, settings) {
     if (settings[defn.name] === undefined) return rest;
     var newValue = defn.multiple === true ? validateMany(defn, settings) : validateOne(defn, settings);
 
-    return attempt.cata(rest, function (errors) {
-      return attempt.cata(newValue, function (validateErrors) {
-        return attempt.failed(errors.concat(validateErrors));
-      }, function (_) {
-        return attempt.failed(errors);
-      });
-    }, function (result) {
-      return attempt.cata(newValue, function (validateErrors) {
-        return attempt.failed(validateErrors);
-      }, function (v) {
-        var output = defn.output !== undefined ? defn.output : defn.name;
-        // REMOVE MUTATION.
-        result[output] = v;
+    return attempt.carry(rest, newValue, function (v) {
+      var output = defn.output !== undefined ? defn.output : defn.name;
+      // REMOVE MUTATION when I know how to do extend in node.
+      if (rest[output] !== undefined) {
+        return attempt.failed('Incompatible');
+      }
+      rest[output] = v;
 
-        return attempt.passed(result);
-      });
+      return attempt.passed(rest);
     });
   }, attempt.passed({}));
 };
 
 module.exports = {
-  checkIncompatible: checkIncompatible,
+  scanRequired: scanRequired,
   scan: scan
 };
