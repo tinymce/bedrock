@@ -96,6 +96,8 @@ tape('Minimal specification of bedrock-remote', function (t) {
   ]);
   var actual = clis.forRemote(directories);
   attemptutils.assertResult(t, {
+    uploaddirs: [ 'test', 'src' ],
+    bucket: 'testing',
     config: 'sample/config.js',
     done: 'div.done',
     testfiles: [
