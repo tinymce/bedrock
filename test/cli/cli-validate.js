@@ -124,6 +124,26 @@ checkErrors(
 
 
 
+checkResult(
+  'Testing more than one definition, all should pass',
+  {
+    alpha: 'Alpha',
+    'new.beta': 'Beta',
+    gamma: [ 'test/resources/test.file1' ]
+  },
+  [
+    { name: 'alpha', validate: extraction.any },
+    { name: 'beta', validate: extraction.any, output: 'new.beta' },
+    { name: 'gamma', validate: extraction.files('') }
+  ],
+  {
+    alpha: 'Alpha',
+    beta: 'Beta',
+    gamma: 'test/resources'
+  }
+);
+
+
 // // Returns either a Failure of an array of error messages, or a Success of the settings object
 // var scan = function (definitions, settings) {
 //   return definitions.reduce(function (rest, defn) {
