@@ -12,6 +12,34 @@ var validateMany = function (defn, settings) {
   });
 };
 
+var createUsage = function (command, desc, definitions) {
+  var commonDefs = definitions.filter(function (defn) {
+    return defn.uncommon !== true;
+  });
+
+  var uncommonDefs = definitions.filter(function (defn) {
+    return defn.uncommon === true;
+  });
+
+  var commonOptions = {
+    header: 'Common Options',
+    optionList: commonDefs
+  };
+
+  var uncommonOptions = {
+    header: 'Uncommon Options',
+    optionList: uncommonDefs
+  };
+
+  var options = [ commonOptions ].concat(uncommonDefs.length > 0 ? [ uncommonOptions ] : []);
+
+  return usage(
+    [
+      { header: command, content: desc }
+    ].concat(options)
+  );
+};
+
 var extract = function (command, desc, directories, extraDefinitions) {
   var baseDefinitions = [
     cloptions.config,
@@ -37,66 +65,44 @@ var extract = function (command, desc, directories, extraDefinitions) {
 
   var definitions = filteredDefinitions.concat(extraDefinitions);
   var settings = commandLineArgs(definitions);
-  try {
-    definitions.forEach(function (defn) {
-      if (settings[defn.name] !== undefined) {
-        var incompatible = defn.incompatible !== undefined ? defn.incompatible : [];
-        incompatible.forEach(function (n) {
-          if (settings[n] !== undefined) throw 'Setting: ' + defn.name + ' is incompatible with: ' + n;
-        });
-      }
-    });
 
-    var result = {};
-    definitions.forEach(function (defn) {
-      if (settings[defn.name] !== undefined) {
+  var errorInfo = [];
+  definitions.forEach(function (defn) {
+    if (settings[defn.name] !== undefined) {
+      var incompatible = defn.incompatible !== undefined ? defn.incompatible : [];
+      incompatible.forEach(function (n) {
+        if (settings[n] !== undefined) errorInfo.push('Setting: [' + defn.name + '] is incompatible with: ' + n + '. It is also incompatible with: ' + JSON.stringify(incompatible));
+      });
+    }
+  });
+
+  var result = {};
+  definitions.forEach(function (defn) {
+    if (settings[defn.name] !== undefined) {
+      try {
         var newValue = defn.multiple === true ? validateMany(defn, settings) : validateOne(defn, settings);
         var output = defn.output !== undefined ? defn.output : defn.name;
         result[output] = newValue;
+      } catch (err) {
+        errorInfo.push(err);
       }
-    });
+    }
+  });
 
-    definitions.forEach(function (defn) {
-      var output = defn.output !== undefined ? defn.output : defn.name;
-      console.log('output', output);
-      if (defn.required === true && result[output] === undefined) throw 'Setting: ' + defn.name + ' must be specified.';
-    });
+  definitions.forEach(function (defn) {
+    var output = defn.output !== undefined ? defn.output : defn.name;
+    if (defn.required === true && result[output] === undefined) errorInfo.push('Setting: ' + defn.name + ' must be specified.');
+  });
 
+  var generateUsage = function () {
+    return createUsage(command, desc, definitions);
+  };
 
-    console.log('result', result);
-    return result;
-  } catch (err) {
-    console.error('\n** Error processing command line arguments.\n');
-    console.error(err);
-
-    var commonDefs = definitions.filter(function (defn) {
-      return defn.uncommon !== true;
-    });
-
-    var uncommonDefs = definitions.filter(function (defn) {
-      return defn.uncommon === true;
-    });
-
-    var commonOptions = {
-      header: 'Common Options',
-      optionList: commonDefs
-    };
-
-    var uncommonOptions = {
-      header: 'Uncommon Options',
-      optionList: uncommonDefs
-    };
-
-    var options = [ commonOptions ].concat(uncommonDefs.length > 0 ? [ uncommonOptions ] : []);
-
-    console.error(usage(
-      [
-        { header: command, content: desc }
-      ].concat(options)
-    ));
-
-    process.exit(0);
-  }
+  return {
+    settings: result,
+    generateUsage: generateUsage,
+    errors: errorInfo.slice(0)
+  };
 };
 
 module.exports = {

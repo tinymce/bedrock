@@ -6,24 +6,18 @@ var directories = {
   bin: __dirname
 };
 
-console.log('process', process.argv);
-
-
 var checkError = function (label, args) {
   process.argv = args;
   var settings = autocli.extract(directories);
-  console.error('Test should have failed: ' + label);
+  console.error('Test should have failed\n  ' + label);
   process.exit(-1);
 };
 
 checkError(
-  'Did not supply browser',
+  'Test 1: bedrock-auto with unknown flag',
   [
     "$executable", "$file",
-    "--config", "sample/config.js",
-    "--testdir", "sample",
-    "-b",
-    "ie"
+    "--flag"
   ]
 );
 

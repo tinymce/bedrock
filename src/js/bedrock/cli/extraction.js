@@ -2,7 +2,7 @@ var fs = require('fs');
 var readdirSyncRec = require('recursive-readdir-sync');
 var attempt = require('./attempt.js');
 
-var validateFile = function (name, value) {
+var file = function (name, value) {
   try {
     fs.accessSync(value);
     if (!fs.statSync(value).isFile()) throw new Error('Property: ' + name + ' => Value: ' + value + ' was not a file');
@@ -17,15 +17,15 @@ var validateFile = function (name, value) {
   }
 };
 
-var isOneOf = function (values) {
+var inSet = function (candidates) {
   return function (name, value) {
-    if (values.indexOf(value) === -1) {
+    if (candidates.indexOf(value) === -1) {
       return attempt.failed({
         property: name,
         value: value,
         error: 'custom',
         label: 'Invalid value for property: ' + name +
-          '. Actual value: ' + value + '\nRequired values: one of ' + JSON.stringify(values)
+          '. Actual value: ' + value + '\nRequired value: one of ' + JSON.stringify(candidates)
       });
     } else {
       return attempt.passed(value);
@@ -33,21 +33,31 @@ var isOneOf = function (values) {
   };
 };
 
-var isAny = function (name, value) {
+var any = function (name, value) {
   return attempt.passed(value);
 };
 
-var listDirectory = function (pattern) {
+var files = function (pattern) {
   return function (name, value) {
-    return readdirSyncRec(value).filter(function (f) {
-      return f.indexOf(pattern) >-1 && fs.lstatSync(f).isFile();
-    });
+    try {
+      var scanned = readdirSyncRec(value).filter(function (f) {
+        return f.indexOf(pattern) >-1 && fs.lstatSync(f).isFile();
+      });
+      return attempt.passed(scanned);
+    } catch (err) {
+      return attempt.failed({
+        property: name,
+        value: value,
+        error: err,
+        label: 'Scanning directory [' + value + '] for files matching pattern: [' + pattern + ']'
+      });
+    }
   };
 };
 
 module.exports = {
-  validateFile: validateFile,
-  isAny: isAny,
-  isOneOf: isOneOf,
-  listDirectory: listDirectory
+  file: file,
+  inSet: inSet,
+  any: any,
+  files: files
 };
