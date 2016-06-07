@@ -54,7 +54,7 @@ checkErrors(
 checkErrors(
   'Testing a directory -> files where the directory does not exist',
   [
-    '[test/resources.not.existing] is not a directory.',
+    '[test/resources.not.existing] is not a directory',
   ],
   [
     { name: 'testdir', validate: extraction.files('Test.js') }
@@ -143,28 +143,26 @@ checkResult(
   }
 );
 
-
-// // Returns either a Failure of an array of error messages, or a Success of the settings object
-// var scan = function (definitions, settings) {
-//   return definitions.reduce(function (rest, defn) {
-//     var newValue = defn.multiple === true ? validateMany(defn, settings) : validateOne(defn, settings);
-
-//     return attempt.cata(rest, function (errors) {
-//       return attempt.cata(newValue, function (validateErrors) {
-//         return attempt.failed(errors.concat(validateErrors));
-//       }, function (_) {
-//         return attempt.failed(errors);
-//       });
-//     }, function (result) {
-//       return attempt.cata(newValue, function (validateErrors) {
-//         return attempt.failed(validateErrors);
-//       }, function (v) {
-//         var output = defn.output !== undefined ? defn.output : defn.name;
-//         // REMOVE MUTATION.
-//         result[output] = v;
-
-//         return attempt.passed(result);
-//       });
-//     });
-//   }, attempt.passed({}));
-// };
+checkErrors(
+  'Testing more than one definition, several fail, so the whole thing should return combined failures',
+  [
+    'Invalid value for property: alpha. Actual value: Alpha. Required value: one of ["a"]',
+    '[test/resources.fake] is not a directory'
+  ],
+  [
+    { name: 'alpha', validate: extraction.inSet([ 'a' ]) },
+    { name: 'beta', validate: extraction.any, output: 'new.beta' },
+    { name: 'gamma', validate: extraction.files('') },
+    { name: 'delta', validate: extraction.inSet([ 'Delta' ]) },
+    { name: 'epsilon', validate: extraction.directory },
+    { name: 'rho', validate: extraction.any }
+  ],
+  {
+    alpha: 'Alpha',
+    beta: 'Beta',
+    gamma: 'test/resources',
+    delta: 'Delta',
+    epsilon: 'test/resources.fake',
+    rho: 'Rho'
+  }
+);
