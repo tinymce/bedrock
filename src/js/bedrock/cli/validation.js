@@ -59,7 +59,7 @@ var scan = function (definitions, settings) {
   }, attempt.passed({}));
 };
 
-return {
-  checkCompatible: checkCompatible,
+module.exports = {
+  checkIncompatible: checkIncompatible,
   scan: scan
 };

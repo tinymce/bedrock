@@ -64,7 +64,11 @@ var extract = function (command, desc, directories, extraDefinitions) {
   });
 
   var definitions = filteredDefinitions.concat(extraDefinitions);
-  var settings = commandLineArgs(definitions);
+  try {
+    var settings = commandLineArgs(definitions);
+  } catch (err) {
+
+  }
 
   var errorInfo = [];
   definitions.forEach(function (defn) {
