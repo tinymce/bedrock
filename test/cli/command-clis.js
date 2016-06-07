@@ -39,6 +39,18 @@ var mutateArgs = function (newArgs) {
   process.argv = [ "$executable", "$file" ].concat(newArgs);
 };
 
+var cleanError = function (result) {
+  return attempt.cata(result, function (err) {
+    return attempt.failed(err.errors);
+  }, attempt.passed);
+};
+
+var cleanResult = function (result) {
+  return attempt.cata(result, attempt.failed, function (v) {
+    return exclude([ 'projectdir', 'basedir' ]);
+  });
+};
+
 tape('Minimal specification of bedrock-auto', function (t) {
   mutateArgs([
     "--browser", "MicrosoftEdge",
@@ -62,7 +74,16 @@ tape('Minimal specification of bedrock-auto', function (t) {
     testName: '.test.running .name',
     total: '.total',
     totalTimeout: 600000
-  }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
+  }, cleanResult(actual));
+});
+
+tape('Specification of bedrock-auto missing required field: browser', function (t) {
+  mutateArgs([
+    "--files", "test/resources/test.file1",
+    "--config", "sample/config.js"
+  ]);
+  var actual = clis.forAuto(directories);
+  attemptutils.assertErrors(t, [ ], cleanResult(actual));
 });
 
 tape('Minimal specification of bedrock-manual', function (t) {
@@ -95,6 +116,32 @@ tape('Minimal specification of bedrock-remote', function (t) {
     "--bucket", "testing"
   ]);
   var actual = clis.forRemote(directories);
+  attemptutils.assertResult(t, {
+    uploaddirs: [ 'test', 'src' ],
+    bucket: 'testing',
+    config: 'sample/config.js',
+    done: 'div.done',
+    testfiles: [
+      'test/resources/test.file1'
+    ],
+
+    progress: '.progress',
+    results: 'textarea.results',
+    singleTimeout: 30000,
+    testName: '.test.running .name',
+    total: '.total',
+    totalTimeout: 600000
+  }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
+});
+
+tape('Minimal specification of bedrock-sauce-single', function (t) {
+  mutateArgs([
+    "--files", "test/resources/test.file1",
+    "--config", "sample/config.js",
+    "--uploaddirs", "test", "src",
+    "--bucket", "testing"
+  ]);
+  var actual = clis.forSauceSingle(directories);
   attemptutils.assertResult(t, {
     uploaddirs: [ 'test', 'src' ],
     bucket: 'testing',
