@@ -93,6 +93,34 @@ checkResult(
   }
 );
 
+checkResult(
+  'Testing more than one definition, but there is not a setting for it',
+  {
+    alpha: 'Alpha'
+  },
+  [
+    { name: 'alpha', validate: extraction.any },
+    { name: 'beta', validate: attempt.failed }
+  ],
+  {
+    alpha: 'Alpha'
+  }
+);
+
+checkErrors(
+  'Testing more than one definition, but there is a setting for it',
+  [
+    'Invalid value for property: beta. Actual value: Beta. Required value: one of ["gamma"]'
+  ],
+  [
+    { name: 'alpha', validate: extraction.any },
+    { name: 'beta', validate: extraction.inSet([ 'gamma' ]) }
+  ],
+  {
+    alpha: 'Alpha',
+    beta: 'Beta'
+  }
+);
 
 
 

@@ -37,6 +37,7 @@ var checkRequired = function (defn, settings) {
 // Returns either a Failure of an array of error messages, or a Success of the settings object
 var scan = function (definitions, settings) {
   return definitions.reduce(function (rest, defn) {
+    if (settings[defn.name] === undefined) return rest;
     var newValue = defn.multiple === true ? validateMany(defn, settings) : validateOne(defn, settings);
 
     return attempt.cata(rest, function (errors) {

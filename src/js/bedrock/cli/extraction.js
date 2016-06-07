@@ -15,13 +15,9 @@ var file = function (name, value) {
 var inSet = function (candidates) {
   return function (name, value) {
     if (candidates.indexOf(value) === -1) {
-      return attempt.failed({
-        property: name,
-        value: value,
-        error: 'custom',
-        label: 'Invalid value for property: ' + name +
-          '. Actual value: ' + value + '\nRequired value: one of ' + JSON.stringify(candidates)
-      });
+      return attempt.failed([
+        'Invalid value for property: ' + name + '. Actual value: ' + value + '. Required value: one of ' + JSON.stringify(candidates)
+      ]);
     } else {
       return attempt.passed(value);
     }
@@ -52,7 +48,7 @@ var files = function (pattern) {
         return attempt.passed(scanned);
       } catch (err) {
         return attempt.failed([
-          'Scanning directory [' + d + '] for files matching pattern: [' + pattern + ']'
+          'Error scanning directory [' + d + '] for files matching pattern: [' + pattern + ']'
         ]);
       }
     });
