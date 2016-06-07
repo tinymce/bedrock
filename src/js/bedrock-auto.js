@@ -9,8 +9,9 @@ var shutdown = function (promise, driver, done) {
   }, function (err) {
     driver.sleep(1000);
     driver.quit().then(function () {
+      console.error('********* Unexpected Bedrock Error -> Server Quitting ***********', err);
       done();
-      throw new Error(err);
+      throw err;
     });
   });
 };
@@ -40,21 +41,29 @@ var run = function (directories) {
 
   var settings = cli.extract(params, directories);
 
+
+  var master = require('./bedrock/server/drivermaster.js').create();
+
   var serveSettings = {
     projectdir: settings.projectdir,
     basedir: settings.basedir,
     config: settings.config,
     testfiles: settings.testfiles,
-    driver: driver
+    driver: driver,
+    master: master
   };
 
   serve.start(serveSettings, function (service, done) {
     console.log('bedrock-auto available at: http://localhost:' + service.port);
     var result = driver.get('http://localhost:' + service.port).then(function () {
-      return poll.loop(driver, settings).then(reporter.write({
-        name: params.suiteName,
-        output: params.outputDir
-      }));
+      console.log('\n ... Initial page has loaded ...');
+      service.markLoaded();
+      return poll.loop(master, driver, settings).then(function (data) {
+        return reporter.write({
+          name: params.suiteName,
+          output: params.outputDir
+        })(data);
+      });
     });
     shutdown(result, driver, done);
   });

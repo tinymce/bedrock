@@ -39,6 +39,9 @@ Installation:
 1. Download http://selenium-release.storage.googleapis.com/2.53/IEDriverServer_x64_2.53.1.zip
 2. Put the file IEDriverServer.exe onto your path
 
+> Note, the 64bit version of the IEDriver can be painfully slow and break often. If you are experiencing problems, use
+the 32bit version.
+
 ### Edge (2.53.0)
 
 Browser: MicrosoftEdge
