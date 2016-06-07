@@ -7,7 +7,7 @@
     name: 'name',
     alias: 'n',
     type: String,
-    defaultValue: 'bedrock-run-' + new Date().getTime(),
+    defaultValue: 'bedrock-run',
     description: 'The name of the test run. It is used in reporting data.',
     validate: extraction.any
   };

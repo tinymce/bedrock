@@ -5,9 +5,10 @@ var validateOne = function (defn, settings) {
 };
 
 var validateMany = function (defn, settings) {
-  return settings[defn.name].map(function (f) {
+  var validations = settings[defn.name].map(function (f) {
     return defn.validate(defn.name, f);
   });
+  return attempt.concat(validations);
 };
 
 var validateRequired = function (defn, settings) {
@@ -32,16 +33,18 @@ var scan = function (definitions, settings) {
   return definitions.reduce(function (rest, defn) {
     if (settings[defn.name] === undefined) return rest;
     var newValue = defn.multiple === true ? validateMany(defn, settings) : validateOne(defn, settings);
-
-    return attempt.carry(rest, newValue, function (v) {
+console.log('rest', rest);
+console.log('newValue', newValue);
+    return attempt.carry(rest, newValue, function (result, v) {
       var output = defn.output !== undefined ? defn.output : defn.name;
       // REMOVE MUTATION when I know how to do extend in node.
       if (rest[output] !== undefined) {
-        return attempt.failed('Incompatible');
+        return attempt.failed([ 'Incompatible' ]);
       }
-      rest[output] = v;
+      result[output] = v;
 
-      return attempt.passed(rest);
+      console.log('result', result);
+      return attempt.passed(result);
     });
   }, attempt.passed({}));
 };

@@ -28,6 +28,12 @@ var bind = function (firstAttempt, f) {
   }, f);
 };
 
+var map = function (firstAttempt, f) {
+  return firstAttempt.foldAttempt(failed, function (v) {
+    return passed(f(v));
+  });
+};
+
 var list = function (firstAttempt, fs) {
   return fs.reduce(function (rest, x) {
     return bind(rest, x);
@@ -64,6 +70,7 @@ module.exports = {
   passed: passed,
   cata: cata,
   bind: bind,
+  map: map,
   list: list,
   carry: carry,
   concat: concat
