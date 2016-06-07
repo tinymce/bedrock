@@ -14,7 +14,7 @@ var validateMany = function (defn, settings) {
 var validateRequired = function (defn, settings) {
   var output = defn.output !== undefined ? defn.output : defn.name;
   return defn.required === true && settings[output] === undefined ? attempt.failed([
-    'The *required* output property [' + defn.output + '] from [' + defn.name + '] must be specified.'
+    'The *required* output property [' + output + '] from [' + defn.name + '] must be specified.'
   ]) : attempt.passed(defn);
 };
 
@@ -33,8 +33,6 @@ var scan = function (definitions, settings) {
   return definitions.reduce(function (rest, defn) {
     if (settings[defn.name] === undefined) return rest;
     var newValue = defn.multiple === true ? validateMany(defn, settings) : validateOne(defn, settings);
-console.log('rest', rest);
-console.log('newValue', newValue);
     return attempt.carry(rest, newValue, function (result, v) {
       var output = defn.output !== undefined ? defn.output : defn.name;
       // REMOVE MUTATION when I know how to do extend in node.
@@ -43,7 +41,6 @@ console.log('newValue', newValue);
       }
       result[output] = v;
 
-      console.log('result', result);
       return attempt.passed(result);
     });
   }, attempt.passed({}));

@@ -102,6 +102,7 @@
     type: String,
     multiple: true,
     description: 'The directories (from the project directory) to upload',
+    validate: extraction.directory,
     defaultValue: [ 'src', 'test', 'config', 'lib' ],
   };
 
@@ -109,6 +110,7 @@
     name: 'bucket',
     type: String,
     description: 'The name of the AWS bucket',
+    validate: extraction.any,
     required: true
   };
 

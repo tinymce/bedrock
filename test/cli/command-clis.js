@@ -52,13 +52,60 @@ tape('Minimal specification of bedrock-auto', function (t) {
     done: 'div.done',
     name: 'bedrock-run',
     output: 'scratch',
+    testfiles: [
+      'test/resources/test.file1'
+    ],
+
     progress: '.progress',
     results: 'textarea.results',
     singleTimeout: 30000,
     testName: '.test.running .name',
+    total: '.total',
+    totalTimeout: 600000
+  }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
+});
+
+tape('Minimal specification of bedrock-manual', function (t) {
+  mutateArgs([
+    "--files", "test/resources/test.file1",
+    "--config", "sample/config.js"
+  ]);
+  var actual = clis.forManual(directories);
+  attemptutils.assertResult(t, {
+    config: 'sample/config.js',
+    done: 'div.done',
     testfiles: [
       'test/resources/test.file1'
     ],
+
+    progress: '.progress',
+    results: 'textarea.results',
+    singleTimeout: 30000,
+    testName: '.test.running .name',
+    total: '.total',
+    totalTimeout: 600000
+  }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
+});
+
+tape('Minimal specification of bedrock-remote', function (t) {
+  mutateArgs([
+    "--files", "test/resources/test.file1",
+    "--config", "sample/config.js",
+    "--uploaddirs", "test", "src",
+    "--bucket", "testing"
+  ]);
+  var actual = clis.forRemote(directories);
+  attemptutils.assertResult(t, {
+    config: 'sample/config.js',
+    done: 'div.done',
+    testfiles: [
+      'test/resources/test.file1'
+    ],
+
+    progress: '.progress',
+    results: 'textarea.results',
+    singleTimeout: 30000,
+    testName: '.test.running .name',
     total: '.total',
     totalTimeout: 600000
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
