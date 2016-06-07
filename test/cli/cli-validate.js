@@ -129,17 +129,20 @@ checkResult(
   {
     alpha: 'Alpha',
     'new.beta': 'Beta',
-    gamma: [ 'test/resources/test.file1' ]
+    gamma: [ 'test/resources/test.file1' ],
+    delta: 'test/resources'
   },
   [
     { name: 'alpha', validate: extraction.any },
     { name: 'beta', validate: extraction.any, output: 'new.beta' },
-    { name: 'gamma', validate: extraction.files('') }
+    { name: 'gamma', validate: extraction.files('') },
+    { name: 'delta', validate: extraction.directory }
   ],
   {
     alpha: 'Alpha',
     beta: 'Beta',
-    gamma: 'test/resources'
+    gamma: 'test/resources',
+    delta: 'test/resources'
   }
 );
 
