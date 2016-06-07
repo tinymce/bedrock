@@ -7,7 +7,7 @@ var By = webdriver.By;
    selector :: String
  }
  */
-var getAction = function (target, type) {
+var getAction = function (driver, target, type) {
   if (type === 'move') return driver.actions().mouseMove(target);
   else if (type === 'down') return driver.actions().mouseMove(target).mouseDown();
   else if (type === 'up') return driver.actions().mouseMove(target).mouseUp();
@@ -17,7 +17,7 @@ var getAction = function (target, type) {
 
 var execute = function (driver, data) {
   var target = driver.findElement(By.css(data.selector));
-  return getAction(target, data.type).perform();
+  return getAction(driver, target, data.type).perform();
 };
 
 var executor = function (driver) {
