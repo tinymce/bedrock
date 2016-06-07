@@ -31,6 +31,13 @@ var checkErrors = function (label, expected, definitions, settings) {
   });
 };
 
+var checkResult = function (label, expected, definitions, settings) {
+  tape(label, function (t) {
+    var actual = validation.scan(definitions, settings);
+    assertResult(t, expected, actual);
+  });
+};
+
 checkErrors(
   'Testing a single file that does not exist',
   [
@@ -45,7 +52,7 @@ checkErrors(
 );
 
 checkErrors(
-  'Testing a directory files that do not exist',
+  'Testing a directory -> files where the directory does not exist',
   [
     '[test/resources.not.existing] is not a directory.',
   ],
@@ -56,6 +63,36 @@ checkErrors(
     testdir: 'test/resources.not.existing'
   }
 );
+
+checkResult(
+  'Testing a directory -> files where the directory does exist, but no files matching pattern',
+  {
+    /* no files matching pattern */
+    other: [ ]
+  },
+  [
+    { name: 'testdir', validate: extraction.files('Test.js'), output: 'other' }
+  ],
+  {
+    testdir: 'test/resources'
+  }
+);
+
+checkResult(
+  'Testing a directory -> files where the directory does exist, but has a file matching pattern',
+  {
+    other: [
+      'test/resources/test.file1'
+    ]
+  },
+  [
+    { name: 'testdir', validate: extraction.files(''), output: 'other' }
+  ],
+  {
+    testdir: 'test/resources'
+  }
+);
+
 
 
 

@@ -34,8 +34,8 @@ var any = function (name, value) {
 
 var directory = function (value) {
   try {
-    if (! fs.lstatSync(value).isDir()) return attempt.passed(value);
-    return attempt.failed([ '[' + value + '] is not a directory.' ]);
+    if (! fs.lstatSync(value).isDirectory()) return attempt.failed([ '[' + value + '] is not a directory.' ]);
+    return attempt.passed(value);
   } catch (err) {
     return attempt.failed([ '[' + value + '] is not a directory.' ]);
   }
