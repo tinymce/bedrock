@@ -4,7 +4,7 @@ var create = function (fields) {
 
   fields.forEach(function (f) {
     r[f] = function (obj) {
-      if (obj[f] === undefined) throw 'Object: ' + JSON.stringify(obj) + ' does not have field: ' + f;
+      if (obj[f] === undefined) throw 'Object: does not have field: ' + f;
       return obj[f];
     };
   });
