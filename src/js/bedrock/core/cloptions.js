@@ -118,7 +118,7 @@
   };
 
   var doneSelector = {
-    name: 'doneSelector',
+    name: 'done',
     type: String,
     description: 'The CSS selector representing the state where tests have completed',
     defaultValue: 'div.done',
@@ -127,7 +127,7 @@
   };
 
   var progressSelector = {
-    name: 'progressSelector',
+    name: 'progress',
     type: String,
     defaultValue: '.progress',
     description: 'The CSS selector representing the element containing the current number of tests run',
@@ -136,7 +136,7 @@
   };
 
   var totalSelector = {
-    name: 'totalSelector',
+    name: 'total',
     type: String,
     defaultValue: '.total',
     description: 'The CSS selector representing the element containing the total number of tests',
@@ -145,7 +145,7 @@
   };
 
   var testNameSelector = {
-    name: 'testNameSelector',
+    name: 'testName',
     type: String,
     defaultValue: '.test.running .name',
     description: 'The CSS selector representing the name of the current test',
@@ -154,7 +154,7 @@
   };
 
   var resultsSelector = {
-    name: 'resultsSelector',
+    name: 'results',
     type: String,
     defaultValue: 'textarea.results',
     description: 'The CSS selector representing the JSON output of running the tests',

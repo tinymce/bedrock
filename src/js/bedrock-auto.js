@@ -28,10 +28,11 @@ var run = function (directories) {
     'bedrock-auto',
     'Use a Webdriver to launch a browser and run tests against it.',
     directories, [
-    cloptions.browser,
-    cloptions.name,
-    cloptions.output
-  ]);
+      cloptions.browser,
+      cloptions.name,
+      cloptions.output
+    ]
+  );
 
   var master = require('./bedrock/server/drivermaster.js').create();
 
@@ -55,8 +56,8 @@ var run = function (directories) {
       service.markLoaded();
       return poll.loop(master, driver, settings).then(function (data) {
         return reporter.write({
-          name: params.suiteName,
-          output: params.outputDir
+          name: settings.name,
+          output: settings.output
         })(data);
       });
     });
