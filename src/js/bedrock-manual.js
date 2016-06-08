@@ -1,27 +1,31 @@
 var run = function (directories) {
   var serve = require('./bedrock/server/serve');
+  var attempt = require('./bedrock/core/attempt');
 
-  var cli = require('./bedrock/core/cli');
-  var cloption = require('./bedrock/core/cloption');
+  var clis = require('./bedrock/cli/clis.js');
 
-  var params = cloption.parse(process.argv.slice(2), [
-    cloption.param('testConfig', '(Filename): the filename for the config file', cloption.validateFile, 'CONFIG_FILE'),
-    cloption.files('testFiles', '{Filename ...} The set of files to test', '{ TEST1 ... }')
-  ], 'bedrock');
+  var maybeSettings = clis.forManual(directories);
 
-  var settings = cli.extract(params, directories);
+  attempt.cata(maybeSettings, function (errs) {
+    console.log('errs', errs);
+  }, function (settings) {
 
-  var serveSettings = {
-    projectdir: settings.projectdir,
-    basedir: settings.basedir,
-    config: settings.config,
-    testfiles: settings.testfiles,
-    // There is no driver for manual mode.
-    driver: null
-  };
+    console.log('settings', settings);
 
-  serve.start(serveSettings, function (service/* , done */) {
-    console.log('bedrock (manual) available at: http://localhost:' + service.port);
+    var serveSettings = {
+      projectdir: settings.projectdir,
+      basedir: settings.basedir,
+      config: settings.config,
+      testfiles: settings.testfiles,
+      // There is no driver for manual mode.
+      driver: attempt.failed('There is no webdriver for manual mode'),
+      master: attempt.failed('There is no master for manual mode'),
+      page: 'src/resources/bedrock.html'
+    };
+
+    serve.start(serveSettings, function (service/* , done */) {
+      console.log('bedrock (manual) available at: http://localhost:' + service.port);
+    });
   });
 };
 

@@ -12,7 +12,7 @@ var start = function (settings, f) {
   var Prefs = accessor.create([
     'projectdir',
     'basedir',
-    'boltconfig',
+    'config',
     'testfiles',
     'driver',
     'master',
@@ -23,6 +23,14 @@ var start = function (settings, f) {
   var path = require('path');
   var finalhandler = require('finalhandler');
   var waiter = require('../util/waiter.js');
+
+  var openport = require('openport');
+
+  var routes = require('./routes');
+  var keys = require('./keyeffects');
+  var mouse = require('./mouseeffects');
+  var clipboard = require('./clipboardeffects');
+  var attempt = require('../core/attempt');
 
   // This is how long to wait before checking if the driver is ready again
   var pollRate = 2000;
@@ -66,11 +74,6 @@ var start = function (settings, f) {
   };
 
   var driverRouter = function (url, apiLabel, executor) {
-    var unsupported = routes.unsupported(
-      url,
-      apiLabel + ' API not supported without webdriver running. Use bedrock-auto to get this feature.'
-    );
-
     var effect = function (driver) {
       return function (data) {
         return waitForDriverReady(maxInvalidAttempts, function () {
@@ -80,7 +83,10 @@ var start = function (settings, f) {
     };
 
     return attempt.cata(maybeDriver, function () {
-      return unsupported();
+      return routes.unsupported(
+        url,
+        apiLabel + ' API not supported without webdriver running. Use bedrock-auto to get this feature.'
+      );
     }, function (driver) {
       return routes.effect(url, effect(driver));
     });
@@ -95,7 +101,7 @@ var start = function (settings, f) {
     // Very bolt specific.
     routes.json('/harness', {
       config: path.relative(projectdir, boltConfig),
-      scripts: testFiles
+      scripts: files
     }),
     driverRouter('/keys', 'Keys', keys.executor),
     driverRouter('/mouse', 'Mouse', mouse.executor),

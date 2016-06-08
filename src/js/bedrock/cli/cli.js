@@ -13,7 +13,7 @@ var parseCommandLine = function (definitions) {
   }
 };
 
-var extract = function (command, desc, directories, definitions) {
+var extract = function (command, desc, definitions) {
   var parsed = parseCommandLine(definitions);
 
   var extracted = attempt.list(parsed, [
