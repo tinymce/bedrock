@@ -7,12 +7,7 @@ var run = function (directories) {
 
   var maybeSettings = clis.forRemote(directories);
 
-  attempt.cata(maybeSettings, function (errs) {
-    console.error('Error while processing command line for bedrock-remote');
-    var messages = errs.errors.join('\n');
-    console.error(messages);
-    console.error('\n' + errs.usage);
-  }, function (settings) {
+  attempt.cata(maybeSettings, clis.log, function (settings) {
 
     console.log('Remote Settings', settings);
     process.exit(0);

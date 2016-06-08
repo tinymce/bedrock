@@ -27,6 +27,7 @@ var extract = function (command, desc, definitions) {
 
   return attempt.cata(extracted, function (errs) {
     return attempt.failed({
+      command: command,
       errors: errs,
       usage: cliusage.generateUsage(command, desc, definitions)
     });

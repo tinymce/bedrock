@@ -24,9 +24,7 @@ var run = function (directories) {
   var clis = require('./bedrock/cli/clis.js');
 
   var maybeSettings = clis.forAuto(directories);
-  attempt.cata(maybeSettings, function (errs) {
-    console.error(errs);
-  }, function (settings) {
+  attempt.cata(maybeSettings, cli.log, function (settings) {
     var poll = require('./bedrock/poll/poll');
     var reporter = require('./bedrock/core/reporter');
 

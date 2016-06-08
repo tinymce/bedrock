@@ -6,9 +6,7 @@ var run = function (directories) {
 
   var maybeSettings = clis.forManual(directories);
 
-  attempt.cata(maybeSettings, function (errs) {
-    console.log('errs', errs);
-  }, function (settings) {
+  attempt.cata(maybeSettings, clis.log, function (settings) {
 
     console.log('settings', settings);
 

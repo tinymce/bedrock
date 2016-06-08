@@ -93,11 +93,19 @@ var forSauce = function (directories) {
   );
 };
 
+var log = function (errs) {
+  console.error('Error while processing command line for ' + errs.command);
+  var messages = errs.errors.join('\n');
+  console.error(messages);
+  console.error('\n' + errs.usage);
+};
 
 module.exports = {
   forAuto: forAuto,
   forManual: forManual,
   forRemote: forRemote,
   forSauceSingle: forSauceSingle,
-  forSauce: forSauce
+  forSauce: forSauce,
+
+  log: log
 };
