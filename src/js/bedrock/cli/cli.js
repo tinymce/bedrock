@@ -9,7 +9,7 @@ var parseCommandLine = function (definitions) {
     var settings = commandLineArgs(definitions);
     return attempt.passed(settings);
   } catch (err) {
-    return attempt.failed([ err ]);
+    return attempt.failed([ err.message !== undefined ? err.message : err ]);
   }
 };
 

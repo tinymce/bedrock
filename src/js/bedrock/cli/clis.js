@@ -80,6 +80,7 @@ var forSauce = function (directories) {
     'Connect to the SauceLabs VMs specified by a json file and run the tests',
     directories, runnerOptions(directories).concat([
       cloptions.uploaddirs,
+      cloptions.bucket,
       cloptions.config,
       cloptions.files,
       cloptions.testdir,

@@ -154,6 +154,14 @@
     required: true
   };
 
+  var sauceconfig = {
+    name: 'sauceconfig',
+    type: String,
+    description: 'The file containing the SauceLabs browser matrix',
+    validate: extraction.file,
+    required: true
+  };
+
   var remoteurl = {
     name: 'remoteurl',
     type: String,
@@ -248,6 +256,7 @@
     sauceos: sauceos,
     sauceuser: sauceuser,
     saucekey: saucekey,
+    sauceconfig: sauceconfig,
 
     // Test driver settings
     doneSelector: doneSelector,

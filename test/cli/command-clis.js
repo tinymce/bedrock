@@ -172,3 +172,37 @@ tape('Specification of bedrock-sauce-single without saucekey', function (t) {
     'The *required* output property [saucekey] from [saucekey] must be specified'
   ], cleanError(actual));
 });
+
+tape('Minimal specification of bedrock-sauce', function (t) {
+  mutateArgs([
+    "--files", "test/resources/test.file1",
+    "--config", "sample/config.js",
+    "--uploaddirs", "test", "src",
+    "--bucket", "testing",
+    "--sauceconfig", "test/resources/test.file1",
+    "--sauceuser", "sauce.user",
+    "--saucekey", "sauce.key"
+  ]);
+  var actual = clis.forSauce(directories);
+  attemptutils.assertResult(t, {
+    uploaddirs: [ 'test', 'src' ],
+    bucket: 'testing',
+    config: 'sample/config.js',
+    done: 'div.done',
+    testfiles: [
+      'test/resources/test.file1'
+    ],
+    name: 'bedrock-run',
+    output: 'scratch',
+
+    sauceconfig: 'test/resources/test.file1',
+    saucekey: 'sauce.key',
+    sauceuser: 'sauce.user',
+    progress: '.progress',
+    results: 'textarea.results',
+    singleTimeout: 30000,
+    testName: '.test.running .name',
+    total: '.total',
+    totalTimeout: 600000
+  }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
+});
