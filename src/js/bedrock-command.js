@@ -15,7 +15,16 @@ var run = function (directories) {
     cloptions.browser,
     cloptions.config,
     cloptions.testdir,
-    cloptions.files
+    cloptions.files,
+
+    cloptions.doneSelector,
+    cloptions.projectdir(directories),
+    cloptions.overallTimeout,
+    cloptions.singleTimeout,
+    cloptions.progressSelector,
+    cloptions.totalSelector,
+    cloptions.testNameSelector,
+    cloptions.resultsSelector
   ];
 
   var settings = commandLineArgs(definitions);

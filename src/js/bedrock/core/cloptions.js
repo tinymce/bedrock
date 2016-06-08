@@ -1,5 +1,5 @@
   var cloption = require('./cloption.js');
-  var usage = require('command-line-usage');
+  var path = require('path');
 
   // Note, this is a blend of the previous hand-rolled cloption approach and
   // the existing npm package: command-line-arguments
@@ -51,7 +51,10 @@
 
   var files = {
     name: 'files',
+    output: 'testfiles',
     alias: 'f',
+    // Confusing.
+    required: true,
     type: String,
     multiple: true,
     incompatible: [
@@ -63,55 +66,100 @@
 
   var testdir = {
     name: 'testdir',
-    output: 'files',
+    output: 'testfiles',
+    // Confusing
+    required: true,
+
     alias: 'd',
     type: String,
     description: 'The directory containing all the files to test',
     validate: cloption.listDirectory('Test.js')
   };
 
-  var validateOne = function (defn, settings) {
-    return defn.validate(defn.name, settings[defn.name]);
+  var projectdir = function (directories) {
+    return {
+      name: 'projectdir',
+      alias: 'p',
+      type: String,
+      description: 'The base directory to host',
+      validate: cloption.isAny,
+      defaultValue: directories.current,
+      uncommon: true
+    };
   };
 
-  var validateMany = function (defn, settings) {
-    return settings[defn.name].map(function (f) {
-      return defn.validate(defn.name, f);
-    });
+  var basedir = function (directories) {
+    return {
+      name: 'basedir',
+      type: String,
+      description: 'The base directory of the bedrock program',
+      validate: cloption.isAny,
+      defaultValue: path.join(directories.bin, '/..'),
+      uncommon: true
+    };
   };
 
-  var validate = function (definitions, settings) {
-    try {
-      definitions.forEach(function (defn) {
-        if (defn.required === true && settings[defn.name] === undefined) throw 'Setting: ' + defn.name + ' must be specified.';
-        if (settings[defn.name] !== undefined) {
-          var incompatible = defn.incompatible !== undefined ? defn.incompatible : [];
-          incompatible.forEach(function (n) {
-            if (settings[n] !== undefined) throw 'Setting: ' + defn.name + ' is incompatible with: ' + n;
-          });
-        }
-      });
+  var overallTimeout = {
+    name: 'totalTimeout',
+    type: Number,
+    description: 'The total amount of time the test can take before bedrock times out.',
+    validate: cloption.isAny,
+    defaultValue: 10 * 60 * 1000,
+    uncommon: true
+  };
 
-      var result = {};
-      definitions.forEach(function (defn) {
-        if (settings[defn.name] !== undefined) {
-          var newValue = defn.multiple === true ? validateMany(defn, settings) : validateOne(defn, settings);
-          var output = defn.output !== undefined ? defn.output : defn.name;
-          result[output] = newValue;
-        }
-      });
-      return result;
-    } catch (err) {
-      console.error('\n** Error processing command line arguments.\n');
-      console.error(err);
+  var singleTimeout = {
+    name: 'singleTimeout',
+    type: Number,
+    description: 'The total amount of time a single test can take before bedrock times out.',
+    validate: cloption.isAny,
+    defaultValue: 30 * 1000,
+    uncommon: true
+  };
 
-      console.error(usage([
-        { header: 'bedrock', content: 'bedrock' },
-        { header: 'Options', optionList: definitions }
-      ]));
+  var doneSelector = {
+    name: 'doneSelector',
+    type: String,
+    description: 'The CSS selector representing the state where tests have completed',
+    defaultValue: 'div.done',
+    uncommon: true,
+    validate: cloption.isAny
+  };
 
-      process.exit(0);
-    }
+  var progressSelector = {
+    name: 'progressSelector',
+    type: String,
+    defaultValue: '.progress',
+    description: 'The CSS selector representing the element containing the current number of tests run',
+    uncommon: true,
+    validate: cloption.isAny
+  };
+
+  var totalSelector = {
+    name: 'totalSelector',
+    type: String,
+    defaultValue: '.total',
+    description: 'The CSS selector representing the element containing the total number of tests',
+    uncommon: true,
+    validate: cloption.isAny
+  };
+
+  var testNameSelector = {
+    name: 'testNameSelector',
+    type: String,
+    defaultValue: '.test.running .name',
+    description: 'The CSS selector representing the name of the current test',
+    uncommon: true,
+    validate: cloption.isAny
+  };
+
+  var resultsSelector = {
+    name: 'resultsSelector',
+    type: String,
+    defaultValue: 'textarea.results',
+    description: 'The CSS selector representing the JSON output of running the tests',
+    uncommon: true,
+    validate: cloption.isAny
   };
 
   module.exports = {
@@ -122,5 +170,14 @@
     configTo: configTo,
     files: files,
     testdir: testdir,
-    validate: validate
+
+    doneSelector: doneSelector,
+    projectdir: projectdir,
+    basedir: basedir,
+    overallTimeout: overallTimeout,
+    singleTimeout: singleTimeout,
+    progressSelector: progressSelector,
+    totalSelector: totalSelector,
+    testNameSelector: testNameSelector,
+    resultsSelector: resultsSelector
   };
