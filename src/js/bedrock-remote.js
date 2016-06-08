@@ -1,25 +1,32 @@
 var run = function (directories) {
-  var cli = require('./bedrock/core/cli');
-  var cloption = require('./bedrock/core/cloption');
-
-  var rest = process.argv.slice(2);
-  var params = cloption.parse(rest, [
-    cloption.param('testDir', '(String): the subdirectory for the s3 bucket', cloption.isAny, 'TEST_DIR'),
-    cloption.param('projectDirs', '(String): a comma-separated list of the directories to upload from the *current directory*', cloption.isAny, 'PROJECT_DIRS'),
-    cloption.param('testConfig', '(Filename): the filename for the config file', cloption.validateFile, 'CONFIG_FILE'),
-    cloption.files('testFiles', '{Filename ...} The set of files to test', '{ TEST1 ... }')
-  ], 'bedrock-remote');
-
-  var settings = cli.extract(params, directories);
   var uploader = require('./bedrock/remote/uploader');
   var uploads = require('./bedrock/remote/project-uploads');
+  var attempt = require('./bedrock/core/attempt');
 
-  var targets = uploads.choose(params.testDir, params.projectDirs.split(','), settings);
-  uploader.upload(targets).then(function (base/* , data */) {
-    console.log('Files uploaded. Note, bedrock-remote available at: ' + base);
-  }, function (err) {
-    console.error('error during bedrock-remote', err, err.stack);
+  var clis = require('./bedrock/cli/clis.js');
+
+  var maybeSettings = clis.forRemote(directories);
+
+  attempt.cata(maybeSettings, function (errs) {
+    console.error('Error while processing command line for bedrock-remote');
+    var messages = errs.errors.join('\n');
+    console.error(messages);
+    console.error('\n' + errs.usage);
+  }, function (settings) {
+
+    console.log('Remote Settings', settings);
+    process.exit(0);
+
+    var targets = uploads.choose(params.testDir, params.projectDirs.split(','), settings);
+    uploader.upload(targets).then(function (base/* , data */) {
+      console.log('Files uploaded. Note, bedrock-remote available at: ' + base);
+    }, function (err) {
+      console.error('error during bedrock-remote', err, err.stack);
+    });
+
   });
+
+
 };
 
 module.exports = {
