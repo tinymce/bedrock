@@ -14,7 +14,7 @@ var validateMany = function (defn, settings) {
 var validateRequired = function (defn, settings) {
   var output = defn.output !== undefined ? defn.output : defn.name;
   return defn.required === true && settings[output] === undefined ? attempt.failed([
-    'The *required* output property [' + output + '] from [' + defn.name + '] must be specified.'
+    'The *required* output property [' + output + '] from [' + defn.name + '] must be specified'
   ]) : attempt.passed(defn);
 };
 

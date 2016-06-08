@@ -8,7 +8,7 @@
     alias: 'n',
     type: String,
     defaultValue: 'bedrock-run',
-    description: 'The name of the test run. It is used in reporting data.',
+    description: 'The name of the test run. It is used in reporting data',
     validate: extraction.any
   };
 
@@ -114,10 +114,51 @@
     required: true
   };
 
+  var saucebrowser = {
+    name: 'saucebrowser',
+    type: String,
+    description: 'The name of the browser to launch on SauceLabs',
+    validate: extraction.inSet([ 'MicrosoftEdge', 'internet explorer', 'firefox', 'chrome', 'safari' ]),
+    defaultValue: 'chrome'
+  };
+
+  var sauceos = {
+    name: 'sauceos',
+    type: String,
+    description: 'The operating system of the VM to launch on SauceLabs',
+    validate: extraction.inSet([ 'Windows 10', 'Windows 8.1', 'OSX 10.9', 'Linux' ]),
+    defaultValue: 'Linux'
+  };
+
+  var saucebrowserVersion = {
+    name: 'saucebrowserVersion',
+    type: String,
+    description: 'The browser version to run on SauceLabs',
+    validate: extraction.any,
+    defaultValue: 'latest'
+  };
+
+  var sauceuser = {
+    name: 'sauceuser',
+    type: String,
+    description: 'The username for SauceLabs',
+    validate: extraction.any,
+    required: true
+  };
+
+  var saucekey = {
+    name: 'saucekey',
+    type: String,
+    description: 'The key for SauceLabs',
+    validate: extraction.any,
+    required: true
+  };
+
   var remoteurl = {
     name: 'remoteurl',
     type: String,
     description: 'The URL of the uploaded project',
+    validate: extraction.any,
     required: true
   };
 
@@ -202,6 +243,11 @@
 
     // Saucelabs testing
     remoteurl: remoteurl,
+    saucebrowser: saucebrowser,
+    saucebrowserVersion: saucebrowserVersion,
+    sauceos: sauceos,
+    sauceuser: sauceuser,
+    saucekey: saucekey,
 
     // Test driver settings
     doneSelector: doneSelector,
@@ -214,3 +260,14 @@
     testNameSelector: testNameSelector,
     resultsSelector: resultsSelector
   };
+
+      // cloptions.saucebrowser, ***
+      // cloptions.config, ***
+      // cloptions.files,
+      // cloptions.testdir,
+      // cloptions.name,
+      // cloptions.sauceos,
+      // cloptions.saucebrowserVersion,
+      // cloptions.sauceuser,
+      // cloptions.saucekey,
+      // cloptions.output

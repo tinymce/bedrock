@@ -18,7 +18,7 @@ var runnerOptions = function (directories) {
 var forAuto = function (directories) {
   return cli.extract(
     'bedrock-auto',
-    'Use a Webdriver to launch a browser and run tests against it.',
+    'Use a Webdriver to launch a browser and run tests against it',
     directories, runnerOptions(directories).concat([
       cloptions.browser,
       cloptions.config,
@@ -64,9 +64,6 @@ var forSauceSingle = function (directories) {
     directories, runnerOptions(directories).concat([
       cloptions.remoteurl,
       cloptions.saucebrowser,
-      cloptions.config,
-      cloptions.files,
-      cloptions.testdir,
       cloptions.name,
       cloptions.sauceos,
       cloptions.saucebrowserVersion,

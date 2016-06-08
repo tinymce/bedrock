@@ -47,7 +47,7 @@ var cleanError = function (result) {
 
 var cleanResult = function (result) {
   return attempt.cata(result, attempt.failed, function (v) {
-    return exclude([ 'projectdir', 'basedir' ]);
+    return attempt.passed(exclude([ 'projectdir', 'basedir' ])(v));
   });
 };
 
@@ -83,7 +83,9 @@ tape('Specification of bedrock-auto missing required field: browser', function (
     "--config", "sample/config.js"
   ]);
   var actual = clis.forAuto(directories);
-  attemptutils.assertErrors(t, [ ], cleanResult(actual));
+  attemptutils.assertErrors(t, [
+    'The *required* output property [browser] from [browser] must be specified'
+  ], cleanError(actual));
 });
 
 tape('Minimal specification of bedrock-manual', function (t) {
@@ -136,21 +138,21 @@ tape('Minimal specification of bedrock-remote', function (t) {
 
 tape('Minimal specification of bedrock-sauce-single', function (t) {
   mutateArgs([
-    "--files", "test/resources/test.file1",
-    "--config", "sample/config.js",
-    "--uploaddirs", "test", "src",
-    "--bucket", "testing"
+    "--remoteurl", "remote.url",
+    "--sauceuser", "sauce.user",
+    "--saucekey", "sauce.key"
   ]);
   var actual = clis.forSauceSingle(directories);
   attemptutils.assertResult(t, {
-    uploaddirs: [ 'test', 'src' ],
-    bucket: 'testing',
-    config: 'sample/config.js',
+    remoteurl: 'remote.url',
     done: 'div.done',
-    testfiles: [
-      'test/resources/test.file1'
-    ],
-
+    sauceuser: 'sauce.user',
+    saucekey: 'sauce.key',
+    saucebrowser: 'chrome',
+    sauceos: 'Linux',
+    saucebrowserVersion: 'latest',
+    output: 'scratch',
+    name: 'bedrock-run',
     progress: '.progress',
     results: 'textarea.results',
     singleTimeout: 30000,
@@ -160,18 +162,13 @@ tape('Minimal specification of bedrock-sauce-single', function (t) {
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
 });
 
-// var checkError = function (label, args) {
-//   process.argv = args;
-//   var settings = autocli.extract(directories);
-//   console.error('Test should have failed\n  ' + label);
-//   process.exit(-1);
-// };
-
-// checkError(
-//   'Test 1: bedrock-auto with unknown flag',
-//   [
-//     "$executable", "$file",
-//     "--flag"
-//   ]
-// );
-
+tape('Specification of bedrock-sauce-single without saucekey', function (t) {
+  mutateArgs([
+    "--remoteurl", "remote.url",
+    "--sauceuser", "sauce.user"
+  ]);
+  var actual = clis.forSauceSingle(directories);
+  attemptutils.assertErrors(t, [
+    'The *required* output property [saucekey] from [saucekey] must be specified'
+  ], cleanError(actual));
+});
