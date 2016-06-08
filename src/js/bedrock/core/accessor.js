@@ -3,9 +3,8 @@ var create = function (fields) {
   console.log('fields', fields);
 
   fields.forEach(function (f) {
-    console.log('f', f);
     r[f] = function (obj) {
-      console.log('here');
+      if (obj[f] === undefined) throw 'Object: ' + JSON.stringify(obj) + ' does not have field: ' + f;
       return obj[f];
     };
   });

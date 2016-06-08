@@ -30,15 +30,12 @@ var start = function (settings, f) {
     pageHasLoaded = true;
   };
 
-  var openport = require('openport');
+  var fallback = routes.constant(settings.basedir, 'src/resources/bedrock.html');
+};
 
-  var routes = require('./routes');
-  var keys = require('./keyeffects');
-  var mouse = require('./mouseeffects');
-  var clipboard = require('./clipboardeffects');
-
-  var testFiles = settings.testfiles.map(function (filePath) {
-    return path.relative(settings.projectdir, filePath);
+var start = function (settings, f) {
+  var testFiles = ServerSettings.testfiles(settings).map(function (filePath) {
+    return path.relative(ServerSettings.projectdir(settings), filePath);
   });
 
   // On IE, the webdriver seems to load the page before it's ready to start
@@ -68,8 +65,8 @@ var start = function (settings, f) {
   };
 
   var routers = [
-    routes.routing('/project', settings.projectdir),
-    routes.routing('/js', path.join(settings.basedir, 'src/resources')),
+    routes.routing('/project', ServerSetings.projectdir(settings)),
+    routes.routing('/js', path.join(ServerSettings.basedir(settings), 'src/resources')),
     routes.routing('/lib/bolt', path.join(settings.basedir, 'node_modules/@ephox/bolt/lib')),
     routes.routing('/lib/jquery', path.join(settings.basedir, 'node_modules/jquery/dist')),
     routes.routing('/css', path.join(settings.basedir, 'src/css')),
