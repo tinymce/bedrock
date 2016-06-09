@@ -81,28 +81,16 @@
         var testTime = timer.elapsed(starttime);
         time.text(testTime);
 
-        $.ajax({
-          method: 'post',
-          url: 'progress',
-          dataType: 'json',
-          success: function () { },
-          error: function () {
-
-          },
-          data: JSON.stringify({ 'test': name, passed: true })
-        });
-
-
         resultJSON.results.push({
           name: name,
           file: testcase,
           passed: true,
           time: testTime
         });
+
         current.text(resultJSON.results.length);
-        if (cancelTests) {
-          done();
-        }
+
+        notify(undefined);
       };
 
       var processQUnit = function (html) {
@@ -139,16 +127,6 @@
         var testTime = timer.elapsed(starttime);
         time.text(testTime);
 
-        $.ajax({
-          method: 'post',
-          url: 'progress',
-          dataType: 'json',
-          success: function () { },
-          error: function () {
-
-          },
-          data: JSON.stringify({ 'test': name, passed: false })
-        });
 
 
         resultJSON.results.push({
@@ -159,9 +137,8 @@
           error: errors.clean(e)
         });
         current.text(resultJSON.results.length);
-        if (cancelTests) {
-          done();
-        }
+
+        notify(errors.clean(e));
       };
 
       var htmlcompare = function (compares) {
@@ -181,6 +158,33 @@
         });
       };
 
+      var notify = function (e) {
+        var checkAbort = function () {
+          if (cancelTests) done();
+        };
+
+        var numFailed = $(resultJSON.results).filter(function (k, result) {
+          return result.passed === false;
+        }).length;
+
+        var numPassed = resultJSON.results.length - numFailed;
+
+        $.ajax({
+          method: 'post',
+          url: 'tests/progress',
+          dataType: 'json',
+          success: checkAbort,
+          error: checkAbort,
+          data: JSON.stringify({
+            test: name,
+            numFailed: numFailed,
+            numPassed: numPassed,
+            total: testcount.text(),
+            error: e
+          })
+        });
+      };
+
       return {
         pass: pass,
         htmlcompare: htmlcompare,
@@ -188,13 +192,33 @@
       };
     };
 
+
+
     var done = function () {
-      var totalTime = timer.elapsed(initial);
-      resultJSON.time = totalTime;
-      $('body').append('<div class="done">Test run completed in <span class="time">' + totalTime + '</span></div>');
-      var resultBox = $('<textarea class="results" />').text(JSON.stringify(resultJSON));
-      $('body').append(resultBox);
-      $('.passed.hidden').removeClass('hidden');
+      $.ajax({
+        method: 'post',
+        url: 'tests/done',
+        dataType: 'json',
+        success: function () {
+          setAsDone();
+        },
+        error: function () {
+          setAsDone();
+        },
+        data: JSON.stringify({
+          total: resultJSON.length,
+          blah: 'hi'
+        })
+      });
+
+      var setAsDone = function () {
+        var totalTime = timer.elapsed(initial);
+        resultJSON.time = totalTime;
+        $('body').append('<div class="done">Test run completed in <span class="time">' + totalTime + '</span></div>');
+        var resultBox = $('<textarea class="results" />').text(JSON.stringify(resultJSON));
+        $('body').append(resultBox);
+        $('.passed.hidden').removeClass('hidden');
+      };
     };
 
     return {

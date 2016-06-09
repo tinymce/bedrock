@@ -1,5 +1,7 @@
 var accessor = require('../core/accessor');
 /*
+
+
  * Settings:
  *
  * projectdir: project directory (what you are testing)
@@ -105,8 +107,14 @@ var start = function (settings, f) {
     }),
     driverRouter('/keys', 'Keys', keys.executor),
     driverRouter('/mouse', 'Mouse', mouse.executor),
-    routes.effect('/progress', function (data) {
-      console.log('data', data);
+    // Add particular methods.
+    routes.effect('/tests/progress', function (data) {
+      process.stdout.cursorTo(0);
+      process.stdout.write('Passed: ' + data.numPassed + '/' + data.total + ', Failed: ' + data.numFailed + '/' + data.total + '  ... ');
+      process.stdout.clearLine(1);
+      return Promise.resolve({});
+    }),
+    routes.effect('/tests/done', function (data) {
       return Promise.resolve({});
     }),
     // This does not need the webdriver.
