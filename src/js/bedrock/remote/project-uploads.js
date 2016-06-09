@@ -1,4 +1,5 @@
 var uploadtypes = require('./upload-types');
+var path = require('path');
 
 var getManyDirectories = function (projectdir, uploaddirs) {
   return uploaddirs.map(function (d) {
@@ -17,11 +18,9 @@ var choose = function (settings) {
   var basedir = settings.basedir;
   var uploaddirs = settings.uploaddirs;
 
-  console.log('basedir', basedir);
-
   var link = function (inputDir, inputName, outputDir, outputName) {
     // TODO: use path.join?
-    return uploadtypes.filetype(basedir + '/' + inputDir + '/' + inputName, outputDir + '/' + outputName);
+    return uploadtypes.filetype(path.join(basedir, inputDir, inputName), path.join(outputDir, outputName));
   };
 
   var boltlink = function (filename) {
@@ -34,14 +33,30 @@ var choose = function (settings) {
   };
 
   return getDirectories().concat([
-    link('src/resources', 'runner.js', 'js', 'runner.js'),
+    link(
+      path.join('src', 'resources'),
+      'runner.js',
+      'js',
+      'runner.js'
+    ),
     boltlink('kernel.js'),
     boltlink('loader.js'),
     boltlink('module.js'),
     boltlink('test.js'),
-    link('node_modules/jquery/dist', 'jquery.min.js', 'lib/jquery', 'jquery.min.js'),
-    uploadtypes.filetype(basedir + '/src/resources/bedrock.html', 'index.html'),
-    uploadtypes.filetype(basedir + '/src/css/bedrock.css', 'css/bedrock.css'),
+    link(
+      path.join('node_modules', 'jquery', 'dist'),
+      'jquery.min.js',
+      path.join('lib', 'jquery'),
+      'jquery.min.js'
+    ),
+    uploadtypes.filetype(
+      path.join(basedir, 'src', 'resources', 'bedrock.html'),
+      'index.html'
+    ),
+    uploadtypes.filetype(
+      path.join(basedir, 'src', 'css', 'bedrock.css'),
+      path.join('css', 'bedrock.css')
+    ),
     uploadtypes.datatype('harness', JSON.stringify({ config: settings.config, scripts: settings.testfiles }))
   ]);
 };
