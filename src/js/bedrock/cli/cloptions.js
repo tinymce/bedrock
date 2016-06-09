@@ -136,7 +136,7 @@
     name: 'sauceos',
     type: String,
     description: 'The operating system of the VM to launch on SauceLabs',
-    validate: extraction.inSet([ 'Windows 10', 'Windows 8.1', 'OSX 10.9', 'Linux' ]),
+    validate: extraction.inSet([ 'Windows 10', 'Windows 8.1', 'OS X 10.9', 'Linux' ]),
     defaultValue: 'Linux'
   };
 
