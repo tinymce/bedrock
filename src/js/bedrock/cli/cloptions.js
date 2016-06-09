@@ -243,6 +243,14 @@
     validate: extraction.any
   };
 
+  var help = {
+    name: 'help',
+    alias: 'h',
+    type: Boolean,
+    defaultValue: false,
+    validate: extraction.any
+  };
+
   module.exports = {
     // All modes testing
     config: config,
@@ -278,16 +286,7 @@
     progressSelector: progressSelector,
     totalSelector: totalSelector,
     testNameSelector: testNameSelector,
-    resultsSelector: resultsSelector
-  };
+    resultsSelector: resultsSelector,
 
-      // cloptions.saucebrowser, ***
-      // cloptions.config, ***
-      // cloptions.files,
-      // cloptions.testdir,
-      // cloptions.name,
-      // cloptions.sauceos,
-      // cloptions.saucebrowserVersion,
-      // cloptions.sauceuser,
-      // cloptions.saucekey,
-      // cloptions.output
+    help: help
+  };

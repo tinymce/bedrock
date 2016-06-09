@@ -11,7 +11,8 @@ var runnerOptions = function (directories) {
     cloptions.progressSelector,
     cloptions.totalSelector,
     cloptions.testNameSelector,
-    cloptions.resultsSelector
+    cloptions.resultsSelector,
+    cloptions.help
   ];
 };
 
@@ -96,10 +97,10 @@ var forSauce = function (directories) {
 };
 
 var log = function (errs) {
-  console.error('Error while processing command line for ' + errs.command);
+  console.error('\n****\nError while processing command line for ' + errs.command);
   var messages = errs.errors.join('\n');
   console.error(messages);
-  console.error('\n' + errs.usage);
+  console.error('Use ' + errs.command + ' --help to print usage\n****\n');
 };
 
 module.exports = {

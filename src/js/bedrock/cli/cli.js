@@ -16,6 +16,16 @@ var parseCommandLine = function (definitions) {
 var extract = function (command, desc, definitions) {
   var parsed = parseCommandLine(definitions);
 
+
+  attempt.cata(parsed, function () {
+  }, function (s) {
+    if (s.help === true) {
+      // Print usage information if used with --help or -h.
+      console.log(cliusage.generateUsage(command, desc, definitions));
+      process.exit(0);
+    }
+  });
+
   var extracted = attempt.list(parsed, [
     function (settings) {
       return validation.scan(definitions, settings);
