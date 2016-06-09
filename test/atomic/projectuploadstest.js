@@ -6,13 +6,17 @@ var tape = require('tape');
 
 tape('Check uploading', function (t) {
   var actual = uploads.choose(
-    'random.name',
-    [ 'test/resources/alpha', 'test/resources/beta' ],
-    'base://', 'project://',
-    'config/sample.js',
-    [
-      'file1'
-    ]
+    {
+      name: 'random.name',
+      bucket: 'tbio-testing',
+      uploaddirs: [ 'test/resources/alpha', 'test/resources/beta' ],
+      basedir: 'base://',
+      projectdir:  'project://',
+      config: 'config/sample.js',
+      testfiles: [
+        'file1'
+      ]
+    }
   );
   t.deepEqual(actual, {
     name: 'random.name',

@@ -6,7 +6,7 @@ var go = function (settings) {
   console.log('Remote Settings', settings);
   process.exit(0);
 
-  var targets = uploads.choose(settings.bucket, settings.uploaddirs, settings.basedir, settings.projectdir, settings.config, settings.testfiles);
+  var targets = uploads.choose(settings);
   uploader.upload(targets).then(function (base/* , data */) {
     console.log('Files uploaded. Note, bedrock-remote available at: ' + base);
   }, function (err) {

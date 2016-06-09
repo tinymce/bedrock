@@ -39,7 +39,7 @@ var upload = function (settings) {
         console.error(err);
         reject(err);
       } else {
-        var base = 'http://' + settings.bucket + '.s3-website-us-west-2.amazonaws.com/tunic/' + settings.bucketfolder;
+        var base = 'http://' + settings.bucket + '.s3-website-us-west-2.amazonaws.com' + settings.bucketfolder;
         resolve(base, results);
       }
     });

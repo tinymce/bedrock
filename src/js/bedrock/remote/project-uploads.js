@@ -12,7 +12,11 @@ var getAllDirectories = function (projectdir) {
   ];
 };
 
-var choose = function (name, uploaddirs, basedir, projectdir, config, testfiles) {
+var choose = function (settings) {
+  var projectdir = settings.projectdir;
+  var basedir = settings.basedir;
+  var uploaddirs = settings.uploaddirs;
+
   var link = function (inputDir, inputName, outputDir, outputName) {
     // TODO: use path.join?
     return uploadtypes.filetype(basedir + inputDir + '/' + inputName, outputDir + '/' + outputName);
@@ -28,8 +32,8 @@ var choose = function (name, uploaddirs, basedir, projectdir, config, testfiles)
   };
 
   return {
-    bucket: 'tbio-testing',
-    name: name,
+    bucket: settings.bucket,
+    name: settings.name,
     fileset: getDirectories().concat([
 
       link('src/resources', 'runner.js', 'js', 'runner.js'),
@@ -40,7 +44,7 @@ var choose = function (name, uploaddirs, basedir, projectdir, config, testfiles)
       link('node_modules/jquery/dist', 'jquery.min.js', 'lib/jquery', 'jquery.min.js'),
       uploadtypes.filetype(basedir + 'src/resources/bedrock.html', 'index.html'),
       uploadtypes.filetype(basedir + 'src/css/bedrock.css', 'css/bedrock.css'),
-      uploadtypes.datatype('harness', JSON.stringify({ config: config, scripts: testfiles }))
+      uploadtypes.datatype('harness', JSON.stringify({ config: settings.config, scripts: settings.testfiles }))
     ])
   };
 };
