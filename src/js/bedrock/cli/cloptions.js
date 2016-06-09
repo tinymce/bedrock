@@ -111,7 +111,17 @@
     type: String,
     description: 'The name of the AWS bucket',
     validate: extraction.any,
+    defaultValue: 'tbio-testing',
     required: true
+  };
+
+  var bucketfolder = {
+    name: 'bucketfolder',
+    type: String,
+    description: 'The namespace inside the bucket',
+    validate: extraction.any,
+    // Current default based on our AWS settings for temporary folders.
+    defaultValue: 'tunic/bedrock-testing'
   };
 
   var saucebrowser = {
@@ -248,6 +258,7 @@
     // Remote testing
     uploaddirs: uploaddirs,
     bucket: bucket,
+    bucketfolder: bucketfolder,
 
     // Saucelabs testing
     remoteurl: remoteurl,

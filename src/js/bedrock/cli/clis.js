@@ -52,7 +52,8 @@ var forRemote = function (directories) {
       cloptions.files,
       cloptions.testdir,
       cloptions.uploaddirs,
-      cloptions.bucket
+      cloptions.bucket,
+      cloptions.bucketfolder
     ])
   );
 };
@@ -81,6 +82,7 @@ var forSauce = function (directories) {
     runnerOptions(directories).concat([
       cloptions.uploaddirs,
       cloptions.bucket,
+      cloptions.bucketfolder,
       cloptions.config,
       cloptions.files,
       cloptions.testdir,

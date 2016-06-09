@@ -29,7 +29,7 @@ var upload = function (settings) {
     async.map(fileset, function (f, cb) {
       counter++;
       s3.upload({
-        Key: 'tunic/' + settings.name + '/' + f.Key,
+        Key: settings.bucketfolder + '/' + f.Key,
         Body: f.Body,
         ContentType: f.ContentType
       }, cb);
@@ -39,7 +39,7 @@ var upload = function (settings) {
         console.error(err);
         reject(err);
       } else {
-        var base = 'http://' + settings.bucket + '.s3-website-us-west-2.amazonaws.com/tunic/' + settings.name;
+        var base = 'http://' + settings.bucket + '.s3-website-us-west-2.amazonaws.com/tunic/' + settings.bucketfolder;
         resolve(base, results);
       }
     });
