@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var clis = require('../../src/js/bedrock/cli/clis.js');
-var attemptutils = require('./attempt-utils.js');
+var attemptutils = require('../util/attempt-utils.js');
 var attempt = require('../../src/js/bedrock/core/attempt.js');
 
 var tape = require('tape');
