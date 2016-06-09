@@ -1,4 +1,4 @@
-var waiter = require('../util/waiter.js');
+var waiter = require('../util/waiter');
 
 var create = function () {
 

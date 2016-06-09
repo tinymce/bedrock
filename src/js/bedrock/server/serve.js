@@ -1,4 +1,4 @@
-var accessor = require('../core/accessor.js');
+var accessor = require('../core/accessor');
 /*
  * Settings:
  *
@@ -22,7 +22,7 @@ var start = function (settings, f) {
   var http = require('http');
   var path = require('path');
   var finalhandler = require('finalhandler');
-  var waiter = require('../util/waiter.js');
+  var waiter = require('../util/waiter');
 
   var openport = require('openport');
 

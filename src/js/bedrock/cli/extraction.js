@@ -1,6 +1,6 @@
 var fs = require('fs');
 var readdirSyncRec = require('recursive-readdir-sync');
-var attempt = require('../core/attempt.js');
+var attempt = require('../core/attempt');
 
 var file = function (name, value) {
   try {

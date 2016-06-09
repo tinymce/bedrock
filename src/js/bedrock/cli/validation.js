@@ -1,4 +1,4 @@
-var attempt = require('../core/attempt.js');
+var attempt = require('../core/attempt');
 
 var validateOne = function (defn, settings) {
   return defn.validate(defn.name, settings[defn.name]);

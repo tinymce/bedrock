@@ -1,5 +1,5 @@
   var path = require('path');
-  var extraction = require('./extraction.js');
+  var extraction = require('./extraction');
 
   // Note, this is a blend of the previous hand-rolled cloption approach and
   // the existing npm package: command-line-arguments

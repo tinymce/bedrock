@@ -1,5 +1,5 @@
-var cli = require('./cli.js');
-var cloptions = require('./cloptions.js');
+var cli = require('./cli');
+var cloptions = require('./cloptions');
 
 var runnerOptions = function (directories) {
   return [

@@ -23,7 +23,7 @@ var go = function (settings) {
   var poll = require('./bedrock/poll/poll');
   var reporter = require('./bedrock/core/reporter');
 
-  var master = require('./bedrock/server/drivermaster.js').create();
+  var master = require('./bedrock/server/drivermaster').create();
 
   var driver = require('./bedrock/auto/driver').create({
     browser: settings.browser

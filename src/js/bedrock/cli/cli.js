@@ -1,8 +1,8 @@
-var cloptions = require('./cloptions.js');
+var cloptions = require('./cloptions');
 var commandLineArgs = require('command-line-args');
-var attempt = require('../core/attempt.js');
-var validation = require('./validation.js');
-var cliusage = require('./cliusage.js');
+var attempt = require('../core/attempt');
+var validation = require('./validation');
+var cliusage = require('./cliusage');
 
 var parseCommandLine = function (definitions) {
   try {

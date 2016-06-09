@@ -25,7 +25,7 @@ var go = function (settings) {
   var detailedName = prettify(settings.sauceos, settings.saucebrowser, settings.saucebrowserVersion);
 
   driver.get(settings.remoteurl + '/index.html').then(function () {
-    var master = require('./bedrock/server/drivermaster.js').create();
+    var master = require('./bedrock/server/drivermaster').create();
 
     console.log('Starting SauceLabs platform: ' + detailedName);
     var jobResult = jobs.runTest(detailedName, driver, function () {
