@@ -2,6 +2,9 @@
 var attempt = require('../../src/js/bedrock/core/attempt');
 
 var jsc = require('jsverify');
+for (var i in jsc) {
+  console.log(i);
+}
 
 // var specs = require('../props/specifiers');
 
@@ -22,19 +25,13 @@ var jsc = require('jsverify');
 var attemptPassedSpec = jsc.bless({
   generator: function () {
     return attempt.passed(
-      jsc.object
+      jsc.json.generator(1)
     );
   },
   show: attempt.toString
 });
 
-// var attemptPassedSpec = jsc.bool.smap(
-//   function (b) { return b === true ? attempt.failed(true); },
-//   function (at) { return false; },
-//   function (at) {
-//     return 'dog';
-//   }
-// );
+
 
 var attemptFailedSpec = jsc.bless({
   generator: function () {
@@ -42,8 +39,19 @@ var attemptFailedSpec = jsc.bless({
       jsc.array(
         jsc.number,
         jsc.string
-      )
+      ).generator(1)
     );
+  },
+  show: attempt.toString
+});
+
+var attemptSpec = jsc.bless({
+  generator: function () {
+    var b = jsc.bool.generator();
+    return b === true ? attemptPassedSpec.generator() : attemptFailedSpec.generator();
+    // return function () {
+    //   return v === true ? attemptPassedSpec : attemptFailedSpec;
+    // ;
   },
   show: attempt.toString
 });
@@ -62,19 +70,38 @@ var sort = function (arr) {
     return attempt.hasPassed(arr) === true;
   });
 
-// jsc.on_result(function (value) {
-//   if (! value.ok) {
-//     console.error(value);
-//     // process.exit(-1);
-//   } else {
-//     console.log(value);
-//   }
-// });
+  var concat1 = jsc.property('attempt.concat should pass if all true', jsc.array(attemptPassedSpec), function (attempts) {
+    var result = attempt.concat(attempts);
+    return attempt.hasPassed(result);
+  });
 
-// jsc.on_report(function (value) {
-//   console.log('report.value',value);
-// });
+  var concat2 = jsc.property('attempt.concat should fail if any have failed', jsc.array(attemptSpec), function (attempts) {
+    var result = attempt.concat(attempts);
+    var allPassed = attempts.filter(attempt.hasPassed).length === attempts.length;
+    return attempt.hasPassed(result) === allPassed;
+  });
 
+  var concat3 = jsc.property('attempt.concat should concatenate any error messages', jsc.array(attemptSpec), function (attempts) {
+    var result = attempt.concat(attempts);
+    var failed = attempts.filter(function (at) { return !attempt.hasPassed(at); });
+    var failedErrors = failed.reduce(function (rest, f) {
+      var current = attempt.cata(f, function (x) {
+        return x;
+      }, function () {
+        return [ ];
+      });
+      return rest.concat(current);
+    }, []);
+
+    return attempt.cata(result, function (errs) {
+      console.log('failedErrors', failedErrors);
+      console.log('errors', errs);
+      return jsc.utils.isEqual(errs, failedErrors);
+    }, function (v) {
+      console.log('passing', v, attempt.hasPassed(result), failed);
+      return jsc.utils.isEqual([ ], failed);
+    });
+  });
 // jsc.test(
 //   'Check attempt.concat only passes if all are success',
 //   function (verdict, attempts) {
