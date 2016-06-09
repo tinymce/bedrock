@@ -1,9 +1,9 @@
 var SauceLabs = require('saucelabs');
 
-var create = function (params) {
+var create = function (settings) {
   var saucelabs = new SauceLabs({
-    username: params.sauceUser,
-    password: params.sauceKey
+    username: settings.sauceuser,
+    password: settings.saucekey
   });
 
   var reporter = require('../core/reporter');
@@ -47,16 +47,16 @@ var create = function (params) {
 
   var runTest = function (suiteName, driver, f) {
     return driver.getSession().then(function (session) {
-      var name = params.sauceJob;
+      var name = settings.name;
       var setAsPassed = setJobPassed(session, name);
       var setAsFailed = setJobFailed(session, name);
 
       var logResults = reporter.write({
         name: suiteName,
-        output: params.outputDir,
+        output: settings.output,
         sauce: {
           id: session.id_,
-          job: params.sauceJob
+          job: name
         }
       });
 
