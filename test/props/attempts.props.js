@@ -1,7 +1,14 @@
-// var jsc = require('jscheck');
 var attempt = require('../../src/js/bedrock/core/attempt');
+var tape = require('tape');
 
 var jsc = require('jsverify');
+
+(function () { return this; })().it = function (name, f) {
+  tape(name, function (t) {
+    f();
+    t.end();
+  });
+};
 
 var attemptPassedSpec = jsc.bless({
   generator: function () {

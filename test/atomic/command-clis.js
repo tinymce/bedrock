@@ -64,6 +64,7 @@ tape('Minimal specification of bedrock-auto', function (t) {
     done: 'div.done',
     name: 'bedrock-run',
     output: 'scratch',
+    help: false,
     testfiles: [
       'test/resources/test.file1'
     ],
@@ -100,6 +101,7 @@ tape('Minimal specification of bedrock-manual', function (t) {
     testfiles: [
       'test/resources/test.file1'
     ],
+    help: false,
 
     progress: '.progress',
     results: 'textarea.results',
@@ -121,11 +123,14 @@ tape('Minimal specification of bedrock-remote', function (t) {
   attemptutils.assertResult(t, {
     uploaddirs: [ 'test', 'src' ],
     bucket: 'testing',
+    bucketfolder: 'tunic/bedrock-testing',
     config: 'sample/config.js',
     done: 'div.done',
+    help: false,
     testfiles: [
       'test/resources/test.file1'
     ],
+    help: false,
 
     progress: '.progress',
     results: 'textarea.results',
@@ -149,6 +154,7 @@ tape('Minimal specification of bedrock-sauce-single', function (t) {
     sauceuser: 'sauce.user',
     saucekey: 'sauce.key',
     saucebrowser: 'chrome',
+    help: false,
     sauceos: 'Linux',
     saucebrowserVersion: 'latest',
     output: 'scratch',
@@ -187,6 +193,7 @@ tape('Minimal specification of bedrock-sauce', function (t) {
   attemptutils.assertResult(t, {
     uploaddirs: [ 'test', 'src' ],
     bucket: 'testing',
+    bucketfolder: 'tunic/bedrock-testing',
     config: 'sample/config.js',
     done: 'div.done',
     testfiles: [
@@ -194,6 +201,7 @@ tape('Minimal specification of bedrock-sauce', function (t) {
     ],
     name: 'bedrock-run',
     output: 'scratch',
+    help: false,
 
     sauceconfig: 'test/resources/test.file1',
     saucekey: 'sauce.key',
