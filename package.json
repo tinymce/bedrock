@@ -32,8 +32,11 @@
     "eslint": "^2.9.0",
     "eslint-config-google": "^0.5.0",
     "grunt": "^1.0.1",
-    "tape": "^4.5.1",
-    "load-grunt-tasks": "^3.5.0"
+    "jscheck": "^0.2.0",
+    "jsverify": "^0.7.1",
+    "load-grunt-tasks": "^3.5.0",
+    "mocha": "^2.5.3",
+    "tape": "^4.5.1"
   },
   "author": "Ephox",
   "license": "BSD-3-Clause"

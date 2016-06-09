@@ -65,6 +65,22 @@ var concat = function (attempts) {
   }, passed([]));
 };
 
+var toString = function (attempt) {
+  return cata(attempt, function (errs) {
+    return 'attempt.failed(' + JSON.stringify(errs) + ')';
+  }, function (value) {
+    return 'attempt.passed(' + JSON.stringify(value) + ')';
+  });
+};
+
+var hasPassed = function (attempt) {
+  return cata(attempt, function () {
+    return false;
+  }, function () {
+    return true;
+  });
+};
+
 module.exports = {
   failed: failed,
   passed: passed,
@@ -73,5 +89,7 @@ module.exports = {
   map: map,
   list: list,
   carry: carry,
-  concat: concat
+  concat: concat,
+  toString: toString,
+  hasPassed: hasPassed
 };
