@@ -35,7 +35,7 @@ var go = function (settings) {
     config: settings.config,
     testfiles: settings.testfiles,
     driver: attempt.passed(driver),
-    master: attempt.passed(master),
+    master: master,
     page: 'src/resources/bedrock.html'
   };
 
