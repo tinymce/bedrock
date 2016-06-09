@@ -22,18 +22,6 @@ var exclude = function (fields) {
   };
 };
 
-// return cli.extract(
-//     'bedrock-auto',
-//     'Use a Webdriver to launch a browser and run tests against it.',
-//     directories, runnerOptions.concat([
-//       cloptions.browser,
-//       cloptions.config,
-//       cloptions.files,
-//       cloptions.testdir,
-//       cloptions.name,
-//       cloptions.output
-//     ])
-//   );
 
 var mutateArgs = function (newArgs) {
   process.argv = [ "$executable", "$file" ].concat(newArgs);
