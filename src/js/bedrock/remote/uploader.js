@@ -2,18 +2,9 @@ var aws = require('aws-sdk');
 var async = require('async');
 var uploadtypes = require('./upload-types');
 
-/*
- * Settings
- *
- *
- * bucket: name of S3 bucket
- * fileset: the list of files to upload (format: ??)
- */
 var upload = function (bucket, bucketfolder, targets) {
   return new Promise(function (resolve, reject) {
     var fileset = uploadtypes.scanAll(targets);
-
-    console.log('fileset', fileset);
 
     console.log('Found approximately ' + fileset.length + ' files to upload');
 
