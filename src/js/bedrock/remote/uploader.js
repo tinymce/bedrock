@@ -7,14 +7,13 @@ var uploadtypes = require('./upload-types');
  *
  *
  * bucket: name of S3 bucket
- * directories: list of top-level directories to upload, (format: ??)
- * files: the list of files to upload (format: ??)
- *
- * name: subdirectory to put on th bucket.
+ * fileset: the list of files to upload (format: ??)
  */
-var upload = function (settings) {
+var upload = function (bucket, bucketfolder, targets) {
   return new Promise(function (resolve, reject) {
-    var fileset = uploadtypes.scanAll(settings.fileset);
+    var fileset = uploadtypes.scanAll(targets);
+
+    console.log('fileset', fileset);
 
     console.log('Found approximately ' + fileset.length + ' files to upload');
 
@@ -22,14 +21,14 @@ var upload = function (settings) {
 
     var s3 = new aws.S3({
       params: {
-        Bucket: settings.bucket
+        Bucket: bucket
       }
     });
 
     async.map(fileset, function (f, cb) {
       counter++;
       s3.upload({
-        Key: settings.bucketfolder + '/' + f.Key,
+        Key: bucketfolder + '/' + f.Key,
         Body: f.Body,
         ContentType: f.ContentType
       }, cb);
@@ -39,7 +38,7 @@ var upload = function (settings) {
         console.error(err);
         reject(err);
       } else {
-        var base = 'http://' + settings.bucket + '.s3-website-us-west-2.amazonaws.com' + settings.bucketfolder;
+        var base = 'http://' + bucket + '.s3-website-us-west-2.amazonaws.com/' + bucketfolder;
         resolve(base, results);
       }
     });

@@ -4,10 +4,10 @@ var go = function (settings) {
   var attempt = require('./bedrock/core/attempt');
 
   console.log('Remote Settings', settings);
-  process.exit(0);
+  // process.exit(0);
 
   var targets = uploads.choose(settings);
-  uploader.upload(targets).then(function (base/* , data */) {
+  uploader.upload(settings.bucket, settings.bucketfolder, targets).then(function (base/* , data */) {
     console.log('Files uploaded. Note, bedrock-remote available at: ' + base);
   }, function (err) {
     console.error('error during bedrock-remote', err, err.stack);

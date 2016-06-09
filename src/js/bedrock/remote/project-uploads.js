@@ -17,9 +17,11 @@ var choose = function (settings) {
   var basedir = settings.basedir;
   var uploaddirs = settings.uploaddirs;
 
+  console.log('basedir', basedir);
+
   var link = function (inputDir, inputName, outputDir, outputName) {
     // TODO: use path.join?
-    return uploadtypes.filetype(basedir + inputDir + '/' + inputName, outputDir + '/' + outputName);
+    return uploadtypes.filetype(basedir + '/' + inputDir + '/' + inputName, outputDir + '/' + outputName);
   };
 
   var boltlink = function (filename) {
@@ -31,22 +33,17 @@ var choose = function (settings) {
     return useAll ? getAllDirectories(projectdir) : getManyDirectories(projectdir, uploaddirs);
   };
 
-  return {
-    bucket: settings.bucket,
-    name: settings.name,
-    fileset: getDirectories().concat([
-
-      link('src/resources', 'runner.js', 'js', 'runner.js'),
-      boltlink('kernel.js'),
-      boltlink('loader.js'),
-      boltlink('module.js'),
-      boltlink('test.js'),
-      link('node_modules/jquery/dist', 'jquery.min.js', 'lib/jquery', 'jquery.min.js'),
-      uploadtypes.filetype(basedir + 'src/resources/bedrock.html', 'index.html'),
-      uploadtypes.filetype(basedir + 'src/css/bedrock.css', 'css/bedrock.css'),
-      uploadtypes.datatype('harness', JSON.stringify({ config: settings.config, scripts: settings.testfiles }))
-    ])
-  };
+  return getDirectories().concat([
+    link('src/resources', 'runner.js', 'js', 'runner.js'),
+    boltlink('kernel.js'),
+    boltlink('loader.js'),
+    boltlink('module.js'),
+    boltlink('test.js'),
+    link('node_modules/jquery/dist', 'jquery.min.js', 'lib/jquery', 'jquery.min.js'),
+    uploadtypes.filetype(basedir + '/src/resources/bedrock.html', 'index.html'),
+    uploadtypes.filetype(basedir + '/src/css/bedrock.css', 'css/bedrock.css'),
+    uploadtypes.datatype('harness', JSON.stringify({ config: settings.config, scripts: settings.testfiles }))
+  ]);
 };
 
 module.exports = {
