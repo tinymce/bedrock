@@ -16,51 +16,46 @@ var shutdown = function (promise, driver, done) {
   });
 };
 
-var run = function (directories) {
+var go = function (settings) {
   var serve = require('./bedrock/server/serve');
-
   var attempt = require('./bedrock/core/attempt');
 
-  var clis = require('./bedrock/cli/clis.js');
+  var poll = require('./bedrock/poll/poll');
+  var reporter = require('./bedrock/core/reporter');
 
-  var maybeSettings = clis.forAuto(directories);
-  attempt.cata(maybeSettings, cli.log, function (settings) {
-    var poll = require('./bedrock/poll/poll');
-    var reporter = require('./bedrock/core/reporter');
+  var master = require('./bedrock/server/drivermaster.js').create();
 
-    var master = require('./bedrock/server/drivermaster.js').create();
+  var driver = require('./bedrock/auto/driver').create({
+    browser: settings.browser
+  });
 
-    var driver = require('./bedrock/auto/driver').create({
-      browser: settings.browser
-    });
+  var serveSettings = {
+    projectdir: settings.projectdir,
+    basedir: settings.basedir,
+    config: settings.config,
+    testfiles: settings.testfiles,
+    driver: attempt.passed(driver),
+    master: attempt.passed(master),
+    page: 'src/resources/bedrock.html'
+  };
 
-    var serveSettings = {
-      projectdir: settings.projectdir,
-      basedir: settings.basedir,
-      config: settings.config,
-      testfiles: settings.testfiles,
-      driver: attempt.passed(driver),
-      master: attempt.passed(master),
-      page: 'src/resources/bedrock.html'
-    };
-
-    serve.start(serveSettings, function (service, done) {
-      console.log('bedrock-auto available at: http://localhost:' + service.port);
-      var result = driver.get('http://localhost:' + service.port).then(function () {
-        console.log('\n ... Initial page has loaded ...');
-        service.markLoaded();
-        return poll.loop(master, driver, settings).then(function (data) {
-          return reporter.write({
-            name: settings.name,
-            output: settings.output
-          })(data);
-        });
+  serve.start(serveSettings, function (service, done) {
+    console.log('bedrock-auto available at: http://localhost:' + service.port);
+    var result = driver.get('http://localhost:' + service.port).then(function () {
+      console.log('\n ... Initial page has loaded ...');
+      service.markLoaded();
+      return poll.loop(master, driver, settings).then(function (data) {
+        return reporter.write({
+          name: settings.name,
+          output: settings.output
+        })(data);
       });
-      shutdown(result, driver, done);
     });
+    shutdown(result, driver, done);
   });
 };
 
 module.exports = {
-  run: run
+  go: go,
+  mode: 'forAuto'
 };
