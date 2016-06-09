@@ -105,6 +105,10 @@ var start = function (settings, f) {
     }),
     driverRouter('/keys', 'Keys', keys.executor),
     driverRouter('/mouse', 'Mouse', mouse.executor),
+    routes.effect('/progress', function (data) {
+      console.log('data', data);
+      return Promise.resolve({});
+    }),
     // This does not need the webdriver.
     routes.effect('/clipboard', clipboard.route(basedir, projectdir))
   ];

@@ -81,6 +81,18 @@
         var testTime = timer.elapsed(starttime);
         time.text(testTime);
 
+        $.ajax({
+          method: 'post',
+          url: 'progress',
+          dataType: 'json',
+          success: function () { },
+          error: function () {
+
+          },
+          data: JSON.stringify({ 'test': name, passed: true })
+        });
+
+
         resultJSON.results.push({
           name: name,
           file: testcase,
@@ -126,6 +138,18 @@
         error.append(pre);
         var testTime = timer.elapsed(starttime);
         time.text(testTime);
+
+        $.ajax({
+          method: 'post',
+          url: 'progress',
+          dataType: 'json',
+          success: function () { },
+          error: function () {
+
+          },
+          data: JSON.stringify({ 'test': name, passed: false })
+        });
+
 
         resultJSON.results.push({
           name: name,
