@@ -1,15 +1,6 @@
-var run = function (directories) {
+var go = function (settings) {
   var serve = require('./bedrock/server/serve');
-
-  var cli = require('./bedrock/core/cli');
-  var cloption = require('./bedrock/core/cloption');
-
-  var params = cloption.parse(process.argv.slice(2), [
-    cloption.param('testConfig', '(Filename): the filename for the config file', cloption.validateFile, 'CONFIG_FILE'),
-    cloption.files('testFiles', '{Filename ...} The set of files to test', '{ TEST1 ... }')
-  ], 'bedrock');
-
-  var settings = cli.extract(params, directories);
+  var attempt = require('./bedrock/core/attempt');
 
   var serveSettings = {
     projectdir: settings.projectdir,
@@ -17,7 +8,9 @@ var run = function (directories) {
     config: settings.config,
     testfiles: settings.testfiles,
     // There is no driver for manual mode.
-    driver: null
+    driver: attempt.failed('There is no webdriver for manual mode'),
+    master: null,
+    page: 'src/resources/bedrock.html'
   };
 
   serve.start(serveSettings, function (service/* , done */) {
@@ -26,6 +19,7 @@ var run = function (directories) {
 };
 
 module.exports = {
-  run: run
+  go: go,
+  mode: 'forManual'
 };
 

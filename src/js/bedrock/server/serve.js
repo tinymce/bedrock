@@ -1,3 +1,4 @@
+var accessor = require('../core/accessor');
 /*
  * Settings:
  *
@@ -8,10 +9,28 @@
  * driver: (optional). Required for supporting keys
  */
 var start = function (settings, f) {
+  var Prefs = accessor.create([
+    'projectdir',
+    'basedir',
+    'config',
+    'testfiles',
+    'driver',
+    'master',
+    'page'
+  ]);
+
   var http = require('http');
   var path = require('path');
   var finalhandler = require('finalhandler');
-  var waiter = require('../util/waiter.js');
+  var waiter = require('../util/waiter');
+
+  var openport = require('openport');
+
+  var routes = require('./routes');
+  var keys = require('./keyeffects');
+  var mouse = require('./mouseeffects');
+  var clipboard = require('./clipboardeffects');
+  var attempt = require('../core/attempt');
 
   // This is how long to wait before checking if the driver is ready again
   var pollRate = 2000;
@@ -22,7 +41,14 @@ var start = function (settings, f) {
   // basic locking and unlocking. All promise chains that require webdriver should
   // use the waitForIdle method. Although webdrivers should be sequencing their
   // script calls by themselves, IE frequently interleaved them. Not sure why.
-  var master = settings.master;
+  var master = Prefs.master(settings);
+
+  var basedir = Prefs.basedir(settings);
+  var projectdir = Prefs.projectdir(settings);
+  var testfiles = Prefs.testfiles(settings);
+  var page = Prefs.page(settings);
+  var maybeDriver = Prefs.driver(settings);
+  var boltConfig = Prefs.config(settings);
 
   var pageHasLoaded = false;
 
@@ -30,15 +56,8 @@ var start = function (settings, f) {
     pageHasLoaded = true;
   };
 
-  var openport = require('openport');
-
-  var routes = require('./routes');
-  var keys = require('./keyeffects');
-  var mouse = require('./mouseeffects');
-  var clipboard = require('./clipboardeffects');
-
-  var testFiles = settings.testfiles.map(function (filePath) {
-    return path.relative(settings.projectdir, filePath);
+  var files = testfiles.map(function (filePath) {
+    return path.relative(projectdir, filePath);
   });
 
   // On IE, the webdriver seems to load the page before it's ready to start
@@ -47,7 +66,7 @@ var start = function (settings, f) {
   // This code is designed to allow the driver.get promise launched in bedrock-auto to
   // let the server known when it is able to use driver when responding to effect ajax calls.
   var waitForDriverReady = function (attempts, f) {
-    if (pageHasLoaded) return master.waitForIdle(f, 'effect');
+    if (pageHasLoaded && master !== null) return master.waitForIdle(f, 'effect');
     else if (attempts === 0) return Promise.reject('Driver never appeared to be ready');
     else return waiter.delay({}, pollRate).then(function () {
       return waitForDriverReady(attempts - 1, f);
@@ -55,34 +74,42 @@ var start = function (settings, f) {
   };
 
   var driverRouter = function (url, apiLabel, executor) {
-    var unsupported = routes.unsupported(
-      url,
-      apiLabel + ' API not supported without webdriver running. Use bedrock-auto to get this feature.'
-    );
-    var effect = function (data) {
-      return waitForDriverReady(maxInvalidAttempts, function () {
-        return executor(settings.driver)(data);
-      });
+    var effect = function (driver) {
+      return function (data) {
+        return waitForDriverReady(maxInvalidAttempts, function () {
+          return executor(driver)(data);
+        });
+      };
     };
-    return settings.driver === null ? unsupported : routes.effect(url, effect);
+
+    return attempt.cata(maybeDriver, function () {
+      return routes.unsupported(
+        url,
+        apiLabel + ' API not supported without webdriver running. Use bedrock-auto to get this feature.'
+      );
+    }, function (driver) {
+      return routes.effect(url, effect(driver));
+    });
   };
 
   var routers = [
-    routes.routing('/project', settings.projectdir),
-    routes.routing('/js', path.join(settings.basedir, 'src/resources')),
-    routes.routing('/lib/bolt', path.join(settings.basedir, 'node_modules/@ephox/bolt/lib')),
-    routes.routing('/lib/jquery', path.join(settings.basedir, 'node_modules/jquery/dist')),
-    routes.routing('/css', path.join(settings.basedir, 'src/css')),
+    routes.routing('/project', projectdir),
+    routes.routing('/js', path.join(basedir, 'src/resources')),
+    routes.routing('/lib/bolt', path.join(basedir, 'node_modules/@ephox/bolt/lib')),
+    routes.routing('/lib/jquery', path.join(basedir, 'node_modules/jquery/dist')),
+    routes.routing('/css', path.join(basedir, 'src/css')),
+    // Very bolt specific.
     routes.json('/harness', {
-      config: path.relative(settings.projectdir, settings.config),
-      scripts: testFiles
+      config: path.relative(projectdir, boltConfig),
+      scripts: files
     }),
     driverRouter('/keys', 'Keys', keys.executor),
     driverRouter('/mouse', 'Mouse', mouse.executor),
-    routes.effect('/clipboard', clipboard.route(settings.basedir, settings.projectdir))
+    // This does not need the webdriver.
+    routes.effect('/clipboard', clipboard.route(basedir, projectdir))
   ];
 
-  var fallback = routes.constant(settings.basedir, 'src/resources/bedrock.html');
+  var fallback = routes.constant(basedir, 'src/resources/bedrock.html');
 
   openport.find({
     startingPort: 8000,

@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "NodeJS test runner for bolt projects",
   "bin": {
     "bedrock-auto": "./bin/bedrock-auto.js",
@@ -9,11 +9,18 @@
     "bedrock-sauce-single": "./bin/bedrock-sauce-single.js",
     "bedrock": "./bin/bedrock.js"
   },
+  "scripts": {
+    "test-atomic": "tape test/atomic/*.js",
+    "test-props": "tape test/props/*.js",
+    "test": "npm run test-atomic && npm run test-props"
+  },
   "private": true,
   "dependencies": {
     "@ephox/bolt": "^1.6.5",
     "aws-sdk": "^2.3.9",
     "capitalize": "^1.0.0",
+    "command-line-args": "^3.0.0",
+    "command-line-usage": "^3.0.1",
     "date-format": "0.0.2",
     "finalhandler": "^0.4.1",
     "jquery": "^2.2.3",
@@ -30,7 +37,10 @@
     "eslint": "^2.9.0",
     "eslint-config-google": "^0.5.0",
     "grunt": "^1.0.1",
-    "load-grunt-tasks": "^3.5.0"
+    "jscheck": "^0.2.0",
+    "jsverify": "^0.7.1",
+    "load-grunt-tasks": "^3.5.0",
+    "tape": "^4.5.1"
   },
   "author": "Ephox",
   "license": "BSD-3-Clause"

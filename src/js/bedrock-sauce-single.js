@@ -1,25 +1,14 @@
-var run = function (directories) {
-  var cli = require('./bedrock/core/cli');
-  var cloption = require('./bedrock/core/cloption');
+var go = function (settings) {
   var poll = require('./bedrock/poll/poll');
   var capitalize = require('capitalize');
   var saucejobs = require('./bedrock/remote/sauce-jobs');
 
-  var rest = process.argv.slice(2);
-  var params = cloption.parse(rest, [
-    cloption.param('base', '(URL): the URL to launch to run the tests (remote site)', cloption.isAny, 'REMOTE_BASE'),
-    cloption.param('sauceJob', '(String): the name of the SauceLabs job (e.g. bedrock-test)', cloption.isAny, 'SAUCE_JOB'),
-    cloption.param('sauceBrowser', '(String): the browser to use', cloption.isAny, 'SAUCE_BROWSER'),
-    cloption.param('sauceBrowserVersion', '(String) the browser version to use', cloption.isAny, 'SAUCE_BROWSER_VERSION'),
-    cloption.param('sauceOS', '(String): the OS for the test', cloption.isAny, 'SAUCE_OS'),
-    cloption.param('sauceUser', '(String): the SauceLabs user', cloption.isAny, 'SAUCE_USER'),
-    cloption.param('sauceKey', '(String): the SauceLabs key', cloption.isAny, 'SAUCE_KEY'),
-    cloption.param('outputDir', '(Filename): Output directory for test file. If it does not exist, it is created.', cloption.isAny, 'OUTPUT_DIR')
-  ], 'sauce-labs-single');
+  var attempt = require('./bedrock/core/attempt');
 
-  var jobs = saucejobs.create(params);
+  console.log('settings', settings);
+  // process.exit(0);
 
-  var settings = cli.extract(params, directories);
+  var jobs = saucejobs.create(settings);
 
   var drivers = require('./bedrock/remote/driver');
 
@@ -27,18 +16,20 @@ var run = function (directories) {
     return [ capitalize(browser) ].concat(bversion === 'latest' ? [ ] : [ bversion ]).concat([ capitalize(os) ]).join('.');
   };
 
-  var driver = drivers.create(params.sauceUser, params.sauceKey, {
-    browser: params.sauceBrowser,
-    browserVersion: params.sauceBrowserVersion,
-    os: params.sauceOS
+  var driver = drivers.create(settings.sauceuser, settings.saucekey, {
+    browser: settings.saucebrowser,
+    browserVersion: settings.saucebrowserVersion,
+    os: settings.sauceos
   });
 
-  var detailedName = prettify(params.sauceOS, params.sauceBrowser, params.sauceBrowserVersion);
+  var detailedName = prettify(settings.sauceos, settings.saucebrowser, settings.saucebrowserVersion);
 
-  driver.get(params.base + '/index.html').then(function () {
+  driver.get(settings.remoteurl + '/index.html').then(function () {
+    var master = require('./bedrock/server/drivermaster').create();
+
     console.log('Starting SauceLabs platform: ' + detailedName);
     var jobResult = jobs.runTest(detailedName, driver, function () {
-      return poll.loop(driver, settings);
+      return poll.loop(master, driver, settings);
     });
 
     return jobResult.then(function (result) {
@@ -63,5 +54,6 @@ var run = function (directories) {
 };
 
 module.exports = {
-  run: run
+  go: go,
+  mode: 'forSauceSingle'
 };
