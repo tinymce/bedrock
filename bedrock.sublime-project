@@ -10,16 +10,6 @@
       "path": "."
     }
   ],
-  "build_systems":
-  [
-    {
-      "name": "Lint",
-      "selector": "source.js",
-      "working_dir": "$project_path",
-      "file_regex": "(.*): line ([0-9]*), col ([0-9]*), (.*)$",
-      "cmd": ["make", "lint", "js"]
-    }
-  ],
   "settings": {
     "detect_indentation": false,
     "tab_size": 2,
