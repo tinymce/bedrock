@@ -6,10 +6,12 @@ Commands
 
 3. Running Tests
 
-### Tape tests
+`$ npm run test`
 
-node_modules/.bin/tape test/atomic/*.js
+For just normal tape tests:
 
-### Tape property-based tests
+`$ npm run test-atomic`
 
-node_modules/.bin/tape test/props/*.js
+For property-based tests:
+
+`$ npm run test-props`

@@ -9,6 +9,11 @@
     "bedrock-sauce-single": "./bin/bedrock-sauce-single.js",
     "bedrock": "./bin/bedrock.js"
   },
+  "scripts": {
+    "test-atomic": "tape test/atomic/*.js",
+    "test-props": "tape test/props/*.js",
+    "test": "npm run test-atomic && npm run test-props"
+  },
   "private": true,
   "dependencies": {
     "@ephox/bolt": "^1.6.5",

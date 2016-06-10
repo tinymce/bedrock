@@ -68,7 +68,7 @@ var start = function (settings, f) {
   // This code is designed to allow the driver.get promise launched in bedrock-auto to
   // let the server known when it is able to use driver when responding to effect ajax calls.
   var waitForDriverReady = function (attempts, f) {
-    if (pageHasLoaded) return master.waitForIdle(f, 'effect');
+    if (pageHasLoaded && master !== null) return master.waitForIdle(f, 'effect');
     else if (attempts === 0) return Promise.reject('Driver never appeared to be ready');
     else return waiter.delay({}, pollRate).then(function () {
       return waitForDriverReady(attempts - 1, f);

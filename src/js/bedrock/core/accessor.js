@@ -1,6 +1,5 @@
 var create = function (fields) {
   var r = {};
-  console.log('fields', fields);
 
   fields.forEach(function (f) {
     r[f] = function (obj) {
