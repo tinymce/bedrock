@@ -1,4 +1,3 @@
-var tape = require('tape');
 var attempt = require('../../src/js/bedrock/core/attempt.js');
 
 var assertErrors = function (t, expected, actual) {
