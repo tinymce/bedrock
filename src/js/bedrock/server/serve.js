@@ -113,7 +113,7 @@ var start = function (settings, f) {
       process.stdout.clearLine(0);
       process.stdout.cursorTo(0);
       process.stdout.write('Current test: ' + (data.test !== undefined ? data.test : 'Unknown') + '\n');
-      process.stdout.write('Passed: ' + data.numPassed + '/' + data.total + ', Failed: ' + data.numFailed + '/' + data.total + '  ... ');
+      process.stdout.write('Passed: ' + data.numPassed + '/' + data.total + ', Failed: ' + data.numFailed + '/' + data.total + ' [' + (data.numPassed + data.numFailed) + ']  ... ');
       process.stdout.clearLine(2);
       return Promise.resolve({});
     }),
