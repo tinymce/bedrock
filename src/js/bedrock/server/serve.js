@@ -109,11 +109,19 @@ var start = function (settings, f) {
     driverRouter('/mouse', 'Mouse', mouse.executor),
     // Add particular methods.
     routes.effect('/tests/progress', function (data) {
+      var totalRun = data.numPassed + data.numFailed;
+
+      // Note, this will remove the previous line if this has not run before, so put a line before the test.
+      // Trying to make it only happen for the first run (without using state) was unreliable
       process.stdout.moveCursor(0, -1);
       process.stdout.clearLine(0);
       process.stdout.cursorTo(0);
       process.stdout.write('Current test: ' + (data.test !== undefined ? data.test : 'Unknown') + '\n');
-      process.stdout.write('Passed: ' + data.numPassed + '/' + data.total + ', Failed: ' + data.numFailed + '/' + data.total + ' [' + (data.numPassed + data.numFailed) + ']  ... ');
+      process.stdout.write(
+        'Passed: ' + data.numPassed + '/' + data.total +
+        ', Failed: ' +data.numFailed + '/' + data.total +
+        ' [' + totalRun + ']  ... '
+      );
       process.stdout.clearLine(2);
       return Promise.resolve({});
     }),
