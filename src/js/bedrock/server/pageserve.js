@@ -90,7 +90,9 @@ var start = function (settings, f) {
     driverRouter('/keys', 'Keys', keys.executor),
     driverRouter('/mouse', 'Mouse', mouse.executor),
     // This does not need the webdriver.
-    routes.effect('/clipboard', clipboard.route(basedir, projectdir))
+    routes.effect('/clipboard', clipboard.route(basedir, projectdir)),
+    routes.hostOn('/page', basedir)
+
   ];
 
 console.log('page', page);

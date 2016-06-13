@@ -25,6 +25,8 @@ var go = function (settings) {
 
   var master = require('./bedrock/server/drivermaster').create();
 
+  var path = require('path');
+
   var driver = require('./bedrock/auto/driver').create({
     browser: settings.browser
   });
@@ -50,11 +52,23 @@ var go = function (settings) {
     var result = driver.get('http://localhost:' + service.port + '/' + settings.page).then(function () {
       console.log('\n ... Initial page has loaded ...');
       service.markLoaded();
+
+      var scriptFile = path.join('/page', 'src', 'resources', 'qunit-wrapper.js');
+      console.log('scriptFile', scriptFile);
+      return driver.executeScript(function (src) {
+        var script = document.createElement('script');
+        script.setAttribute('src', src);
+        document.head.appendChild(script);
+      }, scriptFile).then(function () {
+
+
       return poll.loop(master, driver, pollSettings).then(function (data) {
         return reporter.write({
           name: settings.name,
           output: settings.output
         })(data);
+      });
+
       });
     });
     shutdown(result, driver, done);

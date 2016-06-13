@@ -88,6 +88,25 @@ var host = function (root) {
   };
 };
 
+
+var hostOn = function (prefix, root) {
+  var base = server(root);
+
+  var go = function (request, response, done) {
+    request.url = request.url.substring((prefix + '/').length);
+    console.log('request.url', request.url);
+    base(request, response, done);
+  };
+
+  return {
+    matches: function (url) {
+      console.log('Attempting to match: ', url, 'prefix', prefix);
+      return prefixMatch(prefix)(url);
+    },
+    go: go
+  };
+};
+
 var unsupported = function (root, label) {
   var go = function (request, response/* , done */) {
     concludeJson(response, 404, { error: label });
@@ -116,5 +135,6 @@ module.exports = {
   unsupported: unsupported,
   json: json,
   route: route,
-  host: host
+  host: host,
+  hostOn: hostOn
 };
