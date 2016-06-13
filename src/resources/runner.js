@@ -15,6 +15,17 @@
   var wrapper = ephox.bolt.test.run.wrapper;
   var errors = ephox.bolt.test.report.errors;
 
+  var sendJson = function (url, data, success, error) {
+    $.ajax({
+      method: 'post',
+      url: url,
+      dataType: 'json',
+      success: success,
+      error: error,
+      data: JSON.stringify(data)
+    });
+  };
+
   var bedrocksource = function () {
     return {
       args: [ function (path) { return path; }, 'ephox.bedrock', 'js', function (id) { return id; } ],
@@ -169,20 +180,13 @@
 
         var numPassed = resultJSON.results.length - numFailed;
 
-        $.ajax({
-          method: 'post',
-          url: 'tests/progress',
-          dataType: 'json',
-          success: checkAbort,
-          error: checkAbort,
-          data: JSON.stringify({
-            test: name,
-            numFailed: numFailed,
-            numPassed: numPassed,
-            total: testcount.text(),
-            error: e
-          })
-        });
+        sendJson('tests/progress', {
+          test: name,
+          numFailed: numFailed,
+          numPassed: numPassed,
+          total: testcount.text(),
+          error: e
+        }, checkAbort, checkAbort);
       };
 
       return {
@@ -192,26 +196,8 @@
       };
     };
 
-
-
     var done = function () {
-      $.ajax({
-        method: 'post',
-        url: 'tests/done',
-        dataType: 'json',
-        success: function () {
-          setAsDone();
-        },
-        error: function () {
-          setAsDone();
-        },
-        data: JSON.stringify({
-          total: resultJSON.length,
-          blah: 'hi'
-        })
-      });
-
-      var setAsDone = function () {
+        var setAsDone = function () {
         var totalTime = timer.elapsed(initial);
         resultJSON.time = totalTime;
         $('body').append('<div class="done">Test run completed in <span class="time">' + totalTime + '</span></div>');
@@ -219,6 +205,8 @@
         $('body').append(resultBox);
         $('.passed.hidden').removeClass('hidden');
       };
+
+      sendJson('tests/done', {}, setAsDone, setAsDone);
     };
 
     return {

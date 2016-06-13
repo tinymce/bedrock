@@ -14,7 +14,6 @@ var create = function (files) {
     return Promise.resolve({});
   };
 
-
   var update = function (data) {
     if (started) {
       // Note, this will remove the previous line if this has not run before, so put a line before the test.

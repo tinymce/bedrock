@@ -110,7 +110,7 @@ var start = function (settings, f) {
     }),
     driverRouter('/keys', 'Keys', keys.executor),
     driverRouter('/mouse', 'Mouse', mouse.executor),
-    // Add particular methods.
+    // Update the HUD with current testing process
     routes.effect('/tests/progress', function (data) {
       return hud.update(data);
     }),
