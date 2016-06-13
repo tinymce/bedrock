@@ -36,7 +36,7 @@ var loop = function (master, driver, settings) {
   var nextTick = function () {
     var tick = new Date().getTime();
     if (currentState.allTimeout(tick)) return exits.allTestsTooLong(currentState, tick);
-    else if (currentState.testTimeout(tick)) return exits.oneTestTooLong(currentState, tick);
+    else if (settings.singleTimeout !== null && currentState.testTimeout(tick)) return exits.oneTestTooLong(currentState, tick);
     return checkStatus(tick);
   };
 

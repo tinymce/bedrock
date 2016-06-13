@@ -102,7 +102,9 @@ var forPage = function (directories) {
     'Load bedrock against a specific page',
     runnerOptions(directories).concat([
       cloptions.name,
-      cloptions.page
+      cloptions.page,
+      cloptions.browser,
+      cloptions.output
     ])
   );
 };

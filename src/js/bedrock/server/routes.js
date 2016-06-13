@@ -75,12 +75,10 @@ var constant = function (root, url) {
   };
 };
 
-var identity = function (root) {
+var host = function (root) {
   var base = server(root);
 
   var go = function (request, response, done) {
-    console.log('request.url', request.url);
-    // request.url = url;
     base(request, response, done);
   };
 
@@ -118,5 +116,5 @@ module.exports = {
   unsupported: unsupported,
   json: json,
   route: route,
-  identity: identity
+  host: host
 };

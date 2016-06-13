@@ -94,7 +94,7 @@ var start = function (settings, f) {
   ];
 
 console.log('page', page);
-  var fallback = routes.identity(projectdir, page);
+  var fallback = routes.host(projectdir, page);
 
   openport.find({
     startingPort: 8000,

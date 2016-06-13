@@ -1,21 +1,63 @@
+var shutdown = function (promise, driver, done) {
+  promise.then(function (/* res */) {
+    // All good, so continue.
+    driver.sleep(1000);
+    driver.quit().then(function () {
+      console.log('All tests passed.');
+      done();
+    });
+  }, function (err) {
+    driver.sleep(1000);
+    driver.quit().then(function () {
+      console.error('********* Unexpected Bedrock Error -> Server Quitting ***********', err);
+      done();
+      throw err;
+    });
+  });
+};
+
 var go = function (settings) {
-  console.log('settings', settings);
   var serve = require('./bedrock/server/pageserve');
   var attempt = require('./bedrock/core/attempt');
+
+  var poll = require('./bedrock/poll/poll');
+  var reporter = require('./bedrock/core/reporter');
+
+  var master = require('./bedrock/server/drivermaster').create();
+
+  var driver = require('./bedrock/auto/driver').create({
+    browser: settings.browser
+  });
 
   var serveSettings = {
     projectdir: settings.projectdir,
     basedir: settings.basedir,
-    config: settings.config,
-    testfiles: settings.testfiles,
-    // There is no driver for manual mode.
-    driver: attempt.failed('There is no webdriver for manual mode'),
-    master: null,
+    driver: attempt.passed(driver),
+    master: master,
     page: settings.page
   };
 
-  serve.start(serveSettings, function (service/* , done */) {
-    console.log('bedrock (manual) available at: http://localhost:' + service.port);
+  var pollSettings = {
+    overallTimeout: 10 * 60 * 1000,
+    testName: 'p#qunit-result .test-name',
+    singleTimeout: null,
+    done: '#qunit-banner.qunit-fail,#qunit-banner.qunit-pass',
+    results: null
+  };
+
+  serve.start(serveSettings, function (service, done) {
+    console.log('bedrock-auto available at: http://localhost:' + service.port);
+    var result = driver.get('http://localhost:' + service.port + '/' + settings.page).then(function () {
+      console.log('\n ... Initial page has loaded ...');
+      service.markLoaded();
+      return poll.loop(master, driver, pollSettings).then(function (data) {
+        return reporter.write({
+          name: settings.name,
+          output: settings.output
+        })(data);
+      });
+    });
+    shutdown(result, driver, done);
   });
 };
 
@@ -23,4 +65,3 @@ module.exports = {
   go: go,
   mode: 'forPage'
 };
-

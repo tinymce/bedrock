@@ -22,8 +22,16 @@ var allTestsTooLong = function (state, tick) {
   };
 };
 
+var noResultsSupported = function () {
+  console.log('This mode does not support Results data');
+  return Promise.resolve(JSON.stringify({
+    results: []
+  }));
+};
+
 var testsDone = function (settings) {
   return function (driver) {
+    if (settings.results === null) return noResultsSupported();
     var resultsCss = By.css(settings.results);
     return driver.wait(until.elementLocated(resultsCss), 1).then(function (res) {
       return res.getInnerHtml();
