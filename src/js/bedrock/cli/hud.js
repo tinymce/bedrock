@@ -3,6 +3,9 @@ var create = function (files) {
 
   var stream = process.stdout;
 
+  // TODO: Be able to turn this output off. It will output escape codes which will make
+  // jenkins output less readable.
+
   var writeProgress = function (numPassed, numFailed) {
     var numRun = numPassed + numFailed;
     stream.write(
