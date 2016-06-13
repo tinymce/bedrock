@@ -15,6 +15,17 @@
   var wrapper = ephox.bolt.test.run.wrapper;
   var errors = ephox.bolt.test.report.errors;
 
+  var sendJson = function (url, data, success, error) {
+    $.ajax({
+      method: 'post',
+      url: url,
+      dataType: 'json',
+      success: success,
+      error: error,
+      data: JSON.stringify(data)
+    });
+  };
+
   var bedrocksource = function () {
     return {
       args: [ function (path) { return path; }, 'ephox.bedrock', 'js', function (id) { return id; } ],
@@ -87,10 +98,10 @@
           passed: true,
           time: testTime
         });
+
         current.text(resultJSON.results.length);
-        if (cancelTests) {
-          done();
-        }
+
+        notify(undefined);
       };
 
       var processQUnit = function (html) {
@@ -127,6 +138,8 @@
         var testTime = timer.elapsed(starttime);
         time.text(testTime);
 
+
+
         resultJSON.results.push({
           name: name,
           file: testcase,
@@ -135,9 +148,8 @@
           error: errors.clean(e)
         });
         current.text(resultJSON.results.length);
-        if (cancelTests) {
-          done();
-        }
+
+        notify(errors.clean(e));
       };
 
       var htmlcompare = function (compares) {
@@ -157,6 +169,26 @@
         });
       };
 
+      var notify = function (e) {
+        var checkAbort = function () {
+          if (cancelTests) done();
+        };
+
+        var numFailed = $(resultJSON.results).filter(function (k, result) {
+          return result.passed === false;
+        }).length;
+
+        var numPassed = resultJSON.results.length - numFailed;
+
+        sendJson('tests/progress', {
+          test: name,
+          numFailed: numFailed,
+          numPassed: numPassed,
+          total: testcount.text(),
+          error: e
+        }, checkAbort, checkAbort);
+      };
+
       return {
         pass: pass,
         htmlcompare: htmlcompare,
@@ -165,12 +197,16 @@
     };
 
     var done = function () {
-      var totalTime = timer.elapsed(initial);
-      resultJSON.time = totalTime;
-      $('body').append('<div class="done">Test run completed in <span class="time">' + totalTime + '</span></div>');
-      var resultBox = $('<textarea class="results" />').text(JSON.stringify(resultJSON));
-      $('body').append(resultBox);
-      $('.passed.hidden').removeClass('hidden');
+        var setAsDone = function () {
+        var totalTime = timer.elapsed(initial);
+        resultJSON.time = totalTime;
+        $('body').append('<div class="done">Test run completed in <span class="time">' + totalTime + '</span></div>');
+        var resultBox = $('<textarea class="results" />').text(JSON.stringify(resultJSON));
+        $('body').append(resultBox);
+        $('.passed.hidden').removeClass('hidden');
+      };
+
+      sendJson('tests/done', {}, setAsDone, setAsDone);
     };
 
     return {

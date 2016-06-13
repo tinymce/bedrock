@@ -9,7 +9,7 @@ var go = function (settings) {
     testfiles: settings.testfiles,
     // There is no driver for manual mode.
     driver: attempt.failed('There is no webdriver for manual mode'),
-    master: null,
+    master: null, // there is no need for master,
     page: 'src/resources/bedrock.html'
   };
 

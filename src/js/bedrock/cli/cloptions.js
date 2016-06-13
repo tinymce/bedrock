@@ -32,7 +32,8 @@
       'firefox',
       'MicrosoftEdge',
       'chrome',
-      'safari'
+      'safari',
+      'phantomjs'
     ])
   };
 
