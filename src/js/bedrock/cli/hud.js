@@ -16,8 +16,7 @@ var create = function (files) {
 
   var update = function (data) {
     if (started) {
-      // Note, this will remove the previous line if this has not run before, so put a line before the test.
-      // Trying to make it only happen for the first run (without using state) was unreliable
+      // Note, this writes over the above line, which is why we only do this after the first update.
       stream.moveCursor(0, -2);
     } else {
       started = true;
