@@ -33,6 +33,7 @@ var start = function (settings, f) {
   var mouse = require('./mouseeffects');
   var clipboard = require('./clipboardeffects');
   var attempt = require('../core/attempt');
+  var mHud = require('../cli/hud');
 
   // This is how long to wait before checking if the driver is ready again
   var pollRate = 2000;
@@ -94,6 +95,8 @@ var start = function (settings, f) {
     });
   };
 
+  var hud = mHud.create(files);
+
   var routers = [
     routes.routing('/project', projectdir),
     routes.routing('/js', path.join(basedir, 'src/resources')),
@@ -109,24 +112,10 @@ var start = function (settings, f) {
     driverRouter('/mouse', 'Mouse', mouse.executor),
     // Add particular methods.
     routes.effect('/tests/progress', function (data) {
-      var totalRun = data.numPassed + data.numFailed;
-
-      // Note, this will remove the previous line if this has not run before, so put a line before the test.
-      // Trying to make it only happen for the first run (without using state) was unreliable
-      process.stdout.moveCursor(0, -1);
-      process.stdout.clearLine(0);
-      process.stdout.cursorTo(0);
-      process.stdout.write('Current test: ' + (data.test !== undefined ? data.test : 'Unknown') + '\n');
-      process.stdout.write(
-        'Passed: ' + data.numPassed + '/' + data.total +
-        ', Failed: ' +data.numFailed + '/' + data.total +
-        ' [' + totalRun + ']  ... '
-      );
-      process.stdout.clearLine(2);
-      return Promise.resolve({});
+      return hud.update(data);
     }),
     routes.effect('/tests/done', function (data) {
-      return Promise.resolve({});
+      return hud.complete();
     }),
     // This does not need the webdriver.
     routes.effect('/clipboard', clipboard.route(basedir, projectdir))
@@ -151,7 +140,7 @@ var start = function (settings, f) {
     f({
       port: port,
       server: server,
-      markLoaded: markLoaded,
+      markLoaded: markLoaded
     }, function () {
       server.close();
     });
