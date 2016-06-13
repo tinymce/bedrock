@@ -39,10 +39,13 @@ var go = function (settings) {
     page: 'src/resources/bedrock.html'
   };
 
+  var isPhantom = settings.browser === 'phantomjs';
+
   serve.start(serveSettings, function (service, done) {
-    console.log('bedrock-auto available at: http://localhost:' + service.port);
+    if (! isPhantom) console.log('bedrock-auto available at: http://localhost:' + service.port);
     var result = driver.get('http://localhost:' + service.port).then(function () {
-      console.log('\n ... Initial page has loaded ...');
+      var message = isPhantom ? '\nPhantom tests loading ...\n' : '\n ... Initial page has loaded ...';
+      console.log(message);
       service.markLoaded();
       return poll.loop(master, driver, settings).then(function (data) {
         return reporter.write({
