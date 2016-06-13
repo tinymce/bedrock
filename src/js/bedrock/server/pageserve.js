@@ -45,20 +45,14 @@ var start = function (settings, f) {
 
   var basedir = Prefs.basedir(settings);
   var projectdir = Prefs.projectdir(settings);
-  var testfiles = Prefs.testfiles(settings);
   var page = Prefs.page(settings);
   var maybeDriver = Prefs.driver(settings);
-  var boltConfig = Prefs.config(settings);
 
   var pageHasLoaded = false;
 
   var markLoaded = function () {
     pageHasLoaded = true;
   };
-
-  var files = testfiles.map(function (filePath) {
-    return path.relative(projectdir, filePath);
-  });
 
   // On IE, the webdriver seems to load the page before it's ready to start
   // responding to commands. If the testing page itself tries to interact with
@@ -93,23 +87,14 @@ var start = function (settings, f) {
   };
 
   var routers = [
-    routes.routing('/project', projectdir),
-    routes.routing('/js', path.join(basedir, 'src/resources')),
-    routes.routing('/lib/bolt', path.join(basedir, 'node_modules/@ephox/bolt/lib')),
-    routes.routing('/lib/jquery', path.join(basedir, 'node_modules/jquery/dist')),
-    routes.routing('/css', path.join(basedir, 'src/css')),
-    // Very bolt specific.
-    routes.json('/harness', {
-      config: path.relative(projectdir, boltConfig),
-      scripts: files
-    }),
     driverRouter('/keys', 'Keys', keys.executor),
     driverRouter('/mouse', 'Mouse', mouse.executor),
     // This does not need the webdriver.
     routes.effect('/clipboard', clipboard.route(basedir, projectdir))
   ];
 
-  var fallback = routes.constant(basedir, 'http://localhost/me/work/tiny/tinymce/tests/index.html');
+console.log('page', page);
+  var fallback = routes.identity(projectdir, page);
 
   openport.find({
     startingPort: 8000,
@@ -128,7 +113,7 @@ var start = function (settings, f) {
     f({
       port: port,
       server: server,
-      markLoaded: markLoaded,
+      markLoaded: markLoaded
     }, function () {
       server.close();
     });

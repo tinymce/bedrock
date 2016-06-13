@@ -75,6 +75,21 @@ var constant = function (root, url) {
   };
 };
 
+var identity = function (root) {
+  var base = server(root);
+
+  var go = function (request, response, done) {
+    console.log('request.url', request.url);
+    // request.url = url;
+    base(request, response, done);
+  };
+
+  return {
+    matches: prefixMatch(root),
+    go: go
+  };
+};
+
 var unsupported = function (root, label) {
   var go = function (request, response/* , done */) {
     concludeJson(response, 404, { error: label });
@@ -102,5 +117,6 @@ module.exports = {
   constant: constant,
   unsupported: unsupported,
   json: json,
-  route: route
+  route: route,
+  identity: identity
 };

@@ -96,6 +96,17 @@ var forSauce = function (directories) {
   );
 };
 
+var forPage = function (directories) {
+  return cli.extract(
+    'bedrock-page',
+    'Load bedrock against a specific page',
+    runnerOptions(directories).concat([
+      cloptions.name,
+      cloptions.page
+    ])
+  );
+};
+
 var log = function (errs) {
   console.error('\n****\nError while processing command line for ' + errs.command);
   var messages = errs.errors.join('\n');
@@ -109,6 +120,7 @@ module.exports = {
   forRemote: forRemote,
   forSauceSingle: forSauceSingle,
   forSauce: forSauce,
+  forPage: forPage,
 
   log: log
 };

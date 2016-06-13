@@ -73,6 +73,15 @@
     validate: extraction.files('Test.js')
   };
 
+  var page = {
+    name: 'page',
+    output: 'page',
+    required: true,
+    type: String,
+    description: 'The page to load into the browser',
+    validate: extraction.file
+  };
+
   var projectdir = function (directories) {
     return {
       name: 'projectdir',
@@ -288,5 +297,6 @@
     testNameSelector: testNameSelector,
     resultsSelector: resultsSelector,
 
-    help: help
+    help: help,
+    page: page
   };
