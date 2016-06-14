@@ -1,6 +1,6 @@
 (function () {
-  var div = document.createElement('div');
 
+  var div = document.createElement('div');
 
   div.classList.add('bedrock-qunit');
   div.style.setProperty('visibility', 'hidden');
@@ -50,30 +50,16 @@
     }
   };
 
-
-
   var currentModule = '';
 
   var sendJson = function (url, data) {
+    // This will have minimum browser requirements.
     var request = new XMLHttpRequest();
     request.open('POST', url, true);
     request.setRequestHeader('Content-Type', 'application/json');
     request.setRequestHeader('Accept', 'application/json');
     request.send(JSON.stringify(data));
   };
-
-
-
-
-  // // alert(10);
-  // QUnit.begin(function (details) {
-  //   sendJson('/tests/progress', {
-  //     test: currentModule,
-  //     numPassed: totalPassed,
-  //     numFailed: totalFailed,
-  //     totalFiles: 100
-  //   });
-  // });
 
   QUnit.log(logDetails);
 
