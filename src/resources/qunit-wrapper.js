@@ -32,7 +32,7 @@
 
   var testCounter = 0;
 
-  QUnit.log(function (details) {
+  var logDetails = function (details) {
     if (details.result === false) {
 
       var message = details.message !== undefined ? details.message : '';
@@ -48,19 +48,16 @@
         error: error
       });
     }
-  });
+  };
+
+
 
   var currentModule = '';
-
-
-  // document.body.appendChild(results);
-
 
   var sendJson = function (url, data) {
     var request = new XMLHttpRequest();
     request.open('POST', url, true);
     request.setRequestHeader('Content-Type', 'application/json');
-    // request.setRequestHeader('dataType', 'json');
     request.setRequestHeader('Accept', 'application/json');
     request.send(JSON.stringify(data));
   };
@@ -78,8 +75,9 @@
   //   });
   // });
 
+  QUnit.log(logDetails);
+
   QUnit.moduleStart(function (details) {
-    // alert('Module start: ' + JSON.stringify(details));
     currentModule = details.name;
   });
 
@@ -98,10 +96,10 @@
       numFailed: totalFailed,
       totalFiles: QUnit.config.stats.all
     });
-    // alert(JSON.stringify(details));
   });
 
   QUnit.done(function (details) {
+    // Only add the textarea at the end. It seems to interfere with tests.
     div.appendChild(results);
     results.innerHTML = JSON.stringify({
       results: failures
@@ -109,8 +107,5 @@
     div.classList.add('done');
   });
 
-  setTimeout(function () {
-
-    QUnit.start();
-  }, 1000);
+  QUnit.start();
 })();
