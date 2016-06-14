@@ -1,19 +1,19 @@
 var shutdown = function (promise, driver, done) {
-  promise.then(function (/* res */) {
-    // All good, so continue.
-    driver.sleep(1000);
-    driver.quit().then(function () {
-      console.log('All tests passed.');
-      done();
-    });
-  }, function (err) {
-    driver.sleep(1000);
-    driver.quit().then(function () {
-      console.error('********* Unexpected Bedrock Error -> Server Quitting ***********', err);
-      done();
-      throw err;
-    });
-  });
+  // promise.then(function (/* res */) {
+  //   // All good, so continue.
+  //   driver.sleep(1000);
+  //   driver.quit().then(function () {
+  //     console.log('All tests passed.');
+  //     done();
+  //   });
+  // }, function (err) {
+  //   driver.sleep(1000);
+  //   driver.quit().then(function () {
+  //     console.error('********* Unexpected Bedrock Error -> Server Quitting ***********', err);
+  //     done();
+  //     throw err;
+  //   });
+  // });
 };
 
 var go = function (settings) {
@@ -44,7 +44,7 @@ var go = function (settings) {
     testName: 'p#qunit-result .test-name',
     singleTimeout: null,
     done: '#qunit-banner.qunit-fail,#qunit-banner.qunit-pass',
-    results: null
+    results: '.results'
   };
 
   serve.start(serveSettings, function (service, done) {

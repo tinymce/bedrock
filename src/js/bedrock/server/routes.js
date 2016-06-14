@@ -94,13 +94,15 @@ var hostOn = function (prefix, root) {
 
   var go = function (request, response, done) {
     request.url = request.url.substring((prefix + '/').length);
-    console.log('request.url', request.url);
+    var questionMark = request.url.indexOf('?');
+    request.url = questionMark > -1 ? request.url.substring(0, questionMark) : request.url;
+    // console.log('request.url', request.url);
     base(request, response, done);
   };
 
   return {
     matches: function (url) {
-      console.log('Attempting to match: ', url, 'prefix', prefix);
+      // console.log('Attempting to match: ', url, 'prefix', prefix);
       return prefixMatch(prefix)(url);
     },
     go: go

@@ -32,6 +32,8 @@ var start = function (settings, f) {
   var clipboard = require('./clipboardeffects');
   var attempt = require('../core/attempt');
 
+  var mHud = require('../cli/hud');
+
   // This is how long to wait before checking if the driver is ready again
   var pollRate = 2000;
   // This is how many times to fail the driver check before the process fails
@@ -53,6 +55,8 @@ var start = function (settings, f) {
   var markLoaded = function () {
     pageHasLoaded = true;
   };
+
+  var hud = mHud.create([]);
 
   // On IE, the webdriver seems to load the page before it's ready to start
   // responding to commands. If the testing page itself tries to interact with
@@ -91,8 +95,14 @@ var start = function (settings, f) {
     driverRouter('/mouse', 'Mouse', mouse.executor),
     // This does not need the webdriver.
     routes.effect('/clipboard', clipboard.route(basedir, projectdir)),
-    routes.hostOn('/page', basedir)
-
+    routes.hostOn('/page', basedir),
+    // Update the HUD with current testing process
+    routes.effect('/tests/progress', function (data) {
+      return hud.update(data);
+    }),
+    routes.effect('/tests/done', function (data) {
+      return hud.complete();
+    })
   ];
 
 console.log('page', page);

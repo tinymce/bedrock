@@ -121,7 +121,7 @@ var start = function (settings, f) {
     routes.effect('/clipboard', clipboard.route(basedir, projectdir))
   ];
 
-  var fallback = routes.constant(basedir, 'http://localhost/me/work/tiny/tinymce/tests/index.html');
+  var fallback = routes.constant(basedir, 'src/resources/bedrock.html');
 
   openport.find({
     startingPort: 8000,
