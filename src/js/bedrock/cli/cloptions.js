@@ -253,6 +253,15 @@
     validate: extraction.any
   };
 
+  var framework = {
+    name: 'framework',
+    type: String,
+    defaultValue: 'qunit',
+    description: 'The testing framework being used',
+    validate: extraction.inSet([ 'qunit' ]),
+    required: true
+  };
+
   var help = {
     name: 'help',
     alias: 'h',
@@ -298,6 +307,7 @@
     testNameSelector: testNameSelector,
     resultsSelector: resultsSelector,
 
+    framework: framework,
     help: help,
     page: page
   };

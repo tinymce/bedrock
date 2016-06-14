@@ -30,6 +30,15 @@ var go = function (settings) {
     runner: runner
   };
 
+  var addFramework = function (framework) {
+    var source = path.join('/page', 'src', 'resources', framework + '-wrapper.js');
+    return driver.executeScript(function (src) {
+      var script = document.createElement('script');
+      script.setAttribute('src', src);
+      document.head.appendChild(script);
+    }, source);
+  };
+
   var isPhantom = settings.browser === 'phantomjs';
 
   serve.start(serveSettings, function (service, done) {
@@ -39,21 +48,13 @@ var go = function (settings) {
       console.log(message);
       service.markLoaded();
 
-      var scriptFile = path.join('/page', 'src', 'resources', 'qunit-wrapper.js');
-      return driver.executeScript(function (src) {
-        var script = document.createElement('script');
-        script.setAttribute('src', src);
-        document.head.appendChild(script);
-      }, scriptFile).then(function () {
-
-
-      return poll.loop(master, driver, settings).then(function (data) {
-        return reporter.write({
-          name: settings.name,
-          output: settings.output
-        })(data);
-      });
-
+      return addFramework(settings.framework).then(function () {
+        return poll.loop(master, driver, settings).then(function (data) {
+          return reporter.write({
+            name: settings.name,
+            output: settings.output
+          })(data);
+        });
       });
     });
     lifecycle.shutdown(result, driver, done);

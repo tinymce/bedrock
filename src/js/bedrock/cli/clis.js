@@ -104,7 +104,8 @@ var forPage = function (directories) {
       cloptions.name,
       cloptions.page,
       cloptions.browser,
-      cloptions.output
+      cloptions.output,
+      cloptions.framework
     ])
   );
 };
