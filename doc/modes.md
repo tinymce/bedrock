@@ -96,4 +96,4 @@ Use `bedrock-sauce --help` to see all arguments possible.
 
 `bedrock-sauce-single --remoteurl {REMOTE_BASE} --sauceuser aaa --saucekey bbb`
 
-Use `bedrock-sauce-single` --help to see all arguments possible.
+Use `bedrock-sauce-single --help` to see all arguments possible.
