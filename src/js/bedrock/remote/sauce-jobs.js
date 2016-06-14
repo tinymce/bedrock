@@ -71,7 +71,7 @@ var create = function (settings) {
         }
       });
 
-      // FIX: reporter signature has changed. Now returns an attempt.
+      // The reporter passes for successful and failed tests, so inspect the outcome.
       return setName(session, name).then(f).then(logResults).then(checkResults, setAsFailed);
     });
   };
