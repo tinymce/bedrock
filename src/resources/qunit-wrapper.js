@@ -52,10 +52,15 @@
 
   document.body.appendChild(div);
 
-  // alert(10);
-  QUnit.begin(function (details) {
-    alert(10);
-  });
+  // // alert(10);
+  // QUnit.begin(function (details) {
+  //   sendJson('/tests/progress', {
+  //     test: currentModule,
+  //     numPassed: totalPassed,
+  //     numFailed: totalFailed,
+  //     totalFiles: 100
+  //   });
+  // });
 
   QUnit.moduleStart(function (details) {
     // alert('Module start: ' + JSON.stringify(details));
@@ -72,7 +77,8 @@
     sendJson('/tests/progress', {
       test: currentModule,
       numPassed: totalPassed,
-      numFailed: totalFailed
+      numFailed: totalFailed,
+      totalFiles: QUnit.config.stats.all
     });
     // alert(JSON.stringify(details));
   });
