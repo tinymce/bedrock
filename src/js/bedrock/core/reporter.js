@@ -1,5 +1,6 @@
 var XMLWriter = require('xml-writer');
 var fs = require('fs');
+var attempt = require('./attempt');
 
 var logSauceInfo = function (root, settings) {
   return root.startElement('system-out')
@@ -63,8 +64,8 @@ var write = function (settings) {
       var reportFile = settings.output + '/TEST-' + settings.name + '.xml';
       fs.writeFileSync(reportFile, w.toString());
 
-      if (failed.length > 0) reject('Some tests failed. See {' + reportFile + '} for details.');
-      else resolve(results);
+      if (failed.length > 0) resolve(attempt.failed(['Some tests failed. See {' + reportFile + '} for details.']));
+      else resolve(attempt.passed(results));
     });
   };
 };
