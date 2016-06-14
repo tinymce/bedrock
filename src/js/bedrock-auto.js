@@ -2,6 +2,8 @@ var go = function (settings) {
   var serve = require('./bedrock/server/serve');
   var attempt = require('./bedrock/core/attempt');
 
+  var boltroutes = require('./bedrock/server/boltroutes');
+
   var poll = require('./bedrock/poll/poll');
   var reporter = require('./bedrock/core/reporter');
 
@@ -13,14 +15,15 @@ var go = function (settings) {
 
   var lifecycle = require('./bedrock/core/lifecycle');
 
+  var runner = boltroutes.generate(settings.projectdir, settings.basedir, settings.config, settings.testfiles);
+
   var serveSettings = {
     projectdir: settings.projectdir,
     basedir: settings.basedir,
-    config: settings.config,
     testfiles: settings.testfiles,
     driver: attempt.passed(driver),
     master: master,
-    page: 'src/resources/bedrock.html'
+    runner: runner
   };
 
   var isPhantom = settings.browser === 'phantomjs';
