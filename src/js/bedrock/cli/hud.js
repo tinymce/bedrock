@@ -19,7 +19,7 @@ var create = function (files) {
     return Promise.resolve({});
   };
 
-  var update = function (data) {
+  var advUpdate = function (data) {
     if (started) {
       // Note, this writes over the above line, which is why we only do this after the first update.
       stream.moveCursor(0, -2);
@@ -36,8 +36,19 @@ var create = function (files) {
     return Promise.resolve({});
   };
 
+  var basicUpdate = function (data) {
+    stream.write('.');
+    return Promise.resolve({});
+  };
+
+  var supportsAdvanced = (function () {
+    return stream.clearLine !== undefined &&
+      stream.moveCursor !== undefined &&
+      stream.cursorTo !== undefined;
+  })();
+
   return {
-    update: update,
+    update: supportsAdvanced ? advUpdate : basicUpdate,
     complete: complete
   };
 };
