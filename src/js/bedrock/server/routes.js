@@ -93,10 +93,8 @@ var hostOn = function (prefix, root) {
   var base = server(root);
 
   var go = function (request, response, done) {
-    request.url = request.url.substring((prefix + '/').length);
-    var questionMark = request.url.indexOf('?');
-    request.url = questionMark > -1 ? request.url.substring(0, questionMark) : request.url;
-    // console.log('request.url', request.url);
+    var original = request.url;
+    request.url = original.substring((prefix + '/').length);
     base(request, response, done);
   };
 
