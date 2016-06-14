@@ -99,10 +99,7 @@ var hostOn = function (prefix, root) {
   };
 
   return {
-    matches: function (url) {
-      // console.log('Attempting to match: ', url, 'prefix', prefix);
-      return prefixMatch(prefix)(url);
-    },
+    matches: prefixMatch(prefix),
     go: go
   };
 };
