@@ -5,7 +5,7 @@ establish a WebDriver connection with this browser and close the browser once th
 
 `bedrock-auto {SUITE_NAME} {BROWSER} {CONFIG_FILE} {TESTS ...}`
 
-BROWSER: chrome | firefox | safari | edge | ie
+BROWSER: chrome | firefox | safari | MicrosoftEdge | ie | phantomjs
 
 e.g. run tests in the project: example1
 
