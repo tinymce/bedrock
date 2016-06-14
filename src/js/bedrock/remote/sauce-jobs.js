@@ -60,6 +60,7 @@ var create = function (settings) {
         }
       });
 
+      // FIX: reporter signature has changed. Now returns an attempt.
       return setName(session, name).then(f).then(logResults).then(setAsPassed, setAsFailed);
     });
   };
