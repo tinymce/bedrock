@@ -14,8 +14,22 @@
   var totalPassed = 0;
   var totalFailed = 0;
 
-  QUnit.log(function (detail) {
-    alert('Fail: ' + JSON.stringify(detail));
+  QUnit.log(function (details) {
+    if (details.result === false) {
+
+      var message = details.message !== undefined ? details.message : '';
+      var expected = details.expected !== undefined ? 'Expected: ' + details.expected +
+        ', but Actual: ' + details.actual : '';
+      var source = details.source !== undefined ? details.source : '';
+
+      var error = [ message, expected, source ].join('\n');
+
+      failures.push({
+        test: details.module + ':' + details.name,
+        passed: false,
+        error: error
+      });
+    }
   });
 
   var currentModule = '';
@@ -40,7 +54,7 @@
 
   // alert(10);
   QUnit.begin(function (details) {
-    alert('Beginning');
+    alert(10);
   });
 
   QUnit.moduleStart(function (details) {
@@ -65,8 +79,15 @@
 
   QUnit.done(function (details) {
     results.innerHTML = JSON.stringify({
-      results: details
+      results: failures
     });
-    div.appendChild(results);
+    setTimeout(function () {
+      div.appendChild(results);
+    }, 400);
   });
+
+  setTimeout(function () {
+
+    QUnit.start();
+  }, 1000);
 })();
