@@ -100,3 +100,10 @@ Use `bedrock-sauce-single --help` to see all arguments possible.
 
 ## framework mode
 
+*Framework* mode allows bedrock to run using an existing framework. The only currently supported testing framework is `qunit`. Bedrock assumes that a single page is responsible for running all the tests, so a `page` and `browser` are the only things required. Another parameter `framework` is also possible, but its only possible value currently is `qunit`.
+
+e.g. Run existing tests on a qunit page using phantom
+
+`bedrock-framework --page tests/index.html --browser phantomjs`
+
+Use `bedrock-framework --help` to see all arguments possible.
