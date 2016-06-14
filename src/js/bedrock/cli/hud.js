@@ -8,11 +8,11 @@ var create = function (files) {
   // TODO: Be able to turn this output off. It will output escape codes which will make
   // jenkins output less readable.
 
-  var writeProgress = function (numPassed, numFailed) {
+  var writeProgress = function (numPassed, numFailed, total) {
     var numRun = numPassed + numFailed;
     stream.write(
-      'Passed: ' + numPassed + '/' + totalFiles +
-      ', Failed: ' + numFailed + '/' + totalFiles +
+      'Passed: ' + numPassed + '/' + total +
+      ', Failed: ' + numFailed + '/' + total +
       ' [' + numRun + ']  ... ' + '\n'
     );
     stream.clearLine(2);
@@ -29,7 +29,7 @@ var create = function (files) {
     stream.clearLine(0);
     stream.cursorTo(0);
     stream.write('Current test: ' + (data.test !== undefined ? data.test : 'Unknown') + '\n');
-    return writeProgress(data.numPassed, data.numFailed);
+    return writeProgress(data.numPassed, data.numFailed, data.totalFiles !== undefined ? data.totalFiles : totalFiles);
   };
 
   var complete = function () {

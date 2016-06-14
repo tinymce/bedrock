@@ -47,14 +47,16 @@ var go = function (settings) {
     results: '.results'
   };
 
+  var isPhantom = settings.browser === 'phantomjs';
+
   serve.start(serveSettings, function (service, done) {
-    console.log('bedrock-auto available at: http://localhost:' + service.port);
+    if (! isPhantom) console.log('bedrock-page available at: http://localhost:' + service.port);
     var result = driver.get('http://localhost:' + service.port + '/' + settings.page).then(function () {
-      console.log('\n ... Initial page has loaded ...');
+      var message = isPhantom ? '\nPhantom tests loading ...\n' : '\n ... Initial page has loaded ...';
+      console.log(message);
       service.markLoaded();
 
       var scriptFile = path.join('/page', 'src', 'resources', 'qunit-wrapper.js');
-      console.log('scriptFile', scriptFile);
       return driver.executeScript(function (src) {
         var script = document.createElement('script');
         script.setAttribute('src', src);
