@@ -2,13 +2,16 @@ var fs = require('fs');
 var readdirSyncRec = require('recursive-readdir-sync');
 var attempt = require('../core/attempt');
 
+var qstring = require('../util/qstring');
+
 var file = function (name, rawValue) {
+  // Ignore any query strings when checking if a file exists
+  var parsed = qstring.parse(rawValue);
+  var value = parsed.base;
   try {
-    var questionIndex = rawValue.indexOf('?');
-    var value = questionIndex > -1 ? rawValue.substring(0, questionIndex) : rawValue;
     fs.accessSync(value);
     if (!fs.statSync(value).isFile()) throw new Error('Property: ' + name + ' => Value: ' + value + ' was not a file');
-    return attempt.passed(rawValue);
+    return attempt.passed(parsed.original);
   } catch (err) {
     return attempt.failed([ 'Property [' + name + '] has value: [' + value + ']. This file does not exist' ]);
   }
