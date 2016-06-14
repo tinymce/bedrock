@@ -28,11 +28,11 @@ var choose = function (settings) {
   };
 
   var getDirectories = function () {
-    var useAll = uploaddirs.length === 1 && uploaddirs[0] === "*";
+    var useAll = uploaddirs.length === 1 && uploaddirs[0] === '*';
     return useAll ? getAllDirectories(projectdir) : getManyDirectories(projectdir, uploaddirs);
   };
 
-  // TODO: Take away the bolt centric nature of this.
+  // TODO: Consider supporting other frameworks for uploading.
   return getDirectories().concat([
     link(
       path.join('src', 'resources'),

@@ -17,6 +17,7 @@
   "private": true,
   "dependencies": {
     "@ephox/bolt": "^1.6.5",
+    "async": "^1.5.2",
     "aws-sdk": "^2.3.9",
     "capitalize": "^1.0.0",
     "command-line-args": "^3.0.0",

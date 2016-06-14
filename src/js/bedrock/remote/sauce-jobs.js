@@ -7,6 +7,7 @@ var create = function (settings) {
   });
 
   var reporter = require('../core/reporter');
+  var attempt = require('../core/attempt');
 
   var setJobPassed = function (session, name) {
     return function (result) {
@@ -48,8 +49,18 @@ var create = function (settings) {
   var runTest = function (suiteName, driver, f) {
     return driver.getSession().then(function (session) {
       var name = settings.name;
+
       var setAsPassed = setJobPassed(session, name);
       var setAsFailed = setJobFailed(session, name);
+
+      var checkResults = function (maybeResult) {
+        return attempt.cata(maybeResult, function (errs) {
+          var error = errs.join('\n');
+          return setAsFailed(error);
+        }, function (result) {
+          return setAsPassed(result);
+        });
+      };
 
       var logResults = reporter.write({
         name: suiteName,
@@ -61,7 +72,7 @@ var create = function (settings) {
       });
 
       // FIX: reporter signature has changed. Now returns an attempt.
-      return setName(session, name).then(f).then(logResults).then(setAsPassed, setAsFailed);
+      return setName(session, name).then(f).then(logResults).then(checkResults, setAsFailed);
     });
   };
 
