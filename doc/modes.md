@@ -3,23 +3,23 @@
 *Test* mode allows the user to run tests in an automated fashion. Bedrock will spin up the browser itself (assuming the user has the right [WebDrivers](webdrivers.md) on the path),
 establish a WebDriver connection with this browser and close the browser once the tests have completed.
 
-`bedrock-auto {SUITE_NAME} {BROWSER} {CONFIG_FILE} {TESTS ...}`
 
 BROWSER: chrome | firefox | safari | MicrosoftEdge | ie | phantomjs
 
-e.g. run tests in the project: example1
+e.g. run automated bedrock tests in chrome against test directory src/test/js/browser
 
-`bedrock-auto fake-suite chrome config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js/browser/TwoTest.js`
+`bedrock-auto --browser chrome --testdir src/test/js/browser
 
-
+Use `bedrock-auto --help` to see all arguments possible.
 
 ## server mode (bedrock)
 
 *Server* mode allows the user to host the tests on localhost:{port} where port is the first free port found between 8000 and 20000. It is the most commonly used
 mode, and therefore is the default bedrock executable.
 
-`bedrock config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js/browser/TwoTest.js`
+`bedrock --files src/test/js/browser/TwoTest.js`
 
+Use `bedrock --help` to see all arguments possible.
 
 
 ## remote mode (bedrock-remote)
@@ -34,18 +34,16 @@ aws_secret_access_key = aaaaaaaaaaaaaaaaaaaaa
 Note, that we have named the profile here. This allows you to have multiple profiles on the same machine. In order to set this profile, you can prefix the bedrock-remote command with
 an AWS_PROFILE declaration. This will be covered in the examples below.
 
-`bedrock-remote {TEST_DIR} {UPLOAD_DIRS} {CONFIG_FILE} {TESTS ...}`
+e.g. run tests using the default profile
 
-Note, UPLOAD_DIRS is a *comma-separated* list of directories relative to the current directory. Use "*" to include all directories.
+`bedrock-remote --uploaddirs src test config --testdir test
 
-e.g. run tests using the default profile in the ~/.aws/credentials file on the subdirectory remote-test-1 of the s3 bucket
-
-`bedrock-remote remote-test-1 "src" config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js.browser/TwoTest.js`
 
 e.g. run tests using a non-default profile in the ~/.aws/credentials file
 
-`AWS_PROFILE=bedrock-aws bedrock-remote remote-test-1 "*" config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js.browser/TwoTest.js`
+`AWS_PROFILE=bedrock-aws bedrock-remote --uploaddirs src test config --testdir test`
 
+Use `bedrock-remote --help` to see all arguments possible.
 
 
 ## saucelabs mode (bedrock-sauce)
@@ -54,7 +52,7 @@ e.g. run tests using a non-default profile in the ~/.aws/credentials file
 mode is designed to integrate with the jenkins test reporting system, and does not support any other tools at this stage. Note, as part of the SauceLabs step, we upload the code to an s3
 bucket (which minimises latency), so you will need to set your AWS_PROFILE if it is not the default as documented in the *remote mode* section.
 
-`bedrock-sauce {SAUCE_JOB} {SAUCE_CONFIG} {SAUCE_USER} {SAUCE_KEY} {UPLOAD_DIRS} {CONFIG_FILE} {TESTS ...}`
+`bedrock-sauce --uploaddirs src --testdir src/test --sauceconfig {SAUCE_CONFIG} --sauceuser aaa --saucekey bbb`
 
 Note, {SAUCE_CONFIG} is a json file which specifies the platform configuration. These will be farmed off to SauceLabs in parallel. An example saucelabs configuration file:
 
@@ -88,12 +86,7 @@ Note, {SAUCE_CONFIG} is a json file which specifies the platform configuration. 
   }
 ]
 ```
-
-e.g. run tests on SauceLabs with the job name: saucelabspower
-
-`bedrock-sauce saucelabspower sample/saucelabs.js not-a-real-user not-a-real-key "src,sample" config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js/browser/TwoTest.js`
-
-
+Use `bedrock-sauce --help` to see all arguments possible.
 
 
 
@@ -101,8 +94,6 @@ e.g. run tests on SauceLabs with the job name: saucelabspower
 
 *SauceLabs Single* mode is used to run a specific platform using the automated SauceLabs tool. You will require an account with SauceLabs that will provide you with a SauceID and a SauceKey. As with the normal SauceLabs mode, we upload the code to an s3 bucket (which minimises latency), so you will need to set your AWS_PROFILE if it is not the default as documented in the *remote mode* section.
 
-`bedrock-sauce-single {REMOTE_BASE} {SAUCE_JOB} {SAUCE_BROWSER} {SAUCE_BROWSER_VERSION} {SAUCE_OS} {SAUCE_USER} {SAUCE_KEY}`
+`bedrock-sauce-single --remoteurl {REMOTE_BASE} --sauceuser aaa --saucekey bbb`
 
-e.g. run tests on SauceLabs on chrome latest
-
-`bedrock-sauce-single http://where.it.was.uploaded job-name chrome latest "Windows 8.1" not-a-real-user not-a-real-key config/bolt/browser.js src/test/js/browser/OneTest.js src/test/js/browser/TwoTest.js`
+Use `bedrock-sauce-single` --help to see all arguments possible.
