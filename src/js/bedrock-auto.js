@@ -1,21 +1,3 @@
-var shutdown = function (promise, driver, done) {
-  promise.then(function (/* res */) {
-    // All good, so continue.
-    driver.sleep(1000);
-    driver.quit().then(function () {
-      console.log('All tests passed.');
-      done();
-    });
-  }, function (err) {
-    driver.sleep(1000);
-    driver.quit().then(function () {
-      console.error('********* Unexpected Bedrock Error -> Server Quitting ***********', err);
-      done();
-      throw err;
-    });
-  });
-};
-
 var go = function (settings) {
   var serve = require('./bedrock/server/serve');
   var attempt = require('./bedrock/core/attempt');
@@ -28,6 +10,8 @@ var go = function (settings) {
   var driver = require('./bedrock/auto/driver').create({
     browser: settings.browser
   });
+
+  var lifecycle = require('./bedrock/core/lifecycle');
 
   var serveSettings = {
     projectdir: settings.projectdir,
@@ -54,7 +38,7 @@ var go = function (settings) {
         })(data);
       });
     });
-    shutdown(result, driver, done);
+    lifecycle.shutdown(result, driver, done);
   });
 };
 
