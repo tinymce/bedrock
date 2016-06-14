@@ -1,7 +1,7 @@
 
 
 var go = function (settings) {
-  var serve = require('./bedrock/server/pageserve');
+  var serve = require('./bedrock/server/serve');
 
   var poll = require('./bedrock/poll/poll');
   var reporter = require('./bedrock/core/reporter');
@@ -15,14 +15,19 @@ var go = function (settings) {
     browser: settings.browser
   });
 
+  var pageroutes = require('./bedrock/server/pageroutes');
+
   var lifecycle = require('./bedrock/core/lifecycle');
+
+  var runner = pageroutes.generate(settings.projectdir, settings.basedir, settings.page);
 
   var serveSettings = {
     projectdir: settings.projectdir,
     basedir: settings.basedir,
     driver: attempt.passed(driver),
+    testfiles: [ ],
     master: master,
-    page: settings.page
+    runner: runner
   };
 
   var isPhantom = settings.browser === 'phantomjs';

@@ -32,6 +32,7 @@ var choose = function (settings) {
     return useAll ? getAllDirectories(projectdir) : getManyDirectories(projectdir, uploaddirs);
   };
 
+  // TODO: Take away the bolt centric nature of this.
   return getDirectories().concat([
     link(
       path.join('src', 'resources'),
