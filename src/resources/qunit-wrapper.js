@@ -1,18 +1,36 @@
 (function () {
   var div = document.createElement('div');
 
+
+  div.classList.add('bedrock-qunit');
+  div.style.setProperty('visibility', 'hidden');
+
+  var runningTest = document.createElement('span');
+  runningTest.classList.add('test', 'running');
+
   var testName = document.createElement('span');
-  testName.classList.add('testing');
+  testName.classList.add('name');
+
+  var testProgress = document.createElement('span');
+  testProgress.classList.add('progress');
+
+  runningTest.appendChild(testName);
+  runningTest.appendChild(testProgress);
+
+  div.appendChild(runningTest);
 
   var results = document.createElement('textarea');
   results.classList.add('results');
-  // results.style.setProperty('visibility', 'hidden');
+
+  document.body.appendChild(div);
 
 
   var failures = [ ];
 
   var totalPassed = 0;
   var totalFailed = 0;
+
+  var testCounter = 0;
 
   QUnit.log(function (details) {
     if (details.result === false) {
@@ -35,8 +53,6 @@
   var currentModule = '';
 
 
-  testName.innerHTML = 'Test 1';
-  div.appendChild(testName);
   // document.body.appendChild(results);
 
 
@@ -50,7 +66,7 @@
   };
 
 
-  document.body.appendChild(div);
+
 
   // // alert(10);
   // QUnit.begin(function (details) {
@@ -68,7 +84,9 @@
   });
 
   QUnit.testStart(function (details) {
+    testCounter++;
     testName.innerHTML = currentModule + ':' + details.name;
+    testProgress.innerHTML = testCounter;
   });
 
   QUnit.moduleDone(function (details) {
@@ -84,12 +102,11 @@
   });
 
   QUnit.done(function (details) {
+    div.appendChild(results);
     results.innerHTML = JSON.stringify({
       results: failures
     });
-    setTimeout(function () {
-      div.appendChild(results);
-    }, 400);
+    div.classList.add('done');
   });
 
   setTimeout(function () {

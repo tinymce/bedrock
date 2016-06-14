@@ -25,14 +25,6 @@ var go = function (settings) {
     page: settings.page
   };
 
-  var pollSettings = {
-    overallTimeout: 10 * 60 * 1000,
-    testName: 'p#qunit-result .test-name',
-    singleTimeout: null,
-    done: '#qunit-banner.qunit-fail,#qunit-banner.qunit-pass',
-    results: '.results'
-  };
-
   var isPhantom = settings.browser === 'phantomjs';
 
   serve.start(serveSettings, function (service, done) {
@@ -50,7 +42,7 @@ var go = function (settings) {
       }, scriptFile).then(function () {
 
 
-      return poll.loop(master, driver, pollSettings).then(function (data) {
+      return poll.loop(master, driver, settings).then(function (data) {
         return reporter.write({
           name: settings.name,
           output: settings.output
