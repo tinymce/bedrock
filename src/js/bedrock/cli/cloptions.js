@@ -74,6 +74,15 @@
     validate: extraction.files('Test.js')
   };
 
+  var page = {
+    name: 'page',
+    output: 'page',
+    required: true,
+    type: String,
+    description: 'The page to load into the browser',
+    validate: extraction.file
+  };
+
   var projectdir = function (directories) {
     return {
       name: 'projectdir',
@@ -244,6 +253,15 @@
     validate: extraction.any
   };
 
+  var framework = {
+    name: 'framework',
+    type: String,
+    defaultValue: 'qunit',
+    description: 'The testing framework being used',
+    validate: extraction.inSet([ 'qunit' ]),
+    required: true
+  };
+
   var help = {
     name: 'help',
     alias: 'h',
@@ -289,5 +307,7 @@
     testNameSelector: testNameSelector,
     resultsSelector: resultsSelector,
 
-    help: help
+    framework: framework,
+    help: help,
+    page: page
   };

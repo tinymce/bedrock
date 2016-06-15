@@ -75,6 +75,35 @@ var constant = function (root, url) {
   };
 };
 
+var host = function (root) {
+  var base = server(root);
+
+  var go = function (request, response, done) {
+    base(request, response, done);
+  };
+
+  return {
+    matches: prefixMatch(root),
+    go: go
+  };
+};
+
+
+var hostOn = function (prefix, root) {
+  var base = server(root);
+
+  var go = function (request, response, done) {
+    var original = request.url;
+    request.url = original.substring((prefix + '/').length);
+    base(request, response, done);
+  };
+
+  return {
+    matches: prefixMatch(prefix),
+    go: go
+  };
+};
+
 var unsupported = function (root, label) {
   var go = function (request, response/* , done */) {
     concludeJson(response, 404, { error: label });
@@ -102,5 +131,7 @@ module.exports = {
   constant: constant,
   unsupported: unsupported,
   json: json,
-  route: route
+  route: route,
+  host: host,
+  hostOn: hostOn
 };

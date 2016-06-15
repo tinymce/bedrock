@@ -1,24 +1,8 @@
-var shutdown = function (promise, driver, done) {
-  promise.then(function (/* res */) {
-    // All good, so continue.
-    driver.sleep(1000);
-    driver.quit().then(function () {
-      console.log('All tests passed.');
-      done();
-    });
-  }, function (err) {
-    driver.sleep(1000);
-    driver.quit().then(function () {
-      console.error('********* Unexpected Bedrock Error -> Server Quitting ***********', err);
-      done();
-      throw err;
-    });
-  });
-};
-
 var go = function (settings) {
   var serve = require('./bedrock/server/serve');
   var attempt = require('./bedrock/core/attempt');
+
+  var boltroutes = require('./bedrock/server/boltroutes');
 
   var poll = require('./bedrock/poll/poll');
   var reporter = require('./bedrock/core/reporter');
@@ -29,14 +13,17 @@ var go = function (settings) {
     browser: settings.browser
   });
 
+  var lifecycle = require('./bedrock/core/lifecycle');
+
+  var runner = boltroutes.generate(settings.projectdir, settings.basedir, settings.config, settings.testfiles);
+
   var serveSettings = {
     projectdir: settings.projectdir,
     basedir: settings.basedir,
-    config: settings.config,
     testfiles: settings.testfiles,
     driver: attempt.passed(driver),
     master: master,
-    page: 'src/resources/bedrock.html'
+    runner: runner
   };
 
   var isPhantom = settings.browser === 'phantomjs';
@@ -54,7 +41,7 @@ var go = function (settings) {
         })(data);
       });
     });
-    shutdown(result, driver, done);
+    lifecycle.shutdown(result, driver, done);
   });
 };
 
