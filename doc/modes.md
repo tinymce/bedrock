@@ -8,7 +8,7 @@ BROWSER: chrome | firefox | safari | MicrosoftEdge | ie | phantomjs
 
 e.g. run automated bedrock tests in chrome against test directory src/test/js/browser
 
-`bedrock-auto --browser chrome --testdir src/test/js/browser
+`bedrock-auto --browser chrome --testdir src/test/js/browser`
 
 Use `bedrock-auto --help` to see all arguments possible.
 

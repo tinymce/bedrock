@@ -17,7 +17,7 @@ var shutdown = function (promise, driver, done) {
   }, function (err) {
     driver.sleep(1000);
     driver.quit().then(function () {
-      console.error('********* Unexpected Bedrock Error -> Server Quitting ***********', err);
+      console.error('********** Unexpected Bedrock Error -> Server Quitting **********', err);
       done();
       throw err;
     });
