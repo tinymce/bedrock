@@ -6,7 +6,7 @@ var prefixMatch = function (prefix) {
   };
 };
 
-var routing = function (prefix, source) {
+var routing = function (method, prefix, source) {
   var router = server(source);
 
   var go = function (request, response, done) {
@@ -16,17 +16,19 @@ var routing = function (prefix, source) {
 
   return {
     matches: prefixMatch(prefix),
+    method: method,
     go: go
   };
 };
 
-var json = function (prefix, data) {
+var json = function (method, prefix, data) {
   var go = function (request, response/* , done */) {
     concludeJson(response, 200, data);
   };
 
   return {
     matches: prefixMatch(prefix),
+    method: method,
     go: go
   };
 };
@@ -36,7 +38,7 @@ var concludeJson = function (response, status, info) {
   response.end(JSON.stringify(info));
 };
 
-var effect = function (prefix, action) {
+var effect = function (method, prefix, action) {
   var go = function (request, response/* , done */) {
     var body = '';
     request.on('data', function (data) {
@@ -57,11 +59,12 @@ var effect = function (prefix, action) {
 
   return {
     matches: prefixMatch(prefix),
+    method: method,
     go: go
   };
 };
 
-var constant = function (root, url) {
+var constant = function (method, root, url) {
   var base = server(root);
 
   var go = function (request, response, done) {
@@ -71,11 +74,12 @@ var constant = function (root, url) {
 
   return {
     matches: prefixMatch(root),
+    method: method,
     go: go
   };
 };
 
-var host = function (root) {
+var host = function (method, root) {
   var base = server(root);
 
   var go = function (request, response, done) {
@@ -84,12 +88,13 @@ var host = function (root) {
 
   return {
     matches: prefixMatch(root),
+    method: method,
     go: go
   };
 };
 
 
-var hostOn = function (prefix, root) {
+var hostOn = function (method, prefix, root) {
   var base = server(root);
 
   var go = function (request, response, done) {
@@ -100,29 +105,36 @@ var hostOn = function (prefix, root) {
 
   return {
     matches: prefixMatch(prefix),
+    method: method,
     go: go
   };
 };
 
-var unsupported = function (root, label) {
+var unsupported = function (method, root, label) {
   var go = function (request, response/* , done */) {
     concludeJson(response, 404, { error: label });
   };
 
   return {
     matches: prefixMatch(root),
+    method: method,
     go: go
   };
 };
 
 var route = function (routes, fallback, request, response, done) {
   request.originalUrl = request.url;
-  var match = routes.find(function (candidate) {
-    return candidate.matches(request.url);
-  });
+  if (request.method === 'OPTIONS') {
+    response.writeHeader(200, { "Content-Type": "application/json" });
+    response.end(JSON.stringify({}));
+  } else {
+    var match = routes.find(function (candidate) {
+      return candidate.method === request.method && candidate.matches(request.url);
+    });
 
-  var matching = match === undefined ? fallback : match;
-  matching.go(request, response, done);
+    var matching = match === undefined ? fallback : match;
+    matching.go(request, response, done);
+  }
 };
 
 module.exports = {

@@ -38,11 +38,12 @@ var create = function (master, maybeDriver, projectdir, basedir, files, loglevel
 
     return attempt.cata(maybeDriver, function () {
       return routes.unsupported(
+        'POST',
         url,
         apiLabel + ' API not supported without webdriver running. Use bedrock-auto to get this feature.'
       );
     }, function (driver) {
-      return routes.effect(url, effect(driver));
+      return routes.effect('POST', url, effect(driver));
     });
   };
 
@@ -59,14 +60,14 @@ var create = function (master, maybeDriver, projectdir, basedir, files, loglevel
     driverRouter('/keys', 'Keys', keys.executor),
     driverRouter('/mouse', 'Mouse', mouse.executor),
     // Update the HUD with current testing process
-    routes.effect('/tests/progress', function (data) {
+    routes.effect('POST', '/tests/progress', function (data) {
       return hud.update(data);
     }),
-    routes.effect('/tests/done', function (data) {
+    routes.effect('POST', '/tests/done', function (data) {
       return hud.complete();
     }),
     // This does not need the webdriver.
-    routes.effect('/clipboard', clipboard.route(basedir, projectdir))
+    routes.effect('POST', '/clipboard', clipboard.route(basedir, projectdir))
   ];
 
   return {
