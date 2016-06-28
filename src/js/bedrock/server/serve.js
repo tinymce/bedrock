@@ -38,7 +38,7 @@ var start = function (settings, f) {
 
   var routers = runner.routers.concat(
     api.routers
-  ).concat([ ]);
+  );
 
   var fallback = runner.fallback;
 
