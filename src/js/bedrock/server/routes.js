@@ -124,17 +124,13 @@ var unsupported = function (method, root, label) {
 
 var route = function (routes, fallback, request, response, done) {
   request.originalUrl = request.url;
-  if (request.method === 'OPTIONS') {
-    response.writeHeader(200, { "Content-Type": "application/json" });
-    response.end(JSON.stringify({}));
-  } else {
-    var match = routes.find(function (candidate) {
-      return candidate.method === request.method && candidate.matches(request.url);
-    });
 
-    var matching = match === undefined ? fallback : match;
-    matching.go(request, response, done);
-  }
+  var match = routes.find(function (candidate) {
+    return candidate.method === request.method && candidate.matches(request.url);
+  });
+
+  var matching = match === undefined ? fallback : match;
+  matching.go(request, response, done);
 };
 
 module.exports = {
