@@ -12,7 +12,8 @@ var go = function (settings) {
     // There is no driver for manual mode.
     driver: attempt.failed('There is no webdriver for manual mode'),
     master: null, // there is no need for master,
-    runner: runner
+    runner: runner,
+    loglevel: settings.loglevel
   };
 
   serve.start(serveSettings, function (service/* , done */) {

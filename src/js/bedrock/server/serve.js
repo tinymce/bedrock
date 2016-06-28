@@ -34,11 +34,11 @@ var start = function (settings, f) {
   var master = Prefs.master(settings);
 
   var runner = Prefs.runner(settings);
-  var api = apis.create(master, maybeDriver, projectdir, basedir, testfiles);
+  var api = apis.create(master, maybeDriver, projectdir, basedir, testfiles, settings.loglevel);
 
   var routers = runner.routers.concat(
     api.routers
-  );
+  ).concat([ ]);
 
   var fallback = runner.fallback;
 

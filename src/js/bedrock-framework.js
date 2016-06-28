@@ -27,7 +27,8 @@ var go = function (settings) {
     driver: attempt.passed(driver),
     testfiles: [ ],
     master: master,
-    runner: runner
+    runner: runner,
+    loglevel: settings.loglevel
   };
 
   var addFramework = function (framework) {

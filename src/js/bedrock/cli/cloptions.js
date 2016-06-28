@@ -270,6 +270,15 @@
     validate: extraction.any
   };
 
+  var logging = {
+    name: 'loglevel',
+    type: String,
+    defaultValue: 'advanced',
+    description: 'The level of logging for test progress',
+    validate: extraction.inSet([ 'simple', 'advanced' ]),
+    required: true
+  };
+
   module.exports = {
     // All modes testing
     config: config,
@@ -309,5 +318,6 @@
 
     framework: framework,
     help: help,
-    page: page
+    page: page,
+    logging: logging
   };

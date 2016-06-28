@@ -12,7 +12,7 @@ var pollRate = 2000;
 var maxInvalidAttempts = 300;
 
 // TODO: Do not use files here.
-var create = function (master, maybeDriver, projectdir, basedir, files) {
+var create = function (master, maybeDriver, projectdir, basedir, files, loglevel) {
 
   // On IE, the webdriver seems to load the page before it's ready to start
   // responding to commands. If the testing page itself tries to interact with
@@ -52,7 +52,7 @@ var create = function (master, maybeDriver, projectdir, basedir, files) {
     pageHasLoaded = true;
   };
 
-  var hud = mHud.create(files);
+  var hud = mHud.create(files, loglevel);
 
   var routers = [
 
