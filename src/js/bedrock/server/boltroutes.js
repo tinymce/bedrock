@@ -7,19 +7,19 @@ var generate = function (projectdir, basedir, boltConfig, testfiles) {
   });
 
   var routers = [
-    routes.routing('/project', projectdir),
-    routes.routing('/js', path.join(basedir, 'src/resources')),
-    routes.routing('/lib/bolt', path.join(basedir, 'node_modules/@ephox/bolt/lib')),
-    routes.routing('/lib/jquery', path.join(basedir, 'node_modules/jquery/dist')),
-    routes.routing('/css', path.join(basedir, 'src/css')),
+    routes.routing('GET', '/project', projectdir),
+    routes.routing('GET', '/js', path.join(basedir, 'src/resources')),
+    routes.routing('GET', '/lib/bolt', path.join(basedir, 'node_modules/@ephox/bolt/lib')),
+    routes.routing('GET', '/lib/jquery', path.join(basedir, 'node_modules/jquery/dist')),
+    routes.routing('GET', '/css', path.join(basedir, 'src/css')),
     // Very bolt specific.
-    routes.json('/harness', {
+    routes.json('GET', '/harness', {
       config: path.relative(projectdir, boltConfig),
       scripts: files
     })
   ];
 
-  var fallback = routes.constant(basedir, 'src/resources/bedrock.html');
+  var fallback = routes.constant('GET', basedir, 'src/resources/bedrock.html');
 
   return {
     routers: routers,

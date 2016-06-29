@@ -23,7 +23,8 @@ var go = function (settings) {
     testfiles: settings.testfiles,
     driver: attempt.passed(driver),
     master: master,
-    runner: runner
+    runner: runner,
+    loglevel: settings.loglevel
   };
 
   var isPhantom = settings.browser === 'phantomjs';

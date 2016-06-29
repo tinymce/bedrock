@@ -1,4 +1,4 @@
-var create = function (files) {
+var create = function (files, loglevel) {
   var started = false;
 
   var stream = process.stdout;
@@ -48,7 +48,7 @@ var create = function (files) {
   })();
 
   return {
-    update: supportsAdvanced ? advUpdate : basicUpdate,
+    update: loglevel === 'advanced' && supportsAdvanced ? advUpdate : basicUpdate,
     complete: complete
   };
 };

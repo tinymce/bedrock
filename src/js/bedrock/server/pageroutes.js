@@ -3,10 +3,10 @@ var generate = function (projectdir, basedir, page) {
   var routes = require('./routes');
 
   var routers = [
-    routes.hostOn('/page', basedir)
+    routes.hostOn('GET', '/page', basedir)
   ];
 
-  var fallback = routes.host(projectdir, page);
+  var fallback = routes.host('GET', projectdir, page);
 
   return {
     routers: routers,
