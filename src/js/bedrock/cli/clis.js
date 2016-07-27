@@ -112,11 +112,12 @@ var forPage = function (directories) {
   );
 };
 
-var log = function (errs) {
+var logAndExit = function (errs) {
   console.error('\n****\nError while processing command line for ' + errs.command);
   var messages = errs.errors.join('\n');
   console.error(messages);
   console.error('Use ' + errs.command + ' --help to print usage\n****\n');
+  process.exit(-1);
 };
 
 module.exports = {
@@ -127,5 +128,5 @@ module.exports = {
   forSauce: forSauce,
   forPage: forPage,
 
-  log: log
+  logAndExit: logAndExit
 };

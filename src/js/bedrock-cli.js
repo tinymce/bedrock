@@ -5,7 +5,7 @@ var run = function (program, directories) {
   if (clis[program.mode] === undefined)  throw 'Bedrock mode not known: ' + program.mode;
 
   var maybeSettings = clis[program.mode](directories);
-  attempt.cata(maybeSettings, clis.log, function (settings) {
+  attempt.cata(maybeSettings, clis.logAndExit, function (settings) {
     program.go(settings, directories);
   });
 };
