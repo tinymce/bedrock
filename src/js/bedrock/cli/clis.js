@@ -13,7 +13,8 @@ var commonOptions = function (directories) {
     cloptions.testNameSelector,
     cloptions.resultsSelector,
     cloptions.help,
-    cloptions.logging
+    cloptions.logging,
+    cloptions.version
   ];
 };
 
