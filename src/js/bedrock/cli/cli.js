@@ -13,6 +13,12 @@ var parseCommandLine = function (definitions) {
   }
 };
 
+var getVersion = function () {
+  // NOTE: Do not run browserify if this is here.
+  var npmInfo = require('../../../../package.json');
+  return npmInfo.version;
+};
+
 var extract = function (command, desc, definitions) {
   var parsed = parseCommandLine(definitions);
 
@@ -22,6 +28,9 @@ var extract = function (command, desc, definitions) {
     if (s.help === true) {
       // Print usage information if used with --help or -h.
       console.log(cliusage.generateUsage(command, desc, definitions));
+      process.exit(0);
+    } else if (s.version === true) {
+      console.log(command + ' version: ' + getVersion());
       process.exit(0);
     }
   });

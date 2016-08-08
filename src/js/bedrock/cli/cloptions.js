@@ -267,6 +267,7 @@
     alias: 'h',
     type: Boolean,
     defaultValue: false,
+    description: 'Print out the help information for command',
     validate: extraction.any
   };
 
@@ -277,6 +278,14 @@
     description: 'The level of logging for test progress',
     validate: extraction.inSet([ 'simple', 'advanced' ]),
     required: true
+  };
+
+  var version = {
+    name: 'version',
+    type: Boolean,
+    defaultValue: false,
+    description: 'Output the version number of the command',
+    validate: extraction.any
   };
 
   module.exports = {
@@ -318,6 +327,7 @@
 
     framework: framework,
     help: help,
+    version: version,
     page: page,
     logging: logging
   };
