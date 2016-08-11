@@ -17,6 +17,7 @@ var choose = function (settings) {
   var projectdir = settings.projectdir;
   var basedir = settings.basedir;
   var uploaddirs = settings.uploaddirs;
+  var stopOnFailure = settings.stopOnFailure;
 
   var link = function (inputDir, inputName, outputDir, outputName) {
     // TODO: use path.join?
@@ -58,7 +59,7 @@ var choose = function (settings) {
       path.join(basedir, 'src', 'css', 'bedrock.css'),
       path.join('css', 'bedrock.css')
     ),
-    uploadtypes.datatype('harness', JSON.stringify({ config: settings.config, scripts: settings.testfiles }))
+    uploadtypes.datatype('harness', JSON.stringify({ config: settings.config, scripts: settings.testfiles, stopOnFailure: settings.stopOnFailure }))
   ]);
 };
 

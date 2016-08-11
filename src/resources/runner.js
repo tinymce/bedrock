@@ -262,7 +262,7 @@
   api.loadtests = function (data) {
     testconfig = data.config;  // intentional, see top of file for var decl.
     var scripts = data.scripts;
-    reporter.setStopOnFailure(true);
+    reporter.setStopOnFailure(data.stopOnFailure);
     var loop = function () {
       if (scripts.length > 0) {
         var testfile = 'project/' + scripts.shift();

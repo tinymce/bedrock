@@ -3,7 +3,7 @@ var go = function (settings) {
   var attempt = require('./bedrock/core/attempt');
   var boltroutes = require('./bedrock/server/boltroutes');
 
-  var runner = boltroutes.generate(settings.projectdir, settings.basedir, settings.config, settings.testfiles);
+  var runner = boltroutes.generate(settings.projectdir, settings.basedir, settings.config, settings.testfiles, settings.stopOnFailure);
 
   var serveSettings = {
     projectdir: settings.projectdir,

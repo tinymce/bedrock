@@ -1,10 +1,12 @@
-var generate = function (projectdir, basedir, boltConfig, testfiles) {
+var generate = function (projectdir, basedir, boltConfig, testfiles, stopOnFailure) {
   var path = require('path');
   var routes = require('./routes');
 
   var files = testfiles.map(function (filePath) {
     return path.relative(projectdir, filePath);
   });
+
+  console.log('stop on failure', stopOnFailure);
 
   var routers = [
     routes.routing('GET', '/project', projectdir),
@@ -15,7 +17,8 @@ var generate = function (projectdir, basedir, boltConfig, testfiles) {
     // Very bolt specific.
     routes.json('GET', '/harness', {
       config: path.relative(projectdir, boltConfig),
-      scripts: files
+      scripts: files,
+      stopOnFailure: stopOnFailure
     })
   ];
 

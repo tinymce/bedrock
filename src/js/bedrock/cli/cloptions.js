@@ -288,6 +288,14 @@
     validate: extraction.any
   };
 
+  var stopOnFailure = {
+    name: 'stopOnFailure',
+    type: Boolean,
+    defaultValue: false,
+    description: 'Stop after the first failure',
+    validate: extraction.any
+  };
+
   module.exports = {
     // All modes testing
     config: config,
@@ -328,6 +336,7 @@
     framework: framework,
     help: help,
     version: version,
+    stopOnFailure: stopOnFailure,
     page: page,
     logging: logging
   };
