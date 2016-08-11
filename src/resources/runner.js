@@ -63,6 +63,8 @@
       results: []
     };
 
+    var stopOnFailure = false;
+
     var test = function (testcase, name) {
       if (cancelTests) {
         throw 'user cancelled';
@@ -209,9 +211,14 @@
       sendJson('tests/done', {}, setAsDone, setAsDone);
     };
 
+    var setStopOnFailure = function (flag) {
+      stopOnFailure = flag;
+    };
+
     return {
       test: test,
-      done: done
+      done: done,
+      setStopOnFailure: setStopOnFailure
     };
   })();
 
