@@ -30,7 +30,7 @@
     "recursive-readdir-sync": "^1.0.6",
     "request": "^2.72.0",
     "saucelabs": "^1.2.0",
-    "selenium-webdriver": "latest",
+    "selenium-webdriver": "^2.53",
     "serve-static": "^1.10.2",
     "xml-writer": "^1.6.0"
   },
