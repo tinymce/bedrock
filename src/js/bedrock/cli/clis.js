@@ -12,6 +12,7 @@ var commonOptions = function (directories) {
     cloptions.totalSelector,
     cloptions.testNameSelector,
     cloptions.resultsSelector,
+    cloptions.stopOnFailure,
     cloptions.help,
     cloptions.logging,
     cloptions.version

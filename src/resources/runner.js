@@ -8,7 +8,6 @@
   var testconfig = '';     // set during loadtests, for global config to use.
   var testcount = $('<span />').addClass('total').text(0);       // set during loadtests, for selenium remote test counting
   var testscratch = null;  // set per test, private dom scratch area for the current test to use.
-  var cancelTests = false; // set if the button is clicked
 
   var timer = ephox.bolt.test.report.timer;
   var accumulator = ephox.bolt.test.run.accumulator;
@@ -43,7 +42,7 @@
 
   var reporter = (function () {
     var current = $('<span />').addClass('progress').text(0);
-    var stop = $('<button />').text('stop').click(function () { cancelTests = true; });
+    var stop = $('<button />').text('stop').click(function () { accumulator.cancel(); });
 
     // WARNING: be careful if changing this, bedrock depends on the class names "progress" and "total"
     $('document').ready(function () {
@@ -63,11 +62,9 @@
       results: []
     };
 
-    var test = function (testcase, name) {
-      if (cancelTests) {
-        throw 'user cancelled';
-      }
+    var stopOnFailure = false;
 
+    var test = function (testcase, name) {
       var starttime = new Date();
       var el = $('<div />').addClass('test running');
 
@@ -149,6 +146,10 @@
         });
         current.text(resultJSON.results.length);
 
+        if (stopOnFailure) {
+          accumulator.cancel();
+          current.text(testcount.text());
+        }
         notify(errors.clean(e));
       };
 
@@ -170,10 +171,6 @@
       };
 
       var notify = function (e) {
-        var checkAbort = function () {
-          if (cancelTests) done();
-        };
-
         var numFailed = $(resultJSON.results).filter(function (k, result) {
           return result.passed === false;
         }).length;
@@ -186,7 +183,7 @@
           numPassed: numPassed,
           total: testcount.text(),
           error: e
-        }, checkAbort, checkAbort);
+        }, function () { }, function () { });
       };
 
       return {
@@ -197,7 +194,7 @@
     };
 
     var done = function () {
-        var setAsDone = function () {
+      var setAsDone = function () {
         var totalTime = timer.elapsed(initial);
         resultJSON.time = totalTime;
         $('body').append('<div class="done">Test run completed in <span class="time">' + totalTime + '</span></div>');
@@ -209,9 +206,14 @@
       sendJson('tests/done', {}, setAsDone, setAsDone);
     };
 
+    var setStopOnFailure = function (flag) {
+      stopOnFailure = flag;
+    };
+
     return {
       test: test,
-      done: done
+      done: done,
+      setStopOnFailure: setStopOnFailure
     };
   })();
 
@@ -260,6 +262,7 @@
   api.loadtests = function (data) {
     testconfig = data.config;  // intentional, see top of file for var decl.
     var scripts = data.scripts;
+    reporter.setStopOnFailure(data.stopOnFailure);
     var loop = function () {
       if (scripts.length > 0) {
         var testfile = 'project/' + scripts.shift();
