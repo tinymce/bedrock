@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "NodeJS test runner for bolt projects",
   "bin": {
     "bedrock-auto": "./bin/bedrock-auto.js",
