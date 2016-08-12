@@ -14,7 +14,6 @@ var go = function (settings) {
   });
 
   var lifecycle = require('./bedrock/core/lifecycle');
-console.log('settings', settings);
   var runner = boltroutes.generate(settings.projectdir, settings.basedir, settings.config, settings.testfiles, settings.stopOnFailure);
 
   var serveSettings = {
