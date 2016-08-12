@@ -6,8 +6,6 @@ var generate = function (projectdir, basedir, boltConfig, testfiles, stopOnFailu
     return path.relative(projectdir, filePath);
   });
 
-  console.log('stop on failure', stopOnFailure);
-
   var routers = [
     routes.routing('GET', '/project', projectdir),
     routes.routing('GET', '/js', path.join(basedir, 'src/resources')),
