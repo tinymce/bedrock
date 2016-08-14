@@ -14,6 +14,7 @@ var create = function (settings) {
     .forBrowser(settings.browser).setChromeOptions(chromeOptions)
     .build();
 
+  // Some tests require large windows, so make it as large as it can be.
   driver.manage().window().maximize();
   return driver;
 };
