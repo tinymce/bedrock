@@ -28,6 +28,7 @@ var forAuto = function (directories) {
       cloptions.config,
       cloptions.files,
       cloptions.testdir,
+      cloptions.testdirs,
       cloptions.name,
       cloptions.output
     ])
@@ -41,7 +42,8 @@ var forManual = function (directories) {
     commonOptions(directories).concat([
       cloptions.config,
       cloptions.files,
-      cloptions.testdir
+      cloptions.testdir,
+      cloptions.testdirs
     ])
   );
 
@@ -55,6 +57,7 @@ var forRemote = function (directories) {
       cloptions.config,
       cloptions.files,
       cloptions.testdir,
+      cloptions.testdirs,
       cloptions.uploaddirs,
       cloptions.bucket,
       cloptions.bucketfolder
@@ -90,6 +93,7 @@ var forSauce = function (directories) {
       cloptions.config,
       cloptions.files,
       cloptions.testdir,
+      cloptions.testdirs,
       cloptions.name,
       cloptions.sauceconfig,
       cloptions.sauceuser,

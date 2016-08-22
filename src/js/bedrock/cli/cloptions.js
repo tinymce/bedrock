@@ -74,6 +74,17 @@
     validate: extraction.files('Test.js')
   };
 
+  var testdirs = {
+    name: 'testdirs',
+    output: 'testfiles',
+    required: true,
+    type: String,
+    multiple: true,
+    flatten: true,
+    description: 'The directories (plural) containing all the files to test',
+    validate: extraction.files('Test.js')
+  };
+
   var page = {
     name: 'page',
     output: 'page',
@@ -302,6 +313,7 @@
     configTo: configTo,
     files: files,
     testdir: testdir,
+    testdirs: testdirs,
 
     // Webdriver testing
     name: name,

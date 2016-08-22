@@ -28,6 +28,12 @@ var scanRequired = function (definitions, settings) {
   });
 };
 
+var flatten = function (arrays) {
+  return arrays.reduce(function (b, a) {
+    return b.concat(a);
+  }, []);
+};
+
 // Returns either a Failure of an array of error messages, or a Success of the settings object
 var scan = function (definitions, settings) {
   return definitions.reduce(function (rest, defn) {
@@ -39,7 +45,7 @@ var scan = function (definitions, settings) {
       if (rest[output] !== undefined) {
         return attempt.failed([ 'Incompatible' ]);
       }
-      result[output] = v;
+      result[output] = defn.flatten === true ? flatten(v): v;
 
       return attempt.passed(result);
     });
