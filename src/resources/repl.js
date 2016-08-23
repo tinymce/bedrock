@@ -40,7 +40,13 @@
             var alias = repl.aliases[mod];
             global[alias] = demand(mod);
             console.log('Loaded alias (' + alias + ') for ' + mod);
+
+
           }
+
+          var scriptTag = document.createElement('script');
+          scriptTag.innerHTML = response.script;
+          document.head.appendChild(scriptTag);
         });
       },
       error: function (err ) {

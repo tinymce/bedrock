@@ -9,11 +9,16 @@ var generate = function (projectdir, basedir, boltConfig, replConfig) {
   console.log('repl', repl);
   console.log('bc', bc);
 
-
   var fs = require('fs');
 
   var replFile = fs.readFileSync(repl);
   var replContents = JSON.parse(replFile);
+
+  var scripts = replContents.scripts !== undefined ? replContents.scripts : [ ];
+  var allScript = scripts.reduce(function (b, script) {
+    var sContents = fs.readFileSync(script);
+    return b + '\n' + sContents;
+  }, '');
 
   // Duplication with boltroutes
   var routers = [
@@ -26,7 +31,8 @@ var generate = function (projectdir, basedir, boltConfig, replConfig) {
     // Very bolt specific.
     routes.json('GET', '/repl', {
       config: path.relative(projectdir, boltConfig),
-      repl: replContents
+      repl: replContents,
+      script: allScript
     })
   ];
 
