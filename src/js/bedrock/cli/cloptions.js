@@ -296,6 +296,14 @@
     validate: extraction.any
   };
 
+  var repl = {
+    name: 'repl',
+    type: String,
+    description: 'The name of the repl configuration',
+    validate: extraction.file,
+    required: true
+  };
+
   module.exports = {
     // All modes testing
     config: config,
@@ -338,5 +346,7 @@
     version: version,
     stopOnFailure: stopOnFailure,
     page: page,
-    logging: logging
+    logging: logging,
+
+    repl: repl
   };

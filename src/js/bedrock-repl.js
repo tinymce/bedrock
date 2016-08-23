@@ -1,9 +1,9 @@
 var go = function (settings) {
-  var serve = require('./bedrock/server/serve');
+  var serve = require('./bedrock/repl/serve');
   var attempt = require('./bedrock/core/attempt');
-  var boltroutes = require('./bedrock/server/boltroutes');
+  var replroutes = require('./bedrock/repl/replroutes');
 
-  var runner = boltroutes.generate(settings.projectdir, settings.basedir, settings.config, settings.testfiles, settings.stopOnFailure);
+  var runner = replroutes.generate(settings.projectdir, settings.basedir, settings.config, settings.repl);
 
   var serveSettings = {
     projectdir: settings.projectdir,

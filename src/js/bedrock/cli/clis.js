@@ -26,8 +26,10 @@ var forRepl = function (directories) {
     [
       cloptions.projectdir(directories),
       cloptions.basedir(directories),
+      cloptions.config,
       cloptions.help,
-      cloptions.version
+      cloptions.version,
+      cloptions.repl
     ]
   );
 };
