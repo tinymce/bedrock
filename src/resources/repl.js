@@ -34,7 +34,7 @@
         var repl = response.repl;
 
         require(repl.entries, function () {
-          console.log('Module loaded ...');
+          console.log('Modules loaded ...');
 
           for (var mod in repl.aliases) {
             var alias = repl.aliases[mod];
