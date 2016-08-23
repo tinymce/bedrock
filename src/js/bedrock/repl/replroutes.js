@@ -1,13 +1,9 @@
 var generate = function (projectdir, basedir, boltConfig, replConfig) {
-  console.log('arguments', arguments);
   var path = require('path');
   var routes = require('../server/routes');
 
   var repl = path.relative(projectdir, replConfig);
   var bc = path.relative(projectdir, boltConfig);
-  console.log('projectdir', projectdir);
-  console.log('repl', repl);
-  console.log('bc', bc);
 
   var fs = require('fs');
 
