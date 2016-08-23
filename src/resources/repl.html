@@ -51,7 +51,7 @@
         url: 'repl',
         dataType: 'json',
         success: function (response) {
-          console.log('REPL loaded ...');
+          console.log('REPL loaded ...', response);
 
 
           var install = ephox.bolt.module.bootstrap.install;
@@ -71,16 +71,20 @@
           global.require = ephox.bolt.module.api.require;
           global.demand = ephox.bolt.module.api.demand;
 
-            console.log('here');
-          // })
+          var repl = response.repl;
 
-          // $.getScript(response.config, function () {
+          require(repl.entries, function () {
+            console.log('Module loaded ...');
 
-          //   console.log('REPL active', response.repl, response);
-          //   ephox.bolt.module.api.require([ 'ephox.gopher.api.Component' ], function (Component) {
-          //     console.log('Component', Component);
-          //   });
-          // });
+            for (var mod in repl.aliases) {
+              var alias = repl.aliases[mod];
+              global[alias] = demand(mod);
+              console.log('Loaded alias (' + alias + ') for ' + mod);
+            }
+
+
+
+          });
         },
         error: function (err ) {
           console.error('REPL failed', err);
