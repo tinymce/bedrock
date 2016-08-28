@@ -64,6 +64,22 @@ var effect = function (method, prefix, action) {
   };
 };
 
+var rewrite = function (method, root, input, output) {
+  var base = server(root);
+
+  var go = function (request, response, done) {
+    request.url = output;
+    console.log('request.url', request.url);
+    base(request, response, done);
+  };
+
+  return {
+    matches: prefixMatch(input),
+    method: method,
+    go: go
+  };
+};
+
 var constant = function (method, root, url) {
   var base = server(root);
 
@@ -137,6 +153,7 @@ module.exports = {
   routing: routing,
   effect: effect,
   constant: constant,
+  rewrite: rewrite,
   unsupported: unsupported,
   json: json,
   route: route,

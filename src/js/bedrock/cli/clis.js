@@ -19,6 +19,21 @@ var commonOptions = function (directories) {
   ];
 };
 
+var forRepl = function (directories) {
+  return cli.extract(
+    'bedrock-repl',
+    'Open a project repl on a port',
+    [
+      cloptions.projectdir(directories),
+      cloptions.basedir(directories),
+      cloptions.config,
+      cloptions.help,
+      cloptions.version,
+      cloptions.repl
+    ]
+  );
+};
+
 var forAuto = function (directories) {
   return cli.extract(
     'bedrock-auto',
@@ -126,6 +141,7 @@ var logAndExit = function (errs) {
 };
 
 module.exports = {
+  forRepl: forRepl,
   forAuto: forAuto,
   forManual: forManual,
   forRemote: forRemote,
