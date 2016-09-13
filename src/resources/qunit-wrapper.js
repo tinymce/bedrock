@@ -33,7 +33,6 @@
 
   var logDetails = function (details) {
     if (details.result === false) {
-
       var message = details.message !== undefined ? details.message : '';
       var expected = details.expected !== undefined ? 'Expected: ' + details.expected +
         ', but Actual: ' + details.actual : '';
@@ -45,11 +44,6 @@
         name: details.module + ':' + details.name,
         passed: false,
         error: error
-      });
-    } else {
-      resultsData.push({
-        name: details.module + ':' + details.name,
-        passed: true
       });
     }
   };
@@ -75,6 +69,15 @@
     testCounter++;
     testName.innerHTML = currentModule + ':' + details.name;
     testProgress.innerHTML = testCounter;
+  });
+
+  QUnit.testDone(function (details) {
+    if (details.failed === 0) {
+      resultsData.push({
+        name: details.module + ':' + details.name,
+        passed: true
+      });
+    }
   });
 
   QUnit.moduleDone(function (details) {
