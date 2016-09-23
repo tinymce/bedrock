@@ -26,6 +26,7 @@ var start = function (settings, f) {
 
   var routes = require('./routes');
   var apis = require('./apis');
+  var customroutes = require('./customroutes').create(settings.customRoutes);
 
   var basedir = Prefs.basedir(settings);
   var projectdir = Prefs.projectdir(settings);
@@ -37,7 +38,8 @@ var start = function (settings, f) {
   var api = apis.create(master, maybeDriver, projectdir, basedir, testfiles, settings.loglevel);
 
   var routers = runner.routers.concat(
-    api.routers
+    api.routers,
+    customroutes.routers
   );
 
   var fallback = runner.fallback;

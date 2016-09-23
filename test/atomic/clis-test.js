@@ -60,10 +60,12 @@ tape('Minimal specification of bedrock-auto', function (t) {
     progress: '.progress',
     results: 'textarea.results',
     singleTimeout: 30000,
+    stopOnFailure: false,
     testName: '.test.running .name',
     total: '.total',
     totalTimeout: 600000,
-    loglevel: 'advanced'
+    loglevel: 'advanced',
+    version: false
   }, cleanResult(actual));
 });
 
@@ -95,10 +97,12 @@ tape('Minimal specification of bedrock-manual', function (t) {
     progress: '.progress',
     results: 'textarea.results',
     singleTimeout: 30000,
+    stopOnFailure: false,
     testName: '.test.running .name',
     total: '.total',
     totalTimeout: 600000,
-    loglevel: 'advanced'
+    loglevel: 'advanced',
+    version: false
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
 });
 
@@ -120,15 +124,16 @@ tape('Minimal specification of bedrock-remote', function (t) {
     testfiles: [
       'test/resources/test.file1'
     ],
-    help: false,
 
     progress: '.progress',
     results: 'textarea.results',
     singleTimeout: 30000,
+    stopOnFailure: false,
     testName: '.test.running .name',
     total: '.total',
     totalTimeout: 600000,
-    loglevel: 'advanced'
+    loglevel: 'advanced',
+    version: false
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
 });
 
@@ -153,10 +158,12 @@ tape('Minimal specification of bedrock-sauce-single', function (t) {
     progress: '.progress',
     results: 'textarea.results',
     singleTimeout: 30000,
+    stopOnFailure: false,
     testName: '.test.running .name',
     total: '.total',
     totalTimeout: 600000,
-    loglevel: 'advanced'
+    loglevel: 'advanced',
+    version: false
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
 });
 
@@ -201,9 +208,11 @@ tape('Minimal specification of bedrock-sauce', function (t) {
     progress: '.progress',
     results: 'textarea.results',
     singleTimeout: 30000,
+    stopOnFailure: false,
     testName: '.test.running .name',
     total: '.total',
     totalTimeout: 600000,
-    loglevel: 'advanced'
+    loglevel: 'advanced',
+    version: false
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
 });

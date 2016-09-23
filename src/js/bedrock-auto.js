@@ -24,7 +24,8 @@ var go = function (settings) {
       driver: attempt.passed(driver),
       master: master,
       runner: runner,
-      loglevel: settings.loglevel
+      loglevel: settings.loglevel,
+      customRoutes: settings.customRoutes
     };
 
     var isPhantom = settings.browser === 'phantomjs';

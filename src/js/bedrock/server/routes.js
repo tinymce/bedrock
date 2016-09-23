@@ -1,10 +1,5 @@
 var server = require('serve-static');
-
-var prefixMatch = function (prefix) {
-  return function (url) {
-    return url.indexOf(prefix) === 0;
-  };
-};
+var matchers = require('./matchers');
 
 var routing = function (method, prefix, source) {
   var router = server(source);
@@ -15,8 +10,7 @@ var routing = function (method, prefix, source) {
   };
 
   return {
-    matches: prefixMatch(prefix),
-    method: method,
+    matches: [ matchers.methodMatch(method), matchers.prefixMatch(prefix) ],
     go: go
   };
 };
@@ -27,8 +21,7 @@ var json = function (method, prefix, data) {
   };
 
   return {
-    matches: prefixMatch(prefix),
-    method: method,
+    matches: [ matchers.methodMatch(method), matchers.prefixMatch(prefix) ],
     go: go
   };
 };
@@ -58,8 +51,7 @@ var effect = function (method, prefix, action) {
   };
 
   return {
-    matches: prefixMatch(prefix),
-    method: method,
+    matches: [ matchers.methodMatch(method), matchers.prefixMatch(prefix) ],
     go: go
   };
 };
@@ -69,13 +61,11 @@ var rewrite = function (method, root, input, output) {
 
   var go = function (request, response, done) {
     request.url = output;
-    console.log('request.url', request.url);
     base(request, response, done);
   };
 
   return {
-    matches: prefixMatch(input),
-    method: method,
+    matches: [ matchers.methodMatch(method), matchers.prefixMatch(input) ],
     go: go
   };
 };
@@ -89,8 +79,7 @@ var constant = function (method, root, url) {
   };
 
   return {
-    matches: prefixMatch(root),
-    method: method,
+    matches: [ matchers.methodMatch(method), matchers.prefixMatch(root) ],
     go: go
   };
 };
@@ -103,12 +92,10 @@ var host = function (method, root) {
   };
 
   return {
-    matches: prefixMatch(root),
-    method: method,
+    matches: [ matchers.methodMatch(method), matchers.prefixMatch(root) ],
     go: go
   };
 };
-
 
 var hostOn = function (method, prefix, root) {
   var base = server(root);
@@ -120,8 +107,7 @@ var hostOn = function (method, prefix, root) {
   };
 
   return {
-    matches: prefixMatch(prefix),
-    method: method,
+    matches: [ matchers.methodMatch(method), matchers.prefixMatch(prefix) ],
     go: go
   };
 };
@@ -132,8 +118,7 @@ var unsupported = function (method, root, label) {
   };
 
   return {
-    matches: prefixMatch(root),
-    method: method,
+    matches: [ matchers.methodMatch(method), matchers.prefixMatch(root) ],
     go: go
   };
 };
@@ -142,7 +127,9 @@ var route = function (routes, fallback, request, response, done) {
   request.originalUrl = request.url;
 
   var match = routes.find(function (candidate) {
-    return candidate.method === request.method && candidate.matches(request.url);
+    return candidate.matches.every(function (match) {
+      return match(request);
+    });
   });
 
   var matching = match === undefined ? fallback : match;

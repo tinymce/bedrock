@@ -124,7 +124,7 @@
     multiple: true,
     description: 'The directories (from the project directory) to upload',
     validate: extraction.directory,
-    defaultValue: [ 'src', 'test', 'config', 'lib' ],
+    defaultValue: [ 'src', 'test', 'config', 'lib' ]
   };
 
   var bucket = {
@@ -315,6 +315,14 @@
     required: true
   };
 
+  var customRoutes = {
+    name: 'customRoutes',
+    type: String,
+    description: 'File with custom static routes',
+    validate: extraction.file,
+    uncommon: true
+  };
+
   module.exports = {
     // All modes testing
     config: config,
@@ -322,6 +330,7 @@
     files: files,
     testdir: testdir,
     testdirs: testdirs,
+    customRoutes: customRoutes,
 
     // Webdriver testing
     name: name,
