@@ -76,14 +76,22 @@ var jsonToRouters = function (data) {
   });
 };
 
-var fallbackGo = function (request, response, done) {
-  response.writeHead(404, {'content-type': 'application/json'});
-  response.end('Could not find a matching custom route for: ' + request.method + ' ' + request.url + ' ' + request.body);
-  done();
+var fallbackGo = function (filePath) {
+  return function (request, response, done) {
+    response.writeHead(404, {'content-type': 'application/json'});
+    response.end([
+      'Could not find a matching custom route for: ',
+      'Method: ' + request.method,
+      'Url: ' + request.url,
+      'Body:' + request.body,
+      'Config: ' + (filePath ? filePath : 'No config file provided')
+    ].join('\n'));
+    done();
+  };
 };
 
 var go = function (filePath) {
-  var fallback = { matching: [], go: fallbackGo };
+  var fallback = { matching: [], go: fallbackGo(filePath) };
   return function (request, response, done) {
     var routers = filePath ? jsonToRouters(parseJson(filePath)) : [ ];
     readRequestBody(request, function (body) {
