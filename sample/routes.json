@@ -1,0 +1,44 @@
+[
+  {
+    "request": {
+      "method": "get",
+      "path": "/custom/fake-linkchecker/1/check",
+      "query": {
+        "url": "http://www.google.com"
+      }
+    },
+
+    "response": {
+      "json": {
+        "results": [
+          {"url": "http://www.google.com", "result": "VALID"}
+        ]
+      }
+    }
+  },
+
+  {
+    "request": {
+      "method": "post",
+      "path": "/custom/fake-linkchecker/1/check",
+      "headers": {
+        "tinymce-api-key": "fake-key"
+      },
+      "json": {
+        "urls": [
+          {"url": "http://www.google.com"},
+          {"url": "http://www.google.com/fake"}
+        ]
+      }
+    },
+
+    "response": {
+      "json": {
+        "results": [
+          {"url": "http://www.google.com", "result": "VALID"},
+          {"url": "http://www.google.com/fake", "result": "INVALID"}
+        ]
+      }
+    }
+  }
+]

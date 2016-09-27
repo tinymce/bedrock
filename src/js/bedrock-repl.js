@@ -13,7 +13,8 @@ var go = function (settings) {
     driver: attempt.failed('There is no webdriver for repl mode'),
     master: null, // there is no need for master,
     runner: runner,
-    loglevel: settings.loglevel
+    loglevel: settings.loglevel,
+    customRoutes: settings.customRoutes
   };
 
   serve.start(serveSettings, function (service/* , done */) {

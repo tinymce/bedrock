@@ -3,7 +3,6 @@
   var div = document.createElement('div');
 
   div.classList.add('bedrock-qunit');
-  div.style.setProperty('visibility', 'hidden');
 
   var runningTest = document.createElement('span');
   runningTest.classList.add('test', 'running');
@@ -25,7 +24,7 @@
   document.body.appendChild(div);
 
 
-  var failures = [ ];
+  var resultsData = [ ];
 
   var totalPassed = 0;
   var totalFailed = 0;
@@ -34,7 +33,6 @@
 
   var logDetails = function (details) {
     if (details.result === false) {
-
       var message = details.message !== undefined ? details.message : '';
       var expected = details.expected !== undefined ? 'Expected: ' + details.expected +
         ', but Actual: ' + details.actual : '';
@@ -42,8 +40,8 @@
 
       var error = [ message, expected, source ].join('\n');
 
-      failures.push({
-        test: details.module + ':' + details.name,
+      resultsData.push({
+        name: details.module + ':' + details.name,
         passed: false,
         error: error
       });
@@ -73,6 +71,15 @@
     testProgress.innerHTML = testCounter;
   });
 
+  QUnit.testDone(function (details) {
+    if (details.failed === 0) {
+      resultsData.push({
+        name: details.module + ':' + details.name,
+        passed: true
+      });
+    }
+  });
+
   QUnit.moduleDone(function (details) {
     totalPassed += details.passed;
     totalFailed += details.failed;
@@ -88,7 +95,7 @@
     // Only add the textarea at the end. It seems to interfere with tests.
     div.appendChild(results);
     results.innerHTML = JSON.stringify({
-      results: failures
+      results: resultsData
     });
     div.classList.add('done');
   });

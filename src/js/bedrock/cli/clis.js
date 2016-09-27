@@ -45,7 +45,8 @@ var forAuto = function (directories) {
       cloptions.testdir,
       cloptions.testdirs,
       cloptions.name,
-      cloptions.output
+      cloptions.output,
+      cloptions.customRoutes
     ])
   );
 };
@@ -58,10 +59,10 @@ var forManual = function (directories) {
       cloptions.config,
       cloptions.files,
       cloptions.testdir,
-      cloptions.testdirs
+      cloptions.testdirs,
+      cloptions.customRoutes
     ])
   );
-
 };
 
 var forRemote = function (directories) {
