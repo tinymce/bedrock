@@ -5,9 +5,6 @@ var create = function (files, loglevel) {
 
   var totalFiles = files.length > 0 ? files.length : '?';
 
-  // TODO: Be able to turn this output off. It will output escape codes which will make
-  // jenkins output less readable.
-
   var writeProgress = function (numPassed, numFailed, total) {
     var numRun = numPassed + numFailed;
     stream.write(
