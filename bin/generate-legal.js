@@ -7,7 +7,6 @@ var uArgs = cArgs([
   { name: 'strict', alias: 's' , type: Boolean }
 ]);
 
-
 nlf.find({ directory: '.' }, function (err, data) {
   var output = [ ];
   var errors = [ ];
