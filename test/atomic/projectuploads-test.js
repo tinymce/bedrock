@@ -8,7 +8,7 @@ tape('Check uploading', function (t) {
   var actual = uploads.choose(
     {
       name: 'random.name',
-      bucket: 'tbio-testing',
+      bucket: 'bedrock-testing',
       uploaddirs: [ 'test/resources/alpha', 'test/resources/beta' ],
       basedir: '${BASE}',
       projectdir:  '${PROJECT}',
