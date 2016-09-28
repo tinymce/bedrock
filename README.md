@@ -1,13 +1,15 @@
+# Description
+
 `bedrock` is a test runner for JavaScript projects. Its primary use is to test `bolt` projects, but it also has a `qunit` wrapper. It can run manually (where the user navigates to the browser themselves), or automatically (where `bedrock` starts the browser and runs the tests automatically). Note, in order to run the tests automatically, the appropriate webdrivers need to be installed and available. For more information on setting up webdrivers, see [here](https://www.npmjs.com/package/selenium-webdriver).
 
-# Installing bedrock
+# Installation
 
 `bedrock` is available as an `npm` package. You can install it via `npm install @ephox/bedrock`.
 
 Additionally, you can install it from the source with `npm install .` in the source directory.
 
 
-# Using bedrock
+# Usage
 
 `bedrock` has three main modes: test, server, and framework.
 
@@ -31,7 +33,6 @@ Use `bedrock-auto --help` to see all arguments possible.
 
 Use `bedrock --help` to see all arguments possible.
 
-
 ## framework mode
 
 *Framework* mode allows bedrock to run using an existing framework. The only currently supported testing framework is `qunit`. Bedrock assumes that a single page is responsible for running all the tests, so a `page` and `browser` are the only things required. Another parameter `framework` is also possible, but its only possible value currently is `qunit`.
@@ -42,7 +43,7 @@ e.g. Run existing tests on a qunit page using phantom
 
 Use `bedrock-framework --help` to see all arguments possible.
 
-# Running bedrock's tests
+# Tests
 
 You can run bedrock's tests by executing:
 
