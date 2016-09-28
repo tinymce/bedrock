@@ -47,5 +47,5 @@
     "tape": "^4.5.1"
   },
   "author": "Ephox",
-  "license": "Apache2"
+  "license": "Apache-2.0"
 }
