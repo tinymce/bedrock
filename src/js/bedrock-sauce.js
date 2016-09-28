@@ -12,9 +12,6 @@ var go = function (settings, directories) {
   var uploads = require('./bedrock/remote/project-uploads');
   var distribute = require('./bedrock/remote/distribute');
 
-// Use when avoiding uploading.
-// var base = 'http://tbio-testing.s3-website-us-west-2.amazonaws.com/tunic/sauce';
-
   var uploadDir = settings.name + dateformat('yyyyMMddhhmmss');
 
   var targets = uploads.choose(settings);
