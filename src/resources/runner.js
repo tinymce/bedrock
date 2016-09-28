@@ -230,16 +230,7 @@
 
 
   /*
-   * Alternate bedrock hack
-   *
-   * This overrides the test.create system to share modules rather than
-   * recreating a fresh module system for each test.
-   *
-   * This is primarily required due to memory leaks in TBIO, and the use of an inline module for sauce labs.
-   *
-   * As such, there are two conditions for re-evaluating this decision:
-   * - Put petrie test data in EC2, where Sauce Labs can download 1000 files quickly
-   * - Fix memory leaks in TBIO
+   * Patch bolt to reuse the created module system for tests. This is primarily to decrease loading time when working remotely.
    */
   var install = ephox.bolt.module.bootstrap.install;
   var config = ephox.bolt.test.run.config;
