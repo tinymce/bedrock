@@ -71,9 +71,9 @@ e.g. Run existing tests on a qunit page using phantom
 Use `bedrock-framework --help` to see all arguments possible.
 
 
-## Advanced modes
+## Experimental modes
 
-[Advanced Modes](doc/advanced_modes.md)
+Note, `bedrock` also has several other *experimental* modes including SauceLabs integration and REPL simulation. More detail can be found in [Experimental modes](doc/experimental_modes.md).
 
 # Tests
 
