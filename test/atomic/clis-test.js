@@ -117,7 +117,7 @@ tape('Minimal specification of bedrock-remote', function (t) {
   attemptutils.assertResult(t, {
     uploaddirs: [ 'test', 'src' ],
     bucket: 'testing',
-    bucketfolder: 'tunic/bedrock-testing',
+    bucketfolder: 'bedrock-bucket/bedrock-testing',
     config: 'sample/config.js',
     done: 'div.done',
     help: false,
@@ -192,7 +192,7 @@ tape('Minimal specification of bedrock-sauce', function (t) {
   attemptutils.assertResult(t, {
     uploaddirs: [ 'test', 'src' ],
     bucket: 'testing',
-    bucketfolder: 'tunic/bedrock-testing',
+    bucketfolder: 'bedrock-bucket/bedrock-testing',
     config: 'sample/config.js',
     done: 'div.done',
     testfiles: [

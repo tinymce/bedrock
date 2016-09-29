@@ -119,10 +119,10 @@ var forSauce = function (directories) {
   );
 };
 
-var forPage = function (directories) {
+var forFramework = function (directories) {
   return cli.extract(
-    'bedrock-page',
-    'Load bedrock against a specific page',
+    'bedrock-framework',
+    'Load bedrock against a specific page using a framework',
     commonOptions(directories).concat([
       cloptions.name,
       cloptions.page,
@@ -148,7 +148,7 @@ module.exports = {
   forRemote: forRemote,
   forSauceSingle: forSauceSingle,
   forSauce: forSauce,
-  forPage: forPage,
+  forFramework: forFramework,
 
   logAndExit: logAndExit
 };

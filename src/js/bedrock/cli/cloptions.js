@@ -132,7 +132,7 @@
     type: String,
     description: 'The name of the AWS bucket',
     validate: extraction.any,
-    defaultValue: 'tbio-testing',
+    defaultValue: 'bedrock-testing',
     required: true
   };
 
@@ -142,7 +142,7 @@
     description: 'The namespace inside the bucket',
     validate: extraction.any,
     // Current default based on our AWS settings for temporary folders.
-    defaultValue: 'tunic/bedrock-testing'
+    defaultValue: 'bedrock-bucket/bedrock-testing'
   };
 
   var saucebrowser = {

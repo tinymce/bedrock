@@ -20,7 +20,6 @@ var choose = function (settings) {
   var stopOnFailure = settings.stopOnFailure;
 
   var link = function (inputDir, inputName, outputDir, outputName) {
-    // TODO: use path.join?
     return uploadtypes.filetype(path.join(basedir, inputDir, inputName), path.join(outputDir, outputName));
   };
 

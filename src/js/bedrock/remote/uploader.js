@@ -26,7 +26,7 @@ var upload = function (bucket, bucketfolder, targets) {
     }, function (err, results) {
       console.log('Uploaded: ' + counter + ' files.');
       if (err) {
-        console.error(err);
+        console.error('Error during upload', err);
         reject(err);
       } else {
         var base = 'http://' + bucket + '.s3-website-us-west-2.amazonaws.com/' + bucketfolder;
