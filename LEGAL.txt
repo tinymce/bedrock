@@ -1722,7 +1722,7 @@ Dependency:
 
 Dependency:
   name: selenium-webdriver
-  version: 2.53.3
+  version: 3.0.0-beta-2
   repository: https://github.com/SeleniumHQ/selenium
   licenses: Apache-2.0
 
