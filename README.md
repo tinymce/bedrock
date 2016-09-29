@@ -70,6 +70,11 @@ e.g. Run existing tests on a qunit page using phantom
 
 Use `bedrock-framework --help` to see all arguments possible.
 
+
+## Advanced modes
+
+[Advanced Modes](doc/advanced_modes.md)
+
 # Tests
 
 You can run bedrock's tests by executing:
