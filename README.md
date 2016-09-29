@@ -4,9 +4,36 @@
 
 # Installation
 
-`bedrock` is available as an `npm` package. You can install it via `npm install @ephox/bedrock`.
+`bedrock` is available as an `npm` package. You can install it via the npm package `@ephox/bedrock` or from source
 
-Additionally, you can install it from the source with `npm install .` in the source directory.
+## Global Install
+
+A global install will put the bedrock commands (e.g. `bedrock-auto`) automatically on your path.
+
+### Install from npm
+
+`$ npm install -g @ephox/bolt`
+
+### Install from source (start in source directory)
+
+`$ npm install -g .`
+
+
+
+## Local Install
+
+A local install will not put the bedrock commands automatically on your path. After installing locally, you can access the commands via:
+
+1. adding `node_modules/.bin` to your path
+2. using `npm run ${command}` from the bedrock source directory
+
+### Install from npm
+
+`npm install @ephox/bedrock`.
+
+### Install from source (start in source directory)
+
+`$ npm install .`
 
 
 # Usage
