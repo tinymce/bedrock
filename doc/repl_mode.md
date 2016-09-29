@@ -35,7 +35,7 @@ The `entries` field is an array of top-level bolt module namespaces. It should r
 
 ### Aliases
 
-The `aliases` field is a mapping of bolt module namespace to aliased global variable. All of the modules listed here must have been loaded by following the dependencies of the `entries` or an error will be thrown. `bedrock-repl` does nothing to ensure that you don't have duplicate alias names, so be careful
+The `aliases` field is a mapping of bolt module namespace to aliased global variable. All of the modules listed here must have been loaded by following the dependencies of the `entries` or an error will be thrown. `bedrock-repl` does nothing to ensure that you don't have duplicate alias names, so be careful.
 
 ### Scripts
 
@@ -45,7 +45,7 @@ Example script file `config/repl/script1.js`
 
 ```
 var newObject = Module1.create(10);
-var newObject2 = Modules2.create(20);
+var newObject2 = Module2.create(20);
 ```
 
 Note, that these scripts execute in the global namespace, so any variables declared will populate the global namespace. If you don't want them to be global, you can put them inside a closure.
