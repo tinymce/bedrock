@@ -2,7 +2,7 @@
 
 > NOTE: `bedrock` has only experimental support for SauceLabs integrations. This feature is not yet reliable.
 
-There are three commands which handle the integration: bedrock-remote, bedrock-sauce, and bedrock-sauce-single.
+There are three commands which handle the integration: `bedrock-remote`, `bedrock-sauce-single`, and `bedrock-sauce`.
 
 
 ## bedrock-remote
