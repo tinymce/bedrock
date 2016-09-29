@@ -1,15 +1,11 @@
-# Experimental Modes
+# SauceLabs Integration
 
-These modes have experimental support and are the less frequently used modes of bedrock. They are not stable enough to rely upon yet.
+> NOTE: `bedrock` has only experimental support for SauceLabs integrations. This feature is not yet reliable.
 
-## SauceLabs Integration
-
-`bedrock` has experimental support for SauceLabs integrations. There are three commands which handle the integration: bedrock-remote, bedrock-sauce, and bedrock-sauce-single.
+There are three commands which handle the integration: bedrock-remote, bedrock-sauce, and bedrock-sauce-single.
 
 
-
-
-### bedrock-remote
+## bedrock-remote
 
 `bedrock-remote` is used to send the testing files to an amazon s3 bucket. The user can then navigate their browser to the uploaded URL and 'run(view)' the tests manually, or run the tests on SauceLabs using `bedrock-sauce-single`. In order to upload to an s3 bucket, you will need to provide the credentials to authorise your upload.
 
@@ -26,7 +22,7 @@ Now, you can precede your `bedrock-remote` call with `AWS_PROFILE=bedrock-aws` a
 `bedrock-remote` requires a `bucket` and a `bucketfolder` that your credentials have access to. If you do not provide the appropriate bucket information, you will get an access error.
 
 
-#### Example
+### Example
 
 Upload some bedrock sample tests to an s3 bucket for remote testing:
 
@@ -47,13 +43,13 @@ Use `bedrock-remote --help` to see all arguments possible.
 
 
 
-### bedrock-sauce-single
+## bedrock-sauce-single
 
 `bedrock-sauce-single` is used to leverage SauceLabs to run an uploaded test runner on a single platform. It is primarily provided as a means of getting fast feedback on a previously uploaded test runner.
 
 Note, in order to use [SauceLabs](https://saucelabs.com), you will need an account with SauceLabs that will provide you with a `SauceID` and `SauceKey`. You will also need to provide the platform to run the test on, though it will default to Chrome latest on Linux.
 
-#### Example
+### Example
 
 Run tests against a previously uploaded test runner
 
@@ -70,7 +66,7 @@ Use `bedrock-sauce-single --help` to see all arguments possible.
 
 
 
-### bedrock-sauce
+## bedrock-sauce
 
 `bedrock-sauce` is a combination of `bedrock-sauce-single` and `bedrock-remote`. It will upload the tests and test runner, and run a matrix of platforms against that test runner using SauceLabs. As with `bedrock-sauce-single`, you will need to have a SauceLabs account with a `SauceID` and `SauceKey`.
 
@@ -113,7 +109,7 @@ Sample JSON file:
 ```
 
 
-#### Example
+### Example
 
 Run sample tests in bedrock using SauceLabs against a platform matrix
 
@@ -135,7 +131,3 @@ Run sample tests in bedrock using SauceLabs against a platform matrix
 Use `bedrock-sauce --help` to see all arguments possible.
 
 
-## Read-Eval-Print-Loop Mode
-
-
-2054  AWS_PROFILE=bedrock-aws bedrock-remote --bucketfolder tunic/bedrock-testing --bucket tbio-testing --uploaddirs \sample --files sample/AsyncPassTest.js sample/AsyncFailTest.js --config sample/config.js

@@ -73,7 +73,7 @@ Use `bedrock-framework --help` to see all arguments possible.
 
 ## Experimental modes
 
-Note, `bedrock` also has several other *experimental* modes including SauceLabs integration and REPL simulation. More detail can be found in [Experimental modes](doc/experimental_modes.md).
+Note, `bedrock` also has several other *experimental* modes including [SauceLabs integration](doc/saucelabs_modes.md) and [REPL simulation](doc/repl_mode.md). This features are not yet stable enough to be reliable.
 
 # Tests
 
