@@ -1,4 +1,5 @@
 var fs = require('fs');
+var path = require('path');
 var matchers = require('./matchers');
 var obj = require('../util/obj');
 var routes = require('./routes');
@@ -18,6 +19,10 @@ var parseJson = function (filePath) {
   var contents = fs.readFileSync(filePath);
   var data = JSON.parse(contents);
   return data;
+};
+
+var serializeJson = function (json) {
+  return JSON.stringify(json, null, '  ');
 };
 
 var matchesFromRequest = function (matchRequest) {
@@ -50,28 +55,40 @@ var matchesFromRequest = function (matchRequest) {
   return matches;
 };
 
-var goFromResponse = function (matchResponse) {
+var jsonStringResponse = function (response, json) {
+  response.end(serializeJson(json));
+};
+
+var jsonFileResponse = function (response, filePath, configPath) {
+  var resolvedFilePath = path.join(path.dirname(configPath), filePath);
+  var json = parseJson(resolvedFilePath);
+  response.end(serializeJson(json));
+};
+
+var assignContentType = function (headers, contentType) {
+  return Object.assign({}, {'content-type': contentType}, headers);
+};
+
+var goFromResponse = function (matchResponse, configPath) {
   return function (request, response/* , done */) {
     var headers = matchResponse.headers ? obj.toLowerCaseKeys(matchResponse.headers) : { };
     var status = matchResponse.status ? matchResponse.status : 200;
 
-    if (matchResponse.json && !('content-type' in headers)) {
-      headers['content-type'] = 'application/json';
-    }
-
-    response.writeHead(status, headers);
-
-    if (matchResponse.json) {
-      response.end(JSON.stringify(matchResponse.json, null, '  '));
+    if (matchResponse.json_file) {
+      response.writeHead(status, assignContentType(headers, 'application/json'));
+      jsonFileResponse(response, matchResponse.json_file, configPath);
+    } else if (matchResponse.json) {
+      response.writeHead(status, assignContentType(headers, 'application/json'));
+      jsonStringResponse(response, matchResponse.json);
     }
   };
 };
 
-var jsonToRouters = function (data) {
+var jsonToRouters = function (data, configPath) {
   return data.map(function (staticRouter) {
     return {
       matches: matchesFromRequest(staticRouter.request),
-      go: goFromResponse(staticRouter.response)
+      go: goFromResponse(staticRouter.response, configPath)
     };
   });
 };
@@ -93,7 +110,7 @@ var fallbackGo = function (filePath) {
 var go = function (filePath) {
   var fallback = { matching: [], go: fallbackGo(filePath) };
   return function (request, response, done) {
-    var routers = filePath ? jsonToRouters(parseJson(filePath)) : [ ];
+    var routers = filePath ? jsonToRouters(parseJson(filePath), filePath) : [ ];
     readRequestBody(request, function (body) {
       request.body = body;
       routes.route(routers, fallback, request, response, done);
