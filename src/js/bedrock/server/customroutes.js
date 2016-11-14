@@ -22,7 +22,7 @@ var parseJson = function (filePath) {
 };
 
 var serializeJson = function (json) {
-  return JSON.stringify(json, null, '  ');
+  return JSON.stringify(json, null, 2);
 };
 
 var matchesFromRequest = function (matchRequest) {
@@ -55,14 +55,9 @@ var matchesFromRequest = function (matchRequest) {
   return matches;
 };
 
-var jsonStringResponse = function (response, json) {
-  response.end(serializeJson(json));
-};
-
-var jsonFileResponse = function (response, filePath, configPath) {
+var parseJsonFromFile = function (filePath, configPath) {
   var resolvedFilePath = path.join(path.dirname(configPath), filePath);
-  var json = parseJson(resolvedFilePath);
-  response.end(serializeJson(json));
+  return parseJson(resolvedFilePath);
 };
 
 var assignContentType = function (headers, contentType) {
@@ -74,12 +69,10 @@ var goFromResponse = function (matchResponse, configPath) {
     var headers = matchResponse.headers ? obj.toLowerCaseKeys(matchResponse.headers) : { };
     var status = matchResponse.status ? matchResponse.status : 200;
 
-    if (matchResponse.json_file) {
+    if (matchResponse.json_file !== undefined || matchResponse.json !== undefined) {
       response.writeHead(status, assignContentType(headers, 'application/json'));
-      jsonFileResponse(response, matchResponse.json_file, configPath);
-    } else if (matchResponse.json) {
-      response.writeHead(status, assignContentType(headers, 'application/json'));
-      jsonStringResponse(response, matchResponse.json);
+      var json = typeof matchResponse.json === 'string' ? matchResponse.json : parseJsonFromFile(matchResponse.json_file, configPath);
+      response.end(serializeJson(json));
     }
   };
 };
