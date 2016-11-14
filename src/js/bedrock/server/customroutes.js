@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var matchers = require('./matchers');
 var obj = require('../util/obj');
+var type = require('../util/type');
 var routes = require('./routes');
 
 var readRequestBody = function (request, done) {
@@ -28,27 +29,27 @@ var serializeJson = function (json) {
 var matchesFromRequest = function (matchRequest) {
   var matches = [];
 
-  if (typeof matchRequest.method === 'string') {
+  if (type.isString(matchRequest.method)) {
     matches.push(matchers.methodMatch(matchRequest.method));
   }
 
-  if (typeof matchRequest.url === 'string') {
+  if (type.isString(matchRequest.url)) {
     matches.push(matchers.urlMatch(matchRequest.url));
   }
 
-  if (typeof matchRequest.path === 'string') {
+  if (type.isString(matchRequest.path)) {
     matches.push(matchers.pathMatch(matchRequest.path));
   }
 
-  if (typeof matchRequest.headers === 'object') {
+  if (type.isObject(matchRequest.headers)) {
     matches.push(matchers.headersMatch(matchRequest.headers));
   }
 
-  if (typeof matchRequest.query === 'object') {
+  if (type.isObject(matchRequest.query)) {
     matches.push(matchers.queryMatch(matchRequest.query));
   }
 
-  if (typeof matchRequest.json === 'object') {
+  if (type.isObject(matchRequest.json)) {
     matches.push(matchers.jsonBodyMatch(matchRequest.json));
   }
 
@@ -69,9 +70,9 @@ var goFromResponse = function (matchResponse, configPath) {
     var headers = matchResponse.headers ? obj.toLowerCaseKeys(matchResponse.headers) : { };
     var status = matchResponse.status ? matchResponse.status : 200;
 
-    if (matchResponse.json_file !== undefined || matchResponse.json !== undefined) {
+    if (type.isString(matchResponse.json_file) || type.isObject(matchResponse.json)) {
       response.writeHead(status, assignContentType(headers, 'application/json'));
-      var json = typeof matchResponse.json === 'string' ? matchResponse.json : parseJsonFromFile(matchResponse.json_file, configPath);
+      var json = type.isObject(matchResponse.json) ? matchResponse.json : parseJsonFromFile(matchResponse.json_file, configPath);
       response.end(serializeJson(json));
     }
   };
