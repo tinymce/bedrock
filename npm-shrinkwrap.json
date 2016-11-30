@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock",
-  "version": "1.3.9",
+  "version": "1.3.10",
   "dependencies": {
     "@ephox/bolt": {
       "version": "1.8.1",
