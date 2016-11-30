@@ -44,7 +44,13 @@ var init = function (settings) {
       return parseHtml(driver, settings.testName).then(function (html) {
         testName = html;
         return testName;
+      }, function (err) {
+        console.error('Error trying to read test name');
+        console.error(err);
       });
+    }, function (err) {
+      console.error('Error trying to read test progress');
+      console.error(err);
     });
   };
 
