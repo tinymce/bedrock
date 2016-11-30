@@ -27,7 +27,7 @@ var init = function (settings) {
 
   var parseHtml = function (driver, selector) {
     return driver.wait(until.elementLocated(By.css(selector)), 1).then(function (elem) {
-      return elem.getInnerHtml();
+      return elem.getAttribute('innerHTML');
     });
   };
 
