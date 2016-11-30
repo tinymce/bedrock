@@ -1,10 +1,18 @@
 var path = require('path');
 var child_process = require('child_process');
+var os = require('os');
 
 // Makes sure that Edge has proper focus and is the top most window
 var focusEdge = function (basedir, callback) {
-  var edgeFocusScript = path.join(basedir, 'bin/focus-edge.js');
+  var edgeFocusScript = path.join(basedir, 'bin/focus/edge.js');
   child_process.exec('cscript ' + edgeFocusScript, function () {
+    callback();
+  });
+};
+
+var focusMac = function (basedir, browser, callback) {
+  var macFocusScript = path.join(basedir, 'bin/focus/mac.applescript');
+  child_process.exec(`osascript ${macFocusScript} ${browser}`, function () {
     callback();
   });
 };
@@ -32,6 +40,12 @@ var create = function (settings) {
       if (settings.browser === 'MicrosoftEdge') {
         focusEdge(settings.basedir, function () {
           resolve(driver);
+        });
+      } else if (os.platform() === 'darwin') {
+        focusMac(settings.basedir, settings.browser, function () {
+          driver.executeScript('window.focus();').then(function () {
+            resolve(driver);
+          });
         });
       } else {
         resolve(driver);
