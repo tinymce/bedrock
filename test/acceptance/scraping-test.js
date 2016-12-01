@@ -16,7 +16,7 @@ var assertEq = function (label, expected, actual) {
 };
 
 driver.create({
-  browser: 'chrome',
+  browser: 'phantomjs',
   basedir: basedir
 }).then(function (driver) {
 
