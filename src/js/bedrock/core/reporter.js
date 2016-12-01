@@ -9,13 +9,25 @@ var logSauceInfo = function (root, settings) {
     .endElement();
 };
 
-var fakeResults = function (results, time) {
-  return JSON.stringify(
+var writePollExit = function (settings, pollExit) {
+  var jsonResults = JSON.stringify(
     {
-      results: results,
-      time: time
+      results: pollExit.results,
+      time: pollExit.time
     }
   );
+
+  return write({
+    name: settings.name,
+    output: settings.output
+  })(jsonResults).then(function () {
+    return Promise.reject(pollExit.message);
+  }, function (err) {
+    console.error('Error writing report for polling exit condition');
+    console.error(err);
+    console.error(err.stack);
+    return Promise.reject(pollExit.message);
+  });
 };
 
 var write = function (settings) {
@@ -82,6 +94,6 @@ var write = function (settings) {
 };
 
 module.exports = {
-  fakeResults: fakeResults,
+  writePollExit: writePollExit,
   write: write
 };
