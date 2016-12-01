@@ -19,7 +19,8 @@ var writePollExit = function (settings, pollExit) {
 
   return write({
     name: settings.name,
-    output: settings.output
+    output: settings.output,
+    sauce: settings.sauce
   })(jsonResults).then(function () {
     return Promise.reject(pollExit.message);
   }, function (err) {
