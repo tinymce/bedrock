@@ -25,11 +25,11 @@ var oneTestTooLong = function (state, tick) {
 var allTestsTooLong = function (state, tick) {
   return function (/* driver */) {
     return new Promise(function (resolve, reject) {
-      var message = 'Tests timed out: ' + elapsed + 'ms. Limit is set to ' + formatTime(state.allTimer.getLimit());
       var elapsed = formatTime(state.allTimer.diff(tick));
+      var message = 'Tests timed out: ' + elapsed + '. Limit is set to ' + formatTime(state.allTimer.getLimit()) + '. Current test: ' + state.currentTest();
       reject({
         results: [
-          { file: 'Last test: ' + state.currentTest(), name: 'all', time: elapsed, error: message }
+          { file: 'Current test: ' + state.currentTest(), name: 'all', time: elapsed, error: message }
         ],
         time: elapsed,
         message: message
