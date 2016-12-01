@@ -6,11 +6,11 @@ var go = function (settings) {
   var attempt = require('./bedrock/core/attempt');
 
   console.log('settings', settings);
-  // process.exit(0);
 
   var jobs = saucejobs.create(settings);
 
   var drivers = require('./bedrock/remote/driver');
+  var exitcodes = require('./bedrock/util/exitcodes');
 
   var prettify = function (os, browser, bversion) {
     return [ capitalize(browser) ].concat(bversion === 'latest' ? [ ] : [ bversion ]).concat([ capitalize(os) ]).join('.');
@@ -45,11 +45,11 @@ var go = function (settings) {
     });
   }).then(function (/* res */) {
     console.log('Passed SauceLabs platform: ' + detailedName);
-    process.exit(0);
+    process.exit(exitcodes.success);
   }, function (err) {
     console.log('Failed SauceLabs platform: ' + detailedName);
     console.error(err);
-    process.exit(-1);
+    process.exit(exitcodes.failures.tests);
   });
 };
 

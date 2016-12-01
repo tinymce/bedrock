@@ -1,3 +1,5 @@
+var exitcodes = require('../util/exitcodes');
+
 var shutdown = function (promise, driver, done) {
   var attempt = require('./attempt');
 
@@ -9,7 +11,7 @@ var shutdown = function (promise, driver, done) {
       done();
       attempt.cata(res, function (errs) {
         console.log(errs.join('\n'));
-        process.exit(-1);
+        process.exit(exitcodes.failures.tests);
       }, function () {
         console.log('All tests passed.');
       });
@@ -19,7 +21,7 @@ var shutdown = function (promise, driver, done) {
     driver.quit().then(function () {
       console.error('********** Unexpected Bedrock Error -> Server Quitting **********', err);
       done();
-      throw err;
+      process.exit(exitcodes.failures.tests);
     });
   });
 };

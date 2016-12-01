@@ -6,7 +6,6 @@ var go = function (settings, directories) {
   var dateformat = require('date-format');
 
   console.log('settings', settings);
-  // process.exit(0);
 
   var uploader = require('./bedrock/remote/uploader');
   var uploads = require('./bedrock/remote/project-uploads');
