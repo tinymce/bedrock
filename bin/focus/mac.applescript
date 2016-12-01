@@ -5,7 +5,7 @@ on run argv
       tell application id (id of application appName) to activate
       if appName is "firefox"
         tell application "System Events"
-          -- 97 === F6 key, which is firefox for "focus body of frame"
+          -- 97 is F6, which firefox maps to "focus body of frame"
           key code 97
         end tell
       end if
