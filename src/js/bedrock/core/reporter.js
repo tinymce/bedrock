@@ -38,7 +38,9 @@ var write = function (settings) {
 
       results.forEach(function (res) {
         var elem = w.startElement('testcase')
-          .writeAttribute('name', settings.name + '.' + res.name);
+          .writeAttribute('name', res.file)
+          .writeAttribute('classname', settings.name + '.' + res.name)
+          .writeAttribute('time', res.time);
 
         if (res.passed !== true) {
           elem.startElement('failure')
