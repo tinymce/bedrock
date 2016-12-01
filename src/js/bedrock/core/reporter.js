@@ -9,6 +9,15 @@ var logSauceInfo = function (root, settings) {
     .endElement();
 };
 
+var fakeResults = function (results, time) {
+  return JSON.stringify(
+    {
+      results: results,
+      time: time
+    }
+  );
+};
+
 var write = function (settings) {
   return function (raw) {
     return new Promise(function (resolve, reject) {
@@ -33,7 +42,7 @@ var write = function (settings) {
         .writeAttribute('host', 'localhost')
         .writeAttribute('id', 0)
         .writeAttribute('failures', failed.length)
-        .writeAttribute('timestamp', 'TIMESTAMP')
+        .writeAttribute('timestamp', new Date().getTime())
         .writeAttribute('time', data.time);
 
       results.forEach(function (res) {
@@ -73,5 +82,6 @@ var write = function (settings) {
 };
 
 module.exports = {
+  fakeResults: fakeResults,
   write: write
 };

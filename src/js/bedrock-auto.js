@@ -41,6 +41,20 @@ var go = function (settings) {
             name: settings.name,
             output: settings.output
           })(data);
+        }, function (pollExit) {
+          var jsonResults = reporter.fakeResults(pollExit.results, pollExit.time);
+
+          return reporter.write({
+            name: settings.name,
+            output: settings.output
+          })(jsonResults).then(function () {
+            return Promise.reject(pollExit.message);
+          }, function (err) {
+            console.error('Error writing report for polling exit condition');
+            console.error(err);
+            console.error(err.stack);
+            return Promise.reject(pollExit.message);
+          });
         });
       });
       lifecycle.shutdown(result, driver, done);
