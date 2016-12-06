@@ -5,8 +5,6 @@ var go = function (settings, directories) {
   var childprocess = require('child_process');
   var dateformat = require('date-format');
 
-  console.log('settings', settings);
-
   var uploader = require('./bedrock/remote/uploader');
   var uploads = require('./bedrock/remote/project-uploads');
   var distribute = require('./bedrock/remote/distribute');

@@ -5,8 +5,6 @@ var go = function (settings) {
 
   var attempt = require('./bedrock/core/attempt');
 
-  console.log('settings', settings);
-
   var jobs = saucejobs.create(settings);
 
   var drivers = require('./bedrock/remote/driver');
