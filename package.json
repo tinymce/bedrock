@@ -18,7 +18,8 @@
   "scripts": {
     "test-atomic": "tape test/atomic/*.js",
     "test-props": "tape test/props/*.js",
-    "test": "npm run test-atomic && npm run test-props"
+    "test-acceptance": "node test/acceptance/scraping-test.js",
+    "test": "npm run test-atomic && npm run test-props && npm run test-acceptance"
   },
   "private": false,
   "dependencies": {

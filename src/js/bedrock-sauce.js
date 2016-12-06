@@ -5,9 +5,6 @@ var go = function (settings, directories) {
   var childprocess = require('child_process');
   var dateformat = require('date-format');
 
-  console.log('settings', settings);
-  // process.exit(0);
-
   var uploader = require('./bedrock/remote/uploader');
   var uploads = require('./bedrock/remote/project-uploads');
   var distribute = require('./bedrock/remote/distribute');
@@ -25,7 +22,10 @@ var go = function (settings, directories) {
         '--sauceos', b.os,
         '--sauceuser', settings.sauceuser,
         '--saucekey', settings.saucekey,
-        '--output', settings.output
+        '--output', settings.output,
+        '--singleTimeout', settings.singleTimeout,
+        // Really confusing rename ... consider just using totalTimeout
+        '--totalTimeout', settings.overallTimeout
       ];
 
       return new Promise(function (resolve, reject) {

@@ -1,5 +1,6 @@
 var cli = require('./cli');
 var cloptions = require('./cloptions');
+var exitcodes = require('../util/exitcodes');
 
 var commonOptions = function (directories) {
   return [
@@ -138,7 +139,7 @@ var logAndExit = function (errs) {
   var messages = errs.errors.join('\n');
   console.error(messages);
   console.error('Use ' + errs.command + ' --help to print usage\n****\n');
-  process.exit(-1);
+  process.exit(exitcodes.failures.cli);
 };
 
 module.exports = {

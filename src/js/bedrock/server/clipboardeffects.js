@@ -1,6 +1,8 @@
 var execSync = require('child_process').execSync;
 var path = require('path');
 
+var exitcodes = require('../util/exitcodes');
+
 /*
  JSON API for data: {
    import: "<file name>"
@@ -17,7 +19,7 @@ var importClipboard = function (basedir, clipboarddir, data) {
   var result = execSync(args.join(' '));
   if (result.length > 0) {
     console.error(result);
-    process.exit(-1);
+    process.exit(exitcodes.failures.wink);
   }
 
   return Promise.resolve({});

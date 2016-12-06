@@ -4,6 +4,8 @@ var attempt = require('../core/attempt');
 var validation = require('./validation');
 var cliusage = require('./cliusage');
 
+var exitcodes = require('../util/exitcodes');
+
 var parseCommandLine = function (definitions) {
   try {
     var settings = commandLineArgs(definitions);
@@ -28,10 +30,10 @@ var extract = function (command, desc, definitions) {
     if (s.help === true) {
       // Print usage information if used with --help or -h.
       console.log(cliusage.generateUsage(command, desc, definitions));
-      process.exit(0);
+      process.exit(exitcodes.success);
     } else if (s.version === true) {
       console.log(command + ' version: ' + getVersion());
-      process.exit(0);
+      process.exit(exitcodes.success);
     }
   });
 
