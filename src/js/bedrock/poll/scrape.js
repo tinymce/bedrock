@@ -11,7 +11,7 @@ var parseHtml = function (driver, selector) {
      *
      * elem.getInnerHtml() => was deprecated as of selenium webdriver 3.0
      * elem.getAttribute('innerHTML') returns null on Firefox
-     * elem.getText() works on Firefox, Chrome, and PhantomJS
+     * elem.getText() seems to work on all browsers
      *
      * use "test/acceptance/scraping-test" to check if browsers are compatible with this scraping mode
      */
