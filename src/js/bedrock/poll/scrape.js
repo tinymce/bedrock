@@ -6,7 +6,16 @@ var attempt = require('../core/attempt');
 
 var parseHtml = function (driver, selector) {
   return driver.wait(until.elementLocated(By.css(selector)), 1).then(function (elem) {
-    return elem.getAttribute('innerHTML');
+    /*
+     * History
+     *
+     * elem.getInnerHtml() => was deprecated as of selenium webdriver 3.0
+     * elem.getAttribute('innerHTML') returns null on Firefox
+     * elem.getText() seems to work on all browsers
+     *
+     * use "test/acceptance/scraping-test" to check if browsers are compatible with this scraping mode
+     */
+    return elem.getText();
   });
 };
 

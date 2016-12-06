@@ -24,7 +24,7 @@ var loop = function (master, driver, settings) {
   var checkStatus = function (tick) {
     return master.waitForIdle(function () {
       return driver.wait(until.elementLocated(By.css(settings.done)), 1).then(function () {
-        return exits.testsDone(settings);
+        return exits.testsDone(currentState, tick, settings);
       }, function (/* err */) {
         // We aren't done yet ... so update the current test if necessary.
         return currentState.update(driver, tick).then(repeatLoop, repeatLoop);

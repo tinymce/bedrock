@@ -24,7 +24,10 @@ var go = function (settings, directories) {
         '--sauceos', b.os,
         '--sauceuser', settings.sauceuser,
         '--saucekey', settings.saucekey,
-        '--output', settings.output
+        '--output', settings.output,
+        '--singleTimeout', settings.singleTimeout,
+        // Really confusing rename ... consider just using totalTimeout
+        '--totalTimeout', settings.overallTimeout
       ];
 
       return new Promise(function (resolve, reject) {
