@@ -54,6 +54,6 @@
   "author": "Ephox",
   "license": "Apache-2.0",
   "publishConfig": {
-    "registry": "https://regigit stry.npmjs.org"
+    "registry": "https://registry.npmjs.org"
   }
 }
