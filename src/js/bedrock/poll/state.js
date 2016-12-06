@@ -32,7 +32,7 @@ var init = function (settings) {
       testName: settings.testName
     });
 
-    // NOTE: The return value of update is ignore anyway.
+    // NOTE: The return value of update is ignored anyway.
     return scraped.then(function (dataAttempt) {
       return attempt.cata(
         dataAttempt,
