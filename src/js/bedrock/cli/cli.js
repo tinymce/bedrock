@@ -4,7 +4,7 @@ var attempt = require('../core/attempt');
 var validation = require('./validation');
 var cliusage = require('./cliusage');
 
-  var exitcodes = require('../util/exitcodes');
+var exitcodes = require('../util/exitcodes');
 
 var parseCommandLine = function (definitions) {
   try {
