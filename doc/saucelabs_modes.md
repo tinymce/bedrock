@@ -122,11 +122,8 @@ Run sample tests in bedrock using SauceLabs against a platform matrix
 7. SauceLabs configuration matrix: sample/saucelabs.js
 8. SauceID: not-a-real-id
 9. SauceKey: not-a-real-key
-10. Browser: firefox
-11. Browser version: latest
-12. OS: Windows 10
 
-`AWS_PROFILE=bedrock-aws bedrock-sauce --bucketfolder test-folder --bucket test-bucket --uploaddirs sample --files sample/AsyncPassTest.js  --config sample/config.js  --sauceconfig sample/saucelabs.js --sauceuser not-a-real-user --saucekey not-a-real-key --saucebrowser firefox --sauceos "Windows 10" --saucebrowserVersion "latest"`
+`AWS_PROFILE=bedrock-aws bedrock-sauce --bucketfolder test-folder --bucket test-bucket --uploaddirs sample --files sample/AsyncPassTest.js  --config sample/config.js  --sauceconfig sample/saucelabs.js --sauceuser not-a-real-user --saucekey not-a-real-key
 
 Use `bedrock-sauce --help` to see all arguments possible.
 

@@ -1,8 +1,7 @@
-var webdriver = require('selenium-webdriver');
-var By = webdriver.By;
-var until = webdriver.until;
 
 var timeouts = require('./timeouts');
+var scrape = require('./scrape');
+var attempt = require('../core/attempt');
 
 var init = function (settings) {
   var startTime = new Date().getTime();
@@ -10,8 +9,10 @@ var init = function (settings) {
   var overallTimer = timeouts.timeoutExit(settings.overallTimeout, startTime);
   var singleTimer = timeouts.timeoutExit(settings.singleTimeout, startTime);
 
-  var lastTest = 0;
-  var testName = '(not set)';
+  var testData = {
+    progress: 0,
+    testName: '(not set)'
+  };
 
   var allTimeout = function (tick) {
     return overallTimer.hasExpired(tick);
@@ -22,29 +23,34 @@ var init = function (settings) {
   };
 
   var currentTest = function () {
-    return testName;
-  };
-
-  var parseHtml = function (driver, selector) {
-    return driver.wait(until.elementLocated(By.css(selector)), 1).then(function (elem) {
-      return elem.getInnerHtml();
-    });
+    return testData.testName;
   };
 
   var update = function (driver, tick) {
-    // Firstly, let's see if the test number has changed.
-    return parseHtml(driver, settings.progress).then(function (html) {
-      var num = parseInt(html, 10);
-      if (lastTest !== num) {
-        singleTimer.reset(tick);
-        lastTest = num;
-      }
+    var scraped = scrape.scrape(driver, {
+      progress: settings.progress,
+      testName: settings.testName
+    });
 
-      // Now, let's update the test name if we can.
-      return parseHtml(driver, settings.testName).then(function (html) {
-        testName = html;
-        return testName;
-      });
+    // NOTE: The return value of update is ignored anyway.
+    return scraped.then(function (dataAttempt) {
+      return attempt.cata(
+        dataAttempt,
+        function (err) {
+          console.error('Error scraping test screen');
+          console.error(err);
+          return Promise.reject(err);
+        },
+        function (data) {
+          // Check if test number has changed. If it has, reset the single test timer.
+          if (testData.progress !== data.progress) {
+            singleTimer.reset(tick);
+          }
+
+          testData = data;
+          return Promise.resolve(testData);
+        }
+      );
     });
   };
 

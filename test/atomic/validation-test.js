@@ -82,6 +82,7 @@ checkResult(
   'Testing a directory -> files where the directory does exist, but has a file matching pattern',
   {
     other: [
+      'test/resources/html/screen.html',
       'test/resources/test.file1'
     ]
   },
@@ -129,7 +130,7 @@ checkResult(
   {
     alpha: 'Alpha',
     'new.beta': 'Beta',
-    gamma: [ 'test/resources/test.file1' ],
+    gamma: [ 'test/resources/html/screen.html', 'test/resources/test.file1' ],
     delta: 'test/resources'
   },
   [

@@ -63,7 +63,7 @@ tape('Minimal specification of bedrock-auto', function (t) {
     stopOnFailure: false,
     testName: '.test.running .name',
     total: '.total',
-    totalTimeout: 600000,
+    overallTimeout: 600000,
     loglevel: 'advanced',
     version: false
   }, cleanResult(actual));
@@ -100,7 +100,7 @@ tape('Minimal specification of bedrock-manual', function (t) {
     stopOnFailure: false,
     testName: '.test.running .name',
     total: '.total',
-    totalTimeout: 600000,
+    overallTimeout: 600000,
     loglevel: 'advanced',
     version: false
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
@@ -131,7 +131,7 @@ tape('Minimal specification of bedrock-remote', function (t) {
     stopOnFailure: false,
     testName: '.test.running .name',
     total: '.total',
-    totalTimeout: 600000,
+    overallTimeout: 600000,
     loglevel: 'advanced',
     version: false
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
@@ -161,7 +161,7 @@ tape('Minimal specification of bedrock-sauce-single', function (t) {
     stopOnFailure: false,
     testName: '.test.running .name',
     total: '.total',
-    totalTimeout: 600000,
+    overallTimeout: 600000,
     loglevel: 'advanced',
     version: false
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
@@ -211,7 +211,7 @@ tape('Minimal specification of bedrock-sauce', function (t) {
     stopOnFailure: false,
     testName: '.test.running .name',
     total: '.total',
-    totalTimeout: 600000,
+    overallTimeout: 600000,
     loglevel: 'advanced',
     version: false
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
