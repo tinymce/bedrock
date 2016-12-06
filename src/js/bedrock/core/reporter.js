@@ -9,6 +9,28 @@ var logSauceInfo = function (root, settings) {
     .endElement();
 };
 
+var writePollExit = function (settings, pollExit) {
+  var jsonResults = JSON.stringify(
+    {
+      results: pollExit.results,
+      time: pollExit.time
+    }
+  );
+
+  return write({
+    name: settings.name,
+    output: settings.output,
+    sauce: settings.sauce
+  })(jsonResults).then(function () {
+    return Promise.reject(pollExit.message);
+  }, function (err) {
+    console.error('Error writing report for polling exit condition');
+    console.error(err);
+    console.error(err.stack);
+    return Promise.reject(pollExit.message);
+  });
+};
+
 var write = function (settings) {
   return function (raw) {
     return new Promise(function (resolve, reject) {
@@ -33,12 +55,14 @@ var write = function (settings) {
         .writeAttribute('host', 'localhost')
         .writeAttribute('id', 0)
         .writeAttribute('failures', failed.length)
-        .writeAttribute('timestamp', 'TIMESTAMP')
+        .writeAttribute('timestamp', new Date().getTime())
         .writeAttribute('time', data.time);
 
       results.forEach(function (res) {
         var elem = w.startElement('testcase')
-          .writeAttribute('name', settings.name + '.' + res.name);
+          .writeAttribute('name', res.file)
+          .writeAttribute('classname', settings.name + '.' + res.name)
+          .writeAttribute('time', res.time);
 
         if (res.passed !== true) {
           elem.startElement('failure')
@@ -71,5 +95,6 @@ var write = function (settings) {
 };
 
 module.exports = {
+  writePollExit: writePollExit,
   write: write
 };

@@ -57,6 +57,11 @@ var go = function (settings) {
               name: settings.name,
               output: settings.output
             })(data);
+          }, function (pollExit) {
+            return reporter.writePollExit({
+              name: settings.name,
+              output: settings.output
+            }, pollExit);
           });
         });
       });

@@ -72,7 +72,16 @@ var create = function (settings) {
       });
 
       // The reporter passes for successful and failed tests, so inspect the outcome.
-      return setName(session, name).then(f).then(logResults).then(checkResults, setAsFailed);
+      return setName(session, name).then(f).then(logResults, function (pollExit) {
+        return reporter.writePollExit({
+          name: suiteName,
+          output: settings.output,
+          sauce: {
+            id: session.id_,
+            job: name
+          }
+        }, pollExit);
+      }).then(checkResults, setAsFailed);
     });
   };
 

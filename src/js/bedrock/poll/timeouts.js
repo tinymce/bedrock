@@ -13,10 +13,15 @@ var timeoutExit = function (limit, s) {
     return current - start;
   };
 
+  var getLimit = function () {
+    return limit;
+  };
+
   return {
     hasExpired: hasExpired,
     reset: reset,
-    diff: diff
+    diff: diff,
+    getLimit: getLimit
   };
 };
 
