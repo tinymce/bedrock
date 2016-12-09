@@ -1,0 +1,14 @@
+Version 1.4.0
+
+Date: 2016-12-09
+
+* uses getText instead of getInnerHtml to match new selenium webdriver APIs
+* adds testing page for scraping content
+* generates reports on timeouts
+* improves test report format
+* improves experimental SauceLabs integration
+
+
+
+
+
