@@ -2,6 +2,13 @@ var path = require('path');
 var child_process = require('child_process');
 var os = require('os');
 
+var browserDrivers = {
+  'chrome': 'chromedriver',
+  'firefox': 'geckodriver',
+  'internet explorer': 'iedriver',
+  'MicrosoftEdge': 'edgedriver'
+};
+
 // Makes sure that Edge has proper focus and is the top most window
 var focusEdge = function (basedir, callback) {
   var edgeFocusScript = path.join(basedir, 'bin/focus/edge.js');
@@ -23,6 +30,16 @@ var focusMac = function (basedir, browser, callback) {
  * basedir: base directory for bedrock
  */
 var create = function (settings) {
+  var driverDep = browserDrivers[settings.browser];
+  if (driverDep === undefined) console.log('Not loading a driver for browser ' + settings.browser);
+  else {
+    try {
+      require(driverDep);
+    } catch (e) {
+      console.log(`No local ${driverDep} for ${settings.browser}. Searching system path...`);
+    }
+  }
+
   var webdriver = require('selenium-webdriver');
   // Support for disabling the Automation Chrome Extension
   var chrome = require('selenium-webdriver/chrome');
