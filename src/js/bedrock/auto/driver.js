@@ -10,17 +10,21 @@ var browserDrivers = {
 };
 
 // Makes sure that Edge has proper focus and is the top most window
-var focusEdge = function (basedir, callback) {
-  var edgeFocusScript = path.join(basedir, 'bin/focus/edge.js');
-  child_process.exec('cscript ' + edgeFocusScript, function () {
-    callback();
+var focusEdge = function (basedir) {
+  return new Promise(function (resolve) {
+    var edgeFocusScript = path.join(basedir, 'bin/focus/edge.js');
+    child_process.exec('cscript ' + edgeFocusScript, function () {
+      resolve();
+    });
   });
 };
 
-var focusMac = function (basedir, browser, callback) {
-  var macFocusScript = path.join(basedir, 'bin/focus/mac.applescript');
-  child_process.exec(`osascript ${macFocusScript} ${browser}`, function () {
-    callback();
+var focusMac = function (basedir, browser) {
+  return new Promise(function (resolve) {
+    var macFocusScript = path.join(basedir, 'bin/focus/mac.applescript');
+    child_process.exec(`osascript ${macFocusScript} ${browser}`, function () {
+      resolve();
+    });
   });
 };
 
@@ -52,22 +56,21 @@ var create = function (settings) {
     .build();
 
   return new Promise(function (resolve) {
-    // Some tests require large windows, so make it as large as it can be.
-    return driver.manage().window().maximize().then(function () {
-      if (settings.browser === 'MicrosoftEdge') {
-        focusEdge(settings.basedir, function () {
-          resolve(driver);
-        });
-      } else if (os.platform() === 'darwin') {
-        focusMac(settings.basedir, settings.browser, function () {
+    // wait a bit for the browser to actually be loaded, firefox likes to return before it is ready
+    setTimeout(function () {
+      // Some tests require large windows, so make it as large as it can be.
+      return driver.manage().window().maximize().then(function () {
+        var focus = settings.browser === 'MicrosoftEdge' ? focusEdge(settings.basedir)
+                  : os.platform() === 'darwin' ? focusMac(settings.basedir, settings.browser)
+                  : Promise.resolve();
+
+        focus.then(function () {
           driver.executeScript('window.focus();').then(function () {
             resolve(driver);
           });
         });
-      } else {
-        resolve(driver);
-      }
-    });
+      });
+    }, 1500);
   });
 };
 
