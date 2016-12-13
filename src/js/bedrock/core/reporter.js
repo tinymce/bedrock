@@ -31,6 +31,12 @@ var writePollExit = function (settings, pollExit) {
   });
 };
 
+var outputTime = function (boltTime) {
+  // Bolt adds 's' to the time for human readability, but junit needs just a float value in seconds
+  var time = boltTime;
+  return time.charAt(time.length - 1) === 's' ? time.substr(0, time.length - 2) : time;
+};
+
 var write = function (settings) {
   return function (raw) {
     return new Promise(function (resolve, reject) {
@@ -46,7 +52,7 @@ var write = function (settings) {
       var root = w.startElement('testsuites')
         .writeAttribute('tests', results.length)
         .writeAttribute('failures', failed.length)
-        .writeAttribute('time', data.time)
+        .writeAttribute('time', outputTime(data.time))
         .writeAttribute('errors', 0);
 
       var suite = w.startElement('testsuite')
@@ -56,13 +62,13 @@ var write = function (settings) {
         .writeAttribute('id', 0)
         .writeAttribute('failures', failed.length)
         .writeAttribute('timestamp', new Date().getTime())
-        .writeAttribute('time', data.time);
+        .writeAttribute('time', outputTime(data.time));
 
       results.forEach(function (res) {
         var elem = w.startElement('testcase')
           .writeAttribute('name', res.file)
           .writeAttribute('classname', settings.name + '.' + res.name)
-          .writeAttribute('time', res.time);
+          .writeAttribute('time', outputTime(res.time));
 
         if (res.passed !== true) {
           elem.startElement('failure')
