@@ -56,7 +56,8 @@ var create = function (settings) {
     .build();
 
   return new Promise(function (resolve) {
-    // wait a bit for the browser to actually be loaded, firefox likes to return before it is ready
+    // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
+    // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
     setTimeout(function () {
       // Some tests require large windows, so make it as large as it can be.
       return driver.manage().window().maximize().then(function () {
