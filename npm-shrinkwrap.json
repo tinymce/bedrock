@@ -8,9 +8,9 @@
       "resolved": "https://registry.npmjs.org/@ephox/bolt/-/bolt-1.8.1.tgz"
     },
     "adm-zip": {
-      "version": "0.4.7",
-      "from": "adm-zip@>=0.4.7 <0.5.0",
-      "resolved": "http://nexus:8081/repository/npm-group/adm-zip/-/adm-zip-0.4.7.tgz"
+      "version": "0.4.4",
+      "from": "adm-zip@0.4.4",
+      "resolved": "https://registry.npmjs.org/adm-zip/-/adm-zip-0.4.4.tgz"
     },
     "agent-base": {
       "version": "2.0.1",
@@ -475,10 +475,10 @@
       "from": "openport@0.0.4",
       "resolved": "https://registry.npmjs.org/openport/-/openport-0.0.4.tgz"
     },
-    "os-tmpdir": {
-      "version": "1.0.2",
-      "from": "os-tmpdir@>=1.0.1 <1.1.0",
-      "resolved": "http://nexus:8081/repository/npm-group/os-tmpdir/-/os-tmpdir-1.0.2.tgz"
+    "options": {
+      "version": "0.0.6",
+      "from": "options@>=0.0.5",
+      "resolved": "https://registry.npmjs.org/options/-/options-0.0.6.tgz"
     },
     "parseurl": {
       "version": "1.3.1",
@@ -551,24 +551,19 @@
       "resolved": "https://registry.npmjs.org/sax/-/sax-1.1.5.tgz"
     },
     "selenium-webdriver": {
-      "version": "3.0.1",
-      "from": "selenium-webdriver@>=3.0.0 <4.0.0",
-      "resolved": "http://nexus:8081/repository/npm-group/selenium-webdriver/-/selenium-webdriver-3.0.1.tgz",
+      "version": "3.0.0-beta-2",
+      "from": "selenium-webdriver@3.0.0-beta-2",
+      "resolved": "https://registry.npmjs.org/selenium-webdriver/-/selenium-webdriver-3.0.0-beta-2.tgz",
       "dependencies": {
-        "lodash": {
-          "version": "4.17.2",
-          "from": "lodash@>=4.0.0 <5.0.0",
-          "resolved": "http://nexus:8081/repository/npm-group/lodash/-/lodash-4.17.2.tgz"
+        "sax": {
+          "version": "0.6.1",
+          "from": "sax@>=0.6.0 <0.7.0",
+          "resolved": "https://registry.npmjs.org/sax/-/sax-0.6.1.tgz"
         },
         "xml2js": {
-          "version": "0.4.17",
-          "from": "xml2js@>=0.4.17 <0.5.0",
-          "resolved": "http://nexus:8081/repository/npm-group/xml2js/-/xml2js-0.4.17.tgz"
-        },
-        "xmlbuilder": {
-          "version": "4.2.1",
-          "from": "xmlbuilder@>=4.1.0 <5.0.0",
-          "resolved": "http://nexus:8081/repository/npm-group/xmlbuilder/-/xmlbuilder-4.2.1.tgz"
+          "version": "0.4.4",
+          "from": "xml2js@0.4.4",
+          "resolved": "https://registry.npmjs.org/xml2js/-/xml2js-0.4.4.tgz"
         }
       }
     },
@@ -640,9 +635,9 @@
       "resolved": "http://nexus:8081/repository/npm-group/test-value/-/test-value-2.1.0.tgz"
     },
     "tmp": {
-      "version": "0.0.30",
-      "from": "tmp@0.0.30",
-      "resolved": "http://nexus:8081/repository/npm-group/tmp/-/tmp-0.0.30.tgz"
+      "version": "0.0.24",
+      "from": "tmp@0.0.24",
+      "resolved": "https://registry.npmjs.org/tmp/-/tmp-0.0.24.tgz"
     },
     "tough-cookie": {
       "version": "2.3.2",
@@ -671,6 +666,11 @@
       "version": "2.6.0",
       "from": "typical@>=2.6.0 <3.0.0",
       "resolved": "http://nexus:8081/repository/npm-group/typical/-/typical-2.6.0.tgz"
+    },
+    "ultron": {
+      "version": "1.0.2",
+      "from": "ultron@>=1.0.0 <1.1.0",
+      "resolved": "https://registry.npmjs.org/ultron/-/ultron-1.0.2.tgz"
     },
     "unpipe": {
       "version": "1.0.0",
@@ -701,6 +701,11 @@
       "version": "1.0.2",
       "from": "wrappy@>=1.0.0 <2.0.0",
       "resolved": "https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz"
+    },
+    "ws": {
+      "version": "1.1.1",
+      "from": "ws@>=1.0.1 <2.0.0",
+      "resolved": "https://registry.npmjs.org/ws/-/ws-1.1.1.tgz"
     },
     "xml-writer": {
       "version": "1.6.0",
