@@ -5,7 +5,7 @@ var os = require('os');
 var browserDrivers = {
   'chrome': 'chromedriver',
   'firefox': 'geckodriver',
-  'internet explorer': 'iedriver',
+  'ie': 'iedriver',
   'MicrosoftEdge': 'edgedriver'
 };
 
