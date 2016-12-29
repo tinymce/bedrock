@@ -94,7 +94,8 @@ var forSauceSingle = function (directories) {
       cloptions.saucebrowserVersion,
       cloptions.sauceuser,
       cloptions.saucekey,
-      cloptions.output
+      cloptions.output,
+      cloptions.saucebuild
     ])
   );
 };
@@ -115,7 +116,8 @@ var forSauce = function (directories) {
       cloptions.sauceconfig,
       cloptions.sauceuser,
       cloptions.saucekey,
-      cloptions.output
+      cloptions.output,
+      cloptions.saucebuild
     ])
   );
 };

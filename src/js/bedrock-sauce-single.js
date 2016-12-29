@@ -14,11 +14,17 @@ var go = function (settings) {
     return [ capitalize(browser) ].concat(bversion === 'latest' ? [ ] : [ bversion ]).concat([ capitalize(os) ]).join('.');
   };
 
-  var driver = drivers.create(settings.sauceuser, settings.saucekey, {
-    browser: settings.saucebrowser,
-    browserVersion: settings.saucebrowserVersion,
-    os: settings.sauceos
-  });
+  // sauce labs properties, some of these are generic remote selenium properties others are sauce labs specific
+  var driverConf = {
+    browserName: settings.saucebrowser,
+    version: settings.saucebrowserVersion,
+    platform: settings.sauceos,
+    name: settings.name,
+    build: settings.saucebuild,
+    'max-duration':Math.floor(settings.overallTimeout / 1000)
+  };
+  console.log('creating driver with config', JSON.stringify(driverConf));
+  var driver = drivers.create(settings.sauceuser, settings.saucekey, driverConf);
 
   var detailedName = prettify(settings.sauceos, settings.saucebrowser, settings.saucebrowserVersion);
 
