@@ -5,7 +5,7 @@ var until = webdriver.until;
 var attempt = require('../core/attempt');
 
 var parseHtml = function (driver, selector) {
-  return driver.wait(until.elementLocated(By.css(selector)), 1).then(function (elem) {
+  return driver.wait(until.elementLocated(By.css(selector)), 1000).then(function (elem) {
     /*
      * History
      *
