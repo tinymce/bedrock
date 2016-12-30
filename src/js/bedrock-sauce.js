@@ -51,8 +51,7 @@ This URL will self destruct in 48 hours (assuming you've configured the server c
   }).then(function (/* res */) {
     console.log('SauceLabs Tests complete. Number of test files: ' + settings.testfiles.length);
   }, function (err) {
-    console.log('SauceLabs Error: ', err);
-    console.error(err);
+    console.log('SauceLabs Error in platform: ', err);
   });
 };
 

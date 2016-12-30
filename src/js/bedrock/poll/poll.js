@@ -27,6 +27,7 @@ var loop = function (master, driver, settings) {
         return exits.testsDone(currentState, tick, settings);
       }, function (/* err */) {
         // We aren't done yet ... so update the current test if necessary.
+        // This could also mean the selenium server is dead, but there is a fallback for that elsewhere
         return currentState.update(driver, tick).then(repeatLoop, repeatLoop);
       });
     }, 'poll');
@@ -40,7 +41,8 @@ var loop = function (master, driver, settings) {
     return checkStatus(tick);
   };
 
-  return driver.wait(nextTick, settings.overallTimeout + 100000).then(function (outcome) {
+  // We handle overall test timeout ourselves, so give the driver an extra 30 seconds before it times out
+  return driver.wait(nextTick, settings.overallTimeout + (30 * 1000)).then(function (outcome) {
     return outcome(driver);
   }, function (err) {
     console.log('Unexpected error while running the testing loop: ' + err);

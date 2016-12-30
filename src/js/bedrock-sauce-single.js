@@ -21,7 +21,7 @@ var go = function (settings) {
     platform: settings.sauceos,
     name: settings.name,
     build: settings.saucebuild,
-    'max-duration':Math.floor(settings.overallTimeout / 1000)
+    'max-duration': Math.floor(settings.overallTimeout / 1000)
   };
   console.log('creating driver with config', JSON.stringify(driverConf));
   var driver = drivers.create(settings.sauceuser, settings.saucekey, driverConf);
@@ -43,7 +43,7 @@ var go = function (settings) {
       });
     }, function (err) {
       return driver.quit().then(function () {
-        if (process.send) process.send({ failure: err });
+        if (process.send) process.send({ failure: detailedName });
         return Promise.reject(err);
       });
     });
