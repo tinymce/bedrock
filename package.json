@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "NodeJS test runner for bolt projects",
   "repository": {
     "type": "git",
