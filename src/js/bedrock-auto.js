@@ -32,7 +32,9 @@ var go = function (settings) {
 
     serve.start(serveSettings, function (service, done) {
       if (! isPhantom) console.log('bedrock-auto available at: http://localhost:' + service.port);
-      var result = driver.get('http://localhost:' + service.port).then(function () {
+      var result = driver.get('http://localhost:' + service.port)
+                         .then(driver.executeScript('window.focus();'))
+                         .then(function () {
         var message = isPhantom ? '\nPhantom tests loading ...\n' : '\n ... Initial page has loaded ...';
         console.log(message);
         service.markLoaded();
@@ -50,6 +52,8 @@ var go = function (settings) {
       });
       lifecycle.shutdown(result, driver, done);
     });
+  }, function (err) {
+    console.error('Unable to create driver', err);
   });
 };
 
