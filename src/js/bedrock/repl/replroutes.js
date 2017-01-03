@@ -3,7 +3,6 @@ var generate = function (projectdir, basedir, boltConfig, replConfig) {
   var routes = require('../server/routes');
 
   var repl = path.relative(projectdir, replConfig);
-  var bc = path.relative(projectdir, boltConfig);
 
   var fs = require('fs');
 
@@ -21,8 +20,8 @@ var generate = function (projectdir, basedir, boltConfig, replConfig) {
     routes.routing('GET', '/project', projectdir),
     routes.routing('GET', '/js', path.join(basedir, 'src/resources')),
 
-    routes.routing('GET', '/lib/jquery', path.join(basedir, 'node_modules/jquery/dist')),
-    routes.routing('GET', '/lib/bolt', path.join(basedir, 'node_modules/@ephox/bolt/lib')),
+    routes.routing('GET', '/lib/bolt', path.join(path.dirname(require.resolve('@ephox/bolt')), '../lib')),
+    routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery'))),
     routes.rewrite('GET', projectdir, '/bingo', path.relative(projectdir, boltConfig)),
     // Very bolt specific.
     routes.json('GET', '/repl', {
