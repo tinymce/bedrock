@@ -139,10 +139,10 @@
   var bucketfolder = {
     name: 'bucketfolder',
     type: String,
-    description: 'The namespace inside the bucket',
+    description: 'The namespace inside the bucket (a subfolder is created using the test name and timestamp)',
     validate: extraction.any,
     // Current default based on our AWS settings for temporary folders.
-    defaultValue: 'bedrock-bucket/bedrock-testing'
+    defaultValue: 'bedrock'
   };
 
   var saucebrowser = {
@@ -157,7 +157,7 @@
     name: 'sauceos',
     type: String,
     description: 'The operating system of the VM to launch on SauceLabs',
-    validate: extraction.inSet([ 'Windows 10', 'Windows 8.1', 'OS X 10.9', 'Linux' ]),
+    validate: extraction.inSet([ 'Windows 10', 'Windows 8.1', 'OS X 10.9', 'OS X 10.10', 'OS X 10.11', 'macOS 10.12', 'Linux' ]),
     defaultValue: 'Linux'
   };
 
@@ -217,6 +217,15 @@
     description: 'The total amount of time a single test can take before bedrock times out.',
     validate: extraction.any,
     defaultValue: 30 * 1000,
+    uncommon: true
+  };
+
+  var saucebuild = {
+    name: 'saucebuild',
+    type: String,
+    description: 'The build number to pass to sauce labs.',
+    validate: extraction.any,
+    defaultValue: 'not specified',
     uncommon: true
   };
 
@@ -358,6 +367,7 @@
     basedir: basedir,
     overallTimeout: overallTimeout,
     singleTimeout: singleTimeout,
+    saucebuild: saucebuild,
     progressSelector: progressSelector,
     totalSelector: totalSelector,
     testNameSelector: testNameSelector,

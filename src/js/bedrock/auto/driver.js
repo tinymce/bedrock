@@ -2,23 +2,30 @@ var path = require('path');
 var child_process = require('child_process');
 var os = require('os');
 
+var webdriver = require('selenium-webdriver');
+
 var browserDrivers = {
   'chrome': 'chromedriver',
   'firefox': 'geckodriver',
-  'ie': 'iedriver',
+  'internet explorer': 'iedriver',
   'MicrosoftEdge': 'edgedriver'
 };
 
-// Makes sure that Edge has proper focus and is the top most window
-var focusEdge = function (basedir) {
+var cscriptFocus = function (basedir, script) {
   return new Promise(function (resolve) {
-    var edgeFocusScript = path.join(basedir, 'bin/focus/edge.js');
-    child_process.exec('cscript ' + edgeFocusScript, function () {
+    var focusScript = path.join(basedir, 'bin/focus/' + script);
+    child_process.exec('cscript ' + focusScript, function () {
       resolve();
     });
   });
 };
 
+// Makes sure that Edge has proper focus and is the top most window
+var focusEdge = function (basedir) {
+  return cscriptFocus(basedir, 'edge.js');
+};
+
+// Mac doesn't focus windows opened through automation, so use AppleScript to do it for us
 var focusMac = function (basedir, browser) {
   return new Promise(function (resolve) {
     var macFocusScript = path.join(basedir, 'bin/focus/mac.applescript');
@@ -26,6 +33,14 @@ var focusMac = function (basedir, browser) {
       resolve();
     });
   });
+};
+
+// Firefox insists on having focus in the address bar, and while F6 will focus the body
+// mozilla haven't implemented browser-wide sendkeys in their webdriver
+var focusFirefox = function (basedir) {
+  // mac F6 is handled in the applescript, we haven't looked at linux FF yet so it's just windows for now
+  if (os.platform() === 'win32') return cscriptFocus(basedir, 'winff.js');
+  else return Promise.resolve();
 };
 
 /* Settings:
@@ -44,7 +59,6 @@ var create = function (settings) {
     }
   }
 
-  var webdriver = require('selenium-webdriver');
   // Support for disabling the Automation Chrome Extension
   var chrome = require('selenium-webdriver/chrome');
   var chromeOptions = new chrome.Options();
@@ -55,20 +69,22 @@ var create = function (settings) {
     .forBrowser(settings.browser).setChromeOptions(chromeOptions)
     .build();
 
+  // Andy made some attempt to catch errors in this code but it never worked, I suspect the webdriver implementation
+  // of promise is broken. Node gives 'unhandled rejection' errors no matter where I put the rejection handlers.
   return new Promise(function (resolve) {
     // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
     // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
     setTimeout(function () {
       // Some tests require large windows, so make it as large as it can be.
       return driver.manage().window().maximize().then(function () {
-        var focus = settings.browser === 'MicrosoftEdge' ? focusEdge(settings.basedir)
-                  : os.platform() === 'darwin' ? focusMac(settings.basedir, settings.browser)
-                  : Promise.resolve();
+        var systemFocus = os.platform() === 'darwin' ? focusMac(settings.basedir, settings.browser) : Promise.resolve();
 
-        focus.then(function () {
-          driver.executeScript('window.focus();').then(function () {
-            resolve(driver);
-          });
+        var browserFocus = settings.browser === 'MicrosoftEdge' ? focusEdge(settings.basedir) :
+                          settings.browser === 'firefox' ? focusFirefox(settings.basedir) :
+                          Promise.resolve();
+
+        systemFocus.then(browserFocus).then(function () {
+          resolve(driver);
         });
       });
     }, 1500);

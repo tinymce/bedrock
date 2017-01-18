@@ -7,13 +7,21 @@ var go = function (settings, directories) {
 
   var uploader = require('./bedrock/remote/uploader');
   var uploads = require('./bedrock/remote/project-uploads');
-  var distribute = require('./bedrock/remote/distribute');
 
-  var uploadDir = settings.name + dateformat('yyyyMMddhhmmss');
+  var uploadDir = settings.bucketfolder + '/' + settings.name + '-' + dateformat('yyyyMMddhhmmss');
 
   var targets = uploads.choose(settings);
-  return uploader.upload(settings.bucket, settings.bucketfolder, targets).then(function (base/* , uploadData */) {
-    return distribute.sequence(settings.sauceconfig, function (b) {
+
+  // read the JSON file early so we fail before uploading if it doesn't parse
+  var sauceContents = require('fs').readFileSync(settings.sauceconfig);
+  var browsers = JSON.parse(sauceContents);
+
+  return uploader.upload(settings.bucket, uploadDir, targets).then(function (base/* , uploadData */) {
+      console.log(`TEST URL: ${base} (bedrock assumes you use US west 2)
+
+This URL will self destruct in 48 hours (assuming you've configured the server correctly)`);
+
+    var promises = browsers.map(function (b) {
       var singleArgs = [
         '--remoteurl', base,
         '--name', settings.name,
@@ -22,6 +30,7 @@ var go = function (settings, directories) {
         '--sauceos', b.os,
         '--sauceuser', settings.sauceuser,
         '--saucekey', settings.saucekey,
+        '--saucebuild', settings.saucebuild,
         '--output', settings.output,
         '--singleTimeout', settings.singleTimeout,
         // Really confusing rename ... consider just using totalTimeout
@@ -37,11 +46,12 @@ var go = function (settings, directories) {
         });
       });
     });
+
+    return Promise.all(promises);
   }).then(function (/* res */) {
     console.log('SauceLabs Tests complete. Number of test files: ' + settings.testfiles.length);
   }, function (err) {
-    console.log('SauceLabs Error: ', err);
-    console.error(err);
+    console.log('SauceLabs Error in platform: ', err);
   });
 };
 

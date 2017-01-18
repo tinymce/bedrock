@@ -46,7 +46,7 @@ var write = function (settings) {
         return result.passed !== true;
       });
 
-      var w = new XMLWriter();
+      var w = new XMLWriter(true);
       w.startDocument();
 
       var root = w.startElement('testsuites')

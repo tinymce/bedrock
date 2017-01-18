@@ -36,16 +36,6 @@ var create = function (settings) {
     };
   };
 
-  var setName = function (session, name) {
-    return new Promise(function (resolve, reject) {
-      saucelabs.updateJob(session.id_, {
-        name: name
-      }, function () {
-        resolve(name);
-      });
-    });
-  };
-
   var runTest = function (suiteName, driver, f) {
     return driver.getSession().then(function (session) {
       var name = settings.name;
@@ -72,7 +62,7 @@ var create = function (settings) {
       });
 
       // The reporter passes for successful and failed tests, so inspect the outcome.
-      return setName(session, name).then(f).then(logResults, function (pollExit) {
+      return f().then(logResults, function (pollExit) {
         return reporter.writePollExit({
           name: suiteName,
           output: settings.output,
