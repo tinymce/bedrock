@@ -12,7 +12,7 @@ A global install will put the bedrock commands (e.g. `bedrock-auto`) automatical
 
 ### Install from npm
 
-`$ npm install -g @ephox/bolt`
+`$ npm install -g @ephox/bedrock`
 
 ### Install from source (start in source directory)
 
