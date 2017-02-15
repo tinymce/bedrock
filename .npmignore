@@ -1,4 +1,5 @@
 notes
 *.sublime-workspace
+*.sublime-project
 /*.log
 scratch
