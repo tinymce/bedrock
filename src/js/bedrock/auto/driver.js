@@ -43,6 +43,17 @@ var focusFirefox = function (basedir) {
   else return Promise.resolve();
 };
 
+// Sets logging level to WARNING instead of the verbose default for phantomjs. 
+var phantomCapabilities = function () {
+  var prefs = new webdriver.logging.Preferences();
+  prefs.setLevel(webdriver.logging.Type.DRIVER, webdriver.logging.Level.WARNING);
+  
+  var caps = webdriver.Capabilities.phantomjs();
+  caps.setLoggingPrefs(prefs);
+
+  return caps;
+};
+
 /* Settings:
  *
  * browser: the name of the browser
@@ -67,6 +78,7 @@ var create = function (settings) {
 
   var driver = new webdriver.Builder()
     .forBrowser(settings.browser).setChromeOptions(chromeOptions)
+    .withCapabilities(phantomCapabilities())
     .build();
 
   // Andy made some attempt to catch errors in this code but it never worked, I suspect the webdriver implementation
