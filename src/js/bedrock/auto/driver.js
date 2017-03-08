@@ -77,7 +77,7 @@ var create = function (settings) {
     setTimeout(function () {
       // Some tests require large windows, so make it as large as it can be.
       return driver.manage().window().maximize().then(function () {
-        var systemFocus = os.platform() === 'darwin' ? focusMac(settings.basedir, settings.browser) : Promise.resolve();
+        var systemFocus = os.platform() === 'darwin' && settings.browser !== 'phantomjs' ? focusMac(settings.basedir, settings.browser) : Promise.resolve();
 
         var browserFocus = settings.browser === 'MicrosoftEdge' ? focusEdge(settings.basedir) :
                           settings.browser === 'firefox' ? focusFirefox(settings.basedir) :
