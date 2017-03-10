@@ -44,14 +44,14 @@ var focusFirefox = function (basedir) {
 };
 
 // Sets logging level to WARNING instead of the verbose default for phantomjs. 
-var phantomCapabilities = function () {
+var addPhantomCapabilities = function (blueprints) {
   var prefs = new webdriver.logging.Preferences();
   prefs.setLevel(webdriver.logging.Type.DRIVER, webdriver.logging.Level.WARNING);
   
   var caps = webdriver.Capabilities.phantomjs();
   caps.setLoggingPrefs(prefs);
 
-  return caps;
+  return blueprints.withCapabilities(caps);
 };
 
 /* Settings:
@@ -76,11 +76,13 @@ var create = function (settings) {
 
   chromeOptions.addArguments('chrome.switches', '--disable-extensions');
 
-  var driver = new webdriver.Builder()
-    .forBrowser(settings.browser).setChromeOptions(chromeOptions)
-    .withCapabilities(phantomCapabilities())
-    .build();
+  var rawBlueprints = new webdriver.Builder()
+    .forBrowser(settings.browser).setChromeOptions(chromeOptions);
 
+  var blueprint = settings.browser === 'phantomjs' ? addPhantomCapabilities(rawBlueprints) : rawBlueprints;
+
+  var driver = blueprint.build();
+    
   // Andy made some attempt to catch errors in this code but it never worked, I suspect the webdriver implementation
   // of promise is broken. Node gives 'unhandled rejection' errors no matter where I put the rejection handlers.
   return new Promise(function (resolve) {
