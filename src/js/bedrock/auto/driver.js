@@ -43,6 +43,17 @@ var focusFirefox = function (basedir) {
   else return Promise.resolve();
 };
 
+// Sets logging level to WARNING instead of the verbose default for phantomjs. 
+var addPhantomCapabilities = function (blueprints) {
+  var prefs = new webdriver.logging.Preferences();
+  prefs.setLevel(webdriver.logging.Type.DRIVER, webdriver.logging.Level.WARNING);
+  
+  var caps = webdriver.Capabilities.phantomjs();
+  caps.setLoggingPrefs(prefs);
+
+  return blueprints.withCapabilities(caps);
+};
+
 /* Settings:
  *
  * browser: the name of the browser
@@ -65,10 +76,13 @@ var create = function (settings) {
 
   chromeOptions.addArguments('chrome.switches', '--disable-extensions');
 
-  var driver = new webdriver.Builder()
-    .forBrowser(settings.browser).setChromeOptions(chromeOptions)
-    .build();
+  var rawBlueprints = new webdriver.Builder()
+    .forBrowser(settings.browser).setChromeOptions(chromeOptions);
 
+  var blueprint = settings.browser === 'phantomjs' ? addPhantomCapabilities(rawBlueprints) : rawBlueprints;
+
+  var driver = blueprint.build();
+    
   // Andy made some attempt to catch errors in this code but it never worked, I suspect the webdriver implementation
   // of promise is broken. Node gives 'unhandled rejection' errors no matter where I put the rejection handlers.
   return new Promise(function (resolve) {
@@ -77,7 +91,7 @@ var create = function (settings) {
     setTimeout(function () {
       // Some tests require large windows, so make it as large as it can be.
       return driver.manage().window().maximize().then(function () {
-        var systemFocus = os.platform() === 'darwin' ? focusMac(settings.basedir, settings.browser) : Promise.resolve();
+        var systemFocus = os.platform() === 'darwin' && settings.browser !== 'phantomjs' ? focusMac(settings.basedir, settings.browser) : Promise.resolve();
 
         var browserFocus = settings.browser === 'MicrosoftEdge' ? focusEdge(settings.basedir) :
                           settings.browser === 'firefox' ? focusFirefox(settings.basedir) :
