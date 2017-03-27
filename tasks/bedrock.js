@@ -7,7 +7,6 @@ module.exports = function(grunt) {
   var path = require('path');
   var fs = require('fs');
 
-
   var enrichSettings = function (settings) {
     var newSettings = { };
 
@@ -21,31 +20,28 @@ module.exports = function(grunt) {
       newSettings[k] = settings[k];
     }
 
-
-    var testfiles = getFiles(settings);
+    var testfiles = getFiles(settings.testfiles);
     newSettings.testfiles = testfiles;
 
     newSettings.projectdir = process.cwd();
-    newSettings.basedir = path.join(__dirname, '..');
+    newSettings.basedir = path.dirname(__dirname);
 
     return newSettings;
   };
 
-  var getFiles = function (settings) {
-    var maybeFiles = extraction.files('.js')('testdir', settings.testdir);
-    return attempt.cata(maybeFiles, function (err) {
-      console.error('Error gathering test files', err);
-      throw new Error(err);
-    }, function (x) { return x; });
+  var getFiles = function (testfiles) {
+    return grunt.file.expand(testfiles);
   };
 
   grunt.registerMultiTask('bedrock-manual', 'Bedrock manual test runner', function () {
     var settings = grunt.config([this.name, this.target]);
-
-    var done = this.async();
+    
+    // We don't keep a reference because we never call done on purpose. 
+    // This is a never ending task
+    this.async(); 
 
     this.requiresConfig([this.name, this.target, 'config']);
-    this.requiresConfig([this.name, this.target, 'testdir']);
+    this.requiresConfig([this.name, this.target, 'testfiles']);
 
     var bedrockManual = require('../src/js/bedrock-manual');
     var manualSettings = enrichSettings(settings);
@@ -53,12 +49,8 @@ module.exports = function(grunt) {
     try {
       bedrockManual.go(manualSettings);
     } catch (err) {
-      console.log('Error running bedrock manual', err);
+      grunt.log.error('Error running bedrock manual', err);
     }
-
-    setTimeout(function () {
-      done();
-    }, 30000);
   });
 
   grunt.registerMultiTask('bedrock-auto', 'Bedrock auto test runner', function () {
@@ -67,7 +59,7 @@ module.exports = function(grunt) {
     var done = this.async();
 
     this.requiresConfig([this.name, this.target, 'config']);
-    this.requiresConfig([this.name, this.target, 'testdir']);
+    this.requiresConfig([this.name, this.target, 'testfiles']);
     this.requiresConfig([this.name, this.target, 'browser']);
 
     var options = this.options({
@@ -76,12 +68,6 @@ module.exports = function(grunt) {
 
     var autoSettings = enrichSettings(settings);
     autoSettings.gruntDone = function (passed) {
-      if (passed === false) {
-        console.log('Possible error output');
-        var filename = path.join(autoSettings.output, 'TEST-' + autoSettings.name) + '.xml';
-        var contents = fs.readFileSync(filename, 'utf-8');
-        console.log(contents);
-      }
       done(passed);
     };
     autoSettings.stopOnFailure = options.stopOnFailure;
@@ -91,7 +77,7 @@ module.exports = function(grunt) {
     try {
       bedrockAuto.go(autoSettings);
     } catch (err) {
-      console.error('Error running bedrock-auto', err);
+      grunt.log.error('Error running bedrock-auto', err);
     }
   });
 };
