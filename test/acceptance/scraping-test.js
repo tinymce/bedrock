@@ -69,6 +69,6 @@ driver.create({
 
     lifecycle.shutdown(result, driver, function () {
       server.close();
-    });
+    }, null);
   });
 });

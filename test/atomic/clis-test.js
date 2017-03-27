@@ -56,6 +56,7 @@ tape('Minimal specification of bedrock-auto', function (t) {
     testfiles: [
       'test/resources/test.file1'
     ],
+    debuggingPort: 9000,
 
     progress: '.progress',
     results: 'textarea.results',
