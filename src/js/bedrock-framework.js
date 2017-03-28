@@ -65,7 +65,7 @@ var go = function (settings) {
           });
         });
       });
-      lifecycle.shutdown(result, driver, done);
+      lifecycle.shutdown(result, driver, done, settings.gruntDone !== undefined ? settings.gruntDone : null);
     });
   });
 };

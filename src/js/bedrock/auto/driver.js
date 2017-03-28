@@ -1,6 +1,7 @@
 var path = require('path');
 var child_process = require('child_process');
 var os = require('os');
+var webdriver = require('selenium-webdriver');
 
 var webdriver = require('selenium-webdriver');
 
@@ -44,13 +45,13 @@ var focusFirefox = function (basedir) {
 };
 
 // Sets logging level to WARNING instead of the verbose default for phantomjs. 
-var addPhantomCapabilities = function (blueprints) {
+var addPhantomCapabilities = function (blueprints, settings) {
   var prefs = new webdriver.logging.Preferences();
   prefs.setLevel(webdriver.logging.Type.DRIVER, webdriver.logging.Level.WARNING);
   
   var caps = webdriver.Capabilities.phantomjs();
   caps.setLoggingPrefs(prefs);
-
+  caps.set('phantomjs.cli.args', '--remote-debugger-port=' + settings.debuggingPort);
   return blueprints.withCapabilities(caps);
 };
 
@@ -73,13 +74,12 @@ var create = function (settings) {
   // Support for disabling the Automation Chrome Extension
   var chrome = require('selenium-webdriver/chrome');
   var chromeOptions = new chrome.Options();
-
   chromeOptions.addArguments('chrome.switches', '--disable-extensions');
 
   var rawBlueprints = new webdriver.Builder()
     .forBrowser(settings.browser).setChromeOptions(chromeOptions);
 
-  var blueprint = settings.browser === 'phantomjs' ? addPhantomCapabilities(rawBlueprints) : rawBlueprints;
+  var blueprint = settings.browser === 'phantomjs' ? addPhantomCapabilities(rawBlueprints, settings) : rawBlueprints;
 
   var driver = blueprint.build();
     

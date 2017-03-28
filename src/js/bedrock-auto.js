@@ -12,7 +12,8 @@ var go = function (settings) {
 
   driver.create({
     browser: settings.browser,
-    basedir: settings.basedir
+    basedir: settings.basedir,
+    debuggingPort: settings.debuggingPort
   }).then(function (driver) {
     var lifecycle = require('./bedrock/core/lifecycle');
     var runner = boltroutes.generate(settings.projectdir, settings.basedir, settings.config, settings.testfiles, settings.stopOnFailure);
@@ -50,7 +51,7 @@ var go = function (settings) {
           }, pollExit);
         });
       });
-      lifecycle.shutdown(result, driver, done);
+      lifecycle.shutdown(result, driver, done, settings.gruntDone !== undefined ? settings.gruntDone : null);
     });
   }, function (err) {
     console.error('Unable to create driver', err);

@@ -117,6 +117,15 @@
     };
   };
 
+  var debuggingPort = {
+    name: 'debuggingPort',
+    type: Number,
+    description: 'The port for remote debugging (used for phantom)',
+    validate: extraction.any,
+    defaultValue: 9000,
+    uncommon: true
+  };
+
   var uploaddirs = {
     name: 'uploaddirs',
     alias: 'u',
@@ -372,6 +381,9 @@
     totalSelector: totalSelector,
     testNameSelector: testNameSelector,
     resultsSelector: resultsSelector,
+
+    // Phantom settings
+    debuggingPort: debuggingPort,
 
     framework: framework,
     help: help,

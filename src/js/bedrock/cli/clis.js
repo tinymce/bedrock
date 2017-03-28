@@ -47,6 +47,7 @@ var forAuto = function (directories) {
       cloptions.testdirs,
       cloptions.name,
       cloptions.output,
+      cloptions.debuggingPort,
       cloptions.customRoutes
     ])
   );
@@ -131,7 +132,8 @@ var forFramework = function (directories) {
       cloptions.page,
       cloptions.browser,
       cloptions.output,
-      cloptions.framework
+      cloptions.framework,
+      cloptions.debuggingPort
     ])
   );
 };
