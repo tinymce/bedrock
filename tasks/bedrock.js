@@ -23,7 +23,7 @@ module.exports = function(grunt) {
     var testfiles = getFiles(settings.testfiles);
     newSettings.testfiles = testfiles;
 
-    newSettings.projectdir = process.cwd();
+    newSettings.projectdir = settings.projectdir !== undefined ? settings.projectdir : process.cwd();
     newSettings.basedir = path.dirname(__dirname);
 
     return newSettings;
