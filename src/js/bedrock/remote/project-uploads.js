@@ -51,6 +51,7 @@ var choose = function (settings) {
       'jquery.min.js'
     ),
     uploadtypes.filetype(
+      // NOTE: Uplading should never need phantom
       path.join(basedir, 'src', 'resources', 'bedrock.html'),
       'index.html'
     ),

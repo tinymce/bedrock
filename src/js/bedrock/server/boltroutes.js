@@ -1,4 +1,4 @@
-var generate = function (projectdir, basedir, boltConfig, testfiles, stopOnFailure) {
+var generate = function (projectdir, basedir, boltConfig, testfiles, stopOnFailure, basePage) {
   var path = require('path');
   var routes = require('./routes');
 
@@ -21,7 +21,7 @@ var generate = function (projectdir, basedir, boltConfig, testfiles, stopOnFailu
     })
   ];
 
-  var fallback = routes.constant('GET', basedir, 'src/resources/bedrock.html');
+  var fallback = routes.constant('GET', basedir, basePage);
 
   return {
     routers: routers,
