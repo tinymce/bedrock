@@ -118,7 +118,7 @@ tape('Minimal specification of bedrock-remote', function (t) {
   attemptutils.assertResult(t, {
     uploaddirs: [ 'test', 'src' ],
     bucket: 'testing',
-    bucketfolder: 'bedrock-bucket/bedrock-testing',
+    bucketfolder: 'bedrock',
     config: 'sample/config.js',
     done: 'div.done',
     help: false,
@@ -149,6 +149,7 @@ tape('Minimal specification of bedrock-sauce-single', function (t) {
     remoteurl: 'remote.url',
     done: 'div.done',
     sauceuser: 'sauce.user',
+    saucebuild: 'not specified',
     saucekey: 'sauce.key',
     saucebrowser: 'chrome',
     help: false,
@@ -193,7 +194,7 @@ tape('Minimal specification of bedrock-sauce', function (t) {
   attemptutils.assertResult(t, {
     uploaddirs: [ 'test', 'src' ],
     bucket: 'testing',
-    bucketfolder: 'bedrock-bucket/bedrock-testing',
+    bucketfolder: 'bedrock',
     config: 'sample/config.js',
     done: 'div.done',
     testfiles: [
@@ -205,6 +206,7 @@ tape('Minimal specification of bedrock-sauce', function (t) {
 
     sauceconfig: 'test/resources/test.file1',
     saucekey: 'sauce.key',
+    saucebuild: 'not specified',
     sauceuser: 'sauce.user',
     progress: '.progress',
     results: 'textarea.results',

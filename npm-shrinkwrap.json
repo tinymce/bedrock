@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "dependencies": {
     "@ephox/bolt": {
       "version": "1.8.1",
@@ -66,6 +66,16 @@
       "version": "1.6.0",
       "from": "aws4@>=1.2.1 <2.0.0",
       "resolved": "https://registry.npmjs.org/aws4/-/aws4-1.6.0.tgz"
+    },
+    "babel-polyfill": {
+      "version": "6.23.0",
+      "from": "babel-polyfill@>=6.23.0 <7.0.0",
+      "resolved": "https://registry.npmjs.org/babel-polyfill/-/babel-polyfill-6.23.0.tgz"
+    },
+    "babel-runtime": {
+      "version": "6.23.0",
+      "from": "babel-runtime@>=6.22.0 <7.0.0",
+      "resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-6.23.0.tgz"
     },
     "balanced-match": {
       "version": "0.4.2",
@@ -496,6 +506,11 @@
       "version": "1.0.1",
       "from": "reduce-flatten@>=1.0.1 <2.0.0",
       "resolved": "https://registry.npmjs.org/reduce-flatten/-/reduce-flatten-1.0.1.tgz"
+    },
+    "regenerator-runtime": {
+      "version": "0.10.5",
+      "from": "regenerator-runtime@>=0.10.0 <0.11.0",
+      "resolved": "https://registry.npmjs.org/regenerator-runtime/-/regenerator-runtime-0.10.5.tgz"
     },
     "request": {
       "version": "2.81.0",
