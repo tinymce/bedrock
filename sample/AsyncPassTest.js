@@ -9,8 +9,10 @@ asynctest(
     var success = arguments[arguments.length - 2];
     var failure = arguments[arguments.length - 1];
 
-    setTimeout(function () {
-      success();
-    }, 5000);
+    new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        resolve();
+      }, 1000);
+    }).then(success);
   }
 );

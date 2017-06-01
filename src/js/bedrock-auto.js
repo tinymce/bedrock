@@ -15,8 +15,12 @@ var go = function (settings) {
     basedir: settings.basedir,
     debuggingPort: settings.debuggingPort
   }).then(function (driver) {
+    var isPhantom = settings.browser === 'phantomjs';
+
+    var basePage = isPhantom ? 'src/resources/bedrock-phantom.html' : 'src/resources/bedrock.html';
+
     var lifecycle = require('./bedrock/core/lifecycle');
-    var runner = boltroutes.generate(settings.projectdir, settings.basedir, settings.config, settings.testfiles, settings.stopOnFailure);
+    var runner = boltroutes.generate(settings.projectdir, settings.basedir, settings.config, settings.testfiles, settings.stopOnFailure, basePage);
 
     var serveSettings = {
       projectdir: settings.projectdir,
@@ -29,7 +33,7 @@ var go = function (settings) {
       customRoutes: settings.customRoutes
     };
 
-    var isPhantom = settings.browser === 'phantomjs';
+    
 
     serve.start(serveSettings, function (service, done) {
       if (! isPhantom) console.log('bedrock-auto available at: http://localhost:' + service.port);
