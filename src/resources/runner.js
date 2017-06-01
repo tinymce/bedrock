@@ -193,6 +193,10 @@
       };
     };
 
+    var getCoverage = function () {
+      return typeof __coverage__ === 'undefined' ? { } : __coverage__;
+    };
+
     var done = function () {
       var setAsDone = function () {
         var totalTime = timer.elapsed(initial);
@@ -203,7 +207,7 @@
         $('.passed.hidden').removeClass('hidden');
       };
 
-      sendJson('tests/done', {}, setAsDone, setAsDone);
+      sendJson('tests/done', { coverage: getCoverage() }, setAsDone, setAsDone);
     };
 
     var setStopOnFailure = function (flag) {
