@@ -5,6 +5,7 @@ var mHud = require('../cli/hud');
 var routes = require('./routes');
 var attempt = require('../core/attempt');
 var waiter = require('../util/waiter');
+var coverage = require('../core/coverage');
 
 // This is how long to wait before checking if the driver is ready again
 var pollRate = 2000;
@@ -64,6 +65,7 @@ var create = function (master, maybeDriver, projectdir, basedir, files, loglevel
       return hud.update(data);
     }),
     routes.effect('POST', '/tests/done', function (data) {
+      coverage.writeCoverageData(data.coverage);
       return hud.complete();
     }),
     // This does not need the webdriver.
