@@ -21,7 +21,9 @@ asynctest(
 
       sendText('iframe=>body', 'going').then(function () {
         sendText('textarea', 'blah');
-      });
+      }).then(function () {
+        success();
+      }, failure);
     });
 
 
@@ -44,17 +46,18 @@ asynctest(
       });
     };
 
-    document.body.appendChild(iframe);
-
-
-    var textarea = document.createElement('textarea');
-    document.body.appendChild(textarea);
-
-    textarea.focus();
-
-
     setTimeout(function () {
-      failure('Failed');
-    }, 30000);
+
+      document.body.appendChild(iframe);
+
+
+      var textarea = document.createElement('textarea');
+      document.body.appendChild(textarea);
+
+      textarea.focus();
+
+
+     
+    }, 1000);
   }
 );
