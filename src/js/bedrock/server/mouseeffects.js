@@ -14,9 +14,10 @@ var getAction = function (driver, target, type) {
   else if (type === 'down') return driver.actions().mouseMove(target).mouseDown();
   else if (type === 'up') return driver.actions().mouseMove(target).mouseUp();
   else if (type === 'click') {
-    var moved = driver.actions().mouseMove(target);
-    console.log('moved', moved);
-    return moved.click();
+    target.getAttribute('outerHTML').then(function (html) {
+      console.log('target.html', html);
+    });
+    return driver.actions().mouseMove(target).click();
   }
   else return new Promise.reject('Unknown mouse effect type: ' + type);
 };
