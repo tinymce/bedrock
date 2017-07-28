@@ -10,7 +10,6 @@ var effectutils = require('./effectutils');
  }
  */
 var getAction = function (driver, target, type) {
-  console.log('type', type);
   if (type === 'move') return driver.actions().mouseMove(target);
   else if (type === 'down') return driver.actions().mouseMove(target).mouseDown();
   else if (type === 'up') return driver.actions().mouseMove(target).mouseUp();
@@ -20,9 +19,8 @@ var getAction = function (driver, target, type) {
 
 var execute = function (driver, data) {
   return effectutils.getTarget(driver, data).then(function (tgt) {
-    console.log('mouse');
     return getAction(driver, tgt, data.type).perform().then(function (res) {
-      // driver.switchTo().defaultContent();
+      driver.switchTo().defaultContent();
       return res;
     });
   });

@@ -88,43 +88,50 @@ asynctest(
       fr.addEventListener('load', listener);
     };
 
-    loadContentIntoFrame(iframe1, '<! doctype><html><body contenteditable="true">!</body></html>', function (fr1) {
-      loadContentIntoFrame(iframe2, '<! doctype><html><body contenteditable="true"><input id="chk" type="checkbox"><label for="chk">Check me</label></body></html>', function (fr2) {
-        
+    // Give IE a bit of lead in time.
+    setTimeout(function () {
 
-        sendText('.iframe-keyboard=>body', 'going', function () {
-          sendText('textarea', 'blah', function () {
-            assert.eq('going!', fr1.contentWindow.document.body.innerHTML.trim());
-            assert.eq('blah', textarea.value);
+      loadContentIntoFrame(iframe1, '<! doctype><html><body contenteditable="true"><p>!</p></body></html>', function (fr1) {
+        loadContentIntoFrame(iframe2, '<! doctype><html><body><input id="chk" type="checkbox"><label for="chk">Check me</label></body></html>', function (fr2) {
+          
+          // IE requires focus.
+          fr1.contentWindow.document.body.focus();
+
+          sendText('.iframe-keyboard=>body', 'going', function () {
+            sendText('textarea', 'blah', function () {
+              assert.eq('going!', fr1.contentWindow.document.body.innerHTML.trim());
+              assert.eq('blah', textarea.value);
 
 
-            sendMouse('.iframe-mouse=>input', 'click', function () {
-              assert.eq(true, fr2.contentWindow.document.body.querySelector('input').checked);
-              sendMouse('.button-mouse', 'click', function () { 
-                assert.eq('clicked', button.getAttribute('data-clicked'));
+              sendMouse('.iframe-mouse=>input', 'click', function () {
+                assert.eq(true, fr2.contentWindow.document.body.querySelector('input').checked);
+                sendMouse('.button-mouse', 'click', function () { 
+                  assert.eq('clicked', button.getAttribute('data-clicked'));
 
-              
-                document.body.removeChild(fr1);
-                document.body.removeChild(fr2);
-                document.body.removeChild(textarea);
-                document.body.removeChild(button);
+                
+                  document.body.removeChild(fr1);
+                  document.body.removeChild(fr2);
+                  document.body.removeChild(textarea);
+                  document.body.removeChild(button);
 
-                success();
+                  success();
+                }, failure);
               }, failure);
+              
+             
             }, failure);
-            
-           
           }, failure);
-        }, failure);
-      });
-      
-      document.body.appendChild(iframe2);
-    }, failure);
+        });
+        
+        document.body.appendChild(iframe2);
+      }, failure);
 
-    document.body.appendChild(iframe1);
-    document.body.appendChild(textarea);
-    
-    document.body.appendChild(button);
+
+      document.body.appendChild(iframe1);
+      document.body.appendChild(textarea);
+      
+      document.body.appendChild(button);
+    }, 2000);
 
 
   }
