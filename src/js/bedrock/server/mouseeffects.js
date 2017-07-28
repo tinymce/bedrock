@@ -13,14 +13,11 @@ var getAction = function (driver, target, type) {
   if (type === 'move') return driver.actions().mouseMove(target);
   else if (type === 'down') return driver.actions().mouseMove(target).mouseDown();
   else if (type === 'up') return driver.actions().mouseMove(target).mouseUp();
-  else if (type === 'click') return driver.actions().mouseMove(target).then(function (clickee) {
-    return clickee.click().then(function (s) {
-      return s;
-    }, function (err) {
-      console.error('click failure', err);
-      return Promise.reject(err);
-    });
-  });
+  else if (type === 'click') {
+    var moved = driver.actions().mouseMove(target);
+    console.log('moved', moved);
+    return moved.click();
+  }
   else return new Promise.reject('Unknown mouse effect type: ' + type);
 };
 
@@ -30,6 +27,9 @@ var execute = function (driver, data) {
       return driver.switchTo().defaultContent().then(function () {
         return res;
       });
+    }, function (err) {
+      console.log('perofrming action', err);
+      return Promise.reject(err);
     });
   });
 };
