@@ -1,6 +1,8 @@
 var webdriver = require('selenium-webdriver');
 var By = webdriver.By;
 
+var effectutils = require('./effectutils');
+
 /*
  JSON API for data: {
    type :: String, ("move" || "click" || "down" || "up")
@@ -8,6 +10,7 @@ var By = webdriver.By;
  }
  */
 var getAction = function (driver, target, type) {
+  console.log('type', type);
   if (type === 'move') return driver.actions().mouseMove(target);
   else if (type === 'down') return driver.actions().mouseMove(target).mouseDown();
   else if (type === 'up') return driver.actions().mouseMove(target).mouseUp();
@@ -16,8 +19,13 @@ var getAction = function (driver, target, type) {
 };
 
 var execute = function (driver, data) {
-  var target = driver.findElement(By.css(data.selector));
-  return getAction(driver, target, data.type).perform();
+  return effectutils.getTarget(driver, data).then(function (tgt) {
+    console.log('mouse');
+    return getAction(driver, tgt, data.type).perform().then(function (res) {
+      // driver.switchTo().defaultContent();
+      return res;
+    });
+  });
 };
 
 var executor = function (driver) {

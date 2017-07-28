@@ -5,6 +5,7 @@ var getTargetFromFrame = function (driver, selector) {
   var sections = selector.split('=>');
   var frameSelector = sections[0];
   var targetSelector = sections[1];
+  console.log('targetSelector', targetSelector);
   return driver.findElement(By.css(frameSelector)).then(function (frame) {
     driver.switchTo().frame(frame);
     return driver.findElement(By.css(targetSelector));
