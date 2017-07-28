@@ -20,8 +20,9 @@ var getAction = function (driver, target, type) {
 var execute = function (driver, data) {
   return effectutils.getTarget(driver, data).then(function (tgt) {
     return getAction(driver, tgt, data.type).perform().then(function (res) {
-      driver.switchTo().defaultContent();
-      return res;
+      return driver.switchTo().defaultContent().then(function () {
+        return res;
+      });
     });
   });
 };

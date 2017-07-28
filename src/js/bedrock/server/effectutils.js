@@ -1,5 +1,6 @@
 var webdriver = require('selenium-webdriver');
 var By = webdriver.By;
+var until = require('selenium-webdriver/lib/until');
 
 var getTargetFromFrame = function (driver, selector) {
   var sections = selector.split('=>');
@@ -7,8 +8,10 @@ var getTargetFromFrame = function (driver, selector) {
   var targetSelector = sections[1];
   console.log('targetSelector', targetSelector);
   return driver.findElement(By.css(frameSelector)).then(function (frame) {
-    return driver.switchTo().frame(frame).then(function (_) {
-      return driver.findElement(By.css(targetSelector));
+    return driver.wait(until.ableToSwitchToFrame(frame), 100).then(function (f) {
+      // return driver.switchTo().frame(f).then(function (_) {
+        return driver.findElement(By.css(targetSelector));
+      // });
     });
   });
 };
