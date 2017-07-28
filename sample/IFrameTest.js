@@ -91,7 +91,7 @@ asynctest(
     // Give IE a bit of lead in time.
     setTimeout(function () {
 
-      loadContentIntoFrame(iframe1, '<! doctype><html><body contenteditable="true"><p>!</p></body></html>', function (fr1) {
+      loadContentIntoFrame(iframe1, '<! doctype><html><body contenteditable="true">!</body></html>', function (fr1) {
         loadContentIntoFrame(iframe2, '<! doctype><html><body><input id="chk" type="checkbox"><label for="chk">Check me</label></body></html>', function (fr2) {
           
           // IE requires focus.
