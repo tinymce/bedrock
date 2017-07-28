@@ -41,8 +41,9 @@ var execute = function (driver, data) {
   var actions = scan(data.keys);
   return effectutils.getTarget(driver, data).then(function (target) {
     return target.sendKeys.apply(target, actions).then(function (x) {
-      driver.switchTo().defaultContent();
-      return x;
+      return driver.switchTo().defaultContent().then(function () {
+        return x;
+      });
     });
   });
 };
