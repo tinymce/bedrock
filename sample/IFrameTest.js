@@ -1,5 +1,5 @@
 asynctest(
-  'AsyncFailTest',
+  'Actions in IFrames',
 
   [
 
@@ -18,16 +18,29 @@ asynctest(
       try {
         var doc = iframe.contentWindow.document;
         doc.open('text/html', 'replace');
-        doc.writeln('<! doctype><html><body contenteditable="true">Body of content editable</body></html>');
+        doc.writeln('<! doctype><html><body contenteditable="true">!</body></html>');
         doc.close();
-
-        iframe.contentWindow.document.body.focus();
       } catch (err) {
         console.error(err);
       }
 
       sendText('iframe=>body', 'going', function () {
         sendText('textarea', 'blah', function () {
+          try {
+            assert.eq('going!', iframe.contentWindow.document.body.innerHTML.trim());
+          } catch (err){
+            return failure(err);
+          }
+
+          try {
+            assert.eq('blah', textarea.value);
+          } catch (err) {
+            return failure(err);
+          }
+
+
+          document.body.removeChild(iframe);
+          document.body.removeChild(textarea);
           success();
         }, failure);
       }, failure);
@@ -54,20 +67,9 @@ asynctest(
       }));
     };
 
-    console.log('page is loading');
-
-    setTimeout(function () {
-
-      document.body.appendChild(iframe);
-
-
-      var textarea = document.createElement('textarea');
-      document.body.appendChild(textarea);
-
-      textarea.focus();
-
-
-     
-    }, 1000);
+    
+    document.body.appendChild(iframe);
+    var textarea = document.createElement('textarea');
+    document.body.appendChild(textarea);
   }
 );

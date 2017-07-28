@@ -1,6 +1,7 @@
 var webdriver = require('selenium-webdriver');
-var By = webdriver.By;
 var Key = webdriver.Key;
+
+var effectutils = require('./effectutils');
 
 var NO_ACTION = null;
 
@@ -12,7 +13,6 @@ var scanCombo = function (combo) {
 };
 
 var scanItem = function (item) {
-  console.log('scanning', item);
   if (item.text) return item.text;
   else if (item.combo) return scanCombo(item.combo);
   return NO_ACTION;
@@ -25,7 +25,6 @@ var scan = function (keys) {
     var action = scanItem(keys[i]);
     if (action !== NO_ACTION) actions.push(action);
   }
-  console.log('actions', actions);
   return actions;
 };
 
@@ -38,30 +37,9 @@ var scan = function (keys) {
  }
  */
 
-var getTargetFromFrame = function (driver, selector) {
-  var sections = selector.split('=>');
-  var frameSelector = sections[0];
-  var targetSelector = sections[1];
-  return driver.findElement(By.css(frameSelector)).then(function (frame) {
-    driver.switchTo().frame(frame);
-    return driver.findElement(By.css(targetSelector));
-  });
-};
-
-var getTargetFromMain = function (driver, selector) {
-  return driver.findElement(By.css(selector));
-};
-
-var getTarget = function (driver, data) {
-  var selector = data.selector;
-  var getter = selector.indexOf('=>') > -1 ? getTargetFromFrame : getTargetFromMain;
-  return getter(driver, selector);
-};
-
-
 var execute = function (driver, data) {
   var actions = scan(data.keys);
-  return getTarget(driver, data).then(function (target) {
+  return effectutils.getTarget(driver, data).then(function (target) {
     return target.sendKeys.apply(target, actions).then(function (x) {
       driver.switchTo().defaultContent();
       return x;
