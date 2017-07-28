@@ -9,8 +9,12 @@ var getTargetFromFrame = function (driver, selector) {
   console.log('targetSelector', targetSelector);
   return driver.findElement(By.css(frameSelector)).then(function (frame) {
     return driver.wait(until.ableToSwitchToFrame(frame), 100).then(function (f) {
+
       // return driver.switchTo().frame(f).then(function (_) {
-        return driver.findElement(By.css(targetSelector));
+        return driver.findElement(By.css(targetSelector)).then(function (target) {
+          return driver.wait(until.elementIsVisible(target), 100);
+        });
+
       // });
     });
   });
