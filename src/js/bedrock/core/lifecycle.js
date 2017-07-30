@@ -5,7 +5,7 @@ var shutdown = function (promise, driver, done, gruntDone) {
 
   promise.then(function (res) {
     // All good, so continue.
-    driver.sleep(1000);
+    driver.sleep(100000000);
 
     driver.quit().then(function () {
       done();
