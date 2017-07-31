@@ -75,6 +75,9 @@ var create = function (settings) {
   var chrome = require('selenium-webdriver/chrome');
   var chromeOptions = new chrome.Options();
   chromeOptions.addArguments('chrome.switches', '--disable-extensions');
+  
+  // https://stackoverflow.com/questions/43261516/selenium-chrome-i-just-cant-use-driver-maximize-window-to-maximize-window
+  chromeOptions.addArguments("start-maximized");
 
   var rawBlueprints = new webdriver.Builder()
     .forBrowser(settings.browser).setChromeOptions(chromeOptions);
@@ -82,6 +85,10 @@ var create = function (settings) {
   var blueprint = settings.browser === 'phantomjs' ? addPhantomCapabilities(rawBlueprints, settings) : rawBlueprints;
 
   var driver = blueprint.build();
+
+  var resume = function () {
+    return Promise.resolve(driver);
+  };
     
   // Andy made some attempt to catch errors in this code but it never worked, I suspect the webdriver implementation
   // of promise is broken. Node gives 'unhandled rejection' errors no matter where I put the rejection handlers.
@@ -90,7 +97,7 @@ var create = function (settings) {
     // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
     setTimeout(function () {
       // Some tests require large windows, so make it as large as it can be.
-      return driver.manage().window().maximize().then(function () {
+      return driver.manage().window().maximize().then(resume, resume).then(function () {
         var systemFocus = os.platform() === 'darwin' && settings.browser !== 'phantomjs' ? focusMac(settings.basedir, settings.browser) : Promise.resolve();
 
         var browserFocus = settings.browser === 'MicrosoftEdge' ? focusEdge(settings.basedir) :
