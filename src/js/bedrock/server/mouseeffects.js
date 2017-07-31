@@ -24,6 +24,10 @@ var execute = function (driver, data) {
       return driver.switchTo().defaultContent().then(function () {
         return res;
       });
+    }, function (err) {
+      return driver.switchTo().defaultContent().then(function () {
+        return Promise.reject(err);
+      })
     });
   });
 };

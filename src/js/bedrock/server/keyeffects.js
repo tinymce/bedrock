@@ -44,6 +44,10 @@ var execute = function (driver, data) {
       return driver.switchTo().defaultContent().then(function () {
         return x;
       });
+    }, function (err) {
+      return driver.switchTo().defaultContent().then(function () {
+        return Promise.reject(err);
+      });
     });
   });
 };
