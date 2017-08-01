@@ -48,7 +48,8 @@ var forAuto = function (directories) {
       cloptions.name,
       cloptions.output,
       cloptions.debuggingPort,
-      cloptions.customRoutes
+      cloptions.customRoutes,
+      cloptions.delayExiting
     ])
   );
 };

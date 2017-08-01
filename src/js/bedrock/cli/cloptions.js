@@ -342,6 +342,14 @@
     uncommon: true
   };
 
+  var delayExiting = {
+    name: 'delayExit',
+    type: Boolean,
+    defaultValue: false,
+    description: 'After the tests have completed, delay quitting the server',
+    validate: extraction.any
+  }
+
   module.exports = {
     // All modes testing
     config: config,
@@ -381,7 +389,7 @@
     totalSelector: totalSelector,
     testNameSelector: testNameSelector,
     resultsSelector: resultsSelector,
-
+    
     // Phantom settings
     debuggingPort: debuggingPort,
 
@@ -389,6 +397,7 @@
     help: help,
     version: version,
     stopOnFailure: stopOnFailure,
+    delayExiting: delayExiting,
     page: page,
     logging: logging,
 

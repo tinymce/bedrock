@@ -1,3 +1,14 @@
+Version 1.7.0
+
+Date 2017-07-28
+
+* updated key effects and mouse effects to handle dispatching within iframes
+* introduced '=>' symbol in selectors to represent inside an iframe's contents
+* added IFrameTest.js to the samples
+* changed click from an ActionSequence to a WebElement action because Edge supports it
+* added --delayExit command line option to keep browser open after finishing test run
+
+
 Version 1.4.0
 
 Date: 2016-12-09

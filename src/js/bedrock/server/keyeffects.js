@@ -1,6 +1,7 @@
 var webdriver = require('selenium-webdriver');
-var By = webdriver.By;
 var Key = webdriver.Key;
+
+var effectutils = require('./effectutils');
 
 var NO_ACTION = null;
 
@@ -35,10 +36,20 @@ var scan = function (keys) {
    selector :: String
  }
  */
+
 var execute = function (driver, data) {
   var actions = scan(data.keys);
-  var target = driver.findElement(By.css(data.selector));
-  return target.sendKeys.apply(target, actions);
+  return effectutils.getTarget(driver, data).then(function (target) {
+    return target.sendKeys.apply(target, actions).then(function (x) {
+      return driver.switchTo().defaultContent().then(function () {
+        return x;
+      });
+    }, function (err) {
+      return driver.switchTo().defaultContent().then(function () {
+        return Promise.reject(err);
+      });
+    });
+  });
 };
 
 var executor = function (driver) {

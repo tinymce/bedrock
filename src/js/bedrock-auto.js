@@ -55,7 +55,8 @@ var go = function (settings) {
           }, pollExit);
         });
       });
-      lifecycle.shutdown(result, driver, done, settings.gruntDone !== undefined ? settings.gruntDone : null);
+
+      lifecycle.shutdown(result, driver, done, settings.gruntDone !== undefined ? settings.gruntDone : null, settings.delayExit !== undefined ? settings.delayExit : false);
     });
   }, function (err) {
     console.error('Unable to create driver', err);
