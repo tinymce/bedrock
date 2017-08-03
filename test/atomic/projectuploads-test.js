@@ -7,7 +7,6 @@ tape('Check uploading', function (t) {
       name: 'random.name',
       bucket: 'bedrock-testing',
       uploaddirs: [ 'test/resources/alpha', 'test/resources/beta' ],
-      dependencydir: "node_modules",
       basedir: '.',
       projectdir: '${PROJECT}',
       config: 'config/sample.js',
