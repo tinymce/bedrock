@@ -1,6 +1,7 @@
 var go = function (settings, directories) {
 
   var attempt = require('./bedrock/core/attempt');
+  var version = require('./bedrock/core/version');
   var clis = require('./bedrock/cli/clis');
   var childprocess = require('child_process');
   var dateformat = require('date-format');
@@ -17,7 +18,8 @@ var go = function (settings, directories) {
   var browsers = JSON.parse(sauceContents);
 
   return uploader.upload(settings.bucket, uploadDir, targets).then(function (base/* , uploadData */) {
-      console.log(`TEST URL: ${base} (bedrock assumes you use US west 2)
+    console.log('bedrock-sauce ' + version);
+    console.log(`TEST URL: ${base} (bedrock assumes you use US west 2)
 
 This URL will self destruct in 48 hours (assuming you've configured the server correctly)`);
 

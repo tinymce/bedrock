@@ -1,6 +1,7 @@
 var cloptions = require('./cloptions');
 var commandLineArgs = require('command-line-args');
 var attempt = require('../core/attempt');
+var version = require('../core/version');
 var validation = require('./validation');
 var cliusage = require('./cliusage');
 
@@ -15,12 +16,6 @@ var parseCommandLine = function (definitions) {
   }
 };
 
-var getVersion = function () {
-  // NOTE: Do not run browserify if this is here.
-  var npmInfo = require('../../../../package.json');
-  return npmInfo.version;
-};
-
 var extract = function (command, desc, definitions) {
   var parsed = parseCommandLine(definitions);
 
@@ -32,7 +27,7 @@ var extract = function (command, desc, definitions) {
       console.log(cliusage.generateUsage(command, desc, definitions));
       process.exit(exitcodes.success);
     } else if (s.version === true) {
-      console.log(command + ' version: ' + getVersion());
+      console.log(command + ' version: ' + version);
       process.exit(exitcodes.success);
     }
   });

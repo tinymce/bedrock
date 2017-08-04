@@ -1,6 +1,7 @@
 var go = function (settings) {
   var serve = require('./bedrock/repl/serve');
   var attempt = require('./bedrock/core/attempt');
+  var version = require('./bedrock/core/version');
   var replroutes = require('./bedrock/repl/replroutes');
 
   var runner = replroutes.generate(settings.projectdir, settings.basedir, settings.config, settings.repl);
@@ -18,7 +19,7 @@ var go = function (settings) {
   };
 
   serve.start(serveSettings, function (service/* , done */) {
-    console.log('bedrock (repl) available at: http://localhost:' + service.port);
+    console.log('bedrock-repl ' + version + ' available at: http://localhost:' + service.port);
   });
 };
 

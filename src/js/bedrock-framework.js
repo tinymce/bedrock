@@ -1,11 +1,10 @@
-
-
 var go = function (settings) {
   var serve = require('./bedrock/server/serve');
 
   var poll = require('./bedrock/poll/poll');
   var reporter = require('./bedrock/core/reporter');
   var attempt = require('./bedrock/core/attempt');
+  var version = require('./bedrock/core/version');
 
   var master = require('./bedrock/server/drivermaster').create();
 
@@ -45,7 +44,7 @@ var go = function (settings) {
     var isPhantom = settings.browser === 'phantomjs';
 
     serve.start(serveSettings, function (service, done) {
-      if (! isPhantom) console.log('bedrock-framework available at: http://localhost:' + service.port);
+      if (!isPhantom) console.log('bedrock-framework ' + version + ' available at: http://localhost:' + service.port);
       var result = driver.get('http://localhost:' + service.port + '/' + settings.page).then(function () {
         var message = isPhantom ? '\nPhantom tests loading ...\n' : '\n ... Initial page has loaded ...';
         console.log(message);
