@@ -23,8 +23,13 @@ var choose = function (settings) {
     return uploadtypes.filetype(path.join(basedir, inputDir, inputName), path.join(outputDir, outputName));
   };
 
+  var npmlink = function (pkg) {
+    return path.dirname(path.relative(basedir, require.resolve(pkg)));
+  };
+
   var boltlink = function (filename) {
-    return link('node_modules/@ephox/bolt/lib', filename, 'lib/bolt', filename);
+    var inputDir = path.join(npmlink('@ephox/bolt'), '../lib');
+    return link(inputDir, filename, 'lib/bolt', filename);
   };
 
   var getDirectories = function () {
@@ -45,7 +50,7 @@ var choose = function (settings) {
     boltlink('module.js'),
     boltlink('test.js'),
     link(
-      path.join('node_modules', 'jquery', 'dist'),
+      npmlink('jquery'),
       'jquery.min.js',
       path.join('lib', 'jquery'),
       'jquery.min.js'
