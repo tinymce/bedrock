@@ -86,7 +86,7 @@ var forRemote = function (directories) {
 
 var forSauceSingle = function (directories) {
   return cli.extract(
-    'bedrock-single-sauce',
+    'bedrock-sauce-single',
     'Connect to a SauceLabs VM and run the tests',
     commonOptions(directories).concat([
       cloptions.remoteurl,
