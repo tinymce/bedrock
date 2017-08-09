@@ -1,8 +1,5 @@
 var go = function (settings, directories) {
-
-  var attempt = require('./bedrock/core/attempt');
   var version = require('./bedrock/core/version');
-  var clis = require('./bedrock/cli/clis');
   var childprocess = require('child_process');
   var dateformat = require('date-format');
 

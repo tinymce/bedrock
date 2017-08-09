@@ -3,7 +3,6 @@ var go = function (settings) {
   var capitalize = require('capitalize');
   var saucejobs = require('./bedrock/remote/sauce-jobs');
 
-  var attempt = require('./bedrock/core/attempt');
   var version = require('./bedrock/core/version');
 
   var jobs = saucejobs.create(settings);
