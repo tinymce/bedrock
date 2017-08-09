@@ -3,7 +3,7 @@ var go = function (settings) {
   var capitalize = require('capitalize');
   var saucejobs = require('./bedrock/remote/sauce-jobs');
 
-  var attempt = require('./bedrock/core/attempt');
+  var version = require('./bedrock/core/version');
 
   var jobs = saucejobs.create(settings);
 
@@ -23,6 +23,7 @@ var go = function (settings) {
     build: settings.saucebuild,
     'max-duration': Math.floor(settings.overallTimeout / 1000)
   };
+  console.log('bedrock-sauce-single ' + version);
   console.log('creating driver with config', JSON.stringify(driverConf));
   var driver = drivers.create(settings.sauceuser, settings.saucekey, driverConf);
 

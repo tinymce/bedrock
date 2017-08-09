@@ -1,6 +1,7 @@
 var go = function (settings) {
   var serve = require('./bedrock/server/serve');
   var attempt = require('./bedrock/core/attempt');
+  var version = require('./bedrock/core/version');
   var boltroutes = require('./bedrock/server/boltroutes');
 
   var runner = boltroutes.generate(settings.projectdir, settings.basedir, settings.config, settings.testfiles, settings.stopOnFailure, 'src/resources/bedrock.html');
@@ -18,7 +19,7 @@ var go = function (settings) {
   };
 
   serve.start(serveSettings, function (service/* , done */) {
-    console.log('bedrock (manual) available at: http://localhost:' + service.port);
+    console.log('bedrock-manual ' + version + ' available at: http://localhost:' + service.port);
   });
 };
 

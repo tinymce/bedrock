@@ -1,6 +1,7 @@
 var go = function (settings) {
   var serve = require('./bedrock/server/serve');
   var attempt = require('./bedrock/core/attempt');
+  var version = require('./bedrock/core/version');
 
   var boltroutes = require('./bedrock/server/boltroutes');
 
@@ -33,10 +34,8 @@ var go = function (settings) {
       customRoutes: settings.customRoutes
     };
 
-    
-
     serve.start(serveSettings, function (service, done) {
-      if (! isPhantom) console.log('bedrock-auto available at: http://localhost:' + service.port);
+      if (!isPhantom) console.log('bedrock-auto ' + version + ' available at: http://localhost:' + service.port);
       var result = driver.get('http://localhost:' + service.port)
                          .then(driver.executeScript('window.focus();'))
                          .then(function () {
