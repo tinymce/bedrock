@@ -5,7 +5,7 @@ var webdriver = require('selenium-webdriver');
 
 var webdriver = require('selenium-webdriver');
 
-var headlessModes = {
+var browserVariants = {
   'chrome-headless': 'chrome',
   'firefox-headless': 'firefox'
 };
@@ -74,14 +74,15 @@ var setupHeadlessModes = function (browser, chromeOptions) {
  * basedir: base directory for bedrock
  */
 var create = function (settings) {
-  var browserName = headlessModes.hasOwnProperty(settings.browser) ? headlessModes[settings.browser] : settings.browser;
-  var driverDep = browserDrivers[browserName];
-  if (driverDep === undefined) console.log('Not loading a driver for browser ' + settings.browser);
+  var browser = settings.browser;
+  var browserFamily = browserVariants.hasOwnProperty(browser) ? browserVariants[browser] : browser;
+  var driverDep = browserDrivers[browserFamily];
+  if (driverDep === undefined) console.log('Not loading a driver for browser ' + browser);
   else {
     try {
       require(driverDep);
     } catch (e) {
-      console.log(`No local ${driverDep} for ${settings.browser}. Searching system path...`);
+      console.log(`No local ${driverDep} for ${browser}. Searching system path...`);
     }
   }
 
@@ -100,13 +101,13 @@ var create = function (settings) {
   chromeOptions.addArguments('start-maximized');
 
   var rawBlueprints = new webdriver.Builder()
-    .forBrowser(browserName).setChromeOptions(chromeOptions);
+    .forBrowser(browserFamily).setChromeOptions(chromeOptions);
 
-  var blueprint = settings.browser === 'phantomjs' ? addPhantomCapabilities(rawBlueprints, settings) : rawBlueprints;
+  var blueprint = browser === 'phantomjs' ? addPhantomCapabilities(rawBlueprints, settings) : rawBlueprints;
 
   var driver = blueprint.build();
 
-  setupHeadlessModes(settings.browser, chromeOptions);
+  setupHeadlessModes(browser, chromeOptions);
 
   var setSize = function () {
     /* If maximize does not work on your system (esp. firefox hangs), hard-code the size */
@@ -126,10 +127,10 @@ var create = function (settings) {
     setTimeout(function () {
       // Some tests require large windows, so make it as large as it can be.
       return setSize().then(resume, resume).then(function () {
-        var systemFocus = os.platform() === 'darwin' && settings.browser !== 'phantomjs' ? focusMac(settings.basedir, settings.browser) : Promise.resolve();
+        var systemFocus = os.platform() === 'darwin' && browser !== 'phantomjs' ? focusMac(settings.basedir, browser) : Promise.resolve();
 
-        var browserFocus = settings.browser === 'MicrosoftEdge' ? focusEdge(settings.basedir) :
-                          settings.browser === 'firefox' ? focusFirefox(settings.basedir) :
+        var browserFocus = browser === 'MicrosoftEdge' ? focusEdge(settings.basedir) :
+                          browser === 'firefox' ? focusFirefox(settings.basedir) :
                           Promise.resolve();
 
         systemFocus.then(browserFocus).then(function () {
