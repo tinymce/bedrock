@@ -110,9 +110,9 @@ var create = function (settings) {
   setupHeadlessModes(browser, chromeOptions);
 
   var setSize = function () {
-    /* If maximize does not work on your system (esp. firefox hangs), hard-code the size */
-    return driver.manage().window().setSize(800, 600);
-    // return driver.manage().window().maximize();
+    /* If maximize does not work on your system (esp. firefox hangs), hard-code the size (like so) */
+    // return driver.manage().window().setSize(800, 600);
+    return driver.manage().window().maximize();
   };
 
   var resume = function () {
