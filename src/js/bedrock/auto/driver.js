@@ -5,6 +5,11 @@ var webdriver = require('selenium-webdriver');
 
 var webdriver = require('selenium-webdriver');
 
+var headlessModes = {
+  'chrome-headless': 'chrome',
+  'firefox-headless': 'firefox'
+};
+
 var browserDrivers = {
   'chrome': 'chromedriver',
   'firefox': 'geckodriver',
@@ -61,7 +66,8 @@ var addPhantomCapabilities = function (blueprints, settings) {
  * basedir: base directory for bedrock
  */
 var create = function (settings) {
-  var driverDep = browserDrivers[settings.browser];
+  var browserName = headlessModes.hasOwnProperty(settings.browser) ? headlessModes[settings.browser] : settings.browser;
+  var driverDep = browserDrivers[browserName];
   if (driverDep === undefined) console.log('Not loading a driver for browser ' + settings.browser);
   else {
     try {
@@ -71,25 +77,37 @@ var create = function (settings) {
     }
   }
 
+  /* Add additional logging
+   * var logging = webdriver.logging;
+   * logging.installConsoleHandler();
+   * logging.getLogger('promise.ControlFlow').setLevel(logging.Level.ALL);
+   */
+
   // Support for disabling the Automation Chrome Extension
   var chrome = require('selenium-webdriver/chrome');
   var chromeOptions = new chrome.Options();
   chromeOptions.addArguments('chrome.switches', '--disable-extensions');
   
   // https://stackoverflow.com/questions/43261516/selenium-chrome-i-just-cant-use-driver-maximize-window-to-maximize-window
-  chromeOptions.addArguments("start-maximized");
+  chromeOptions.addArguments('start-maximized');
 
   var rawBlueprints = new webdriver.Builder()
-    .forBrowser(settings.browser).setChromeOptions(chromeOptions);
+    .forBrowser(browserName).setChromeOptions(chromeOptions);
 
   var blueprint = settings.browser === 'phantomjs' ? addPhantomCapabilities(rawBlueprints, settings) : rawBlueprints;
 
   var driver = blueprint.build();
 
+  var setSize = function () {
+    /* If maximize does not work on your system (esp. firefox), hard-code the size */
+    // return driver.manage().window().setSize(800, 600);
+    return driver.manage().window().maximize();
+  };
+
   var resume = function () {
     return Promise.resolve(driver);
   };
-    
+
   // Andy made some attempt to catch errors in this code but it never worked, I suspect the webdriver implementation
   // of promise is broken. Node gives 'unhandled rejection' errors no matter where I put the rejection handlers.
   return new Promise(function (resolve) {
@@ -97,7 +115,7 @@ var create = function (settings) {
     // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
     setTimeout(function () {
       // Some tests require large windows, so make it as large as it can be.
-      return driver.manage().window().maximize().then(resume, resume).then(function () {
+      return setSize().then(resume, resume).then(function () {
         var systemFocus = os.platform() === 'darwin' && settings.browser !== 'phantomjs' ? focusMac(settings.basedir, settings.browser) : Promise.resolve();
 
         var browserFocus = settings.browser === 'MicrosoftEdge' ? focusEdge(settings.basedir) :

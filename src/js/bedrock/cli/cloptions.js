@@ -30,8 +30,10 @@
     validate: extraction.inSet([
       'ie',
       'firefox',
+      'firefox-headless',
       'MicrosoftEdge',
       'chrome',
+      'chrome-headless',
       'safari',
       'phantomjs'
     ])
