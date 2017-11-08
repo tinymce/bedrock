@@ -8,11 +8,17 @@
   var testconfig = '';     // set during loadtests, for global config to use.
   var testcount = $('<span />').addClass('total').text(0);       // set during loadtests, for selenium remote test counting
   var testscratch = null;  // set per test, private dom scratch area for the current test to use.
+  var globalTests = global.__tests ? global.__tests : [];
+  var globalTestFiles = global.__testFiles ? global.__testFiles : [];
 
   var timer = ephox.bolt.test.report.timer;
   var accumulator = ephox.bolt.test.run.accumulator;
   var wrapper = ephox.bolt.test.run.wrapper;
   var errors = ephox.bolt.test.report.errors;
+
+  globalTestFiles.forEach(function (filePath, i) {
+    globalTests[i].filePath = filePath;
+  });
 
   var sendJson = function (url, data, success, error) {
     $.ajax({
@@ -214,10 +220,15 @@
       stopOnFailure = flag;
     };
 
+    var shouldStopOnFailure = function () {
+      return stopOnFailure;
+    };
+
     return {
       test: test,
       done: done,
-      setStopOnFailure: setStopOnFailure
+      setStopOnFailure: setStopOnFailure,
+      shouldStopOnFailure: shouldStopOnFailure
     };
   })();
 
@@ -254,6 +265,37 @@
     $('body').append('<div class="failed done">ajax error: ' + JSON.stringify(e) + '</div>');
   };
 
+  var runGlobalTests = function () {
+    var loop = function (tests) {
+      if (tests.length > 0) {
+        var test = tests.shift();
+        var report = reporter.test(test.filePath, test.name);
+
+        try {
+          test.test(function () {
+            loop(tests);
+          }, function (e) {
+            report.fail(e);
+
+            if (!reporter.shouldStopOnFailure()) {
+              loop(tests);
+            }
+          });
+        } catch (e) {
+          report.fail(e);
+
+          if (!reporter.shouldStopOnFailure()) {
+            loop(tests);
+          }
+        }
+      } else {
+        reporter.done();
+      }
+    };
+  
+    loop(globalTests.slice());
+  };
+
   api.loadtests = function (data) {
     testconfig = data.config;  // intentional, see top of file for var decl.
     var scripts = data.scripts;
@@ -264,8 +306,8 @@
         accumulator.register(testfile, wrapper.sync, wrapper.async);
         loadscript(testfile, loop, bomb);
       } else {
-        testcount.text(accumulator.length()); // intentional, see top of file for var decl.
-        accumulator.drain(runtest, reporter.done);
+        testcount.text(accumulator.length() + globalTests.length); // intentional, see top of file for var decl.
+        accumulator.drain(runtest, runGlobalTests);
       }
     };
     loop();
