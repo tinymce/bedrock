@@ -71,7 +71,7 @@
     alias: 'd',
     type: String,
     description: 'The directory containing all the files to test',
-    validate: extraction.files('Test.js')
+    validate: extraction.files(['Test.js', 'Test.ts'])
   };
 
   var testdirs = {
@@ -82,7 +82,7 @@
     multiple: true,
     flatten: true,
     description: 'The directories (plural) containing all the files to test',
-    validate: extraction.files('Test.js')
+    validate: extraction.files(['Test.js', 'Test.ts'])
   };
 
   var page = {

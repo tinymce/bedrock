@@ -42,18 +42,22 @@ var directory = function (name, value) {
   }
 };
 
-var files = function (pattern) {
+var files = function (patterns) {
   return function (name, value) {
     var dir = directory(name, value);
     return attempt.bind(dir, function (d) {
       try {
         var scanned = readdirSyncRec(d).filter(function (f) {
-          return f.indexOf(pattern) >-1 && fs.lstatSync(f).isFile();
+          var matches = patterns.filter(function (p) {
+            return f.indexOf(p) > -1;
+          });
+
+          return matches.length > 0 && fs.lstatSync(f).isFile();
         });
         return attempt.passed(scanned);
       } catch (err) {
         return attempt.failed([
-          'Error scanning directory [' + d + '] for files matching pattern: [' + pattern + ']'
+          'Error scanning directory [' + d + '] for files matching pattern: [' + patterns.join(', ') + ']'
         ]);
       }
     });
