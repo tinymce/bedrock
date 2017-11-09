@@ -274,6 +274,7 @@
         try {
           test.test(function () {
             loop(tests);
+            report.pass();
           }, function (e) {
             report.fail(e);
 
