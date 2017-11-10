@@ -1,4 +1,4 @@
-var generate = function (projectdir, basedir, boltConfig, testfiles, stopOnFailure, basePage) {
+var generate = function (projectdir, basedir, configFile, testfiles, stopOnFailure, basePage) {
   var path = require('path');
   var fs = require('fs');
   var routes = require('./routes');
@@ -29,7 +29,7 @@ var generate = function (projectdir, basedir, boltConfig, testfiles, stopOnFailu
     routes.asyncJs('GET', '/compiled/tests.js', function (done) {
       if (tsFiles.length > 0) {
         rollup.compile(
-          path.join(projectdir, 'sample/ts/tsconfig.json'),
+          path.join(projectdir, configFile),
           scratchTestTs,
           tsFiles,
           bundledTestsJs
@@ -44,7 +44,7 @@ var generate = function (projectdir, basedir, boltConfig, testfiles, stopOnFailu
     }),
     // Very bolt specific.
     routes.json('GET', '/harness', {
-      config: path.relative(projectdir, boltConfig),
+      config: path.relative(projectdir, configFile),
       scripts: jsFiles,
       stopOnFailure: stopOnFailure
     })
