@@ -2,7 +2,7 @@ var generate = function (projectdir, basedir, configFile, testfiles, stopOnFailu
   var path = require('path');
   var fs = require('fs');
   var routes = require('./routes');
-  var rollup = require('../compiler/rollup');
+  var webpack = require('../compiler/webpack');
 
   var files = testfiles.map(function (filePath) {
     return path.relative(projectdir, filePath);
@@ -16,9 +16,6 @@ var generate = function (projectdir, basedir, configFile, testfiles, stopOnFailu
     return path.extname(filePath) === '.ts';
   });
 
-  var scratchTestTs = path.join(projectdir, 'scratch/compiled/tests.ts');
-  var bundledTestsJs = path.join(projectdir, 'scratch/compiled/tests.js');
-
   var routers = [
     routes.routing('GET', '/project', projectdir),
     routes.routing('GET', '/js', path.join(basedir, 'src/resources')),
@@ -28,20 +25,19 @@ var generate = function (projectdir, basedir, configFile, testfiles, stopOnFailu
     routes.routing('GET', '/css', path.join(basedir, 'src/css')),
     routes.asyncJs('GET', '/compiled/tests.js', function (done) {
       if (tsFiles.length > 0) {
-        rollup.compile(
+        webpack.compile(
           path.join(projectdir, configFile),
-          scratchTestTs,
+          path.join(projectdir, 'scratch/compiled'),
           tsFiles,
-          bundledTestsJs
-        ).then(function () {
-          return done(fs.readFileSync(bundledTestsJs));
-        }).catch(function () {
-          done('Error');
-        });
+          function (compiledJsFilePath) {
+            done(fs.readFileSync(compiledJsFilePath));
+          }
+        );
       } else {
         done('');
       }
     }),
+    routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
     // Very bolt specific.
     routes.json('GET', '/harness', {
       config: path.relative(projectdir, configFile),

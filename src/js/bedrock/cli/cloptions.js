@@ -48,7 +48,7 @@
     };
   };
 
-  var config = configTo('config/bolt/browser.js');
+  var config = configTo('webpack.test.js');
 
   var files = {
     name: 'files',
