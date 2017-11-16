@@ -276,6 +276,7 @@
             loop(tests);
             report.pass();
           }, function (e) {
+            console.error(e);
             report.fail(e);
 
             if (!reporter.shouldStopOnFailure()) {
@@ -283,6 +284,7 @@
             }
           });
         } catch (e) {
+          console.error(e);
           report.fail(e);
 
           if (!reporter.shouldStopOnFailure()) {
