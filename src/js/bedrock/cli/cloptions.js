@@ -48,7 +48,7 @@
     };
   };
 
-  var config = configTo('webpack.test.js');
+  var config = configTo('webpack.config.js');
 
   var files = {
     name: 'files',
