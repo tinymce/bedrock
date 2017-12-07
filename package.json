@@ -39,6 +39,8 @@
     "openport": "0.0.4",
     "recursive-readdir-sync": "^1.0.6",
     "request": "^2.72.0",
+    "rollup": "^0.52.1",
+    "rollup-plugin-typescript2": "^0.8.4",
     "saucelabs": "^1.2.0",
     "selenium-webdriver": "^3.4.0",
     "serve-static": "^1.10.2",
@@ -46,6 +48,7 @@
     "xml-writer": "^1.6.0"
   },
   "devDependencies": {
+    "awesome-typescript-loader": "^3.3.0",
     "eslint": "^2.9.0",
     "eslint-config-google": "^0.5.0",
     "grunt": "^1.0.1",
@@ -53,8 +56,8 @@
     "jsverify": "^0.7.1",
     "load-grunt-tasks": "^3.5.0",
     "nlf": "^1.4.2",
+    "rollup-plugin-node-resolve": "^3.0.0",
     "tape": "^4.5.1",
-    "awesome-typescript-loader": "^3.3.0",
     "webpack": "^3.8.1"
   },
   "author": "Ephox Corporation",

@@ -2,6 +2,7 @@ var generate = function (projectdir, basedir, configFile, testfiles, stopOnFailu
   var path = require('path');
   var fs = require('fs');
   var routes = require('./routes');
+  var rollup = require('../compiler/rollup');
   var webpack = require('../compiler/webpack');
 
   var files = testfiles.map(function (filePath) {
@@ -16,6 +17,10 @@ var generate = function (projectdir, basedir, configFile, testfiles, stopOnFailu
     return path.extname(filePath) === '.ts';
   });
 
+  var getCompileFunc = function () {
+    return configFile.indexOf('webpack') !== -1 ? webpack.compile : rollup.compile;
+  };
+
   var routers = [
     routes.routing('GET', '/project', projectdir),
     routes.routing('GET', '/js', path.join(basedir, 'src/resources')),
@@ -24,8 +29,9 @@ var generate = function (projectdir, basedir, configFile, testfiles, stopOnFailu
     routes.routing('GET', '/lib/babel-polyfill', path.join(path.dirname(require.resolve('babel-polyfill')), '../dist')),
     routes.routing('GET', '/css', path.join(basedir, 'src/css')),
     routes.asyncJs('GET', '/compiled/tests.js', function (done) {
+      var compile = getCompileFunc();
       if (tsFiles.length > 0) {
-        webpack.compile(
+        compile(
           path.join(projectdir, configFile),
           path.join(projectdir, 'scratch/compiled'),
           tsFiles,
