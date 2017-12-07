@@ -43,8 +43,8 @@ let generateImports = function (scratchFile, srcFiles) {
 };
 
 let compile = function (webpackConfigFile, scratchDir, srcFiles, success) {
-  var scratchFile = path.join(scratchDir, 'tests.ts');
-  var dest = path.join(scratchDir, 'tests.js');
+  var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
+  var dest = path.join(scratchDir, 'compiled/tests.js');
   var webPackConfig = require(webpackConfigFile);
 
   mkdirp.sync(path.dirname(scratchFile));

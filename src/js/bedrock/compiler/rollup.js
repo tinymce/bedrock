@@ -30,8 +30,8 @@ let parseTsConfig = function (tsconfig) {
 };
 
 let compile = function (tsConfigFile, scratchDir, srcFiles, success) {
-  var scratchFile = path.join(scratchDir, 'tests.ts');
-  var dest = path.join(scratchDir, 'tests.js');
+  var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
+  var dest = path.join(scratchDir, 'compiled/tests.js');
 
   const outputOptions = {
     name: 'ephoxTests',
@@ -48,6 +48,7 @@ let compile = function (tsConfigFile, scratchDir, srcFiles, success) {
 
   rollup.rollup({
     input: scratchFile,
+    treeshake: false,
     plugins: [
       resolve({
         jsnext: true,
@@ -56,10 +57,11 @@ let compile = function (tsConfigFile, scratchDir, srcFiles, success) {
         }
       }),
       typescript({
+        cacheRoot: path.join(scratchDir, 'rts2_cache'),
         tsconfig: tsConfigFile,
         verbosity: 2,
         check: false,
-        clean: true,
+        // clean: true,
         tsconfigOverride: {
           compilerOptions: {
             declaration: false,

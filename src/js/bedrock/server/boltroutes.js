@@ -33,7 +33,7 @@ var generate = function (projectdir, basedir, configFile, testfiles, stopOnFailu
       if (tsFiles.length > 0) {
         compile(
           path.join(projectdir, configFile),
-          path.join(projectdir, 'scratch/compiled'),
+          path.join(projectdir, 'scratch'),
           tsFiles,
           function (compiledJsFilePath) {
             done(fs.readFileSync(compiledJsFilePath));
