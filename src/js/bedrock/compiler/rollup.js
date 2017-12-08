@@ -1,6 +1,7 @@
 const rollup = require('rollup');
 const typescript = require('rollup-plugin-typescript2');
 const resolve = require('rollup-plugin-node-resolve');
+const sourcemaps = require('rollup-plugin-sourcemaps');
 const path = require('path');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
@@ -71,7 +72,8 @@ let compile = function (tsConfigFile, scratchDir, srcFiles, success) {
             path.resolve(scratchFile)
           ])
         }
-      })
+      }),
+      sourcemaps()
     ]
   }).then(function (bundle) {
     bundle.generate(outputOptions);
