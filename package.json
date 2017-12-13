@@ -48,6 +48,7 @@
     "saucelabs": "^1.2.0",
     "selenium-webdriver": "^3.4.0",
     "serve-static": "^1.10.2",
+    "source-map-loader": "^0.2.3",
     "typescript": "^2.6.1",
     "webpack": "^3.8.1",
     "xml-writer": "^1.6.0"
