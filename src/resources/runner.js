@@ -17,7 +17,10 @@
   var errors = ephox.bolt.test.report.errors;
 
   globalTestFiles.forEach(function (filePath, i) {
-    globalTests[i].filePath = filePath;
+    var test = globalTests[i];
+    if (test && !test.filePath) {
+      test.filePath = filePath;
+    }
   });
 
   var sendJson = function (url, data, success, error) {
