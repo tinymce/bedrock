@@ -39,6 +39,18 @@
     ])
   };
 
+  var bundler = {
+    name: 'bundler',
+    type: String,
+    required: false,
+    defaultValue: 'webpack',
+    description: 'The name bundler to use webpack/rollup',
+    validate: extraction.inSet([
+      'webpack',
+      'rollup'
+    ])
+  };
+
   var configTo = function (defaultValue) {
     return {
       name: 'config',
@@ -50,7 +62,7 @@
     };
   };
 
-  var config = configTo('webpack.config.js');
+  var config = configTo('tsconfig.json');
 
   var files = {
     name: 'files',
@@ -360,6 +372,7 @@
     testdir: testdir,
     testdirs: testdirs,
     customRoutes: customRoutes,
+    bundler: bundler,
 
     // Webdriver testing
     name: name,

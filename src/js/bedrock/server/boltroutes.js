@@ -1,4 +1,4 @@
-var generate = function (projectdir, basedir, configFile, testfiles, stopOnFailure, basePage) {
+var generate = function (projectdir, basedir, configFile, bundler, testfiles, stopOnFailure, basePage) {
   var path = require('path');
   var fs = require('fs');
   var routes = require('./routes');
@@ -18,7 +18,7 @@ var generate = function (projectdir, basedir, configFile, testfiles, stopOnFailu
   });
 
   var getCompileFunc = function () {
-    return configFile.indexOf('webpack') !== -1 ? webpack.compile : rollup.compile;
+    return bundler === 'webpack' ? webpack.compile : rollup.compile;
   };
 
   var routers = [

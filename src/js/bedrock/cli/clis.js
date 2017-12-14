@@ -16,7 +16,8 @@ var commonOptions = function (directories) {
     cloptions.stopOnFailure,
     cloptions.help,
     cloptions.logging,
-    cloptions.version
+    cloptions.version,
+    cloptions.bundler
   ];
 };
 

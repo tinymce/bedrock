@@ -78,7 +78,7 @@ let getWebPackConfig = function (scratchDir, scratchFile, dest) {
 
     output: {
       filename: path.basename(dest),
-      path: path.dirname(dest)
+      path: path.resolve(path.dirname(dest))
     }
   };
 };
