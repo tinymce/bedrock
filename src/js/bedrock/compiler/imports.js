@@ -9,7 +9,7 @@ let filePathToImport = function (scratchFile) {
     relativePath = relativePath.replace(/\\/g, '\\\\');
 
     return [
-      'import "' + relativePath  + '";',
+      'import "' + relativePath + '";',
       'if (__tests && __tests[__tests.length - 1] && !__tests[__tests.length - 1].filePath) {',
       '__tests[__tests.length - 1].filePath = "' + filePath + '";',
       '}'
