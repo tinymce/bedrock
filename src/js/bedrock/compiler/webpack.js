@@ -3,26 +3,7 @@ var path = require('path');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
 var webpack = require("webpack");
-
-let generateImports = function (scratchFile, srcFiles) {
-  var imports = srcFiles.map(function (filePath) {
-    var importFilePath = path.join(path.dirname(filePath), path.basename(filePath, path.extname(filePath)));
-
-    return [
-      'import "' + path.relative(path.dirname(scratchFile), importFilePath) + '";'
-    ].join('\n');
-  }).join('\n');
-
-  var filePaths = srcFiles.map(function (filePath) {
-    return '"' + filePath + '"';
-  }).join(', ');
-
-  return [
-    imports,
-    'declare let window: any;',
-    'window.__testFiles = [' + filePaths + '];'
-  ].join('\n');
-};
+const imports = require('./imports');
 
 let getWebPackConfig = function (scratchDir, scratchFile, dest) {
   return {
@@ -73,7 +54,9 @@ let getWebPackConfig = function (scratchDir, scratchFile, dest) {
     },
 
     plugins: [
-      new CheckerPlugin()
+      new CheckerPlugin({
+        silent: true
+      })
     ],
 
     output: {
@@ -88,7 +71,7 @@ let compile = function (webpackConfigFile, scratchDir, srcFiles, success) {
   var dest = path.join(scratchDir, 'compiled/tests.js');
 
   mkdirp.sync(path.dirname(scratchFile));
-  fs.writeFileSync(scratchFile, generateImports(scratchFile, srcFiles));
+  fs.writeFileSync(scratchFile, imports.generateImports(scratchFile, srcFiles));
 
   webpack(getWebPackConfig(scratchDir, scratchFile, dest), (err, stats) => {
     if (err || stats.hasErrors()) {

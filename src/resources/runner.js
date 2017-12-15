@@ -9,19 +9,11 @@
   var testcount = $('<span />').addClass('total').text(0);       // set during loadtests, for selenium remote test counting
   var testscratch = null;  // set per test, private dom scratch area for the current test to use.
   var globalTests = global.__tests ? global.__tests : [];
-  var globalTestFiles = global.__testFiles ? global.__testFiles : [];
 
   var timer = ephox.bolt.test.report.timer;
   var accumulator = ephox.bolt.test.run.accumulator;
   var wrapper = ephox.bolt.test.run.wrapper;
   var errors = ephox.bolt.test.report.errors;
-
-  globalTestFiles.forEach(function (filePath, i) {
-    var test = globalTests[i];
-    if (test && !test.filePath) {
-      test.filePath = filePath;
-    }
-  });
 
   var sendJson = function (url, data, success, error) {
     $.ajax({
