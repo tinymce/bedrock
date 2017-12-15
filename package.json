@@ -16,6 +16,8 @@
     "bedrock": "./bin/bedrock.js"
   },
   "scripts": {
+    "prepublishOnly": "tsc",
+    "build": "tsc",
     "test-atomic": "tape test/atomic/*.js",
     "test-props": "tape test/props/*.js",
     "test-samples": "bin/bedrock-auto.js -b phantomjs --config sample/config.js --files sample/AsyncPassTest.js sample/IFrameTest.js",
@@ -65,6 +67,8 @@
   },
   "author": "Ephox Corporation",
   "license": "Apache-2.0",
+  "main": "./lib/api/Main.js",
+  "module": "./lib/api/Main.js",
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   }
