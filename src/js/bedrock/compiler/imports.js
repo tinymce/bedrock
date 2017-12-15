@@ -3,9 +3,13 @@ var path = require('path');
 let filePathToImport = function (scratchFile) {
   return function (filePath) {
     var importFilePath = path.join(path.dirname(filePath), path.basename(filePath, path.extname(filePath)));
+    var relativePath = path.relative(path.dirname(scratchFile), importFilePath);
+
+    // make sure slashes are escaped for windows
+    relativePath = relativePath.replace(/\\/g, '\\\\');
 
     return [
-      'import "' + path.relative(path.dirname(scratchFile), importFilePath) + '";',
+      'import "' + relativePath  + '";',
       'if (__tests && __tests[__tests.length - 1] && !__tests[__tests.length - 1].filePath) {',
       '__tests[__tests.length - 1].filePath = "' + filePath + '";',
       '}'
