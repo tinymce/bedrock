@@ -26,7 +26,7 @@ let compile = function (tsConfigFile, scratchDir, srcFiles, success) {
   const include = tsConfig.include ? tsConfig.include : [];
 
   mkdirp.sync(path.dirname(scratchFile));
-  fs.writeFileSync(scratchFile, imports.generateImports(scratchFile, srcFiles));
+  fs.writeFileSync(scratchFile, imports.generateImports(false, scratchFile, srcFiles));
 
   rollup.rollup({
     input: scratchFile,

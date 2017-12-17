@@ -71,7 +71,7 @@ let compile = function (webpackConfigFile, scratchDir, srcFiles, success) {
   var dest = path.join(scratchDir, 'compiled/tests.js');
 
   mkdirp.sync(path.dirname(scratchFile));
-  fs.writeFileSync(scratchFile, imports.generateImports(scratchFile, srcFiles));
+  fs.writeFileSync(scratchFile, imports.generateImports(true, scratchFile, srcFiles));
 
   webpack(getWebPackConfig(scratchDir, scratchFile, dest), (err, stats) => {
     if (err || stats.hasErrors()) {
