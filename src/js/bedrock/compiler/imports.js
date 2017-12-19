@@ -21,9 +21,10 @@ let generateImports = function (useRequire, scratchFile, srcFiles) {
   var imports = srcFiles.map(filePathToImport(useRequire, scratchFile)).join('\n');
 
   return [
+    'declare let require: any;',
+    'declare let __tests: any;',
     imports,
-    'declare let window: any;',
-    'declare let __tests: any;'
+    'export {};'
   ].join('\n');
 };
 

@@ -21,7 +21,7 @@ var go = function (settings) {
     var basePage = isPhantom ? 'src/resources/bedrock-phantom.html' : 'src/resources/bedrock.html';
 
     var lifecycle = require('./bedrock/core/lifecycle');
-    var runner = boltroutes.generate(settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.stopOnFailure, basePage);
+    var runner = boltroutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.stopOnFailure, basePage);
 
     var serveSettings = {
       projectdir: settings.projectdir,

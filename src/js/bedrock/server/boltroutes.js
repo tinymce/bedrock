@@ -1,4 +1,4 @@
-var generate = function (projectdir, basedir, configFile, bundler, testfiles, stopOnFailure, basePage) {
+var generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, stopOnFailure, basePage) {
   var path = require('path');
   var fs = require('fs');
   var routes = require('./routes');
@@ -34,6 +34,7 @@ var generate = function (projectdir, basedir, configFile, bundler, testfiles, st
         compile(
           path.join(projectdir, configFile),
           path.join(projectdir, 'scratch'),
+          mode === 'auto',
           tsFiles,
           function (compiledJsFilePath) {
             done(fs.readFileSync(compiledJsFilePath));

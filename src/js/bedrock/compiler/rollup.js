@@ -6,12 +6,13 @@ const path = require('path');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
 const imports = require('./imports');
+const exitcodes = require('../util/exitcodes');
 
 let parseTsConfig = function (tsconfig) {
   return JSON.parse(fs.readFileSync(tsconfig));
 };
 
-let compile = function (tsConfigFile, scratchDir, srcFiles, success) {
+let compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, success) {
   var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   var dest = path.join(scratchDir, 'compiled/tests.js');
 
@@ -62,6 +63,11 @@ let compile = function (tsConfigFile, scratchDir, srcFiles, success) {
     success(dest);
   }).catch(function (err) {
     console.log(err);
+
+    if (exitOnCompileError) {
+      process.exit(exitcodes.failures.error);
+    }
+
     success(dest);
   });
 };

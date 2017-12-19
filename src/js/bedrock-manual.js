@@ -4,7 +4,7 @@ var go = function (settings) {
   var version = require('./bedrock/core/version');
   var boltroutes = require('./bedrock/server/boltroutes');
 
-  var runner = boltroutes.generate(settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.stopOnFailure, 'src/resources/bedrock.html');
+  var runner = boltroutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.stopOnFailure, 'src/resources/bedrock.html');
 
   var serveSettings = {
     projectdir: settings.projectdir,

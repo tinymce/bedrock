@@ -3,9 +3,10 @@ var path = require('path');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
 var webpack = require("webpack");
+var exitcodes = require('../util/exitcodes');
 const imports = require('./imports');
 
-let getWebPackConfig = function (scratchDir, scratchFile, dest) {
+let getWebPackConfig = function (tsConfigFile, scratchDir, scratchFile, dest) {
   return {
     context: path.resolve(__dirname),
     stats: 'none',
@@ -17,7 +18,7 @@ let getWebPackConfig = function (scratchDir, scratchFile, dest) {
       plugins: [
         new TsConfigPathsPlugin({
           options: {
-            baseUrl: '.'
+            configFileName: tsConfigFile
           }
         })
       ]
@@ -37,9 +38,10 @@ let getWebPackConfig = function (scratchDir, scratchFile, dest) {
             {
               loader: 'awesome-typescript-loader',
               options: {
+                configFileName: tsConfigFile,
                 compiler: 'typescript',
                 useCache: false,
-                transpileOnly: true,
+                transpileOnly: false,
                 cacheDirectory: path.join(scratchDir, 'awcache')
               }
             }
@@ -54,9 +56,7 @@ let getWebPackConfig = function (scratchDir, scratchFile, dest) {
     },
 
     plugins: [
-      new CheckerPlugin({
-        silent: true
-      })
+      new CheckerPlugin({})
     ],
 
     output: {
@@ -66,22 +66,28 @@ let getWebPackConfig = function (scratchDir, scratchFile, dest) {
   };
 };
 
-let compile = function (webpackConfigFile, scratchDir, srcFiles, success) {
+let compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, success) {
   var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   var dest = path.join(scratchDir, 'compiled/tests.js');
 
   mkdirp.sync(path.dirname(scratchFile));
   fs.writeFileSync(scratchFile, imports.generateImports(true, scratchFile, srcFiles));
 
-  webpack(getWebPackConfig(scratchDir, scratchFile, dest), (err, stats) => {
+  webpack(getWebPackConfig(tsConfigFile, scratchDir, scratchFile, dest), (err, stats) => {
     if (err || stats.hasErrors()) {
-      console.log(stats.toString({
+      let msg = stats.toString({
         all: false,
         errors: true,
         moduleTrace: true,
         chunks: false,
         colors: true
-      }));
+      });
+
+      console.log(msg);
+
+      if (exitOnCompileError) {
+        process.exit(exitcodes.failures.error);
+      }
     }
 
     success(dest);
