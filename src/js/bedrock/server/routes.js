@@ -31,6 +31,20 @@ var concludeJson = function (response, status, info) {
   response.end(JSON.stringify(info));
 };
 
+var asyncJs = function (method, url, fn) {
+  var go = function (request, response/* , done */) {
+    fn(function (data) {
+      response.writeHeader(200, { "Content-Type": "text/javascript" });
+      response.end(data);
+    });
+  };
+
+  return {
+    matches: [ matchers.methodMatch(method), matchers.urlMatch(url) ],
+    go: go
+  };
+};
+
 var effect = function (method, prefix, action) {
   var go = function (request, response/* , done */) {
     var body = '';
@@ -143,6 +157,7 @@ module.exports = {
   rewrite: rewrite,
   unsupported: unsupported,
   json: json,
+  asyncJs: asyncJs,
   route: route,
   host: host,
   hostOn: hostOn

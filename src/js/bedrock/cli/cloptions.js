@@ -39,6 +39,18 @@
     ])
   };
 
+  var bundler = {
+    name: 'bundler',
+    type: String,
+    required: false,
+    defaultValue: 'webpack',
+    description: 'The name bundler to use webpack/rollup',
+    validate: extraction.inSet([
+      'webpack',
+      'rollup'
+    ])
+  };
+
   var configTo = function (defaultValue) {
     return {
       name: 'config',
@@ -50,7 +62,7 @@
     };
   };
 
-  var config = configTo('config/bolt/browser.js');
+  var config = configTo('tsconfig.json');
 
   var files = {
     name: 'files',
@@ -73,7 +85,7 @@
     alias: 'd',
     type: String,
     description: 'The directory containing all the files to test',
-    validate: extraction.files('Test.js')
+    validate: extraction.files(['Test.js', 'Test.ts'])
   };
 
   var testdirs = {
@@ -84,7 +96,7 @@
     multiple: true,
     flatten: true,
     description: 'The directories (plural) containing all the files to test',
-    validate: extraction.files('Test.js')
+    validate: extraction.files(['Test.js', 'Test.ts'])
   };
 
   var page = {
@@ -360,6 +372,7 @@
     testdir: testdir,
     testdirs: testdirs,
     customRoutes: customRoutes,
+    bundler: bundler,
 
     // Webdriver testing
     name: name,

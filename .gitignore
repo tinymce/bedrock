@@ -1,4 +1,6 @@
+.rpt2_cache
 /node_modules
 /scratch
 /*.log
+/lib
 *.sublime-workspace

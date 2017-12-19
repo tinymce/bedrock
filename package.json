@@ -1,7 +1,7 @@
 {
   "name": "@ephox/bedrock",
-  "version": "1.8.0",
-  "description": "NodeJS test runner for bolt projects",
+  "version": "2.0.0",
+  "description": "NodeJS test runner",
   "repository": {
     "type": "git",
     "url": "https://github.com/ephox/bedrock"
@@ -16,6 +16,8 @@
     "bedrock": "./bin/bedrock.js"
   },
   "scripts": {
+    "prepublishOnly": "tsc",
+    "build": "tsc",
     "test-atomic": "tape test/atomic/*.js",
     "test-props": "tape test/props/*.js",
     "test-samples": "bin/bedrock-auto.js -b phantomjs --config sample/config.js --files sample/AsyncPassTest.js sample/IFrameTest.js",
@@ -26,6 +28,7 @@
   "dependencies": {
     "@ephox/bolt": "^1.6.5",
     "async": "^1.5.2",
+    "awesome-typescript-loader": "^3.3.0",
     "aws-sdk": "^2.3.9",
     "babel-polyfill": "^6.23.0",
     "capitalize": "^1.0.0",
@@ -35,12 +38,21 @@
     "finalhandler": "^0.4.1",
     "jquery": "^2.2.3",
     "mime": "^1.3.4",
+    "mkdirp": "^0.5.1",
     "openport": "0.0.4",
+    "raw-loader": "^0.5.1",
     "recursive-readdir-sync": "^1.0.6",
     "request": "^2.72.0",
+    "rollup": "^0.52.1",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-sourcemaps": "^0.4.2",
+    "rollup-plugin-typescript2": "^0.8.4",
     "saucelabs": "^1.2.0",
     "selenium-webdriver": "^3.4.0",
     "serve-static": "^1.10.2",
+    "source-map-loader": "^0.2.3",
+    "typescript": "^2.6.1",
+    "webpack": "^3.8.1",
     "xml-writer": "^1.6.0"
   },
   "devDependencies": {
@@ -55,6 +67,8 @@
   },
   "author": "Ephox Corporation",
   "license": "Apache-2.0",
+  "main": "./lib/api/Main.js",
+  "module": "./lib/api/Main.js",
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   }
