@@ -47,9 +47,9 @@ let getWebPackConfig = function (scratchDir, scratchFile, dest) {
         },
 
         {
-          test: /\.css$/,
+          test: /\.(html|htm|css|bower|hex|rtf)$/,
           use: [ 'raw-loader' ]
-        }
+        }        
       ]
     },
 
