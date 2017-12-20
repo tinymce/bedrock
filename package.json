@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "NodeJS test runner",
   "repository": {
     "type": "git",
@@ -48,7 +48,7 @@
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-typescript2": "^0.8.4",
     "saucelabs": "^1.2.0",
-    "selenium-webdriver": "^3.4.0",
+    "selenium-webdriver": "~3.4.0",
     "serve-static": "^1.10.2",
     "source-map-loader": "^0.2.3",
     "typescript": "^2.6.1",
