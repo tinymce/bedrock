@@ -49,7 +49,7 @@ let getWebPackConfig = function (tsConfigFile, scratchDir, scratchFile, dest) {
         },
 
         {
-          test: /\.(html|htm|css|bower|hex|rtf)$/,
+          test: /\.(html|htm|css|bower|hex|rtf|yml)$/,
           use: [ 'raw-loader' ]
         }        
       ]
