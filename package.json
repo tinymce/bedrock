@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "NodeJS test runner",
   "repository": {
     "type": "git",
@@ -43,10 +43,6 @@
     "raw-loader": "^0.5.1",
     "recursive-readdir-sync": "^1.0.6",
     "request": "^2.72.0",
-    "rollup": "^0.52.1",
-    "rollup-plugin-node-resolve": "^3.0.0",
-    "rollup-plugin-sourcemaps": "^0.4.2",
-    "rollup-plugin-typescript2": "^0.8.4",
     "saucelabs": "^1.2.0",
     "selenium-webdriver": "~3.4.0",
     "serve-static": "^1.10.2",
@@ -63,8 +59,12 @@
     "jsverify": "^0.7.1",
     "load-grunt-tasks": "^3.5.0",
     "nlf": "^1.4.2",
-    "tape": "^4.5.1"
-  },
+    "tape": "^4.5.1",
+    "rollup": "^0.52.1",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-sourcemaps": "^0.4.2",
+    "rollup-plugin-typescript2": "^0.8.4"
+},
   "author": "Ephox Corporation",
   "license": "Apache-2.0",
   "main": "./lib/api/Main.js",

@@ -276,6 +276,8 @@
 
             if (!reporter.shouldStopOnFailure()) {
               loop(tests);
+            } else {
+              reporter.done();
             }
           });
         } catch (e) {
@@ -284,13 +286,15 @@
 
           if (!reporter.shouldStopOnFailure()) {
             loop(tests);
+          } else {
+            reporter.done();
           }
         }
       } else {
         reporter.done();
       }
     };
-  
+
     loop(globalTests.slice());
   };
 

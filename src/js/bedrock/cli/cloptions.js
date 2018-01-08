@@ -44,7 +44,7 @@
     type: String,
     required: false,
     defaultValue: 'webpack',
-    description: 'The name bundler to use webpack/rollup',
+    description: 'DISABLED: The name bundler to use webpack/rollup (forced webpack in this build)',
     validate: extraction.inSet([
       'webpack',
       'rollup'
@@ -404,7 +404,7 @@
     totalSelector: totalSelector,
     testNameSelector: testNameSelector,
     resultsSelector: resultsSelector,
-    
+
     // Phantom settings
     debuggingPort: debuggingPort,
 

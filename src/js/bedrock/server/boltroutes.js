@@ -1,25 +1,18 @@
 var generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, stopOnFailure, basePage) {
   var path = require('path');
-  var fs = require('fs');
   var routes = require('./routes');
-  var rollup = require('../compiler/rollup');
-  var webpack = require('../compiler/webpack');
+  var compiler = require('../compiler/compiler');
 
   var files = testfiles.map(function (filePath) {
     return path.relative(projectdir, filePath);
   });
 
-  var jsFiles = files.filter(function (filePath) {
-    return path.extname(filePath) !== '.ts';
-  });
-  
-  var tsFiles = files.filter(function (filePath) {
-    return path.extname(filePath) === '.ts';
-  });
-
-  var getCompileFunc = function () {
-    return bundler === 'webpack' ? webpack.compile : rollup.compile;
-  };
+  var testGenerator = compiler(
+    path.join(projectdir, configFile),
+    path.join(projectdir, 'scratch'),
+    mode === 'auto',
+    files
+  );
 
   var routers = [
     routes.routing('GET', '/project', projectdir),
@@ -29,26 +22,15 @@ var generate = function (mode, projectdir, basedir, configFile, bundler, testfil
     routes.routing('GET', '/lib/babel-polyfill', path.join(path.dirname(require.resolve('babel-polyfill')), '../dist')),
     routes.routing('GET', '/css', path.join(basedir, 'src/css')),
     routes.asyncJs('GET', '/compiled/tests.js', function (done) {
-      var compile = getCompileFunc();
-      if (tsFiles.length > 0) {
-        compile(
-          path.join(projectdir, configFile),
-          path.join(projectdir, 'scratch'),
-          mode === 'auto',
-          tsFiles,
-          function (compiledJsFilePath) {
-            done(fs.readFileSync(compiledJsFilePath));
-          }
-        );
-      } else {
-        done('');
-      }
+      testGenerator.generate().then(done);
     }),
     routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
-    // Very bolt specific.
+
+    // bolt tests won't work anymore, so until we have time to rewrite the runtime
+    // just return an empty array of scripts
     routes.json('GET', '/harness', {
       config: path.relative(projectdir, configFile),
-      scripts: jsFiles,
+      scripts: [],
       stopOnFailure: stopOnFailure
     })
   ];

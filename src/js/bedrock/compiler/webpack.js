@@ -11,7 +11,7 @@ let getWebPackConfig = function (tsConfigFile, scratchDir, scratchFile, dest) {
     context: path.resolve(__dirname),
     stats: 'none',
     entry: scratchFile,
-    devtool: 'source-map',
+    devtool: 'eval-cheap-module-source-map',
 
     resolve: {
       extensions: ['.ts', '.js'],
@@ -51,7 +51,7 @@ let getWebPackConfig = function (tsConfigFile, scratchDir, scratchFile, dest) {
         {
           test: /\.(html|htm|css|bower|hex|rtf|yml)$/,
           use: [ 'raw-loader' ]
-        }        
+        }
       ]
     },
 
