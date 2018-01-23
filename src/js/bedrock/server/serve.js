@@ -9,7 +9,7 @@ var accessor = require('../core/accessor');
  * master (can be null) The driver master (locking and unlocking)
  * runner: runner (e.g. boltroutes, pageroutes etc). Has fallback and routers.
  */
-var start = function (settings, f) {
+var startCustom = function (settings, createServer, f) {
   var Prefs = accessor.create([
     'projectdir',
     'basedir',
@@ -19,7 +19,6 @@ var start = function (settings, f) {
     'runner'
   ]);
 
-  var http = require('http');
   var finalhandler = require('finalhandler');
 
   var openport = require('openport');
@@ -53,7 +52,7 @@ var start = function (settings, f) {
       return;
     }
 
-    var server = http.createServer(function (request, response) {
+    var server = createServer(function (request, response) {
       var done = finalhandler(request, response);
       routes.route(routers, fallback, request, response, done);
     }).listen(port);
@@ -68,6 +67,12 @@ var start = function (settings, f) {
   });
 };
 
+var start = function (settings, f) {
+  var http = require('http');
+  startCustom(settings, http.createServer, f);
+};
+
 module.exports = {
+  startCustom: startCustom,
   start: start
 };
