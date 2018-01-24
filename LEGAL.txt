@@ -12,15 +12,15 @@ Dependency:
 
 Dependency: 
   name: abbrev
-  version: 1.1.0
+  version: 1.1.1
   repository: ssh://git@github.com/isaacs/abbrev-js
   licenses: ISC
 
 Dependency: 
-  name: abbrev
-  version: 1.1.1
-  repository: ssh://git@github.com/isaacs/abbrev-js
-  licenses: ISC
+  name: accepts
+  version: 1.3.4
+  repository: https://github.com/jshttp/accepts
+  licenses: MIT
 
 Dependency: 
   name: acorn
@@ -107,6 +107,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: ansi-html
+  version: 0.0.7
+  repository: http://github.com/Tjatse/ansi-html
+  licenses: Apache-2.0
+
+Dependency: 
   name: ansi-regex
   version: 2.1.1
   repository: https://github.com/chalk/ansi-regex
@@ -131,9 +137,9 @@ Dependency:
   licenses: ISC
 
 Dependency: 
-  name: aproba
-  version: 1.1.1
-  repository: https://github.com/iarna/aproba
+  name: anymatch
+  version: 2.0.0
+  repository: https://github.com/micromatch/anymatch
   licenses: ISC
 
 Dependency: 
@@ -141,12 +147,6 @@ Dependency:
   version: 1.0.0
   repository: ssh://git@github.com/substack/node-archy
   licenses: MIT
-
-Dependency: 
-  name: are-we-there-yet
-  version: 1.1.4
-  repository: https://github.com/iarna/are-we-there-yet
-  licenses: ISC
 
 Dependency: 
   name: argparse
@@ -194,6 +194,24 @@ Dependency:
   name: array-find-index
   version: 1.0.2
   repository: https://github.com/sindresorhus/array-find-index
+  licenses: MIT
+
+Dependency: 
+  name: array-flatten
+  version: 1.1.1
+  repository: http://github.com/blakeembrey/array-flatten
+  licenses: MIT
+
+Dependency: 
+  name: array-flatten
+  version: 2.1.1
+  repository: http://github.com/blakeembrey/array-flatten
+  licenses: MIT
+
+Dependency: 
+  name: array-includes
+  version: 3.0.3
+  repository: http://github.com/ljharb/array-includes
   licenses: MIT
 
 Dependency: 
@@ -252,12 +270,6 @@ Dependency:
 
 Dependency: 
   name: assert-plus
-  version: 0.2.0
-  repository: https://github.com/mcavage/node-assert-plus
-  licenses: MIT
-
-Dependency: 
-  name: assert-plus
   version: 1.0.0
   repository: https://github.com/mcavage/node-assert-plus
   licenses: MIT
@@ -306,12 +318,6 @@ Dependency:
 
 Dependency: 
   name: aws-sign2
-  version: 0.6.0
-  repository: https://github.com/mikeal/aws-sign
-  licenses: Apache-2.0
-
-Dependency: 
-  name: aws-sign2
   version: 0.7.0
   repository: https://github.com/mikeal/aws-sign
   licenses: Apache-2.0
@@ -336,12 +342,6 @@ Dependency:
 
 Dependency: 
   name: balanced-match
-  version: 0.4.2
-  repository: http://github.com/juliangruber/balanced-match
-  licenses: MIT
-
-Dependency: 
-  name: balanced-match
   version: 1.0.0
   repository: http://github.com/juliangruber/balanced-match
   licenses: MIT
@@ -356,6 +356,12 @@ Dependency:
   name: base64-js
   version: 1.2.1
   repository: http://github.com/beatgammit/base64-js
+  licenses: MIT
+
+Dependency: 
+  name: batch
+  version: 0.6.1
+  repository: https://github.com/visionmedia/batch
   licenses: MIT
 
 Dependency: 
@@ -377,22 +383,22 @@ Dependency:
   licenses: MIT
 
 Dependency: 
-  name: block-stream
-  version: 0.0.9
-  repository: http://github.com/isaacs/block-stream
-  licenses: ISC
-
-Dependency: 
   name: bn.js
   version: 4.11.8
   repository: ssh://git@github.com/indutny/bn.js
   licenses: MIT
 
 Dependency: 
-  name: boom
-  version: 2.10.1
-  repository: http://github.com/hapijs/boom
-  licenses: BSD-3-Clause
+  name: body-parser
+  version: 1.18.2
+  repository: https://github.com/expressjs/body-parser
+  licenses: MIT
+
+Dependency: 
+  name: bonjour
+  version: 3.5.0
+  repository: https://github.com/watson/bonjour
+  licenses: MIT
 
 Dependency: 
   name: boom
@@ -405,12 +411,6 @@ Dependency:
   version: 5.2.0
   repository: http://github.com/hapijs/boom
   licenses: BSD-3-Clause
-
-Dependency: 
-  name: brace-expansion
-  version: 1.1.7
-  repository: http://github.com/juliangruber/brace-expansion
-  licenses: MIT
 
 Dependency: 
   name: brace-expansion
@@ -479,9 +479,9 @@ Dependency:
   licenses: MIT
 
 Dependency: 
-  name: buffer-shims
-  version: 1.0.0
-  repository: ssh://git@github.com/calvinmetcalf/buffer-shims
+  name: buffer-indexof
+  version: 1.1.1
+  repository: http://github.com/soldair/node-buffer-indexof
   licenses: MIT
 
 Dependency: 
@@ -500,6 +500,12 @@ Dependency:
   name: builtin-status-codes
   version: 3.0.0
   repository: https://github.com/bendrucker/builtin-status-codes
+  licenses: MIT
+
+Dependency: 
+  name: bytes
+  version: 3.0.0
+  repository: https://github.com/visionmedia/bytes.js
   licenses: MIT
 
 Dependency: 
@@ -529,6 +535,12 @@ Dependency:
 Dependency: 
   name: camelcase
   version: 2.1.1
+  repository: https://github.com/sindresorhus/camelcase
+  licenses: MIT
+
+Dependency: 
+  name: camelcase
+  version: 3.0.0
   repository: https://github.com/sindresorhus/camelcase
   licenses: MIT
 
@@ -571,6 +583,12 @@ Dependency:
 Dependency: 
   name: chokidar
   version: 1.7.0
+  repository: https://github.com/paulmillr/chokidar
+  licenses: MIT
+
+Dependency: 
+  name: chokidar
+  version: 2.0.0
   repository: https://github.com/paulmillr/chokidar
   licenses: MIT
 
@@ -683,6 +701,18 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: compressible
+  version: 2.0.12
+  repository: https://github.com/jshttp/compressible
+  licenses: MIT
+
+Dependency: 
+  name: compression
+  version: 1.7.1
+  repository: https://github.com/expressjs/compression
+  licenses: MIT
+
+Dependency: 
   name: concat-map
   version: 0.0.1
   repository: http://github.com/substack/node-concat-map
@@ -695,21 +725,45 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: connect-history-api-fallback
+  version: 1.5.0
+  repository: ssh://git@github.com/bripkens/connect-history-api-fallback
+  licenses: MIT
+
+Dependency: 
   name: console-browserify
   version: 1.1.0
   repository: http://github.com/Raynos/console-browserify
   licenses: MIT
 
 Dependency: 
-  name: console-control-strings
-  version: 1.1.0
-  repository: https://github.com/iarna/console-control-strings
-  licenses: ISC
-
-Dependency: 
   name: constants-browserify
   version: 1.0.0
   repository: http://github.com/juliangruber/constants-browserify
+  licenses: MIT
+
+Dependency: 
+  name: content-disposition
+  version: 0.5.2
+  repository: https://github.com/jshttp/content-disposition
+  licenses: MIT
+
+Dependency: 
+  name: content-type
+  version: 1.0.4
+  repository: https://github.com/jshttp/content-type
+  licenses: MIT
+
+Dependency: 
+  name: cookie
+  version: 0.3.1
+  repository: https://github.com/jshttp/cookie
+  licenses: MIT
+
+Dependency: 
+  name: cookie-signature
+  version: 1.0.6
+  repository: https://github.com/visionmedia/node-cookie-signature
   licenses: MIT
 
 Dependency: 
@@ -753,12 +807,6 @@ Dependency:
   version: 5.1.0
   repository: http://github.com/IndigoUnited/node-cross-spawn
   licenses: MIT
-
-Dependency: 
-  name: cryptiles
-  version: 2.0.5
-  repository: http://github.com/hapijs/cryptiles
-  licenses: BSD-3-Clause
 
 Dependency: 
   name: cryptiles
@@ -816,13 +864,13 @@ Dependency:
 
 Dependency: 
   name: debug
-  version: 2.6.8
+  version: 2.6.9
   repository: http://github.com/visionmedia/debug
   licenses: MIT
 
 Dependency: 
   name: debug
-  version: 2.6.9
+  version: 3.1.0
   repository: http://github.com/visionmedia/debug
   licenses: MIT
 
@@ -893,15 +941,15 @@ Dependency:
   licenses: MIT
 
 Dependency: 
-  name: delayed-stream
-  version: 1.0.0
-  repository: http://github.com/felixge/node-delayed-stream
+  name: del
+  version: 3.0.0
+  repository: https://github.com/sindresorhus/del
   licenses: MIT
 
 Dependency: 
-  name: delegates
+  name: delayed-stream
   version: 1.0.0
-  repository: https://github.com/visionmedia/node-delegates
+  repository: http://github.com/felixge/node-delayed-stream
   licenses: MIT
 
 Dependency: 
@@ -923,10 +971,10 @@ Dependency:
   licenses: MIT
 
 Dependency: 
-  name: detect-libc
-  version: 1.0.2
-  repository: http://github.com/lovell/detect-libc
-  licenses: Apache-2.0
+  name: detect-node
+  version: 2.0.3
+  repository: https://github.com/iliakan/detect-node
+  licenses: ISC
 
 Dependency: 
   name: dezalgo
@@ -938,6 +986,24 @@ Dependency:
   name: diffie-hellman
   version: 5.0.2
   repository: https://github.com/crypto-browserify/diffie-hellman
+  licenses: MIT
+
+Dependency: 
+  name: dns-equal
+  version: 1.0.0
+  repository: https://github.com/watson/dns-equal
+  licenses: MIT
+
+Dependency: 
+  name: dns-packet
+  version: 1.3.1
+  repository: https://github.com/mafintosh/dns-packet
+  licenses: MIT
+
+Dependency: 
+  name: dns-txt
+  version: 2.0.2
+  repository: https://github.com/watson/dns-txt
   licenses: MIT
 
 Dependency: 
@@ -1151,9 +1217,21 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: eventemitter3
+  version: 1.2.0
+  repository: http://github.com/primus/eventemitter3
+  licenses: MIT
+
+Dependency: 
   name: events
   version: 1.1.1
   repository: http://github.com/Gozala/events
+  licenses: MIT
+
+Dependency: 
+  name: eventsource
+  version: 0.1.6
+  repository: http://github.com/aslakhellesoy/eventsource-node
   licenses: MIT
 
 Dependency: 
@@ -1199,6 +1277,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: express
+  version: 4.16.2
+  repository: https://github.com/expressjs/express
+  licenses: MIT
+
+Dependency: 
   name: extend
   version: 3.0.1
   repository: https://github.com/justmoon/node-extend
@@ -1229,10 +1313,10 @@ Dependency:
   licenses: MIT
 
 Dependency: 
-  name: extsprintf
-  version: 1.0.2
-  repository: http://github.com/davepacheco/node-extsprintf
-  licenses: Unknown
+  name: extglob
+  version: 2.0.4
+  repository: https://github.com/micromatch/extglob
+  licenses: MIT
 
 Dependency: 
   name: extsprintf
@@ -1256,6 +1340,18 @@ Dependency:
   name: fast-levenshtein
   version: 2.0.6
   repository: https://github.com/hiddentao/fast-levenshtein
+  licenses: MIT
+
+Dependency: 
+  name: faye-websocket
+  version: 0.10.0
+  repository: http://github.com/faye/faye-websocket-node
+  licenses: MIT
+
+Dependency: 
+  name: faye-websocket
+  version: 0.11.1
+  repository: http://github.com/faye/faye-websocket-node
   licenses: MIT
 
 Dependency: 
@@ -1297,6 +1393,12 @@ Dependency:
 Dependency: 
   name: finalhandler
   version: 0.4.1
+  repository: https://github.com/pillarjs/finalhandler
+  licenses: MIT
+
+Dependency: 
+  name: finalhandler
+  version: 1.1.0
   repository: https://github.com/pillarjs/finalhandler
   licenses: MIT
 
@@ -1362,14 +1464,14 @@ Dependency:
 
 Dependency: 
   name: form-data
-  version: 2.1.4
+  version: 2.3.1
   repository: http://github.com/form-data/form-data
   licenses: MIT
 
 Dependency: 
-  name: form-data
-  version: 2.3.1
-  repository: http://github.com/form-data/form-data
+  name: forwarded
+  version: 0.1.2
+  repository: https://github.com/jshttp/forwarded
   licenses: MIT
 
 Dependency: 
@@ -1397,34 +1499,10 @@ Dependency:
   licenses: ISC
 
 Dependency: 
-  name: fsevents
-  version: 1.1.3
-  repository: https://github.com/strongloop/fsevents
-  licenses: MIT
-
-Dependency: 
-  name: fstream
-  version: 1.0.11
-  repository: https://github.com/npm/fstream
-  licenses: ISC
-
-Dependency: 
-  name: fstream-ignore
-  version: 1.0.5
-  repository: http://github.com/isaacs/fstream-ignore
-  licenses: ISC
-
-Dependency: 
   name: function-bind
   version: 1.1.1
   repository: http://github.com/Raynos/function-bind
   licenses: MIT
-
-Dependency: 
-  name: gauge
-  version: 2.7.4
-  repository: https://github.com/iarna/gauge
-  licenses: ISC
 
 Dependency: 
   name: generate-function
@@ -1511,6 +1589,12 @@ Dependency:
   licenses: ISC
 
 Dependency: 
+  name: glob-parent
+  version: 3.1.0
+  repository: https://github.com/es128/glob-parent
+  licenses: ISC
+
+Dependency: 
   name: globals
   version: 9.18.0
   repository: https://github.com/sindresorhus/globals
@@ -1519,6 +1603,12 @@ Dependency:
 Dependency: 
   name: globby
   version: 5.0.0
+  repository: https://github.com/sindresorhus/globby
+  licenses: MIT
+
+Dependency: 
+  name: globby
+  version: 6.1.0
   repository: https://github.com/sindresorhus/globby
   licenses: MIT
 
@@ -1571,21 +1661,15 @@ Dependency:
   licenses: MIT
 
 Dependency: 
-  name: har-schema
-  version: 1.0.5
-  repository: https://github.com/ahmadnassri/har-schema
-  licenses: ISC
+  name: handle-thing
+  version: 1.2.5
+  repository: ssh://git@github.com/indutny/handle-thing
+  licenses: MIT
 
 Dependency: 
   name: har-schema
   version: 2.0.0
   repository: https://github.com/ahmadnassri/har-schema
-  licenses: ISC
-
-Dependency: 
-  name: har-validator
-  version: 4.2.1
-  repository: https://github.com/ahmadnassri/har-validator
   licenses: ISC
 
 Dependency: 
@@ -1611,12 +1695,6 @@ Dependency:
   version: 2.0.0
   repository: https://github.com/sindresorhus/has-flag
   licenses: MIT
-
-Dependency: 
-  name: has-unicode
-  version: 2.0.1
-  repository: https://github.com/iarna/has-unicode
-  licenses: ISC
 
 Dependency: 
   name: has-value
@@ -1662,12 +1740,6 @@ Dependency:
 
 Dependency: 
   name: hawk
-  version: 3.1.3
-  repository: http://github.com/hueniverse/hawk
-  licenses: BSD-3-Clause
-
-Dependency: 
-  name: hawk
   version: 6.0.2
   repository: http://github.com/hueniverse/hawk
   licenses: BSD-3-Clause
@@ -1677,12 +1749,6 @@ Dependency:
   version: 1.0.1
   repository: ssh://git@github.com/indutny/hmac-drbg
   licenses: MIT
-
-Dependency: 
-  name: hoek
-  version: 2.16.3
-  repository: http://github.com/hapijs/hoek
-  licenses: BSD-3-Clause
 
 Dependency: 
   name: hoek
@@ -1703,15 +1769,45 @@ Dependency:
   licenses: ISC
 
 Dependency: 
+  name: hpack.js
+  version: 2.1.6
+  repository: ssh://git@github.com/indutny/hpack.js
+  licenses: MIT
+
+Dependency: 
+  name: html-entities
+  version: 1.2.1
+  repository: https://github.com/mdevils/node-html-entities
+  licenses: MIT
+
+Dependency: 
+  name: http-deceiver
+  version: 1.2.7
+  repository: ssh://git@github.com/indutny/http-deceiver
+  licenses: MIT
+
+Dependency: 
   name: http-errors
   version: 1.6.2
   repository: https://github.com/jshttp/http-errors
   licenses: MIT
 
 Dependency: 
-  name: http-signature
-  version: 1.1.1
-  repository: http://github.com/joyent/node-http-signature
+  name: http-parser-js
+  version: 0.4.9
+  repository: http://github.com/creationix/http-parser-js
+  licenses: MIT
+
+Dependency: 
+  name: http-proxy
+  version: 1.16.2
+  repository: https://github.com/nodejitsu/node-http-proxy
+  licenses: MIT
+
+Dependency: 
+  name: http-proxy-middleware
+  version: 0.17.4
+  repository: https://github.com/chimurai/http-proxy-middleware
   licenses: MIT
 
 Dependency: 
@@ -1751,6 +1847,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: import-local
+  version: 1.0.0
+  repository: https://github.com/sindresorhus/import-local
+  licenses: MIT
+
+Dependency: 
   name: imurmurhash
   version: 0.1.4
   repository: https://github.com/jensyt/imurmurhash-js
@@ -1787,15 +1889,15 @@ Dependency:
   licenses: ISC
 
 Dependency: 
-  name: ini
-  version: 1.3.4
-  repository: http://github.com/isaacs/ini
-  licenses: ISC
-
-Dependency: 
   name: inquirer
   version: 0.12.0
   repository: https://github.com/SBoudrias/Inquirer.js
+  licenses: MIT
+
+Dependency: 
+  name: internal-ip
+  version: 1.2.0
+  repository: https://github.com/sindresorhus/internal-ip
   licenses: MIT
 
 Dependency: 
@@ -1808,6 +1910,18 @@ Dependency:
   name: invert-kv
   version: 1.0.0
   repository: https://github.com/sindresorhus/invert-kv
+  licenses: MIT
+
+Dependency: 
+  name: ip
+  version: 1.1.5
+  repository: ssh://git@github.com/indutny/node-ip
+  licenses: MIT
+
+Dependency: 
+  name: ipaddr.js
+  version: 1.5.2
+  repository: http://github.com/whitequark/ipaddr.js
   licenses: MIT
 
 Dependency: 
@@ -1901,6 +2015,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: is-extglob
+  version: 2.1.1
+  repository: https://github.com/jonschlinkert/is-extglob
+  licenses: MIT
+
+Dependency: 
   name: is-finite
   version: 1.0.2
   repository: https://github.com/sindresorhus/is-finite
@@ -1927,6 +2047,18 @@ Dependency:
 Dependency: 
   name: is-glob
   version: 2.0.1
+  repository: https://github.com/jonschlinkert/is-glob
+  licenses: MIT
+
+Dependency: 
+  name: is-glob
+  version: 3.1.0
+  repository: https://github.com/jonschlinkert/is-glob
+  licenses: MIT
+
+Dependency: 
+  name: is-glob
+  version: 4.0.0
   repository: https://github.com/jonschlinkert/is-glob
   licenses: MIT
 
@@ -2039,6 +2171,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: is-wsl
+  version: 1.1.0
+  repository: https://github.com/sindresorhus/is-wsl
+  licenses: MIT
+
+Dependency: 
   name: isarray
   version: 1.0.0
   repository: http://github.com/juliangruber/isarray
@@ -2073,12 +2211,6 @@ Dependency:
   version: 0.15.0
   repository: http://github.com/jmespath/jmespath.js
   licenses: Apache 2.0
-
-Dependency: 
-  name: jodid25519
-  version: 1.0.2
-  repository: https://github.com/meganz/jodid25519
-  licenses: MIT
 
 Dependency: 
   name: jquery
@@ -2147,6 +2279,12 @@ Dependency:
   licenses: ISC
 
 Dependency: 
+  name: json3
+  version: 3.3.2
+  repository: http://github.com/bestiejs/json3
+  licenses: MIT
+
+Dependency: 
   name: json5
   version: 0.5.1
   repository: https://github.com/aseemk/json5
@@ -2172,12 +2310,6 @@ Dependency:
 
 Dependency: 
   name: jsprim
-  version: 1.4.0
-  repository: http://github.com/joyent/node-jsprim
-  licenses: MIT
-
-Dependency: 
-  name: jsprim
   version: 1.4.1
   repository: http://github.com/joyent/node-jsprim
   licenses: MIT
@@ -2187,6 +2319,12 @@ Dependency:
   version: 0.7.5
   repository: http://github.com/jsverify/jsverify
   licenses: MIT
+
+Dependency: 
+  name: killable
+  version: 1.0.0
+  repository: https://github.com/marten-de-vries/killable
+  licenses: ISC
 
 Dependency: 
   name: kind-of
@@ -2303,6 +2441,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: loglevel
+  version: 1.6.1
+  repository: http://github.com/pimterry/loglevel
+  licenses: MIT
+
+Dependency: 
   name: longest
   version: 1.0.1
   repository: https://github.com/jonschlinkert/longest
@@ -2345,6 +2489,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: media-typer
+  version: 0.3.0
+  repository: https://github.com/jshttp/media-typer
+  licenses: MIT
+
+Dependency: 
   name: mem
   version: 1.1.0
   repository: https://github.com/sindresorhus/mem
@@ -2363,6 +2513,18 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: merge-descriptors
+  version: 1.0.1
+  repository: https://github.com/component/merge-descriptors
+  licenses: MIT
+
+Dependency: 
+  name: methods
+  version: 1.1.2
+  repository: https://github.com/jshttp/methods
+  licenses: MIT
+
+Dependency: 
   name: micromatch
   version: 2.3.11
   repository: https://github.com/jonschlinkert/micromatch
@@ -2371,6 +2533,12 @@ Dependency:
 Dependency: 
   name: micromatch
   version: 3.1.4
+  repository: https://github.com/micromatch/micromatch
+  licenses: MIT
+
+Dependency: 
+  name: micromatch
+  version: 3.1.5
   repository: https://github.com/micromatch/micromatch
   licenses: MIT
 
@@ -2394,20 +2562,8 @@ Dependency:
 
 Dependency: 
   name: mime-db
-  version: 1.27.0
-  repository: https://github.com/jshttp/mime-db
-  licenses: MIT
-
-Dependency: 
-  name: mime-db
   version: 1.30.0
   repository: https://github.com/jshttp/mime-db
-  licenses: MIT
-
-Dependency: 
-  name: mime-types
-  version: 2.1.15
-  repository: https://github.com/jshttp/mime-types
   licenses: MIT
 
 Dependency: 
@@ -2483,6 +2639,18 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: multicast-dns
+  version: 6.2.2
+  repository: https://github.com/mafintosh/multicast-dns
+  licenses: MIT
+
+Dependency: 
+  name: multicast-dns-service-types
+  version: 1.1.0
+  repository: https://github.com/mafintosh/multicast-dns-service-types
+  licenses: MIT
+
+Dependency: 
   name: multimatch
   version: 2.1.0
   repository: https://github.com/sindresorhus/multimatch
@@ -2495,15 +2663,15 @@ Dependency:
   licenses: ISC
 
 Dependency: 
-  name: nan
-  version: 2.8.0
-  repository: http://github.com/nodejs/nan
-  licenses: MIT
-
-Dependency: 
   name: nanomatch
   version: 1.2.6
   repository: https://github.com/micromatch/nanomatch
+  licenses: MIT
+
+Dependency: 
+  name: negotiator
+  version: 0.6.1
+  repository: https://github.com/jshttp/negotiator
   licenses: MIT
 
 Dependency: 
@@ -2513,26 +2681,20 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: node-forge
+  version: 0.6.33
+  repository: ssh://git@github.com/digitalbazaar/forge
+  licenses: BSD
+
+Dependency: 
   name: node-libs-browser
   version: 2.1.0
   repository: https://github.com/webpack/node-libs-browser
   licenses: MIT
 
 Dependency: 
-  name: node-pre-gyp
-  version: 0.6.39
-  repository: http://github.com/mapbox/node-pre-gyp
-  licenses: BSD-3-Clause
-
-Dependency: 
   name: nopt
   version: 3.0.6
-  repository: https://github.com/npm/nopt
-  licenses: ISC
-
-Dependency: 
-  name: nopt
-  version: 4.0.1
   repository: https://github.com/npm/nopt
   licenses: ISC
 
@@ -2553,12 +2715,6 @@ Dependency:
   version: 2.0.2
   repository: https://github.com/sindresorhus/npm-run-path
   licenses: MIT
-
-Dependency: 
-  name: npmlog
-  version: 4.1.0
-  repository: https://github.com/npm/npmlog
-  licenses: ISC
 
 Dependency: 
   name: number-is-nan
@@ -2615,9 +2771,21 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: obuf
+  version: 1.1.1
+  repository: ssh://git@github.com/indutny/offset-buffer
+  licenses: MIT
+
+Dependency: 
   name: on-finished
   version: 2.3.0
   repository: https://github.com/jshttp/on-finished
+  licenses: MIT
+
+Dependency: 
+  name: on-headers
+  version: 1.0.1
+  repository: https://github.com/jshttp/on-headers
   licenses: MIT
 
 Dependency: 
@@ -2639,9 +2807,21 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: opn
+  version: 5.2.0
+  repository: https://github.com/sindresorhus/opn
+  licenses: MIT
+
+Dependency: 
   name: optionator
   version: 0.8.2
   repository: http://github.com/gkz/optionator
+  licenses: MIT
+
+Dependency: 
+  name: original
+  version: 1.0.0
+  repository: https://github.com/unshiftio/original
   licenses: MIT
 
 Dependency: 
@@ -2658,6 +2838,12 @@ Dependency:
 
 Dependency: 
   name: os-locale
+  version: 1.4.0
+  repository: https://github.com/sindresorhus/os-locale
+  licenses: MIT
+
+Dependency: 
+  name: os-locale
   version: 2.1.0
   repository: https://github.com/sindresorhus/os-locale
   licenses: MIT
@@ -2667,12 +2853,6 @@ Dependency:
   version: 1.0.2
   repository: https://github.com/sindresorhus/os-tmpdir
   licenses: MIT
-
-Dependency: 
-  name: osenv
-  version: 0.1.4
-  repository: https://github.com/npm/osenv
-  licenses: ISC
 
 Dependency: 
   name: p-finally
@@ -2690,6 +2870,12 @@ Dependency:
   name: p-locate
   version: 2.0.0
   repository: https://github.com/sindresorhus/p-locate
+  licenses: MIT
+
+Dependency: 
+  name: p-map
+  version: 1.2.0
+  repository: https://github.com/sindresorhus/p-map
   licenses: MIT
 
 Dependency: 
@@ -2735,6 +2921,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: path-dirname
+  version: 1.0.2
+  repository: https://github.com/es128/path-dirname
+  licenses: MIT
+
+Dependency: 
   name: path-exists
   version: 2.1.0
   repository: https://github.com/sindresorhus/path-exists
@@ -2771,6 +2963,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: path-to-regexp
+  version: 0.1.7
+  repository: https://github.com/component/path-to-regexp
+  licenses: MIT
+
+Dependency: 
   name: path-type
   version: 1.1.0
   repository: https://github.com/sindresorhus/path-type
@@ -2790,12 +2988,6 @@ Dependency:
 
 Dependency: 
   name: performance-now
-  version: 0.2.0
-  repository: http://github.com/meryn/performance-now
-  licenses: MIT
-
-Dependency: 
-  name: performance-now
   version: 2.1.0
   repository: http://github.com/braveg1rl/performance-now
   licenses: MIT
@@ -2803,6 +2995,12 @@ Dependency:
 Dependency: 
   name: pify
   version: 2.3.0
+  repository: https://github.com/sindresorhus/pify
+  licenses: MIT
+
+Dependency: 
+  name: pify
+  version: 3.0.0
   repository: https://github.com/sindresorhus/pify
   licenses: MIT
 
@@ -2819,6 +3017,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: pkg-dir
+  version: 2.0.0
+  repository: https://github.com/sindresorhus/pkg-dir
+  licenses: MIT
+
+Dependency: 
   name: pkg-up
   version: 1.0.0
   repository: https://github.com/sindresorhus/pkg-up
@@ -2828,6 +3032,12 @@ Dependency:
   name: pluralize
   version: 1.2.1
   repository: https://github.com/blakeembrey/pluralize
+  licenses: MIT
+
+Dependency: 
+  name: portfinder
+  version: 1.0.13
+  repository: ssh://git@github.com/indexzero/node-portfinder
   licenses: MIT
 
 Dependency: 
@@ -2867,6 +3077,12 @@ Dependency:
   licenses: Unknown
 
 Dependency: 
+  name: proxy-addr
+  version: 2.0.2
+  repository: https://github.com/jshttp/proxy-addr
+  licenses: MIT
+
+Dependency: 
   name: prr
   version: 0.0.0
   repository: https://github.com/rvagg/prr
@@ -2898,12 +3114,6 @@ Dependency:
 
 Dependency: 
   name: qs
-  version: 6.4.0
-  repository: https://github.com/ljharb/qs
-  licenses: BSD-3-Clause
-
-Dependency: 
-  name: qs
   version: 6.5.1
   repository: https://github.com/ljharb/qs
   licenses: BSD-3-Clause
@@ -2918,6 +3128,18 @@ Dependency:
   name: querystring-es3
   version: 0.2.1
   repository: http://github.com/mike-spainhower/querystring
+  licenses: MIT
+
+Dependency: 
+  name: querystringify
+  version: 0.0.4
+  repository: https://github.com/unshiftio/querystringify
+  licenses: MIT
+
+Dependency: 
+  name: querystringify
+  version: 1.0.0
+  repository: https://github.com/unshiftio/querystringify
   licenses: MIT
 
 Dependency: 
@@ -2945,16 +3167,16 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: raw-body
+  version: 2.3.2
+  repository: https://github.com/stream-utils/raw-body
+  licenses: MIT
+
+Dependency: 
   name: raw-loader
   version: 0.5.1
   repository: ssh://git@github.com/webpack/raw-loader
   licenses: MIT
-
-Dependency: 
-  name: rc
-  version: 1.2.1
-  repository: https://github.com/dominictarr/rc
-  licenses: (BSD-2-Clause OR MIT OR Apache-2.0)
 
 Dependency: 
   name: rc4
@@ -3001,12 +3223,6 @@ Dependency:
 Dependency: 
   name: readable-stream
   version: 2.0.6
-  repository: http://github.com/nodejs/readable-stream
-  licenses: MIT
-
-Dependency: 
-  name: readable-stream
-  version: 2.2.9
   repository: http://github.com/nodejs/readable-stream
   licenses: MIT
 
@@ -3102,12 +3318,6 @@ Dependency:
 
 Dependency: 
   name: request
-  version: 2.81.0
-  repository: https://github.com/request/request
-  licenses: Apache-2.0
-
-Dependency: 
-  name: request
   version: 2.83.0
   repository: https://github.com/request/request
   licenses: Apache-2.0
@@ -3131,6 +3341,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: requires-port
+  version: 1.0.0
+  repository: https://github.com/unshiftio/requires-port
+  licenses: MIT
+
+Dependency: 
   name: resolve
   version: 1.1.7
   repository: http://github.com/substack/node-resolve
@@ -3149,6 +3365,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: resolve-cwd
+  version: 2.0.0
+  repository: https://github.com/sindresorhus/resolve-cwd
+  licenses: MIT
+
+Dependency: 
   name: resolve-from
   version: 1.0.1
   repository: https://github.com/sindresorhus/resolve-from
@@ -3157,6 +3379,12 @@ Dependency:
 Dependency: 
   name: resolve-from
   version: 2.0.0
+  repository: https://github.com/sindresorhus/resolve-from
+  licenses: MIT
+
+Dependency: 
+  name: resolve-from
+  version: 3.0.0
   repository: https://github.com/sindresorhus/resolve-from
   licenses: MIT
 
@@ -3195,12 +3423,6 @@ Dependency:
   version: 2.2.8
   repository: http://github.com/isaacs/rimraf
   licenses: MIT
-
-Dependency: 
-  name: rimraf
-  version: 2.6.1
-  repository: http://github.com/isaacs/rimraf
-  licenses: ISC
 
 Dependency: 
   name: rimraf
@@ -3258,12 +3480,6 @@ Dependency:
 
 Dependency: 
   name: safe-buffer
-  version: 5.0.1
-  repository: http://github.com/feross/safe-buffer
-  licenses: MIT
-
-Dependency: 
-  name: safe-buffer
   version: 5.1.1
   repository: http://github.com/feross/safe-buffer
   licenses: MIT
@@ -3281,10 +3497,22 @@ Dependency:
   licenses: ISC
 
 Dependency: 
+  name: select-hose
+  version: 2.0.0
+  repository: ssh://git@github.com/indutny/select-hose
+  licenses: MIT
+
+Dependency: 
   name: selenium-webdriver
   version: 3.4.0
   repository: https://github.com/SeleniumHQ/selenium
   licenses: Apache-2.0
+
+Dependency: 
+  name: selfsigned
+  version: 1.10.1
+  repository: http://github.com/jfromaniello/selfsigned
+  licenses: MIT
 
 Dependency: 
   name: semver
@@ -3293,15 +3521,15 @@ Dependency:
   licenses: ISC
 
 Dependency: 
-  name: semver
-  version: 5.3.0
-  repository: https://github.com/npm/node-semver
-  licenses: ISC
-
-Dependency: 
   name: send
   version: 0.16.1
   repository: https://github.com/pillarjs/send
+  licenses: MIT
+
+Dependency: 
+  name: serve-index
+  version: 1.9.1
+  repository: https://github.com/expressjs/serve-index
   licenses: MIT
 
 Dependency: 
@@ -3349,6 +3577,12 @@ Dependency:
 Dependency: 
   name: setprototypeof
   version: 1.0.3
+  repository: https://github.com/wesleytodd/setprototypeof
+  licenses: ISC
+
+Dependency: 
+  name: setprototypeof
+  version: 1.1.0
   repository: https://github.com/wesleytodd/setprototypeof
   licenses: ISC
 
@@ -3420,15 +3654,21 @@ Dependency:
 
 Dependency: 
   name: sntp
-  version: 1.0.9
-  repository: http://github.com/hueniverse/sntp
-  licenses: BSD
-
-Dependency: 
-  name: sntp
   version: 2.1.0
   repository: http://github.com/hueniverse/sntp
   licenses: BSD-3-Clause
+
+Dependency: 
+  name: sockjs
+  version: 0.3.19
+  repository: https://github.com/sockjs/sockjs-node
+  licenses: MIT
+
+Dependency: 
+  name: sockjs-client
+  version: 1.1.4
+  repository: https://github.com/sockjs/sockjs-client
+  licenses: MIT
 
 Dependency: 
   name: source-list-map
@@ -3491,6 +3731,18 @@ Dependency:
   licenses: Unlicense
 
 Dependency: 
+  name: spdy
+  version: 3.4.7
+  repository: http://github.com/indutny/node-spdy
+  licenses: MIT
+
+Dependency: 
+  name: spdy-transport
+  version: 2.0.20
+  repository: http://github.com/spdy-http2/spdy-transport
+  licenses: MIT
+
+Dependency: 
   name: split-string
   version: 3.1.0
   repository: https://github.com/jonschlinkert/split-string
@@ -3501,12 +3753,6 @@ Dependency:
   version: 1.0.3
   repository: https://github.com/alexei/sprintf.js
   licenses: BSD-3-Clause
-
-Dependency: 
-  name: sshpk
-  version: 1.13.0
-  repository: https://github.com/arekinath/node-sshpk
-  licenses: MIT
 
 Dependency: 
   name: sshpk
@@ -3559,12 +3805,6 @@ Dependency:
 Dependency: 
   name: string_decoder
   version: 0.10.31
-  repository: http://github.com/rvagg/string_decoder
-  licenses: MIT
-
-Dependency: 
-  name: string_decoder
-  version: 1.0.1
   repository: http://github.com/rvagg/string_decoder
   licenses: MIT
 
@@ -3623,12 +3863,6 @@ Dependency:
   licenses: MIT
 
 Dependency: 
-  name: strip-json-comments
-  version: 2.0.1
-  repository: https://github.com/sindresorhus/strip-json-comments
-  licenses: MIT
-
-Dependency: 
   name: supports-color
   version: 2.0.0
   repository: https://github.com/chalk/supports-color
@@ -3637,6 +3871,12 @@ Dependency:
 Dependency: 
   name: supports-color
   version: 4.5.0
+  repository: https://github.com/chalk/supports-color
+  licenses: MIT
+
+Dependency: 
+  name: supports-color
+  version: 5.1.0
   repository: https://github.com/chalk/supports-color
   licenses: MIT
 
@@ -3665,18 +3905,6 @@ Dependency:
   licenses: MIT
 
 Dependency: 
-  name: tar
-  version: 2.2.1
-  repository: http://github.com/isaacs/node-tar
-  licenses: ISC
-
-Dependency: 
-  name: tar-pack
-  version: 3.4.0
-  repository: https://github.com/ForbesLindesay/tar-pack
-  licenses: BSD-2-Clause
-
-Dependency: 
   name: test-value
   version: 2.1.0
   repository: https://github.com/75lb/test-value
@@ -3692,6 +3920,18 @@ Dependency:
   name: through
   version: 2.3.8
   repository: https://github.com/dominictarr/through
+  licenses: MIT
+
+Dependency: 
+  name: thunky
+  version: 0.1.0
+  repository: http://github.com/mafintosh/thunky
+  licenses: Unknown
+
+Dependency: 
+  name: time-stamp
+  version: 2.0.0
+  repository: https://github.com/jonschlinkert/time-stamp
   licenses: MIT
 
 Dependency: 
@@ -3729,12 +3969,6 @@ Dependency:
   version: 2.1.1
   repository: https://github.com/micromatch/to-regex-range
   licenses: MIT
-
-Dependency: 
-  name: tough-cookie
-  version: 2.3.2
-  repository: http://github.com/salesforce/tough-cookie
-  licenses: BSD-3-Clause
 
 Dependency: 
   name: tough-cookie
@@ -3791,6 +4025,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: type-is
+  version: 1.6.15
+  repository: https://github.com/jshttp/type-is
+  licenses: MIT
+
+Dependency: 
   name: typedarray
   version: 0.0.6
   repository: http://github.com/substack/typedarray
@@ -3831,12 +4071,6 @@ Dependency:
   version: 0.4.6
   repository: https://github.com/webpack-contrib/uglifyjs-webpack-plugin
   licenses: MIT
-
-Dependency: 
-  name: uid-number
-  version: 0.0.6
-  repository: http://github.com/isaacs/uid-number
-  licenses: ISC
 
 Dependency: 
   name: underscore.string
@@ -3887,6 +4121,18 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: url-parse
+  version: 1.0.5
+  repository: https://github.com/unshiftio/url-parse
+  licenses: MIT
+
+Dependency: 
+  name: url-parse
+  version: 1.2.0
+  repository: https://github.com/unshiftio/url-parse
+  licenses: MIT
+
+Dependency: 
   name: use
   version: 2.0.2
   repository: https://github.com/jonschlinkert/use
@@ -3917,10 +4163,10 @@ Dependency:
   licenses: MIT
 
 Dependency: 
-  name: uuid
-  version: 3.0.1
-  repository: https://github.com/kelektiv/node-uuid
-  licenses: MIT
+  name: utils-merge
+  version: 1.0.1
+  repository: http://github.com/jaredhanson/utils-merge
+  licenses: MIT, MIT
 
 Dependency: 
   name: uuid
@@ -3935,10 +4181,10 @@ Dependency:
   licenses: Apache-2.0
 
 Dependency: 
-  name: verror
-  version: 1.3.6
-  repository: http://github.com/davepacheco/node-verror
-  licenses: Unknown
+  name: vary
+  version: 1.1.2
+  repository: https://github.com/jshttp/vary
+  licenses: MIT
 
 Dependency: 
   name: verror
@@ -3959,15 +4205,45 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: wbuf
+  version: 1.7.2
+  repository: ssh://git@github.com/indutny/wbuf
+  licenses: MIT
+
+Dependency: 
   name: webpack
   version: 3.10.0
   repository: https://github.com/webpack/webpack
   licenses: MIT
 
 Dependency: 
+  name: webpack-dev-middleware
+  version: 1.12.2
+  repository: https://github.com/webpack/webpack-dev-middleware
+  licenses: MIT
+
+Dependency: 
+  name: webpack-dev-server
+  version: 2.11.1
+  repository: https://github.com/webpack/webpack-dev-server
+  licenses: MIT
+
+Dependency: 
   name: webpack-sources
   version: 1.1.0
   repository: https://github.com/webpack/webpack-sources
+  licenses: MIT
+
+Dependency: 
+  name: websocket-driver
+  version: 0.7.0
+  repository: http://github.com/faye/websocket-driver-node
+  licenses: MIT
+
+Dependency: 
+  name: websocket-extensions
+  version: 0.1.3
+  repository: http://github.com/faye/websocket-extensions-node
   licenses: MIT
 
 Dependency: 
@@ -3978,14 +4254,14 @@ Dependency:
 
 Dependency: 
   name: which-module
-  version: 2.0.0
+  version: 1.0.0
   repository: https://github.com/nexdrew/which-module
   licenses: ISC
 
 Dependency: 
-  name: wide-align
-  version: 1.1.2
-  repository: https://github.com/iarna/wide-align
+  name: which-module
+  version: 2.0.0
+  repository: https://github.com/nexdrew/which-module
   licenses: ISC
 
 Dependency: 
@@ -4080,9 +4356,21 @@ Dependency:
 
 Dependency: 
   name: yargs
+  version: 6.6.0
+  repository: ssh://git@github.com/yargs/yargs
+  licenses: MIT
+
+Dependency: 
+  name: yargs
   version: 8.0.2
   repository: ssh://git@github.com/yargs/yargs
   licenses: MIT
+
+Dependency: 
+  name: yargs-parser
+  version: 4.2.1
+  repository: ssh://git@github.com/yargs/yargs-parser
+  licenses: ISC
 
 Dependency: 
   name: yargs-parser
