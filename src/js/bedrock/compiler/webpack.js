@@ -2,8 +2,10 @@ var { CheckerPlugin, TsConfigPathsPlugin } = require('awesome-typescript-loader'
 var path = require('path');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
-var webpack = require("webpack");
+var serve = require("../server/serve");
 var exitcodes = require('../util/exitcodes');
+var webpack = require("webpack");
+const WebpackDevServer = require('webpack-dev-server');
 const imports = require('./imports');
 
 let getWebPackConfig = function (tsConfigFile, scratchDir, scratchFile, dest) {
@@ -94,6 +96,40 @@ let compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, 
   });
 };
 
+let isCompiledRequest = request => request.url.startsWith('/compiled/');
+
+let devserver = function (settings, done) {
+  return serve.startCustom(settings, function (handler) {
+    var scratchDir = path.resolve('scratch');
+    var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
+    var dest = path.join(scratchDir, 'compiled/tests.js');
+    var tsConfigFile = settings.config;
+
+    mkdirp.sync(path.dirname(scratchFile));
+    fs.writeFileSync(scratchFile, imports.generateImports(true, scratchFile, settings.testfiles));
+
+    const compiler = webpack(getWebPackConfig(tsConfigFile, scratchDir, scratchFile, dest));
+
+    // Prevents webpack from doing a recompilation of a change of tests.ts over and over
+    compiler.plugin('emit', function(compilation, callback) {
+      compilation.fileDependencies = compilation.fileDependencies.filter(filePath => filePath !== scratchFile);
+      callback();
+    });
+
+    return new WebpackDevServer(compiler, {
+      publicPath: '/compiled/',
+      disableHostCheck: true,
+      stats: 'minimal',
+      before: function (app) {
+        app.all('*', (request, response, next) => {
+          return isCompiledRequest(request) ? next() : handler(request, response);
+        });
+      }
+    });
+  }, done);
+};
+
 module.exports = {
-  compile: compile
+  compile: compile,
+  devserver: devserver
 };

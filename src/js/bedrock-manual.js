@@ -1,8 +1,8 @@
 var go = function (settings) {
-  var serve = require('./bedrock/server/serve');
   var attempt = require('./bedrock/core/attempt');
   var version = require('./bedrock/core/version');
   var boltroutes = require('./bedrock/server/boltroutes');
+  var webpack = require('./bedrock/compiler/webpack');
 
   var runner = boltroutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.stopOnFailure, 'src/resources/bedrock.html');
 
@@ -15,10 +15,11 @@ var go = function (settings) {
     master: null, // there is no need for master,
     runner: runner,
     loglevel: settings.loglevel,
-    customRoutes: settings.customRoutes
+    customRoutes: settings.customRoutes,
+    config: settings.config
   };
 
-  serve.start(serveSettings, function (service/* , done */) {
+  webpack.devserver(serveSettings, function (service/* , done */) {
     console.log('bedrock-manual ' + version + ' available at: http://localhost:' + service.port);
   });
 };
