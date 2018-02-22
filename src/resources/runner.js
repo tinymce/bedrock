@@ -316,11 +316,14 @@
   };
 
   api.testrunner = function () {
-    $.ajax({
-      url: 'harness',
-      dataType: 'json',
-      success: api.loadtests,
-      error: bomb
+    // delay this ajax call until after the reporter status elements are in the page
+    $('document').ready(function () {
+      $.ajax({
+        url: 'harness',
+        dataType: 'json',
+        success: api.loadtests,
+        error: bomb
+      });
     });
   };
 
