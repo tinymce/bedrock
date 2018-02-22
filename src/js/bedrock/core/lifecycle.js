@@ -3,11 +3,21 @@ var exitcodes = require('../util/exitcodes');
 var shutdown = function (promise, driver, done, gruntDone, delayExiting) {
   var attempt = require('./attempt');
 
-  var exitDelay = delayExiting !== true ? 1000 : 1000000;
+  var exitDelay = function () {
+    if (delayExiting) {
+      // 17 minutes should be enough, if it's not we can make this configurable later.
+      driver.sleep(17 * 60 * 1000);
+    }
+  };
 
   promise.then(function (res) {
-    // All good, so continue.
-    driver.sleep(exitDelay);
+    // Only check the delay exit option if tests failed.
+    attempt.cata(res, function (_errs) {
+      exitDelay();
+    }, function () { });
+
+    // we always need at least 1s delay here
+    driver.sleep(1000);
 
     driver.quit().then(function () {
       done();
@@ -21,7 +31,10 @@ var shutdown = function (promise, driver, done, gruntDone, delayExiting) {
       });
     });
   }, function (err) {
-    driver.sleep(exitDelay);
+    exitDelay();
+    // we always need at least 1s delay here
+    driver.sleep(1000);
+
     driver.quit().then(function () {
       console.error('********** Unexpected Bedrock Error -> Server Quitting **********', err);
       done();
