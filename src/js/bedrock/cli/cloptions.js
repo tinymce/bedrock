@@ -140,6 +140,15 @@
     uncommon: true
   };
 
+  var logBrowserDetails = {
+    name: 'logBrowserDetails',
+    type: Boolean,
+    description: 'Logs browser and driver details when enabled',
+    validate: extraction.any,
+    defaultValue: false,
+    uncommon: true
+  };
+
   var uploaddirs = {
     name: 'uploaddirs',
     alias: 'u',
@@ -362,7 +371,7 @@
     defaultValue: false,
     description: 'After the tests have completed, delay quitting the server',
     validate: extraction.any
-  }
+  };
 
   module.exports = {
     // All modes testing
@@ -378,6 +387,7 @@
     name: name,
     output: output,
     browser: browser,
+    logBrowserDetails: logBrowserDetails,
 
     // Remote testing
     uploaddirs: uploaddirs,

@@ -14,7 +14,8 @@ var go = function (settings) {
   driver.create({
     browser: settings.browser,
     basedir: settings.basedir,
-    debuggingPort: settings.debuggingPort
+    debuggingPort: settings.debuggingPort,
+    logBrowserDetails: settings.logBrowserDetails
   }).then(function (driver) {
     var isPhantom = settings.browser === 'phantomjs';
 

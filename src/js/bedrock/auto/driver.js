@@ -68,10 +68,29 @@ var setupHeadlessModes = function (browser, chromeOptions) {
   }
 };
 
+var logBrowserDetails = function (driver) {
+  return function () {
+    return driver.getCapabilities().then(caps => {
+      var browser = caps.get('browserName');
+
+      if (browser === 'chrome') {
+        console.log('browser:', caps.get('version'), 'driver:', caps.get('chrome').chromedriverVersion);
+      } else if (browser === 'firefox') {
+        console.log('browser:', caps.get('browserVersion'));
+      } else if (browser === 'phantomjs') {
+        console.log('browser:', caps.get('version'), 'driver:', caps.get('driverVersion'));
+      } else if (browser === 'MicrosoftEdge') {
+        console.log('browser:', caps.get('browserVersion'));
+      }
+    });
+  };
+};
+
 /* Settings:
  *
  * browser: the name of the browser
  * basedir: base directory for bedrock
+ * logBrowserDetails: log details about browser and webdriver
  */
 var create = function (settings) {
   var browser = settings.browser;
@@ -133,9 +152,12 @@ var create = function (settings) {
                           browser === 'firefox' ? focusFirefox(settings.basedir) :
                           Promise.resolve();
 
-        systemFocus.then(browserFocus).then(function () {
-          resolve(driver);
-        });
+        systemFocus
+          .then(browserFocus)
+          .then(settings.logBrowserDetails ? logBrowserDetails(driver) : Promise.resolve())
+          .then(function () {
+            resolve(driver);
+          });
       });
     }, 1500);
   });
