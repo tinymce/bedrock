@@ -362,7 +362,7 @@
     defaultValue: false,
     description: 'After the tests have completed, delay quitting the server',
     validate: extraction.any
-  }
+  };
 
   module.exports = {
     // All modes testing
