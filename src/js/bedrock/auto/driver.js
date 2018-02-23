@@ -90,7 +90,6 @@ var logBrowserDetails = function (driver) {
  *
  * browser: the name of the browser
  * basedir: base directory for bedrock
- * logBrowserDetails: log details about browser and webdriver
  */
 var create = function (settings) {
   var browser = settings.browser;
@@ -154,7 +153,7 @@ var create = function (settings) {
 
         systemFocus
           .then(browserFocus)
-          .then(settings.logBrowserDetails ? logBrowserDetails(driver) : Promise.resolve())
+          .then(logBrowserDetails(driver))
           .then(function () {
             resolve(driver);
           });

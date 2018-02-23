@@ -140,15 +140,6 @@
     uncommon: true
   };
 
-  var logBrowserDetails = {
-    name: 'logBrowserDetails',
-    type: Boolean,
-    description: 'Logs browser and driver details when enabled',
-    validate: extraction.any,
-    defaultValue: false,
-    uncommon: true
-  };
-
   var uploaddirs = {
     name: 'uploaddirs',
     alias: 'u',
@@ -387,7 +378,6 @@
     name: name,
     output: output,
     browser: browser,
-    logBrowserDetails: logBrowserDetails,
 
     // Remote testing
     uploaddirs: uploaddirs,
