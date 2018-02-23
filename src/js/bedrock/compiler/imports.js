@@ -17,11 +17,12 @@ let filePathToImport = function (useRequire, scratchFile) {
       useRequire ? `require("${relativePath}");` : `import "${relativePath}";`, // rollup doesn't support require
       `if (__tests && __tests[__tests.length - 1]) {
         var testFilePath = "${filePath}";
-        if (!__tests[__tests.length - 1].filePath) {
-          __tests[__tests.length - 1].filePath = testFilePath;
-        } else if (__tests[__tests.length - 1].filePath === testFilePath) {
+        var lastTest = __tests[__tests.length - 1];
+        if (!lastTest.filePath) {
+          lastTest.filePath = testFilePath;
+        } else if (lastTest.filePath === testFilePath) {
           // repeated test, duplicate the test entry
-          __tests.push(__tests[__tests.length - 1]);
+          __tests.push(lastTest);
         } else {
           console.warn('file ' + testFilePath + ' did not add a new test to the list, ignoring');
         }
