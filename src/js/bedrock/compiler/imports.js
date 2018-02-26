@@ -14,10 +14,21 @@ let filePathToImport = function (useRequire, scratchFile) {
     filePath = filePath.replace(/\\/g, '/');
 
     return [
-      useRequire ? 'require("' + relativePath + '");' : 'import "' + relativePath + '";', // rollup doesn't support require
-      'if (__tests && __tests[__tests.length - 1] && !__tests[__tests.length - 1].filePath) {',
-      '__tests[__tests.length - 1].filePath = "' + filePath + '";',
-      '}'
+      useRequire ? `require("${relativePath}");` : `import "${relativePath}";`, // rollup doesn't support require
+      `if (__tests && __tests[__tests.length - 1]) {
+        var testFilePath = "${filePath}";
+        var lastTest = __tests[__tests.length - 1];
+        if (!lastTest.filePath) {
+          lastTest.filePath = testFilePath;
+        } else if (lastTest.filePath === testFilePath) {
+          // repeated test, duplicate the test entry
+          __tests.push(lastTest);
+        } else {
+          console.warn('file ' + testFilePath + ' did not add a new test to the list, ignoring');
+        }
+      } else {
+        console.error('no test list to add tests to');
+      }`
     ].join('\n');
   };
 };
