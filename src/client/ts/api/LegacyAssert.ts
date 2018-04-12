@@ -1,6 +1,6 @@
 import Compare from '../core/Compare';
 
-var eq = function<A=any> (expected: A, actual: A, message?: string) {
+var eq = function (expected: any, actual: any, message?: string) {
   var result = Compare.compare(expected, actual);
   if (!result.eq) {
     if (message !== undefined)
