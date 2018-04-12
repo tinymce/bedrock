@@ -1,3 +1,5 @@
+type SuccessCallback = () => void;
+type FailureCallback = (error: string | Error) => void;
 
 const Global = (function () {
   if (typeof window !== 'undefined') {
@@ -15,11 +17,11 @@ var register = function (name, test) {
   Global.__tests.push({ name: name, test: test });
 };
 
-var asynctest = function (name, test) {
+var asynctest = function (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) {
   register(name, test);
 };
 
-var test = function (name, test) {
+var test = function (name: string, test: SuccessCallback) {
   register(name, function (success, failure) {
     try {
       test();
@@ -30,7 +32,7 @@ var test = function (name, test) {
   });
 };
 
-var domtest = function (name, test) {
+var domtest = function (name: string, test: () => Promise<void>) {
   register(name, function (success, failure) {
     // This would later include setup/teardown of jsdoc for atomic tests
     var promise = test();
@@ -45,8 +47,8 @@ var domtest = function (name, test) {
   });
 };
 
-export default <any> {
-  test: test,
-  asynctest: asynctest,
-  domtest: domtest
+export {
+  test,
+  asynctest,
+  domtest
 };

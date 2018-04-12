@@ -1,6 +1,6 @@
 import Compare from '../core/Compare';
 
-var eq = function (expected, actual, message) {
+var eq = function<A=any> (expected: A, actual: A, message?: string) {
   var result = Compare.compare(expected, actual);
   if (!result.eq) {
     if (message !== undefined)
@@ -10,7 +10,7 @@ var eq = function (expected, actual, message) {
   }
 };
 
-var throws = function (f, expected, message) {
+var throws = function (f: () => void, expected?: string, message?: string) {
   var token = {};
 
   try {
@@ -24,7 +24,7 @@ var throws = function (f, expected, message) {
   }
 };
 
-var throwsError = function (f, expected, message) {
+var throwsError = function (f: () => void, expected?: string, message?: string) {
   var token = {};
 
   try {
@@ -38,7 +38,7 @@ var throwsError = function (f, expected, message) {
   }
 }
 
-var succeeds = function (f, message) {
+var succeeds = function (f: () => void, message: string) {
   try {
     f();
   } catch (e) {
@@ -46,14 +46,14 @@ var succeeds = function (f, message) {
   }
 };
 
-var fail = function (message) {
+var fail = function (message?: string) {
   if (message !== undefined)
     throw new Error(message);
   else
     throw new Error('Test failed.');
 };
 
-var html = function (expected, actual, message) {
+var html = function (expected: string, actual: string, message: string) {
   return {
     expected: expected,
     actual: actual,
@@ -61,11 +61,11 @@ var html = function (expected, actual, message) {
   };
 };
 
-export default <any> {
-  eq: eq,
-  throws: throws,
-  throwsError: throwsError,
-  succeeds: succeeds,
-  fail: fail,
-  html: html
+export {
+  eq,
+  throws,
+  throwsError,
+  succeeds,
+  fail,
+  html
 };
