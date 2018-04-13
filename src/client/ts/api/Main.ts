@@ -1,4 +1,4 @@
-import LegacyAssert from './LegacyAssert';
-import UnitTest from './UnitTest';
+import * as LegacyAssert from './LegacyAssert';
+import * as UnitTest from './UnitTest';
 
 export { LegacyAssert as assert, UnitTest };

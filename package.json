@@ -70,6 +70,7 @@
   "license": "Apache-2.0",
   "main": "./lib/api/Main.js",
   "module": "./lib/api/Main.js",
+  "types": "./lib/api/Main.d.ts",
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   }
