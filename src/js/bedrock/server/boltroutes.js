@@ -1,4 +1,4 @@
-var generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, stopOnFailure, basePage) {
+var generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, stopOnFailure, basePage, coverage) {
   var path = require('path');
   var routes = require('./routes');
   var compiler = require('../compiler/compiler');
@@ -11,7 +11,8 @@ var generate = function (mode, projectdir, basedir, configFile, bundler, testfil
     path.join(projectdir, configFile),
     path.join(projectdir, 'scratch'),
     mode === 'auto',
-    files
+    files,
+    coverage
   );
 
   var routers = [

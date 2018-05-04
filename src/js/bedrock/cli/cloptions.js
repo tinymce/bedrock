@@ -364,6 +364,15 @@
     validate: extraction.any
   };
 
+  var coverage = {
+    name: 'coverage',
+    output: 'coverage',
+    type: String,
+    description: 'Path to generate code coverage on',
+    uncommon: true,
+    validate: extraction.directory
+  };
+
   module.exports = {
     // All modes testing
     config: config,
@@ -373,6 +382,7 @@
     testdirs: testdirs,
     customRoutes: customRoutes,
     bundler: bundler,
+    coverage,
 
     // Webdriver testing
     name: name,

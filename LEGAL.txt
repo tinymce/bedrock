@@ -1,6 +1,6 @@
 Dependency: 
   name: @ephox/bedrock
-  version: 2.0.8
+  version: 2.2.0
   repository: https://github.com/ephox/bedrock
   licenses: Apache-2.0
 
@@ -329,6 +329,24 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: babel-code-frame
+  version: 6.26.0
+  repository: https://github.com/babel/babel/tree/master/packages/babel-code-frame
+  licenses: MIT
+
+Dependency: 
+  name: babel-generator
+  version: 6.26.1
+  repository: https://github.com/babel/babel/tree/master/packages/babel-generator
+  licenses: MIT
+
+Dependency: 
+  name: babel-messages
+  version: 6.23.0
+  repository: https://github.com/babel/babel/tree/master/packages/babel-messages
+  licenses: MIT
+
+Dependency: 
   name: babel-polyfill
   version: 6.26.0
   repository: https://github.com/babel/babel/tree/master/packages/babel-polyfill
@@ -338,6 +356,30 @@ Dependency:
   name: babel-runtime
   version: 6.26.0
   repository: https://github.com/babel/babel/tree/master/packages/babel-runtime
+  licenses: MIT
+
+Dependency: 
+  name: babel-template
+  version: 6.26.0
+  repository: https://github.com/babel/babel/tree/master/packages/babel-template
+  licenses: MIT
+
+Dependency: 
+  name: babel-traverse
+  version: 6.26.0
+  repository: https://github.com/babel/babel/tree/master/packages/babel-traverse
+  licenses: MIT
+
+Dependency: 
+  name: babel-types
+  version: 6.26.0
+  repository: https://github.com/babel/babel/tree/master/packages/babel-types
+  licenses: MIT
+
+Dependency: 
+  name: babylon
+  version: 6.18.0
+  repository: https://github.com/babel/babylon
   licenses: MIT
 
 Dependency: 
@@ -755,6 +797,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: convert-source-map
+  version: 1.5.1
+  repository: http://github.com/thlorenz/convert-source-map
+  licenses: MIT
+
+Dependency: 
   name: cookie
   version: 0.3.1
   repository: https://github.com/jshttp/cookie
@@ -968,6 +1016,12 @@ Dependency:
   name: destroy
   version: 1.0.4
   repository: https://github.com/stream-utils/destroy
+  licenses: MIT
+
+Dependency: 
+  name: detect-indent
+  version: 4.0.0
+  repository: https://github.com/sindresorhus/detect-indent
   licenses: MIT
 
 Dependency: 
@@ -1907,6 +1961,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: invariant
+  version: 2.2.4
+  repository: https://github.com/zertosh/invariant
+  licenses: MIT
+
+Dependency: 
   name: invert-kv
   version: 1.0.0
   repository: https://github.com/sindresorhus/invert-kv
@@ -2207,6 +2267,24 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: istanbul-instrumenter-loader
+  version: 3.0.1
+  repository: https://github.com/webpack-contrib/istanbul-instrumenter-loader
+  licenses: MIT
+
+Dependency: 
+  name: istanbul-lib-coverage
+  version: 1.2.0
+  repository: ssh://git@github.com/istanbuljs/istanbuljs
+  licenses: BSD-3-Clause
+
+Dependency: 
+  name: istanbul-lib-instrument
+  version: 1.10.1
+  repository: ssh://git@github.com/istanbuljs/istanbuljs
+  licenses: BSD-3-Clause
+
+Dependency: 
   name: jmespath
   version: 0.15.0
   repository: http://github.com/jmespath/jmespath.js
@@ -2216,6 +2294,12 @@ Dependency:
   name: jquery
   version: 3.3.1
   repository: https://github.com/jquery/jquery
+  licenses: MIT
+
+Dependency: 
+  name: js-tokens
+  version: 3.0.2
+  repository: https://github.com/lydell/js-tokens
   licenses: MIT
 
 Dependency: 
@@ -2241,6 +2325,12 @@ Dependency:
   version: 0.2.0
   repository: http://github.com/tristanstraub/JSCheck
   licenses: Public Domain
+
+Dependency: 
+  name: jsesc
+  version: 1.3.0
+  repository: https://github.com/mathiasbynens/jsesc
+  licenses: MIT
 
 Dependency: 
   name: json-loader
@@ -2450,6 +2540,12 @@ Dependency:
   name: longest
   version: 1.0.1
   repository: https://github.com/jonschlinkert/longest
+  licenses: MIT
+
+Dependency: 
+  name: loose-envify
+  version: 1.3.1
+  repository: http://github.com/zertosh/loose-envify
   licenses: MIT
 
 Dependency: 
@@ -3497,6 +3593,12 @@ Dependency:
   licenses: ISC
 
 Dependency: 
+  name: schema-utils
+  version: 0.3.0
+  repository: https://github.com/webpack-contrib/schema-utils
+  licenses: MIT
+
+Dependency: 
   name: select-hose
   version: 2.0.0
   repository: ssh://git@github.com/indutny/select-hose
@@ -3517,6 +3619,12 @@ Dependency:
 Dependency: 
   name: semver
   version: 5.0.3
+  repository: https://github.com/npm/node-semver
+  licenses: ISC
+
+Dependency: 
+  name: semver
+  version: 5.5.0
   repository: https://github.com/npm/node-semver
   licenses: ISC
 
@@ -3953,6 +4061,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: to-fast-properties
+  version: 1.0.3
+  repository: https://github.com/sindresorhus/to-fast-properties
+  licenses: MIT
+
+Dependency: 
   name: to-object-path
   version: 0.3.0
   repository: https://github.com/jonschlinkert/to-object-path
@@ -3986,6 +4100,12 @@ Dependency:
   name: trim-newlines
   version: 1.0.0
   repository: https://github.com/sindresorhus/trim-newlines
+  licenses: MIT
+
+Dependency: 
+  name: trim-right
+  version: 1.0.1
+  repository: https://github.com/sindresorhus/trim-right
   licenses: MIT
 
 Dependency: 

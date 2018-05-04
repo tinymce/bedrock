@@ -8,7 +8,7 @@ var webpack = require("webpack");
 const WebpackDevServer = require('webpack-dev-server');
 const imports = require('./imports');
 
-let getWebPackConfig = function (tsConfigFile, scratchDir, scratchFile, dest) {
+let getWebPackConfig = function (tsConfigFile, scratchDir, scratchFile, dest, coverage) {
   return {
     context: path.resolve(__dirname),
     stats: 'none',
@@ -54,7 +54,19 @@ let getWebPackConfig = function (tsConfigFile, scratchDir, scratchFile, dest) {
           test: /\.(html|htm|css|bower|hex|rtf|xml|yml)$/,
           use: [ 'raw-loader' ]
         }
-      ]
+      ].concat(
+        coverage ? [
+          {
+            test: /\.ts$/,
+            enforce: 'post',
+            loader: 'istanbul-instrumenter-loader',
+            include: [ path.resolve(coverage) ],
+            options: {
+              esModules: true
+            }
+          },
+        ] : []
+      )
     },
 
     plugins: [
@@ -68,14 +80,14 @@ let getWebPackConfig = function (tsConfigFile, scratchDir, scratchFile, dest) {
   };
 };
 
-let compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, success) {
+let compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, coverage, success) {
   var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   var dest = path.join(scratchDir, 'compiled/tests.js');
 
   mkdirp.sync(path.dirname(scratchFile));
   fs.writeFileSync(scratchFile, imports.generateImports(true, scratchFile, srcFiles));
 
-  webpack(getWebPackConfig(tsConfigFile, scratchDir, scratchFile, dest), (err, stats) => {
+  webpack(getWebPackConfig(tsConfigFile, scratchDir, scratchFile, dest, coverage), (err, stats) => {
     if (err || stats.hasErrors()) {
       let msg = stats.toString({
         all: false,
@@ -108,7 +120,7 @@ let devserver = function (settings, done) {
     mkdirp.sync(path.dirname(scratchFile));
     fs.writeFileSync(scratchFile, imports.generateImports(true, scratchFile, settings.testfiles));
 
-    const compiler = webpack(getWebPackConfig(tsConfigFile, scratchDir, scratchFile, dest));
+    const compiler = webpack(getWebPackConfig(tsConfigFile, scratchDir, scratchFile, dest, settings.coverage));
 
     // Prevents webpack from doing a recompilation of a change of tests.ts over and over
     compiler.plugin('emit', function(compilation, callback) {
