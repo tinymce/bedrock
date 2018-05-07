@@ -370,6 +370,8 @@
     type: String,
     description: 'Path to generate code coverage on',
     uncommon: true,
+    multiple: true,
+    flatten: true,
     validate: extraction.directory
   };
 

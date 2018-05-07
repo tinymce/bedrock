@@ -60,7 +60,7 @@ let getWebPackConfig = function (tsConfigFile, scratchDir, scratchFile, dest, co
             test: /\.ts$/,
             enforce: 'post',
             loader: 'istanbul-instrumenter-loader',
-            include: [ path.resolve(coverage) ],
+            include: coverage.map((p) => path.resolve(p)),
             options: {
               esModules: true
             }
