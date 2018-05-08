@@ -1,7 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 
-var coverageDataDir = '.nyc_output';
+var coverageDataDir = 'scratch';
 
 var writeCoverageData = function (data) {
   if (Object.keys(data).length > 0) {

@@ -50,7 +50,8 @@ var forAuto = function (directories) {
       cloptions.output,
       cloptions.debuggingPort,
       cloptions.customRoutes,
-      cloptions.delayExiting
+      cloptions.delayExiting,
+      cloptions.coverage
     ])
   );
 };
@@ -64,7 +65,8 @@ var forManual = function (directories) {
       cloptions.files,
       cloptions.testdir,
       cloptions.testdirs,
-      cloptions.customRoutes
+      cloptions.customRoutes,
+      cloptions.coverage
     ])
   );
 };

@@ -16,7 +16,8 @@ var go = function (settings) {
     runner: runner,
     loglevel: settings.loglevel,
     customRoutes: settings.customRoutes,
-    config: settings.config
+    config: settings.config,
+    coverage: settings.coverage
   };
 
   webpack.devserver(serveSettings, function (service/* , done */) {

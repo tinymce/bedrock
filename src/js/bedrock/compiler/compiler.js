@@ -3,7 +3,7 @@ var fs = require('fs');
 // var rollup = require('../compiler/rollup');
 var webpack = require('../compiler/webpack');
 
-module.exports = function (tsConfigFile, scratchDir, exitOnCompileError, files) {
+module.exports = function (tsConfigFile, scratchDir, exitOnCompileError, files, coverage) {
   var getCompileFunc = function () {
     // return bundler === 'webpack' ? webpack.compile : rollup.compile;
     return webpack.compile;
@@ -22,6 +22,7 @@ module.exports = function (tsConfigFile, scratchDir, exitOnCompileError, files) 
           scratchDir,
           exitOnCompileError,
           tsFiles,
+          coverage,
           function (compiledJsFilePath) {
             resolve(fs.readFileSync(compiledJsFilePath))
           }
