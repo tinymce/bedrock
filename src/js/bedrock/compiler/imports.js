@@ -39,6 +39,7 @@ let generateImports = function (useRequire, scratchFile, srcFiles) {
   return [
     'declare let require: any;',
     'declare let __tests: any;',
+    'declare let console: any;',
     imports,
     'export {};'
   ].join('\n');
