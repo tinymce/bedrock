@@ -9,6 +9,7 @@ var scanCombo = function (combo) {
   // Does not currently support complex key combinations.
   if (combo.ctrlKey) return Key.chord(Key.CONTROL, combo.key);
   else if (combo.metaKey) return Key.chord(Key.COMMAND, combo.key);
+  else if (combo.shiftKey) return Key.chord(Key.SHIFT, combo.key);
   return NO_ACTION;
 };
 
