@@ -57,7 +57,7 @@ checkErrors(
     '[test/resources.not.existing] is not a directory',
   ],
   [
-    { name: 'testdir', validate: extraction.files('Test.js') }
+    { name: 'testdir', validate: extraction.files([ 'Test.js' ]) }
   ],
   {
     testdir: 'test/resources.not.existing'
@@ -71,7 +71,7 @@ checkResult(
     other: [ ]
   },
   [
-    { name: 'testdir', validate: extraction.files('Test.js'), output: 'other' }
+    { name: 'testdir', validate: extraction.files([ 'Test.js' ]), output: 'other' }
   ],
   {
     testdir: 'test/resources'
@@ -87,7 +87,7 @@ checkResult(
     ]
   },
   [
-    { name: 'testdir', validate: extraction.files(''), output: 'other' }
+    { name: 'testdir', validate: extraction.files([ '' ]), output: 'other' }
   ],
   {
     testdir: 'test/resources'
@@ -136,7 +136,7 @@ checkResult(
   [
     { name: 'alpha', validate: extraction.any },
     { name: 'beta', validate: extraction.any, output: 'new.beta' },
-    { name: 'gamma', validate: extraction.files('') },
+    { name: 'gamma', validate: extraction.files([ '' ]) },
     { name: 'delta', validate: extraction.directory }
   ],
   {
@@ -156,7 +156,7 @@ checkErrors(
   [
     { name: 'alpha', validate: extraction.inSet([ 'a' ]) },
     { name: 'beta', validate: extraction.any, output: 'new.beta' },
-    { name: 'gamma', validate: extraction.files('') },
+    { name: 'gamma', validate: extraction.files([ '' ]) },
     { name: 'delta', validate: extraction.inSet([ 'Delta' ]) },
     { name: 'epsilon', validate: extraction.directory },
     { name: 'rho', validate: extraction.any }

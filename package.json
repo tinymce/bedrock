@@ -20,7 +20,7 @@
     "build": "tsc",
     "test-atomic": "tape test/atomic/*.js",
     "test-props": "tape test/props/*.js",
-    "test-samples": "bin/bedrock-auto.js -b phantomjs --config sample/config.js --files sample/AsyncPassTest.js sample/IFrameTest.js",
+    "test-samples": "bin/bedrock-auto.js -b phantomjs --config sample/config.js --files sample/AsyncPassTest.js sample/IFrameTest.js sample/TabbingTest.ts",
     "test-acceptance": "node test/acceptance/scraping-test.js",
     "test": "npm run test-atomic && npm run test-props && npm run test-samples && npm run test-acceptance"
   },

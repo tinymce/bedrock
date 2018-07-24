@@ -48,6 +48,7 @@ tape('Minimal specification of bedrock-auto', function (t) {
   var actual = clis.forAuto(directories);
   attemptutils.assertResult(t, {
     browser: 'MicrosoftEdge',
+    bundler: 'webpack',
     config: 'sample/config.js',
     done: 'div.done',
     name: 'bedrock-run',
@@ -94,6 +95,7 @@ tape('Minimal specification of bedrock-manual', function (t) {
       'test/resources/test.file1'
     ],
     help: false,
+    bundler: 'webpack',
 
     progress: '.progress',
     results: 'textarea.results',
@@ -125,6 +127,7 @@ tape('Minimal specification of bedrock-remote', function (t) {
     testfiles: [
       'test/resources/test.file1'
     ],
+    bundler: 'webpack',
 
     progress: '.progress',
     results: 'textarea.results',
@@ -146,6 +149,7 @@ tape('Minimal specification of bedrock-sauce-single', function (t) {
   ]);
   var actual = clis.forSauceSingle(directories);
   attemptutils.assertResult(t, {
+    bundler: 'webpack',
     remoteurl: 'remote.url',
     done: 'div.done',
     sauceuser: 'sauce.user',
@@ -193,6 +197,7 @@ tape('Minimal specification of bedrock-sauce', function (t) {
   var actual = clis.forSauce(directories);
   attemptutils.assertResult(t, {
     uploaddirs: [ 'test', 'src' ],
+    bundler: 'webpack',
     bucket: 'testing',
     bucketfolder: 'bedrock',
     config: 'sample/config.js',
