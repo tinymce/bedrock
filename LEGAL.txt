@@ -1,6 +1,6 @@
 Dependency: 
   name: @ephox/bedrock
-  version: 2.2.0
+  version: 2.4.0
   repository: https://github.com/ephox/bedrock
   licenses: Apache-2.0
 
@@ -53,12 +53,6 @@ Dependency:
   licenses: MIT
 
 Dependency: 
-  name: adm-zip
-  version: 0.4.7
-  repository: https://github.com/cthackers/adm-zip
-  licenses: MIT
-
-Dependency: 
   name: agent-base
   version: 2.1.1
   repository: http://github.com/TooTallNate/node-agent-base
@@ -77,6 +71,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: ajv
+  version: 6.5.2
+  repository: https://github.com/epoberezkin/ajv
+  licenses: MIT
+
+Dependency: 
   name: ajv-keywords
   version: 1.5.1
   repository: https://github.com/epoberezkin/ajv-keywords
@@ -84,7 +84,7 @@ Dependency:
 
 Dependency: 
   name: ajv-keywords
-  version: 2.1.1
+  version: 3.2.0
   repository: https://github.com/epoberezkin/ajv-keywords
   licenses: MIT
 
@@ -127,6 +127,12 @@ Dependency:
 Dependency: 
   name: ansi-styles
   version: 2.2.1
+  repository: https://github.com/chalk/ansi-styles
+  licenses: MIT
+
+Dependency: 
+  name: ansi-styles
+  version: 3.2.1
   repository: https://github.com/chalk/ansi-styles
   licenses: MIT
 
@@ -275,6 +281,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: assign-symbols
+  version: 1.0.0
+  repository: https://github.com/jonschlinkert/assign-symbols
+  licenses: MIT
+
+Dependency: 
   name: async
   version: 1.5.2
   repository: https://github.com/caolan/async
@@ -283,6 +295,12 @@ Dependency:
 Dependency: 
   name: async
   version: 2.6.0
+  repository: https://github.com/caolan/async
+  licenses: MIT
+
+Dependency: 
+  name: async
+  version: 2.6.1
   repository: https://github.com/caolan/async
   licenses: MIT
 
@@ -306,7 +324,7 @@ Dependency:
 
 Dependency: 
   name: awesome-typescript-loader
-  version: 3.4.1
+  version: 4.0.1
   repository: https://github.com/s-panferov/awesome-typescript-loader
   licenses: MIT
 
@@ -468,7 +486,7 @@ Dependency:
 
 Dependency: 
   name: braces
-  version: 2.3.0
+  version: 2.3.2
   repository: https://github.com/micromatch/braces
   licenses: MIT
 
@@ -518,6 +536,12 @@ Dependency:
   name: buffer
   version: 4.9.1
   repository: http://github.com/feross/buffer
+  licenses: MIT
+
+Dependency: 
+  name: buffer-from
+  version: 1.1.0
+  repository: https://github.com/LinusU/buffer-from
   licenses: MIT
 
 Dependency: 
@@ -623,6 +647,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: chalk
+  version: 2.4.1
+  repository: https://github.com/chalk/chalk
+  licenses: MIT
+
+Dependency: 
   name: chokidar
   version: 1.7.0
   repository: https://github.com/paulmillr/chokidar
@@ -630,7 +660,7 @@ Dependency:
 
 Dependency: 
   name: chokidar
-  version: 2.0.0
+  version: 2.0.4
   repository: https://github.com/paulmillr/chokidar
   licenses: MIT
 
@@ -698,6 +728,18 @@ Dependency:
   name: collection-visit
   version: 1.0.0
   repository: https://github.com/jonschlinkert/collection-visit
+  licenses: MIT
+
+Dependency: 
+  name: color-convert
+  version: 1.9.2
+  repository: https://github.com/Qix-/color-convert
+  licenses: MIT
+
+Dependency: 
+  name: color-name
+  version: 1.1.1
+  repository: ssh://git@github.com/dfcreative/color-name
   licenses: MIT
 
 Dependency: 
@@ -818,6 +860,12 @@ Dependency:
   name: copy-descriptor
   version: 0.1.1
   repository: https://github.com/jonschlinkert/copy-descriptor
+  licenses: MIT
+
+Dependency: 
+  name: core-js
+  version: 2.3.0
+  repository: https://github.com/zloirock/core-js
   licenses: MIT
 
 Dependency: 
@@ -973,6 +1021,12 @@ Dependency:
 Dependency: 
   name: define-property
   version: 1.0.0
+  repository: https://github.com/jonschlinkert/define-property
+  licenses: MIT
+
+Dependency: 
+  name: define-property
+  version: 2.0.2
   repository: https://github.com/jonschlinkert/define-property
   licenses: MIT
 
@@ -1154,6 +1208,12 @@ Dependency:
   name: es6-map
   version: 0.1.5
   repository: http://github.com/medikoo/es6-map
+  licenses: MIT
+
+Dependency: 
+  name: es6-promise
+  version: 3.0.2
+  repository: http://github.com/jakearchibald/ES6-Promises
   licenses: MIT
 
 Dependency: 
@@ -1355,15 +1415,15 @@ Dependency:
   licenses: MIT
 
 Dependency: 
-  name: extglob
-  version: 0.3.2
-  repository: http://github.com/jonschlinkert/extglob
+  name: extend-shallow
+  version: 3.0.2
+  repository: https://github.com/jonschlinkert/extend-shallow
   licenses: MIT
 
 Dependency: 
   name: extglob
-  version: 2.0.2
-  repository: https://github.com/micromatch/extglob
+  version: 0.3.2
+  repository: http://github.com/jonschlinkert/extglob
   licenses: MIT
 
 Dependency: 
@@ -1381,6 +1441,12 @@ Dependency:
 Dependency: 
   name: fast-deep-equal
   version: 1.0.0
+  repository: https://github.com/epoberezkin/fast-deep-equal
+  licenses: MIT
+
+Dependency: 
+  name: fast-deep-equal
+  version: 2.0.1
   repository: https://github.com/epoberezkin/fast-deep-equal
   licenses: MIT
 
@@ -1542,7 +1608,7 @@ Dependency:
 
 Dependency: 
   name: fs-extra
-  version: 4.0.3
+  version: 5.0.0
   repository: https://github.com/jprichardson/node-fs-extra
   licenses: MIT
 
@@ -1751,6 +1817,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: has-flag
+  version: 3.0.0
+  repository: https://github.com/sindresorhus/has-flag
+  licenses: MIT
+
+Dependency: 
   name: has-value
   version: 0.3.1
   repository: https://github.com/jonschlinkert/has-value
@@ -1901,6 +1973,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: immediate
+  version: 3.0.6
+  repository: http://github.com/calvinmetcalf/immediate
+  licenses: MIT
+
+Dependency: 
   name: import-local
   version: 1.0.0
   repository: https://github.com/sindresorhus/import-local
@@ -1991,6 +2069,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: is-accessor-descriptor
+  version: 1.0.0
+  repository: https://github.com/jonschlinkert/is-accessor-descriptor
+  licenses: MIT
+
+Dependency: 
   name: is-arrayish
   version: 0.2.1
   repository: https://github.com/qix-/node-is-arrayish
@@ -2027,6 +2111,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: is-data-descriptor
+  version: 1.0.0
+  repository: https://github.com/jonschlinkert/is-data-descriptor
+  licenses: MIT
+
+Dependency: 
   name: is-date-object
   version: 1.0.1
   repository: http://github.com/ljharb/is-date-object
@@ -2041,6 +2131,12 @@ Dependency:
 Dependency: 
   name: is-descriptor
   version: 1.0.1
+  repository: https://github.com/jonschlinkert/is-descriptor
+  licenses: MIT
+
+Dependency: 
+  name: is-descriptor
+  version: 1.0.2
   repository: https://github.com/jonschlinkert/is-descriptor
   licenses: MIT
 
@@ -2147,12 +2243,6 @@ Dependency:
   licenses: MIT
 
 Dependency: 
-  name: is-odd
-  version: 1.0.0
-  repository: https://github.com/jonschlinkert/is-odd
-  licenses: MIT
-
-Dependency: 
   name: is-path-cwd
   version: 1.0.0
   repository: https://github.com/sindresorhus/is-path-cwd
@@ -2228,6 +2318,12 @@ Dependency:
   name: is-utf8
   version: 0.2.1
   repository: https://github.com/wayfind/is-utf8
+  licenses: MIT
+
+Dependency: 
+  name: is-windows
+  version: 1.0.2
+  repository: https://github.com/jonschlinkert/is-windows
   licenses: MIT
 
 Dependency: 
@@ -2357,6 +2453,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: json-schema-traverse
+  version: 0.4.1
+  repository: https://github.com/epoberezkin/json-schema-traverse
+  licenses: MIT
+
+Dependency: 
   name: json-stable-stringify
   version: 1.0.1
   repository: http://github.com/substack/json-stable-stringify
@@ -2409,6 +2511,12 @@ Dependency:
   version: 0.7.5
   repository: http://github.com/jsverify/jsverify
   licenses: MIT
+
+Dependency: 
+  name: jszip
+  version: 3.1.5
+  repository: https://github.com/Stuk/jszip
+  licenses: (MIT OR GPL-3.0)
 
 Dependency: 
   name: killable
@@ -2471,6 +2579,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: lie
+  version: 3.1.1
+  repository: https://github.com/calvinmetcalf/lie
+  licenses: MIT
+
+Dependency: 
   name: load-grunt-tasks
   version: 3.5.2
   repository: https://github.com/sindresorhus/load-grunt-tasks
@@ -2527,6 +2641,18 @@ Dependency:
 Dependency: 
   name: lodash
   version: 4.17.4
+  repository: https://github.com/lodash/lodash
+  licenses: MIT
+
+Dependency: 
+  name: lodash
+  version: 4.17.10
+  repository: https://github.com/lodash/lodash
+  licenses: MIT
+
+Dependency: 
+  name: lodash.debounce
+  version: 4.0.8
   repository: https://github.com/lodash/lodash
   licenses: MIT
 
@@ -2628,13 +2754,7 @@ Dependency:
 
 Dependency: 
   name: micromatch
-  version: 3.1.4
-  repository: https://github.com/micromatch/micromatch
-  licenses: MIT
-
-Dependency: 
-  name: micromatch
-  version: 3.1.5
+  version: 3.1.10
   repository: https://github.com/micromatch/micromatch
   licenses: MIT
 
@@ -2760,7 +2880,7 @@ Dependency:
 
 Dependency: 
   name: nanomatch
-  version: 1.2.6
+  version: 1.2.13
   repository: https://github.com/micromatch/nanomatch
   licenses: MIT
 
@@ -3209,6 +3329,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: punycode
+  version: 2.1.1
+  repository: https://github.com/bestiejs/punycode.js
+  licenses: MIT
+
+Dependency: 
   name: qs
   version: 6.5.1
   repository: https://github.com/ljharb/qs
@@ -3389,6 +3515,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: regex-not
+  version: 1.0.2
+  repository: https://github.com/jonschlinkert/regex-not
+  licenses: MIT
+
+Dependency: 
   name: remove-trailing-separator
   version: 1.1.0
   repository: https://github.com/darsain/remove-trailing-separator
@@ -3461,6 +3593,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: resolve
+  version: 1.8.1
+  repository: http://github.com/browserify/resolve
+  licenses: MIT
+
+Dependency: 
   name: resolve-cwd
   version: 2.0.0
   repository: https://github.com/sindresorhus/resolve-cwd
@@ -3509,6 +3647,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: ret
+  version: 0.1.15
+  repository: http://github.com/fent/ret.js
+  licenses: MIT
+
+Dependency: 
   name: right-align
   version: 0.1.3
   repository: http://github.com/jonschlinkert/right-align
@@ -3552,7 +3696,7 @@ Dependency:
 
 Dependency: 
   name: rollup-plugin-typescript2
-  version: 0.8.4
+  version: 0.15.1
   repository: https://github.com/ezolenko/rollup-plugin-typescript2
   licenses: MIT
 
@@ -3581,6 +3725,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: safe-regex
+  version: 1.1.0
+  repository: http://github.com/substack/safe-regex
+  licenses: MIT
+
+Dependency: 
   name: saucelabs
   version: 1.4.0
   repository: http://github.com/holidayextras/node-saucelabs
@@ -3606,7 +3756,7 @@ Dependency:
 
 Dependency: 
   name: selenium-webdriver
-  version: 3.4.0
+  version: 3.5.0
   repository: https://github.com/SeleniumHQ/selenium
   licenses: Apache-2.0
 
@@ -3810,7 +3960,7 @@ Dependency:
 
 Dependency: 
   name: source-map-support
-  version: 0.4.18
+  version: 0.5.6
   repository: https://github.com/evanw/node-source-map-support
   licenses: MIT
 
@@ -3984,7 +4134,7 @@ Dependency:
 
 Dependency: 
   name: supports-color
-  version: 5.1.0
+  version: 5.4.0
   repository: https://github.com/chalk/supports-color
   licenses: MIT
 
@@ -4074,7 +4224,7 @@ Dependency:
 
 Dependency: 
   name: to-regex
-  version: 3.0.1
+  version: 3.0.2
   repository: https://github.com/jonschlinkert/to-regex
   licenses: MIT
 
@@ -4116,7 +4266,7 @@ Dependency:
 
 Dependency: 
   name: tslib
-  version: 1.8.1
+  version: 1.9.2
   repository: https://github.com/Microsoft/tslib
   licenses: Apache-2.0
 
@@ -4158,7 +4308,7 @@ Dependency:
 
 Dependency: 
   name: typescript
-  version: 2.6.2
+  version: 2.9.2
   repository: https://github.com/Microsoft/TypeScript
   licenses: Apache-2.0
 
@@ -4221,6 +4371,18 @@ Dependency:
   version: 1.0.0
   repository: https://github.com/jonschlinkert/unset-value
   licenses: MIT
+
+Dependency: 
+  name: upath
+  version: 1.1.0
+  repository: http://github.com/anodynos/upath
+  licenses: MIT
+
+Dependency: 
+  name: uri-js
+  version: 4.2.2
+  repository: ssh://git@github.com/garycourt/uri-js
+  licenses: BSD-2-Clause
 
 Dependency: 
   name: urix
@@ -4332,7 +4494,7 @@ Dependency:
 
 Dependency: 
   name: webpack
-  version: 3.10.0
+  version: 3.12.0
   repository: https://github.com/webpack/webpack
   licenses: MIT
 
@@ -4344,7 +4506,7 @@ Dependency:
 
 Dependency: 
   name: webpack-dev-server
-  version: 2.11.1
+  version: 2.11.2
   repository: https://github.com/webpack/webpack-dev-server
   licenses: MIT
 
