@@ -4308,7 +4308,7 @@ Dependency:
 
 Dependency: 
   name: typescript
-  version: 2.9.2
+  version: 3.0.1
   repository: https://github.com/Microsoft/TypeScript
   licenses: Apache-2.0
 

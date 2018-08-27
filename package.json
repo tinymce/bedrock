@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock",
-  "version": "2.4.0",
+  "version": "3.0.0",
   "description": "NodeJS test runner",
   "repository": {
     "type": "git",
@@ -48,7 +48,7 @@
     "selenium-webdriver": "~3.5.0",
     "serve-static": "^1.10.2",
     "source-map-loader": "^0.2.3",
-    "typescript": "^2.9.2",
+    "typescript": "^3.0.1",
     "webpack": "webpack-3",
     "webpack-dev-server": "webpack-3",
     "xml-writer": "^1.6.0"
