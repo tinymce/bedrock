@@ -1,5 +1,5 @@
 type SuccessCallback = () => void;
-type FailureCallback = (error: string | Error) => void;
+type FailureCallback = (error: string | Error, logs) => void;
 
 const Global = (function () {
   if (typeof window !== 'undefined') {
@@ -18,8 +18,45 @@ var register = function (name, test) {
 };
 
 var asynctest = function (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) {
-  register(name, test);
+  register(name, function (success, failure) {
+    test(success, function (err, logs) {
+      const outputToStr = function (indent, entries) {
+        let everything = [ ];
+
+        for (let i = 0; i < entries.length; i++) {
+          const entry = entries[i];
+          const output = (function () {
+            const traceLines = entry.trace === null ? [ ] : [ '', '', '' ].concat(entry.trace.split('\n'));
+
+            if (entry.entries.length === 0) {
+              if (entry.trace === null) {
+                return [ indent + '*  ' + entry.message ];
+              } else {
+                return [ indent + '*  ' + entry.message ].concat(traceLines);
+              }
+            } else {
+              // We have entries ... let's format them.
+              return [ indent + '*  ' + entry.message ].concat(
+                outputToStr(indent + '  ', entry.entries)
+              ).concat(traceLines);
+            }
+          })();
+          everything = everything.concat(output)
+        }
+        return everything;
+      };
+
+      const processed = outputToStr('  ', logs.history);
+
+      failure(JSON.stringify({
+        error: err instanceof Error ? err.message : err,
+        logs: processed
+      }, null, 2));
+    });
+  });
 };
+
+
 
 var test = function (name: string, test: SuccessCallback) {
   register(name, function (success, failure) {
