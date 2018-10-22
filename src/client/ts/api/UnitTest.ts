@@ -1,5 +1,5 @@
 type SuccessCallback = () => void;
-type FailureCallback = (error: string | Error, logs) => void;
+type FailureCallback = (error: string | Error, logs?) => void;
 
 const Global = (function () {
   if (typeof window !== 'undefined') {
@@ -55,7 +55,7 @@ const processLog = (err, logs) => {
 
 var asynctest = function (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) {
   register(name, function (success, failure) {
-    test(success, function (err, logs) {
+    test(success, function (err, logs?) {
       const failureMessage = logs !== undefined ? processLog(err, logs) : err;
       failure(failureMessage);
     });
