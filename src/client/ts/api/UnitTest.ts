@@ -19,8 +19,12 @@ var register = function (name, test) {
 
 
 const processLog = (err, logs) => {
-  const outputToStr = function (indent, entries) {
+  const outputToStr = function (numIndent, entries) {
     let everything = [ ];
+    let indentString = '';
+    for (let i = 0; i < numIndent; i++) {
+      indentString += ' ';
+    }
 
     for (let i = 0; i < entries.length; i++) {
       const entry = entries[i];
@@ -29,14 +33,14 @@ const processLog = (err, logs) => {
 
         if (entry.entries.length === 0) {
           if (entry.trace === null) {
-            return [ indent + '*  ' + entry.message ];
+            return [ indentString + '*  ' + entry.message ];
           } else {
-            return [ indent + '*  ' + entry.message ].concat(traceLines);
+            return [ indentString + '*  ' + entry.message ].concat(traceLines);
           }
         } else {
           // We have entries ... let's format them.
-          return [ indent + '*  ' + entry.message ].concat(
-            outputToStr(indent + '  ', entry.entries)
+          return [ indentString + '*  ' + entry.message ].concat(
+            outputToStr(indentString + 2, entry.entries)
           ).concat(traceLines);
         }
       })();
@@ -45,7 +49,7 @@ const processLog = (err, logs) => {
     return everything;
   };
 
-  const processed = outputToStr('  ', logs.history);
+  const processed = outputToStr(2, logs.history);
 
   return (err instanceof Error ? err.message : err) + '\n\n' + JSON.stringify({
     logs: processed
