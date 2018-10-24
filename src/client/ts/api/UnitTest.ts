@@ -47,8 +47,7 @@ const processLog = (err, logs) => {
 
   const processed = outputToStr('  ', logs.history);
 
-  return JSON.stringify({
-    error: err instanceof Error ? err.message : err,
+  return (err instanceof Error ? err.message : err) + '\n\n' + JSON.stringify({
     logs: processed
   }, null, 2);
 }
