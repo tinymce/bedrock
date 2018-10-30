@@ -52,9 +52,10 @@ const processLog = (err, logs) => {
   const processed = outputToStr(2, logs.history);
 
   return (err instanceof Error ? err.message : err) + '\n\n' + JSON.stringify({
+    error: err,
     logs: processed
   }, null, 2);
-}
+};
 
 var asynctest = function (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) {
   register(name, function (success, failure) {
