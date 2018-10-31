@@ -40,7 +40,7 @@ const processLog = (err, logs) => {
         } else {
           // We have entries ... let's format them.
           return [ indentString + '*  ' + entry.message ].concat(
-            outputToStr(indentNum + 2, entry.entries)
+            outputToStr(numIndent + 2, entry.entries)
           ).concat(traceLines);
         }
       })();
