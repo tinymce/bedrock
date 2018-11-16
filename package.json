@@ -28,7 +28,7 @@
   "dependencies": {
     "@ephox/bolt": "^1.6.5",
     "async": "^1.5.2",
-    "awesome-typescript-loader": "^4.0.0",
+    "awesome-typescript-loader": "^5.2.1",
     "aws-sdk": "^2.186.0",
     "babel-polyfill": "^6.23.0",
     "capitalize": "^1.0.0",
@@ -48,9 +48,9 @@
     "selenium-webdriver": "^3",
     "serve-static": "^1.10.2",
     "source-map-loader": "^0.2.3",
-    "typescript": "^3.0.1",
-    "webpack": "webpack-3",
-    "webpack-dev-server": "webpack-3",
+    "typescript": "^3.1.6",
+    "webpack": "^4.25.1",
+    "webpack-dev-server": "^3.1.10",
     "xml-writer": "^1.6.0"
   },
   "devDependencies": {

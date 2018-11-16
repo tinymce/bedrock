@@ -124,7 +124,7 @@ let devserver = function (settings, done) {
 
     // Prevents webpack from doing a recompilation of a change of tests.ts over and over
     compiler.plugin('emit', function(compilation, callback) {
-      compilation.fileDependencies = compilation.fileDependencies.filter(filePath => filePath !== scratchFile);
+      compilation.fileDependencies.delete(scratchFile);
       callback();
     });
 

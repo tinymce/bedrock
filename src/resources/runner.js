@@ -6,6 +6,7 @@
   var api = global.ephox.bedrock;
 
   var testconfig = '';     // set during loadtests, for global config to use.
+  var chunk = 100; // set during loadtests, for global config to use.
   var testcount = $('<span />').addClass('total').text(0);       // set during loadtests, for selenium remote test counting
   var testscratch = null;  // set per test, private dom scratch area for the current test to use.
   var globalTests = global.__tests ? global.__tests : [];
@@ -14,6 +15,37 @@
   var accumulator = ephox.bolt.test.run.accumulator;
   var wrapper = ephox.bolt.test.run.wrapper;
   var errors = ephox.bolt.test.report.errors;
+
+  var urlParams = function() {
+    var params = {};
+    var qs = window.location.search;
+    qs = qs.split('+').join(' ');
+    var re = /[?&]?([^=]+)=([^&]*)/g;
+    var m;
+    while (m = re.exec(qs)) {
+      params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+    }
+    return params;
+  };
+
+  var posInt = function(str) {
+    if (typeof str === 'string') {
+      var num = parseInt(str, 10);
+      if (!isNaN(num) && num > 0) {
+        return num;
+      }
+    }
+    return 0;
+  }
+
+  var getParams = function () {
+    var params = urlParams();
+    return {
+      offset: posInt(params['offset']),
+      succeeded: posInt(params['succeeded']),
+      failed: posInt(params['failed'])
+    }
+  };
 
   var sendJson = function (url, data, success, error) {
     $.ajax({
@@ -41,8 +73,11 @@
     });
   };
 
+
+  var params = getParams();
+
   var reporter = (function () {
-    var current = $('<span />').addClass('progress').text(0);
+    var current = $('<span />').addClass('progress').text(params.succeeded + params.failed);
     var stop = $('<button />').text('stop').click(function () { accumulator.cancel(); });
 
     // WARNING: be careful if changing this, bedrock depends on the class names "progress" and "total"
@@ -64,6 +99,19 @@
     };
 
     var stopOnFailure = false;
+
+    var summary = function() {
+      var numFailed = resultJSON.results.reduce(function (sum, result) {
+        return sum + (result.passed === false ? 1 : 0);
+      }, 0);
+
+      var numPassed = resultJSON.results.length - numFailed;
+
+      return {
+        passed: numPassed + params.succeeded,
+        failed: numFailed + params.failed,
+      };
+    };
 
     var test = function (testcase, name) {
       var starttime = new Date();
@@ -97,7 +145,7 @@
           time: testTime
         });
 
-        current.text(resultJSON.results.length);
+        current.text(params.succeeded + params.failed + resultJSON.results.length);
 
         notify(undefined);
       };
@@ -145,11 +193,11 @@
           time: testTime,
           error: errors.clean(e)
         });
-        current.text(resultJSON.results.length);
+        current.text(params.succeeded + params.failed + resultJSON.results.length);
 
         if (stopOnFailure) {
           accumulator.cancel();
-          current.text(testcount.text());
+          current.text('\u274c @ ' + current.text());
         }
         notify(errors.clean(e));
       };
@@ -172,16 +220,11 @@
       };
 
       var notify = function (e) {
-        var numFailed = $(resultJSON.results).filter(function (k, result) {
-          return result.passed === false;
-        }).length;
-
-        var numPassed = resultJSON.results.length - numFailed;
-
+        var sum = summary();
         sendJson('tests/progress', {
           test: name,
-          numFailed: numFailed,
-          numPassed: numPassed,
+          numFailed: sum.failed,
+          numPassed: sum.passed,
           total: testcount.text(),
           error: e
         }, function () { }, function () { });
@@ -220,6 +263,7 @@
     };
 
     return {
+      summary: summary,
       test: test,
       done: done,
       setStopOnFailure: setStopOnFailure,
@@ -261,6 +305,22 @@
   };
 
   var runGlobalTests = function () {
+
+    var loadNextChunk = function() {
+      if (globalTests.length > (params.offset + chunk)) {
+        var sum = reporter.summary();
+        var offset = params.offset + chunk;
+        var qs = '?offset=' + offset + '&succeeded=' + sum.passed + '&failed=' + sum.failed;
+        var url = window.location.protocol + '//' + window.location.host + window.location.pathname + qs;
+        console.log('NEW URL WILL BE', url);
+        debugger;
+        window.location.assign(url);
+      } else {
+        console.log('DONE');
+        reporter.done();
+      }
+    };
+
     var loop = function (tests) {
       if (tests.length > 0) {
         var test = tests.shift();
@@ -268,8 +328,8 @@
 
         try {
           test.test(function () {
-            loop(tests);
             report.pass();
+            loop(tests);
           }, function (e) {
             console.error(e);
             report.fail(e);
@@ -291,15 +351,16 @@
           }
         }
       } else {
-        reporter.done();
+        loadNextChunk();
       }
     };
 
-    loop(globalTests.slice());
+    loop(globalTests.slice(params.offset, params.offset + chunk));
   };
 
   api.loadtests = function (data) {
     testconfig = data.config;  // intentional, see top of file for var decl.
+    chunk = typeof data.chunk === 'number' && data.chunk > 0 ? data.chunk : 100;
     var scripts = data.scripts;
     reporter.setStopOnFailure(data.stopOnFailure);
     var loop = function () {
