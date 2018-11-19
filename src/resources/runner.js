@@ -312,11 +312,8 @@
         var offset = params.offset + chunk;
         var qs = '?offset=' + offset + '&passed=' + sum.passed + '&failed=' + sum.failed;
         var url = window.location.protocol + '//' + window.location.host + window.location.pathname + qs;
-        console.log('NEW URL WILL BE', url);
-        debugger;
         window.location.assign(url);
       } else {
-        console.log('DONE');
         reporter.done();
       }
     };
