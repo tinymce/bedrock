@@ -42,7 +42,7 @@
     var params = urlParams();
     return {
       offset: posInt(params['offset']),
-      succeeded: posInt(params['succeeded']),
+      passed: posInt(params['passed']),
       failed: posInt(params['failed'])
     }
   };
@@ -77,7 +77,7 @@
   var params = getParams();
 
   var reporter = (function () {
-    var current = $('<span />').addClass('progress').text(params.succeeded + params.failed);
+    var current = $('<span />').addClass('progress').text(params.passed + params.failed);
     var stop = $('<button />').text('stop').click(function () { accumulator.cancel(); });
 
     // WARNING: be careful if changing this, bedrock depends on the class names "progress" and "total"
@@ -108,7 +108,7 @@
       var numPassed = resultJSON.results.length - numFailed;
 
       return {
-        passed: numPassed + params.succeeded,
+        passed: numPassed + params.passed,
         failed: numFailed + params.failed,
       };
     };
@@ -145,7 +145,7 @@
           time: testTime
         });
 
-        current.text(params.succeeded + params.failed + resultJSON.results.length);
+        current.text(params.passed + params.failed + resultJSON.results.length);
 
         notify(undefined);
       };
@@ -193,7 +193,7 @@
           time: testTime,
           error: errors.clean(e)
         });
-        current.text(params.succeeded + params.failed + resultJSON.results.length);
+        current.text(params.passed + params.failed + resultJSON.results.length);
 
         if (stopOnFailure) {
           accumulator.cancel();
@@ -310,7 +310,7 @@
       if (globalTests.length > (params.offset + chunk)) {
         var sum = reporter.summary();
         var offset = params.offset + chunk;
-        var qs = '?offset=' + offset + '&succeeded=' + sum.passed + '&failed=' + sum.failed;
+        var qs = '?offset=' + offset + '&passed=' + sum.passed + '&failed=' + sum.failed;
         var url = window.location.protocol + '//' + window.location.host + window.location.pathname + qs;
         console.log('NEW URL WILL BE', url);
         debugger;
