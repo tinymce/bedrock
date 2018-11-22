@@ -260,6 +260,17 @@
       }
     };
 
+    var loadNextTest = function() {
+      var sum = reporter.summary();
+      window.location.assign(
+        makeUrl(
+          params.session,
+          sum.passed + sum.failed,
+          sum.failed
+        )
+      );
+    };
+
     var loop = function (tests) {
       if (tests.length > 0) {
         var test = tests.shift();
@@ -273,20 +284,20 @@
           }, function (e) {
             console.error(e);
             report.fail(e, function() {
-              if (!reporter.shouldStopOnFailure()) {
-                loop(tests);
-              } else {
+              if (reporter.shouldStopOnFailure()) {
                 reporter.done();
+              } else {
+                loadNextTest();
               }
             });
           });
         } catch (e) {
           console.error(e);
           report.fail(e, function() {
-            if (!reporter.shouldStopOnFailure()) {
-              loop(tests);
-            } else {
+            if (reporter.shouldStopOnFailure()) {
               reporter.done();
+            } else {
+              loadNextTest();
             }
           });
 
