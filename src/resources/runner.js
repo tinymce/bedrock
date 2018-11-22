@@ -36,11 +36,13 @@
     return {
       session: params['session'] || makeSessionId(),
       offset: posInt(params['offset']),
-      failed: posInt(params['failed'])
+      failed: posInt(params['failed']),
+      retry: posInt(params['retry']),
     }
   };
 
-  var chunk = 100; // set during loadtests
+  var chunk; // set during loadtests
+  var retries; // set during loadtests
   var testscratch = null; // set per test, private dom scratch area for the current test to use.
   var globalTests = global.__tests ? global.__tests : [];
 
@@ -49,10 +51,11 @@
 
   var params = getParams();
 
-  var makeUrl = function(session, offset, failed) {
+  var makeUrl = function(session, offset, failed, retry) {
     var baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
     if (offset > 0) {
-      return baseUrl + '?session=' + session + '&offset=' + offset + '&failed=' + failed;
+      var rt = (retry > 0 ? '&retry=' + retry : '');
+      return baseUrl + '?session=' + session + '&offset=' + offset + '&failed=' + failed + rt;
     } else {
       return baseUrl;
     }
@@ -183,9 +186,6 @@
         current.text(params.offset + passCount + failCount);
         if (stopOnFailure) {
           current.text('\u274c @ ' + current.text());
-          // make it easy to restart at this test
-          const testOffset = params.offset + passCount + failCount - 1;
-          window.history.pushState({}, '', makeUrl(params.session, testOffset, 0));
         }
         sendTestResult(params.session, file, name, false, testTime, errors.clean(e), onDone, onDone);
       };
@@ -252,12 +252,25 @@
 
     var loadNextChunk = function() {
       if (globalTests.length > (params.offset + chunk)) {
-        window.location.assign(makeUrl(params.session, params.offset + chunk, reporter.summary().failed));
+        var url = makeUrl(params.session, params.offset + chunk, reporter.summary().failed, 0);
+        window.location.assign(url);
       } else {
         reporter.done();
         // for easy rerun reset the URL
-        window.history.pushState({}, '', makeUrl(params.session, 0, 0));
+        window.history.pushState({}, '', makeUrl(params.session, 0, 0, 0));
       }
+    };
+
+    var retryTest = function() {
+      var sum = reporter.summary();
+      window.location.assign(
+        makeUrl(
+          params.session,
+          sum.passed + sum.failed - 1,
+          sum.failed - 1,
+          params.retry + 1
+        )
+      );
     };
 
     var loadNextTest = function() {
@@ -266,9 +279,24 @@
         makeUrl(
           params.session,
           sum.passed + sum.failed,
-          sum.failed
+          sum.failed,
+          0
         )
       );
+    };
+
+    var afterFail = function() {
+      if (reporter.shouldStopOnFailure()) {
+        reporter.done();
+        // make it easy to restart at this test
+        var sum = reporter.summary();
+        var url = makeUrl(params.session, sum.passed + sum.failed - 1, sum.failed - 1, 0);
+        window.history.pushState({}, '', url);
+      } else if (params.retry < retries) {
+        retryTest();
+      } else {
+        loadNextTest();
+      }
     };
 
     var loop = function (tests) {
@@ -279,27 +307,18 @@
         try {
           test.test(function () {
             report.pass(function() {
+              params.retry = 0;
+              var url = makeUrl(params.session, params.offset, params.failed, params.retry);
+              window.history.pushState({}, '', url);
               loop(tests);
             });
           }, function (e) {
             console.error(e);
-            report.fail(e, function() {
-              if (reporter.shouldStopOnFailure()) {
-                reporter.done();
-              } else {
-                loadNextTest();
-              }
-            });
+            report.fail(e, afterFail);
           });
         } catch (e) {
           console.error(e);
-          report.fail(e, function() {
-            if (reporter.shouldStopOnFailure()) {
-              reporter.done();
-            } else {
-              loadNextTest();
-            }
-          });
+          report.fail(e, afterFail);
 
         }
       } else {
@@ -311,8 +330,8 @@
   };
 
   api.loadtests = function (data) {
-    testconfig = data.config;  // intentional, see top of file for var decl.
-    chunk = typeof data.chunk === 'number' && data.chunk > 0 ? data.chunk : chunk;
+    chunk = data.chunk;
+    retries = data.retries;
     reporter.setStopOnFailure(data.stopOnFailure);
     runGlobalTests();
   };

@@ -81,6 +81,7 @@ const makeController = function(stickyFirstSession, singleTimeout, overallTimeou
     const start = Date.now();
     session.inflight = { name, file, start };
     session.updated = Date.now();
+    session.done = false;
     updateHud(session);
   };
 
@@ -102,6 +103,7 @@ const makeController = function(stickyFirstSession, singleTimeout, overallTimeou
       session.inflight = null;
     }
     session.updated = Date.now();
+    session.done = false;
     updateHud(session);
   };
 

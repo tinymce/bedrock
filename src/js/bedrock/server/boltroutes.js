@@ -40,7 +40,9 @@ var generate = function (mode, projectdir, basedir, configFile, bundler, testfil
         routes.json('GET', '/harness', {
           config: path.relative(projectdir, configFile),
           scripts: [],
-          stopOnFailure: stopOnFailure
+          stopOnFailure: stopOnFailure,
+          chunk: 100,
+          retries: 1,
         })
       ];
     
