@@ -4,26 +4,29 @@ var go = function (settings) {
   var boltroutes = require('./bedrock/server/boltroutes');
   var webpack = require('./bedrock/compiler/webpack');
 
-  var runner = boltroutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.stopOnFailure, 'src/resources/bedrock.html');
+  var routes = boltroutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.stopOnFailure, 'src/resources/bedrock.html');
 
-  var serveSettings = {
-    projectdir: settings.projectdir,
-    basedir: settings.basedir,
-    testfiles: settings.testfiles,
-    // There is no driver for manual mode.
-    driver: attempt.failed('There is no webdriver for manual mode'),
-    master: null, // there is no need for master,
-    runner: runner,
-    loglevel: settings.loglevel,
-    customRoutes: settings.customRoutes,
-    config: settings.config,
-    coverage: settings.coverage,
-    overallTimeout: settings.overallTimeout,
-    singleTimeout: settings.singleTimeout
-  };
-
-  webpack.devserver(serveSettings, function (service/* , done */) {
-    console.log('bedrock-manual ' + version + ' available at: http://localhost:' + service.port);
+  routes.then((runner) => {
+    var serveSettings = {
+      projectdir: settings.projectdir,
+      basedir: settings.basedir,
+      testfiles: settings.testfiles,
+      // There is no driver for manual mode.
+      driver: attempt.failed('There is no webdriver for manual mode'),
+      master: null, // there is no need for master,
+      runner: runner,
+      loglevel: settings.loglevel,
+      customRoutes: settings.customRoutes,
+      config: settings.config,
+      coverage: settings.coverage,
+      overallTimeout: settings.overallTimeout,
+      singleTimeout: settings.singleTimeout
+    };
+  
+    webpack.devserver(serveSettings, function (service/* , done */) {
+      service.enableHud();
+      console.log('bedrock-manual ' + version + ' available at: http://localhost:' + service.port);
+    });
   });
 };
 

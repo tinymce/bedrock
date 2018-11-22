@@ -12,11 +12,12 @@ var pollRate = 2000;
 // This is how many times to fail the driver check before the process fails
 var maxInvalidAttempts = 300;
 
-const makeControler = function(stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel) {
+const makeController = function(stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel) {
   const hud = mHud.create(testfiles, loglevel);
   const sessions = {};
   let stickyId = null;
   let timeoutError = false;
+  let outputToHud = false;
 
   // clean up any sessions which have not had any activity in the last 10 seconds
   setInterval(function() {
@@ -47,6 +48,7 @@ const makeControler = function(stickyFirstSession, singleTimeout, overallTimeout
         results: [],
         lookup: {},
         inflight: null,
+        previous: null,
         done: false,
       };
       sessions[sessionId] = session;
@@ -55,12 +57,17 @@ const makeControler = function(stickyFirstSession, singleTimeout, overallTimeout
     return session;
   };
 
+  const enableHud = function() {
+    outputToHud = true;
+  };
+
   const updateHud = function(session) {
+    if (!outputToHud) return;
     if (stickyFirstSession && (timeoutError  || session.id !== stickyId)) return;
     const id = session.id;
     const numFailed = session.results.reduce((sum, res) => sum + (res.passed ? 0 : 1), 0);
     const numPassed = session.results.length - numFailed;
-    const test = session.inflight !== null ? session.inflight.name : '';
+    const test = session.inflight !== null ? session.inflight.name : (session.previous !== null ? session.previous.name : '');
     const done = session.done;
     hud.update({ id, test, numPassed, numFailed, done });
   };
@@ -91,6 +98,7 @@ const makeControler = function(stickyFirstSession, singleTimeout, overallTimeout
     }
     // this check is just in case the test start arrives before the result of the previous
     if (session.inflight !== null && session.inflight.file === file && session.inflight.name === name) {
+      session.previous = session.inflight;
       session.inflight = null;
     }
     session.updated = Date.now();
@@ -163,6 +171,7 @@ const makeControler = function(stickyFirstSession, singleTimeout, overallTimeout
   };
 
   return {
+    enableHud,
     recordAlive,
     recordTestStart,
     recordTestResult,
@@ -207,33 +216,34 @@ var create = function (master, maybeDriver, projectdir, basedir, stickyFirstSess
     });
   };
 
+
   var pageHasLoaded = false;
 
   var markLoaded = function () {
     pageHasLoaded = true;
   };
 
-  const controler = makeControler(stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel);
+  const controller = makeController(stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel);
 
   var routers = [
 
     driverRouter('/keys', 'Keys', keys.executor),
     driverRouter('/mouse', 'Mouse', mouse.executor),
     routes.effect('POST', '/tests/alive', function (data) {
-      controler.recordAlive(data.session);
+      controller.recordAlive(data.session);
       return Promise.resolve({});
     }),
     routes.effect('POST', '/tests/start', function (data) {
-      controler.recordTestStart(data.session, data.name, data.file);
+      controller.recordTestStart(data.session, data.name, data.file);
       return Promise.resolve({});
     }),
     routes.effect('POST', '/tests/result', function (data) {
-      controler.recordTestResult(data.session, data.name, data.file, data.passed, data.time, data.error);
+      controller.recordTestResult(data.session, data.name, data.file, data.passed, data.time, data.error);
       return Promise.resolve({});
     }),
     routes.effect('POST', '/tests/done', function (data) {
       coverage.writeCoverageData(data.coverage);
-      controler.recordDone(data.session);
+      controller.recordDone(data.session);
       return Promise.resolve({});
     }),
     // This does not need the webdriver.
@@ -243,7 +253,8 @@ var create = function (master, maybeDriver, projectdir, basedir, stickyFirstSess
   return {
     routers: routers,
     markLoaded: markLoaded,
-    awaitDone: controler.awaitDone
+    enableHud: controller.enableHud,
+    awaitDone: controller.awaitDone
   };
 };
 

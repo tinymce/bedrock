@@ -66,6 +66,7 @@ var startCustom = function (settings, createServer, f) {
       port: port,
       server: server,
       markLoaded: api.markLoaded,
+      enableHud: api.enableHud,
       awaitDone: api.awaitDone
     }, function () {
       server.close();
