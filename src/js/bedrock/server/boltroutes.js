@@ -15,6 +15,8 @@ var generate = function (mode, projectdir, basedir, configFile, bundler, testfil
     coverage
   );
 
+  var cachedTests = null;
+
   var routers = [
     routes.routing('GET', '/project', projectdir),
     routes.routing('GET', '/js', path.join(basedir, 'src/resources')),
@@ -23,7 +25,14 @@ var generate = function (mode, projectdir, basedir, configFile, bundler, testfil
     routes.routing('GET', '/lib/babel-polyfill', path.join(path.dirname(require.resolve('babel-polyfill')), '../dist')),
     routes.routing('GET', '/css', path.join(basedir, 'src/css')),
     routes.asyncJs('GET', '/compiled/tests.js', function (done) {
-      testGenerator.generate().then(done);
+      if (mode === 'auto') {
+        if (cachedTests === null) {
+          cachedTests = testGenerator.generate();
+        }
+        cachedTests.then(done);
+      } else {
+        testGenerator.generate().then(done);
+      }
     }),
     routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
 

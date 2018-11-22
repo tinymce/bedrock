@@ -5,7 +5,6 @@ var go = function (settings) {
 
   var boltroutes = require('./bedrock/server/boltroutes');
 
-  var poll = require('./bedrock/poll/poll');
   var reporter = require('./bedrock/core/reporter');
 
   var master = require('./bedrock/server/drivermaster').create();
@@ -31,7 +30,10 @@ var go = function (settings) {
       master: master,
       runner: runner,
       loglevel: settings.loglevel,
-      customRoutes: settings.customRoutes
+      customRoutes: settings.customRoutes,
+      stickyFirstSession: true,
+      overallTimeout: settings.overallTimeout,
+      singleTimeout: settings.singleTimeout
     };
 
     serve.start(serveSettings, function (service, done) {
@@ -42,7 +44,7 @@ var go = function (settings) {
         var message = isPhantom ? '\nPhantom tests loading ...\n' : '\n ... Initial page has loaded ...';
         console.log(message);
         service.markLoaded();
-        return poll.loop(master, driver, settings).then(function (data) {
+        return service.awaitDone().then(function (data) {
           return reporter.write({
             name: settings.name,
             output: settings.output

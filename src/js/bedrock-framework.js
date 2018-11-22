@@ -1,7 +1,6 @@
 var go = function (settings) {
   var serve = require('./bedrock/server/serve');
 
-  var poll = require('./bedrock/poll/poll');
   var reporter = require('./bedrock/core/reporter');
   var attempt = require('./bedrock/core/attempt');
   var version = require('./bedrock/core/version');
@@ -29,7 +28,9 @@ var go = function (settings) {
       master: master,
       runner: runner,
       loglevel: settings.loglevel,
-      customRoutes: settings.customRoutes
+      customRoutes: settings.customRoutes,
+      overallTimeout: settings.overallTimeout,
+      singleTimeout: settings.singleTimeout,
     };
 
     var addFramework = function (framework) {
@@ -51,7 +52,7 @@ var go = function (settings) {
         service.markLoaded();
 
         return addFramework(settings.framework).then(function () {
-          return poll.loop(master, driver, settings).then(function (data) {
+          return service.awaitDone().then(function (data) {
             return reporter.write({
               name: settings.name,
               output: settings.output

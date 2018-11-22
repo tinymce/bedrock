@@ -14,6 +14,7 @@ let getWebPackConfig = function (tsConfigFile, scratchDir, scratchFile, dest, co
     stats: 'none',
     entry: scratchFile,
     devtool: 'eval-cheap-module-source-map',
+    mode: 'development',
 
     resolve: {
       extensions: ['.ts', '.js'],

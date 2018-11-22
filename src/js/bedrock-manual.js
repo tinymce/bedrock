@@ -17,7 +17,9 @@ var go = function (settings) {
     loglevel: settings.loglevel,
     customRoutes: settings.customRoutes,
     config: settings.config,
-    coverage: settings.coverage
+    coverage: settings.coverage,
+    overallTimeout: settings.overallTimeout,
+    singleTimeout: settings.singleTimeout
   };
 
   webpack.devserver(serveSettings, function (service/* , done */) {

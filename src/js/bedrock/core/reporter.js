@@ -9,25 +9,18 @@ var logSauceInfo = function (root, settings) {
     .endElement();
 };
 
-var writePollExit = function (settings, pollExit) {
-  var jsonResults = JSON.stringify(
-    {
-      results: pollExit.results,
-      time: pollExit.time
-    }
-  );
-
+var writePollExit = function (settings, results) {
   return write({
     name: settings.name,
     output: settings.output,
     sauce: settings.sauce
-  })(jsonResults).then(function () {
-    return Promise.reject(pollExit.message);
+  })(results).then(function () {
+    return Promise.reject(results.message);
   }, function (err) {
     console.error('Error writing report for polling exit condition');
     console.error(err);
     console.error(err.stack);
-    return Promise.reject(pollExit.message);
+    return Promise.reject(results.message);
   });
 };
 
@@ -38,10 +31,10 @@ var outputTime = function (boltTime) {
 };
 
 var write = function (settings) {
-  return function (raw) {
+  return function (data) {
     return new Promise(function (resolve, reject) {
-      var data = JSON.parse(raw);
       var results = data.results;
+      var time = (data.now - data.start) / 1000;
       var failed = results.filter(function (result) {
         return result.passed !== true;
       });
@@ -52,7 +45,7 @@ var write = function (settings) {
       var root = w.startElement('testsuites')
         .writeAttribute('tests', results.length)
         .writeAttribute('failures', failed.length)
-        .writeAttribute('time', outputTime(data.time))
+        .writeAttribute('time', time)
         .writeAttribute('errors', 0);
 
       var suite = w.startElement('testsuite')
@@ -61,8 +54,8 @@ var write = function (settings) {
         .writeAttribute('host', 'localhost')
         .writeAttribute('id', 0)
         .writeAttribute('failures', failed.length)
-        .writeAttribute('timestamp', new Date().getTime())
-        .writeAttribute('time', outputTime(data.time));
+        .writeAttribute('timestamp', data.start)
+        .writeAttribute('time', time);
 
       results.forEach(function (res) {
         var elem = w.startElement('testcase')
