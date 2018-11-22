@@ -40,7 +40,7 @@
     }
   };
 
-  var chunk = 10000; // set during loadtests     // set during loadtests, for selenium remote test counting
+  var chunk = 100; // set during loadtests
   var testscratch = null; // set per test, private dom scratch area for the current test to use.
   var globalTests = global.__tests ? global.__tests : [];
 
