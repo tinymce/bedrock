@@ -44,7 +44,6 @@
   var chunk; // set during loadtests
   var retries; // set during loadtests
   var testscratch = null; // set per test, private dom scratch area for the current test to use.
-  var stop = false;
   var globalTests = global.__tests ? global.__tests : [];
 
   var timer = ephox.bolt.test.report.timer;
@@ -113,7 +112,20 @@
 
   var reporter = (function () {
     var current = $('<span />').addClass('progress').text(params.offset);
-    var stopBtn = $('<button />').text('stop').click(function () { stop = true; });
+    var restartBtn = $('<button />').text('Restart').click(function () {
+      var url = makeUrl(null, 0, 0, 0);
+      window.location.assign(url);
+    });
+    var retryBtn = $('<button />').text('Retry').click(function () {
+      var sum = summary();
+      var url = makeUrl(params.session, sum.passed + sum.failed - 1, sum.failed - 1, 0);
+      window.location.assign(url);
+    }).hide();
+    var skipBtn = $('<button />').text('Skip').click(function () {
+      var sum = summary();
+      var url = makeUrl(params.session, sum.passed + sum.failed, sum.failed, 0);
+      window.location.assign(url);
+    }).hide();
 
     $('document').ready(function () {
       $('body')
@@ -123,7 +135,11 @@
         .append($('<span />').text('/'))
         .append($('<span />').text(globalTests.length))
         .append('&nbsp;&nbsp;&nbsp;')
-        .append(stopBtn)
+        .append(restartBtn)
+        .append('&nbsp;&nbsp;&nbsp;')
+        .append(retryBtn)
+        .append('&nbsp;&nbsp;&nbsp;')
+        .append(skipBtn)
       );
     });
 
@@ -190,6 +206,8 @@
         current.text(params.offset + passCount + failCount);
         if (stopOnFailure) {
           current.text('\u274c @ ' + current.text());
+          retryBtn.show();
+          skipBtn.show();
         }
         sendTestResult(params.session, file, name, false, testTime, errors.clean(e), onDone, onDone);
       };
@@ -290,7 +308,7 @@
     };
 
     var afterFail = function() {
-      if (stop || reporter.shouldStopOnFailure()) {
+      if (reporter.shouldStopOnFailure()) {
         reporter.done();
         // make it easy to restart at this test
         var sum = reporter.summary();
@@ -304,13 +322,6 @@
     };
 
     var loop = function (tests) {
-      if (stop) {
-        // make it easy to restart at this test
-        var sum = reporter.summary();
-        var url = makeUrl(params.session, sum.passed + sum.failed, sum.failed, 0);
-        window.history.pushState({}, '', url);
-        return;
-      }
       if (tests.length > 0) {
         var test = tests.shift();
         var report = reporter.test(test.filePath, test.name);
