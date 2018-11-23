@@ -68,22 +68,6 @@ var forManual = function (directories) {
   );
 };
 
-var forRemote = function (directories) {
-  return cli.extract(
-    'bedrock-remote',
-    'Launch a testing process on a remote machine and allow the user to navigate to it in any browser',
-    commonOptions(directories).concat([
-      cloptions.config,
-      cloptions.files,
-      cloptions.testdir,
-      cloptions.testdirs,
-      cloptions.uploaddirs,
-      cloptions.bucket,
-      cloptions.bucketfolder
-    ])
-  );
-};
-
 var forFramework = function (directories) {
   return cli.extract(
     'bedrock-framework',
@@ -111,7 +95,6 @@ module.exports = {
   forRepl: forRepl,
   forAuto: forAuto,
   forManual: forManual,
-  forRemote: forRemote,
   forFramework: forFramework,
 
   logAndExit: logAndExit

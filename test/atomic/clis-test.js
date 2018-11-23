@@ -101,32 +101,3 @@ tape('Minimal specification of bedrock-manual', function (t) {
     retries: 0
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
 });
-
-tape('Minimal specification of bedrock-remote', function (t) {
-  mutateArgs([
-    "--files", "test/resources/test.file1",
-    "--config", "sample/config.js",
-    "--uploaddirs", "test", "src",
-    "--bucket", "testing"
-  ]);
-  var actual = clis.forRemote(directories);
-  attemptutils.assertResult(t, {
-    uploaddirs: [ 'test', 'src' ],
-    bucket: 'testing',
-    bucketfolder: 'bedrock',
-    config: 'sample/config.js',
-    help: false,
-    testfiles: [
-      'test/resources/test.file1'
-    ],
-    bundler: 'webpack',
-
-    singleTimeout: 30000,
-    stopOnFailure: false,
-    overallTimeout: 600000,
-    loglevel: 'advanced',
-    version: false,
-    chunk: 100,
-    retries: 0
-  }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
-});

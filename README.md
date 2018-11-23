@@ -73,7 +73,7 @@ Use `bedrock-framework --help` to see all arguments possible.
 
 ## Experimental modes
 
-Note, `bedrock` also has several other *experimental* modes including [Remote](doc/remote_mode.md) and [REPL Simulation](doc/repl_mode.md). These features are not yet stable enough to be reliable.
+Note, `bedrock` also has other *experimental* modes including [REPL Simulation](doc/repl_mode.md). These features are not yet stable enough to be reliable.
 
 # Tests
 

@@ -140,34 +140,6 @@
     uncommon: true
   };
 
-  var uploaddirs = {
-    name: 'uploaddirs',
-    alias: 'u',
-    type: String,
-    multiple: true,
-    description: 'The directories (from the project directory) to upload',
-    validate: extraction.directory,
-    defaultValue: [ 'src', 'test', 'config', 'lib' ]
-  };
-
-  var bucket = {
-    name: 'bucket',
-    type: String,
-    description: 'The name of the AWS bucket',
-    validate: extraction.any,
-    defaultValue: 'bedrock-testing',
-    required: true
-  };
-
-  var bucketfolder = {
-    name: 'bucketfolder',
-    type: String,
-    description: 'The namespace inside the bucket (a subfolder is created using the test name and timestamp)',
-    validate: extraction.any,
-    // Current default based on our AWS settings for temporary folders.
-    defaultValue: 'bedrock'
-  };
-
   var overallTimeout = {
     name: 'totalTimeout',
     type: Number,
@@ -297,11 +269,6 @@
     name: name,
     output: output,
     browser: browser,
-
-    // Remote testing
-    uploaddirs: uploaddirs,
-    bucket: bucket,
-    bucketfolder: bucketfolder,
 
     // Test driver settings
     projectdir: projectdir,
