@@ -1,3 +1,14 @@
+Version 3.3.0
+
+Date 2018-11-23
+
+* Test results are sent to node server instead of being scraped using selenium
+* Tests are chunked into batches to 'solve' memory leaks
+* Tests are retried once on failure (when not stopping)
+* Testing page is reloaded on failure to avoid cascades
+* Test HUD has been reformatted
+
+
 Version 3.2.1
 
 Date 2018-10-30
