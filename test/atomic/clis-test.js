@@ -67,7 +67,9 @@ tape('Minimal specification of bedrock-auto', function (t) {
     total: '.total',
     overallTimeout: 600000,
     loglevel: 'advanced',
-    version: false
+    version: false,
+    chunk: 100,
+    retries: 1
   }, cleanResult(actual));
 });
 
@@ -105,7 +107,9 @@ tape('Minimal specification of bedrock-manual', function (t) {
     total: '.total',
     overallTimeout: 600000,
     loglevel: 'advanced',
-    version: false
+    version: false,
+    chunk: 100,
+    retries: 1
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
 });
 
@@ -137,7 +141,9 @@ tape('Minimal specification of bedrock-remote', function (t) {
     total: '.total',
     overallTimeout: 600000,
     loglevel: 'advanced',
-    version: false
+    version: false,
+    chunk: 100,
+    retries: 1
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
 });
 
@@ -169,7 +175,9 @@ tape('Minimal specification of bedrock-sauce-single', function (t) {
     total: '.total',
     overallTimeout: 600000,
     loglevel: 'advanced',
-    version: false
+    version: false,
+    chunk: 100,
+    retries: 1
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
 });
 
@@ -221,6 +229,8 @@ tape('Minimal specification of bedrock-sauce', function (t) {
     total: '.total',
     overallTimeout: 600000,
     loglevel: 'advanced',
-    version: false
+    version: false,
+    chunk: 100,
+    retries: 1
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
 });
