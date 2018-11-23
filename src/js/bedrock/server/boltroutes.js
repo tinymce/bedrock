@@ -1,4 +1,4 @@
-var generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, stopOnFailure, basePage, coverage) {
+var generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, chunk, retries, stopOnFailure, basePage, coverage) {
   var path = require('path');
   var routes = require('./routes');
   var compiler = require('../compiler/compiler');
@@ -34,15 +34,14 @@ var generate = function (mode, projectdir, basedir, configFile, bundler, testfil
           }
         }),
         routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
-    
         // bolt tests won't work anymore, so until we have time to rewrite the runtime
         // just return an empty array of scripts
         routes.json('GET', '/harness', {
           config: path.relative(projectdir, configFile),
           scripts: [],
           stopOnFailure: stopOnFailure,
-          chunk: 100,
-          retries: 1,
+          chunk: chunk,
+          retries: retries
         })
       ];
     

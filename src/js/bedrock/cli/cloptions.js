@@ -332,6 +332,24 @@
     validate: extraction.any
   };
 
+  var chunk = {
+    name: 'chunk',
+    type: Number,
+    description: 'Run tests in groups of this size, reload page between.',
+    validate: extraction.any,
+    defaultValue: 100,
+    uncommon: true
+  };
+
+  var retries = {
+    name: 'retries',
+    type: Number,
+    description: 'Retry failing tests this many times. Ignored with stopOnFailure.',
+    validate: extraction.any,
+    defaultValue: 1,
+    uncommon: true
+  };
+
   var stopOnFailure = {
     name: 'stopOnFailure',
     type: Boolean,
@@ -423,6 +441,8 @@
     framework: framework,
     help: help,
     version: version,
+    chunk: chunk,
+    retries: retries,
     stopOnFailure: stopOnFailure,
     delayExiting: delayExiting,
     page: page,

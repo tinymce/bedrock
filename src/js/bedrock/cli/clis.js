@@ -14,6 +14,8 @@ var commonOptions = function (directories) {
     cloptions.testNameSelector,
     cloptions.resultsSelector,
     cloptions.stopOnFailure,
+    cloptions.chunk,
+    cloptions.retries,
     cloptions.help,
     cloptions.logging,
     cloptions.version,
