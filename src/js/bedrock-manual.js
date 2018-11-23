@@ -1,4 +1,5 @@
 var go = function (settings) {
+  settings.stopOnFailure = true;
   var attempt = require('./bedrock/core/attempt');
   var version = require('./bedrock/core/version');
   var boltroutes = require('./bedrock/server/boltroutes');

@@ -1,11 +1,14 @@
 var usage = require('command-line-usage');
 
 var generateUsage = function (command, desc, definitions) {
-  var commonDefs = definitions.filter(function (defn) {
+  var visibleDefinitions = definitions.filter(function (defn) {
+    return defn.hidden !== true;
+  })
+  var commonDefs = visibleDefinitions.filter(function (defn) {
     return defn.uncommon !== true;
   });
 
-  var uncommonDefs = definitions.filter(function (defn) {
+  var uncommonDefs = visibleDefinitions.filter(function (defn) {
     return defn.uncommon === true;
   });
 

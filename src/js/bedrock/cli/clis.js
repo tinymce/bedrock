@@ -8,9 +8,7 @@ var commonOptions = function (directories) {
     cloptions.basedir(directories),
     cloptions.overallTimeout,
     cloptions.singleTimeout,
-    cloptions.stopOnFailure,
     cloptions.chunk,
-    cloptions.retries,
     cloptions.help,
     cloptions.logging,
     cloptions.version,
@@ -23,6 +21,7 @@ var forRepl = function (directories) {
     'bedrock-repl',
     'Open a project repl on a port',
     [
+      cloptions.stopOnFailure,
       cloptions.projectdir(directories),
       cloptions.basedir(directories),
       cloptions.config,
@@ -47,6 +46,8 @@ var forAuto = function (directories) {
       cloptions.output,
       cloptions.debuggingPort,
       cloptions.customRoutes,
+      cloptions.stopOnFailure,
+      cloptions.retries,
       cloptions.delayExiting,
       cloptions.coverage
     ])
@@ -58,6 +59,7 @@ var forManual = function (directories) {
     'bedrock',
     'Launch a testing process on a localhost port and allow the user to navigate to it in any browser',
     commonOptions(directories).concat([
+      cloptions.stopOnFailure__hidden,
       cloptions.config,
       cloptions.files,
       cloptions.testdir,
@@ -73,6 +75,7 @@ var forFramework = function (directories) {
     'bedrock-framework',
     'Load bedrock against a specific page using a framework',
     commonOptions(directories).concat([
+      cloptions.stopOnFailure,
       cloptions.name,
       cloptions.page,
       cloptions.browser,

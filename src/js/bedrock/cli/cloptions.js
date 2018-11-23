@@ -219,6 +219,14 @@
     validate: extraction.any
   };
 
+  var stopOnFailure__hidden = {
+    name: 'stopOnFailure',
+    type: Boolean,
+    defaultValue: false,
+    validate: extraction.any,
+    hidden: true
+  };
+
   var repl = {
     name: 'repl',
     type: String,
@@ -285,6 +293,7 @@
     chunk: chunk,
     retries: retries,
     stopOnFailure: stopOnFailure,
+    stopOnFailure__hidden: stopOnFailure__hidden,
     delayExiting: delayExiting,
     page: page,
     logging: logging,
