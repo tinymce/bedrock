@@ -346,7 +346,7 @@
     type: Number,
     description: 'Retry failing tests this many times. Ignored with stopOnFailure.',
     validate: extraction.any,
-    defaultValue: 1,
+    defaultValue: 0,
     uncommon: true
   };
 
