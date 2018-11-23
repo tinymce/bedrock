@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock",
-  "version": "3.3.0",
+  "version": "4.0.0",
   "description": "NodeJS test runner",
   "repository": {
     "type": "git",
@@ -9,8 +9,6 @@
   "bin": {
     "bedrock-auto": "./bin/bedrock-auto.js",
     "bedrock-remote": "./bin/bedrock-remote.js",
-    "bedrock-sauce": "./bin/bedrock-sauce.js",
-    "bedrock-sauce-single": "./bin/bedrock-sauce-single.js",
     "bedrock-repl": "./bin/bedrock-repl.js",
     "bedrock-framework": "./bin/bedrock-framework.js",
     "bedrock": "./bin/bedrock.js"
@@ -21,8 +19,7 @@
     "test-atomic": "tape test/atomic/*.js",
     "test-props": "tape test/props/*.js",
     "test-samples": "bin/bedrock-auto.js -b phantomjs --config sample/config.js --files sample/AsyncPassTest.ts sample/IFrameTest.ts sample/TabbingTest.ts",
-    "test-acceptance": "node test/acceptance/scraping-test.js",
-    "test": "npm run test-atomic && npm run test-props && npm run test-samples && npm run test-acceptance"
+    "test": "npm run test-atomic && npm run test-props && npm run test-samples"
   },
   "private": false,
   "dependencies": {
@@ -44,7 +41,6 @@
     "raw-loader": "^0.5.1",
     "recursive-readdir-sync": "^1.0.6",
     "request": "^2.72.0",
-    "saucelabs": "^1.2.0",
     "selenium-webdriver": "^3",
     "serve-static": "^1.10.2",
     "source-map-loader": "^0.2.3",

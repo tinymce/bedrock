@@ -1,4 +1,4 @@
-Version 3.3.0
+Version 4.0.0
 
 Date 2018-11-23
 
@@ -7,7 +7,7 @@ Date 2018-11-23
 * Tests are retried once on failure (when not stopping)
 * Testing page is reloaded on failure to avoid cascades
 * Test HUD has been reformatted
-
+* Removed SauceLabs integration
 
 Version 3.2.1
 

@@ -1,6 +1,6 @@
 Dependency: 
   name: @ephox/bedrock
-  version: 3.3.0
+  version: 4.0.0
   repository: https://github.com/ephox/bedrock
   licenses: Apache-2.0
 
@@ -170,12 +170,6 @@ Dependency:
   name: acorn-jsx
   version: 3.0.1
   repository: https://github.com/RReverser/acorn-jsx
-  licenses: MIT
-
-Dependency: 
-  name: agent-base
-  version: 2.1.1
-  repository: http://github.com/TooTallNate/node-agent-base
   licenses: MIT
 
 Dependency: 
@@ -2165,12 +2159,6 @@ Dependency:
   licenses: MIT
 
 Dependency: 
-  name: https-proxy-agent
-  version: 1.0.0
-  repository: http://github.com/TooTallNate/node-https-proxy-agent
-  licenses: MIT
-
-Dependency: 
   name: iconv-lite
   version: 0.4.19
   repository: http://github.com/ashtuchkin/iconv-lite
@@ -4095,12 +4083,6 @@ Dependency:
   version: 2.1.2
   repository: https://github.com/ChALkeR/safer-buffer
   licenses: MIT
-
-Dependency: 
-  name: saucelabs
-  version: 1.4.0
-  repository: http://github.com/holidayextras/node-saucelabs
-  licenses: Unknown
 
 Dependency: 
   name: sax

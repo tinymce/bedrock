@@ -2,18 +2,10 @@ var XMLWriter = require('xml-writer');
 var fs = require('fs');
 var attempt = require('./attempt');
 
-var logSauceInfo = function (root, settings) {
-  return root.startElement('system-out')
-    .startCData().text('\nSauceOnDemandSessionID=' + settings.sauce.id + ' job-name=' + settings.sauce.job + '\n')
-    .endCData()
-    .endElement();
-};
-
 var writePollExit = function (settings, results) {
   return write({
     name: settings.name,
-    output: settings.output,
-    sauce: settings.sauce
+    output: settings.output
   })(results).then(function () {
     return Promise.reject(results.message);
   }, function (err) {
@@ -73,8 +65,6 @@ var write = function (settings) {
         elem.endElement();
       });
       suite.endElement();
-
-      if (settings.sauce !== undefined) logSauceInfo(root, settings);
 
       root.endElement();
 

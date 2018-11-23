@@ -4,15 +4,10 @@ var exitcodes = require('../util/exitcodes');
 
 var commonOptions = function (directories) {
   return [
-    cloptions.doneSelector,
     cloptions.projectdir(directories),
     cloptions.basedir(directories),
     cloptions.overallTimeout,
     cloptions.singleTimeout,
-    cloptions.progressSelector,
-    cloptions.totalSelector,
-    cloptions.testNameSelector,
-    cloptions.resultsSelector,
     cloptions.stopOnFailure,
     cloptions.chunk,
     cloptions.retries,
@@ -89,46 +84,6 @@ var forRemote = function (directories) {
   );
 };
 
-var forSauceSingle = function (directories) {
-  return cli.extract(
-    'bedrock-sauce-single',
-    'Connect to a SauceLabs VM and run the tests',
-    commonOptions(directories).concat([
-      cloptions.remoteurl,
-      cloptions.saucebrowser,
-      cloptions.name,
-      cloptions.sauceos,
-      cloptions.saucebrowserVersion,
-      cloptions.sauceuser,
-      cloptions.saucekey,
-      cloptions.output,
-      cloptions.saucebuild
-    ])
-  );
-};
-
-var forSauce = function (directories) {
-  return cli.extract(
-    'bedrock-sauce',
-    'Connect to the SauceLabs VMs specified by a json file and run the tests',
-    commonOptions(directories).concat([
-      cloptions.uploaddirs,
-      cloptions.bucket,
-      cloptions.bucketfolder,
-      cloptions.config,
-      cloptions.files,
-      cloptions.testdir,
-      cloptions.testdirs,
-      cloptions.name,
-      cloptions.sauceconfig,
-      cloptions.sauceuser,
-      cloptions.saucekey,
-      cloptions.output,
-      cloptions.saucebuild
-    ])
-  );
-};
-
 var forFramework = function (directories) {
   return cli.extract(
     'bedrock-framework',
@@ -157,8 +112,6 @@ module.exports = {
   forAuto: forAuto,
   forManual: forManual,
   forRemote: forRemote,
-  forSauceSingle: forSauceSingle,
-  forSauce: forSauce,
   forFramework: forFramework,
 
   logAndExit: logAndExit

@@ -50,7 +50,6 @@ tape('Minimal specification of bedrock-auto', function (t) {
     browser: 'MicrosoftEdge',
     bundler: 'webpack',
     config: 'sample/config.js',
-    done: 'div.done',
     name: 'bedrock-run',
     output: 'scratch',
     help: false,
@@ -59,17 +58,13 @@ tape('Minimal specification of bedrock-auto', function (t) {
     ],
     debuggingPort: 9000,
     delayExit: false,
-    progress: '.progress',
-    results: 'textarea.results',
     singleTimeout: 30000,
     stopOnFailure: false,
-    testName: '.test.running .name',
-    total: '.total',
     overallTimeout: 600000,
     loglevel: 'advanced',
     version: false,
     chunk: 100,
-    retries: 1
+    retries: 0
   }, cleanResult(actual));
 });
 
@@ -92,24 +87,18 @@ tape('Minimal specification of bedrock-manual', function (t) {
   var actual = clis.forManual(directories);
   attemptutils.assertResult(t, {
     config: 'sample/config.js',
-    done: 'div.done',
     testfiles: [
       'test/resources/test.file1'
     ],
     help: false,
     bundler: 'webpack',
-
-    progress: '.progress',
-    results: 'textarea.results',
     singleTimeout: 30000,
     stopOnFailure: false,
-    testName: '.test.running .name',
-    total: '.total',
     overallTimeout: 600000,
     loglevel: 'advanced',
     version: false,
     chunk: 100,
-    retries: 1
+    retries: 0
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
 });
 
@@ -126,111 +115,18 @@ tape('Minimal specification of bedrock-remote', function (t) {
     bucket: 'testing',
     bucketfolder: 'bedrock',
     config: 'sample/config.js',
-    done: 'div.done',
     help: false,
     testfiles: [
       'test/resources/test.file1'
     ],
     bundler: 'webpack',
 
-    progress: '.progress',
-    results: 'textarea.results',
     singleTimeout: 30000,
     stopOnFailure: false,
-    testName: '.test.running .name',
-    total: '.total',
     overallTimeout: 600000,
     loglevel: 'advanced',
     version: false,
     chunk: 100,
-    retries: 1
-  }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
-});
-
-tape('Minimal specification of bedrock-sauce-single', function (t) {
-  mutateArgs([
-    "--remoteurl", "remote.url",
-    "--sauceuser", "sauce.user",
-    "--saucekey", "sauce.key"
-  ]);
-  var actual = clis.forSauceSingle(directories);
-  attemptutils.assertResult(t, {
-    bundler: 'webpack',
-    remoteurl: 'remote.url',
-    done: 'div.done',
-    sauceuser: 'sauce.user',
-    saucebuild: 'not specified',
-    saucekey: 'sauce.key',
-    saucebrowser: 'chrome',
-    help: false,
-    sauceos: 'Linux',
-    saucebrowserVersion: 'latest',
-    output: 'scratch',
-    name: 'bedrock-run',
-    progress: '.progress',
-    results: 'textarea.results',
-    singleTimeout: 30000,
-    stopOnFailure: false,
-    testName: '.test.running .name',
-    total: '.total',
-    overallTimeout: 600000,
-    loglevel: 'advanced',
-    version: false,
-    chunk: 100,
-    retries: 1
-  }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
-});
-
-tape('Specification of bedrock-sauce-single without saucekey', function (t) {
-  mutateArgs([
-    "--remoteurl", "remote.url",
-    "--sauceuser", "sauce.user"
-  ]);
-  var actual = clis.forSauceSingle(directories);
-  attemptutils.assertErrors(t, [
-    'The *required* output property [saucekey] from [saucekey] must be specified'
-  ], cleanError(actual));
-});
-
-tape('Minimal specification of bedrock-sauce', function (t) {
-  mutateArgs([
-    "--files", "test/resources/test.file1",
-    "--config", "sample/config.js",
-    "--uploaddirs", "test", "src",
-    "--bucket", "testing",
-    "--sauceconfig", "test/resources/test.file1",
-    "--sauceuser", "sauce.user",
-    "--saucekey", "sauce.key"
-  ]);
-  var actual = clis.forSauce(directories);
-  attemptutils.assertResult(t, {
-    uploaddirs: [ 'test', 'src' ],
-    bundler: 'webpack',
-    bucket: 'testing',
-    bucketfolder: 'bedrock',
-    config: 'sample/config.js',
-    done: 'div.done',
-    testfiles: [
-      'test/resources/test.file1'
-    ],
-    name: 'bedrock-run',
-    output: 'scratch',
-    help: false,
-
-    sauceconfig: 'test/resources/test.file1',
-    saucekey: 'sauce.key',
-    saucebuild: 'not specified',
-    sauceuser: 'sauce.user',
-    progress: '.progress',
-    results: 'textarea.results',
-    singleTimeout: 30000,
-    stopOnFailure: false,
-    testName: '.test.running .name',
-    total: '.total',
-    overallTimeout: 600000,
-    loglevel: 'advanced',
-    version: false,
-    chunk: 100,
-    retries: 1
+    retries: 0
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
 });
