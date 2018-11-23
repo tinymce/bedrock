@@ -44,6 +44,7 @@
   var chunk; // set during loadtests
   var retries; // set during loadtests
   var testscratch = null; // set per test, private dom scratch area for the current test to use.
+  var stop = false;
   var globalTests = global.__tests ? global.__tests : [];
 
   var timer = ephox.bolt.test.report.timer;
@@ -112,6 +113,7 @@
 
   var reporter = (function () {
     var current = $('<span />').addClass('progress').text(params.offset);
+    var stopBtn = $('<button />').text('stop').click(function () { stop = true; });
 
     $('document').ready(function () {
       $('body')
@@ -120,6 +122,8 @@
         .append(current)
         .append($('<span />').text('/'))
         .append($('<span />').text(globalTests.length))
+        .append('&nbsp;&nbsp;&nbsp;')
+        .append(stopBtn)
       );
     });
 
@@ -286,7 +290,7 @@
     };
 
     var afterFail = function() {
-      if (reporter.shouldStopOnFailure()) {
+      if (stop || reporter.shouldStopOnFailure()) {
         reporter.done();
         // make it easy to restart at this test
         var sum = reporter.summary();
@@ -300,6 +304,13 @@
     };
 
     var loop = function (tests) {
+      if (stop) {
+        // make it easy to restart at this test
+        var sum = reporter.summary();
+        var url = makeUrl(params.session, sum.passed + sum.failed, sum.failed, 0);
+        window.history.pushState({}, '', url);
+        return;
+      }
       if (tests.length > 0) {
         var test = tests.shift();
         var report = reporter.test(test.filePath, test.name);
