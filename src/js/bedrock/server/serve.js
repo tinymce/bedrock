@@ -16,7 +16,9 @@ var startCustom = function (settings, createServer, f) {
     'testfiles',
     'driver',
     'master',
-    'runner'
+    'runner',
+    'singleTimeout',
+    'overallTimeout'
   ]);
 
   var finalhandler = require('finalhandler');
@@ -32,9 +34,12 @@ var startCustom = function (settings, createServer, f) {
   var testfiles = Prefs.testfiles(settings);
   var maybeDriver = Prefs.driver(settings);
   var master = Prefs.master(settings);
+  var stickyFirstSession = settings.stickyFirstSession;
+  var singleTimeout = Prefs.singleTimeout(settings);
+  var overallTimeout = Prefs.overallTimeout(settings);
 
   var runner = Prefs.runner(settings);
-  var api = apis.create(master, maybeDriver, projectdir, basedir, testfiles, settings.loglevel);
+  var api = apis.create(master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, settings.loglevel);
 
   var routers = runner.routers.concat(
     api.routers,
@@ -60,7 +65,9 @@ var startCustom = function (settings, createServer, f) {
     f({
       port: port,
       server: server,
-      markLoaded: api.markLoaded
+      markLoaded: api.markLoaded,
+      enableHud: api.enableHud,
+      awaitDone: api.awaitDone
     }, function () {
       server.close();
     });

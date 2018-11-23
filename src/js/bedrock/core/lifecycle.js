@@ -28,6 +28,7 @@ var shutdown = function (promise, driver, done, gruntDone, delayExiting) {
       }, function () {
         console.log('All tests passed.');
         if (gruntDone !== null) gruntDone(true);
+        else process.exit(0); // I don't know why it won't exit without this.
       });
     });
   }, function (err) {

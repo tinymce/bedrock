@@ -5,210 +5,227 @@
   global.ephox.bedrock = global.ephox.bedrock || {};
   var api = global.ephox.bedrock;
 
-  var testconfig = '';     // set during loadtests, for global config to use.
-  var testcount = $('<span />').addClass('total').text(0);       // set during loadtests, for selenium remote test counting
-  var testscratch = null;  // set per test, private dom scratch area for the current test to use.
+  var urlParams = function() {
+    var params = {};
+    var qs = window.location.search;
+    qs = qs.split('+').join(' ');
+    var re = /[?&]?([^=]+)=([^&]*)/g;
+    var m;
+    while (m = re.exec(qs)) {
+      params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+    }
+    return params;
+  };
+
+  var posInt = function(str) {
+    if (typeof str === 'string') {
+      var num = parseInt(str, 10);
+      if (!isNaN(num) && num > 0) {
+        return num;
+      }
+    }
+    return 0;
+  };
+
+  var makeSessionId = function() {
+    return '' + Math.ceil((Math.random() * 100000000));
+  };
+
+  var getParams = function () {
+    var params = urlParams();
+    return {
+      session: params['session'] || makeSessionId(),
+      offset: posInt(params['offset']),
+      failed: posInt(params['failed']),
+      retry: posInt(params['retry']),
+    }
+  };
+
+  var chunk; // set during loadtests
+  var retries; // set during loadtests
+  var testscratch = null; // set per test, private dom scratch area for the current test to use.
   var globalTests = global.__tests ? global.__tests : [];
 
   var timer = ephox.bolt.test.report.timer;
-  var accumulator = ephox.bolt.test.run.accumulator;
-  var wrapper = ephox.bolt.test.run.wrapper;
   var errors = ephox.bolt.test.report.errors;
 
-  var sendJson = function (url, data, success, error) {
+  var params = getParams();
+
+  var makeUrl = function(session, offset, failed, retry) {
+    var baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
+    if (offset > 0) {
+      var rt = (retry > 0 ? '&retry=' + retry : '');
+      return baseUrl + '?session=' + session + '&offset=' + offset + '&failed=' + failed + rt;
+    } else {
+      return baseUrl;
+    }
+  };
+
+  var sendJson = function (url, data, onSuccess, onError) {
+    if (onSuccess === undefined) onSuccess = function() {};
+    if (onError === undefined) onError = function() {};
     $.ajax({
       method: 'post',
       url: url,
       dataType: 'json',
-      success: success,
-      error: error,
+      success: onSuccess,
+      error: onError,
       data: JSON.stringify(data)
     });
   };
 
-  var bedrocksource = function () {
-    return {
-      args: [ function (path) { return path; }, 'ephox.bedrock', 'js', function (id) { return id; } ],
-      relativeTo: '',
-      type: 'amd'
-    };
+  var sendKeepAlive = function(session, onSuccess, onError) {
+    sendJson('/tests/alive', {
+      session: session
+    }, onSuccess, onError);
   };
 
-  var reader = function (done) {
-    browser.read('./', 'project/' + testconfig, function (data) {
-      data.sources = [ bedrocksource() ].concat(data.sources);
-      done(data);
-    });
+  var sendTestStart = function (session, file, name, onSuccess, onError) {
+    sendJson('/tests/start', {
+      session: session,
+      file: file,
+      name: name,
+    }, onSuccess, onError);
+  };
+
+  var sendTestResult = function(session, file, name, passed, time, error, onSuccess, onError) {
+    sendJson('/tests/result', {
+      session: session,
+      file: file,
+      name: name,
+      passed: passed,
+      time: time,
+      error: error
+    }, onSuccess, onError);
+  };
+
+  var sendDone = function (session, onSuccess, onError) {
+    var getCoverage = function () {
+      return typeof __coverage__ === 'undefined' ? { } : __coverage__;
+    };
+
+    sendJson('/tests/done', {
+      session: session,
+      coverage: getCoverage()
+    }, onSuccess, onError);
   };
 
   var reporter = (function () {
-    var current = $('<span />').addClass('progress').text(0);
-    var stop = $('<button />').text('stop').click(function () { accumulator.cancel(); });
+    var current = $('<span />').addClass('progress').text(params.offset);
+    var restartBtn = $('<button />').text('Restart').click(function () {
+      var url = makeUrl(null, 0, 0, 0);
+      window.location.assign(url);
+    });
+    var retryBtn = $('<button />').text('Retry').click(function () {
+      var sum = summary();
+      var url = makeUrl(params.session, sum.passed + sum.failed - 1, sum.failed - 1, 0);
+      window.location.assign(url);
+    }).hide();
+    var skipBtn = $('<button />').text('Skip').click(function () {
+      var sum = summary();
+      var url = makeUrl(params.session, sum.passed + sum.failed, sum.failed, 0);
+      window.location.assign(url);
+    }).hide();
 
-    // WARNING: be careful if changing this, bedrock depends on the class names "progress" and "total"
     $('document').ready(function () {
       $('body')
         .append($('<div />')
-          .append($('<span />').text('Suite progress: '))
-          .append(current)
-          .append($('<span />').text('/'))
-          .append(testcount)
-          .append('&nbsp;&nbsp;&nbsp;')
-          .append(stop)
-        );
+        .append($('<span />').text('Suite progress: '))
+        .append(current)
+        .append($('<span />').text('/'))
+        .append($('<span />').text(globalTests.length))
+        .append('&nbsp;&nbsp;&nbsp;')
+        .append(restartBtn)
+        .append('&nbsp;&nbsp;&nbsp;')
+        .append(retryBtn)
+        .append('&nbsp;&nbsp;&nbsp;')
+        .append(skipBtn)
+      );
     });
 
     var initial = new Date();
-    var resultJSON = {
-      results: []
-    };
+    var passCount = 0;
+    var failCount = 0;
 
     var stopOnFailure = false;
 
-    var test = function (testcase, name) {
+    var keepAliveTimer = setInterval(function() {
+      sendKeepAlive(params.session, undefined, function() {
+        // if the server shutsdown stop trying to send messages
+        clearInterval(keepAliveTimer);
+      });
+    }, 5000);
+
+    var summary = function() {
+      return {
+        passed: passCount + (params.offset - params.failed),
+        failed: failCount + params.failed,
+      };
+    };
+
+    var test = function (file, name) {
+      sendTestStart(params.session, file, name);
       var starttime = new Date();
       var el = $('<div />').addClass('test running');
 
       var output = $('<div />').addClass('output');
       var marker = $('<span />').text('[running]').addClass('result');
-      var testfile = $('<span />').text(testcase).addClass('testfile');
+      var testfile = $('<span />').text(file).addClass('testfile');
       var nameSpan = $('<span />').text(name).addClass('name');
       var error = $('<span />').addClass('error-container');
       var time = $('<span />').addClass('time');
       output.append(marker, ' ', nameSpan, ' [', time, '] ', error, ' ', testfile);
-
       var scratch = $('<div />').addClass('scratch');
-
       el.append(output, scratch);
       $('body').append(el);
 
       testscratch = scratch.get(0);  // intentional, see top of file for var decl.
 
-      var pass = function () {
+      var pass = function (onDone) {
+        passCount++;
         el.removeClass('running').addClass('passed').addClass('hidden');
         marker.text('[passed]').addClass('passed');
         var testTime = timer.elapsed(starttime);
         time.text(testTime);
-
-        resultJSON.results.push({
-          name: name,
-          file: testcase,
-          passed: true,
-          time: testTime
-        });
-
-        current.text(resultJSON.results.length);
-
-        notify(undefined);
+        current.text(params.offset + passCount + failCount);
+        sendTestResult(params.session, file, name, true, testTime, null, onDone, onDone);
       };
 
-      var processQUnit = function (html) {
-        // Required to make <del> and <ins> stay as tags.
-        return html.replace(/&lt;del&gt;/g, '<del>').replace(/&lt;\/del&gt;/g, '</del>').replace(/&lt;ins&gt;/g, '<ins>').replace(/&lt;\/ins&gt;/g, '</ins>');
-      };
-
-      var failhtml = function (pre, e) {
-        // Provide detailed HTML comparison information
-        pre.html('Test failure: ' + e.message +
-          '\nExpected: ' + htmlentities(e.diff.expected) +
-          '\nActual: ' + htmlentities(e.diff.actual) +
-          '\n\nHTML Diff: ' + processQUnit(htmlentities(e.diff.comparison)) + '\n\nStack: ' + e.stack);
-      };
-
-      var failnormal = function (pre, e) {
-        pre.html(htmlentities(errors.clean(e)));
-      };
-
-      var populate = function (pre, e) {
-        // If the diff property is available, this is an HTML diff error
-        if (e.diff !== undefined) failhtml(pre, e);
-        else failnormal(pre, e);
-      };
-
-      var fail = function (e) {
-        el.addClass('failed').removeClass('running');
+      var fail = function (e, onDone) {
+        failCount++;
+        el.removeClass('running').addClass('failed');
         marker.text('[failed]').addClass('failed');
         // Don't use .text() as it strips out newlines in IE, even when used
         // on a pre tag.
-        var pre = $('<pre/>').addClass('error');
-        populate(pre, e);
+        var pre = $('<pre/>')
+          .addClass('error')
+          .html((e.diff !== undefined ? failhtml : failnormal)(e));
         error.append(pre);
         var testTime = timer.elapsed(starttime);
         time.text(testTime);
-
-
-
-        resultJSON.results.push({
-          name: name,
-          file: testcase,
-          passed: false,
-          time: testTime,
-          error: errors.clean(e)
-        });
-        current.text(resultJSON.results.length);
-
+        current.text(params.offset + passCount + failCount);
         if (stopOnFailure) {
-          accumulator.cancel();
-          current.text(testcount.text());
+          current.text('\u274c @ ' + current.text());
+          retryBtn.show();
+          skipBtn.show();
         }
-        notify(errors.clean(e));
-      };
-
-      var htmlcompare = function (compares) {
-        el.addClass('delayed').removeClass('running');
-        marker.text('[delayed]').addClass('delayed');
-        // Don't use .text() as it strips out newlines in IE, even when used
-        // on a pre tag.
-        error.append('<pre class="delayed">Test incomplete, bedrock will perform HTML comparison</pre>');
-        var testTime = timer.elapsed(starttime);
-        time.text(testTime);
-
-        resultJSON.results.push({
-          name: name,
-          file: testcase,
-          time: testTime,
-          comparisonrequired: compares
-        });
-      };
-
-      var notify = function (e) {
-        var numFailed = $(resultJSON.results).filter(function (k, result) {
-          return result.passed === false;
-        }).length;
-
-        var numPassed = resultJSON.results.length - numFailed;
-
-        sendJson('tests/progress', {
-          test: name,
-          numFailed: numFailed,
-          numPassed: numPassed,
-          total: testcount.text(),
-          error: e
-        }, function () { }, function () { });
+        sendTestResult(params.session, file, name, false, testTime, errors.clean(e), onDone, onDone);
       };
 
       return {
         pass: pass,
-        htmlcompare: htmlcompare,
         fail: fail
       };
-    };
-
-    var getCoverage = function () {
-      return typeof __coverage__ === 'undefined' ? { } : __coverage__;
     };
 
     var done = function () {
       var setAsDone = function () {
         var totalTime = timer.elapsed(initial);
-        resultJSON.time = totalTime;
         $('body').append('<div class="done">Test run completed in <span class="time">' + totalTime + '</span></div>');
-        var resultBox = $('<textarea class="results" />').text(JSON.stringify(resultJSON));
-        $('body').append(resultBox);
         $('.passed.hidden').removeClass('hidden');
       };
 
-      sendJson('tests/done', { coverage: getCoverage() }, setAsDone, setAsDone);
+      sendDone(params.session, setAsDone, setAsDone);
     };
 
     var setStopOnFailure = function (flag) {
@@ -220,6 +237,7 @@
     };
 
     return {
+      summary: summary,
       test: test,
       done: done,
       setStopOnFailure: setStopOnFailure,
@@ -231,36 +249,78 @@
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   };
 
-  var builtins = ephox.bolt.module.config.builtins.browser;
-  var load = ephox.bolt.loader.transporter.xhr.request;
-  var loadscript = ephox.bolt.loader.api.scripttag.load;
-  var browser = ephox.bolt.module.reader.browser;
-  // var test = ephox.bolt.test.run.test;
-  // var runtest = test.create(builtins, load, loadscript, reporter, reader);
-
-
-  /*
-   * Patch bolt to reuse the created module system for tests. This is primarily to decrease loading time when working remotely.
-   */
-  var install = ephox.bolt.module.bootstrap.install;
-  var config = ephox.bolt.test.run.config;
-
-  var runtest =  function (next, wrapper, testfile, name, replacements, deps, fn) {
-    var enriched = config.enricher(reader, testfile, replacements);
-    if (ephox.bolt.module.runtime.define === undefined) {
-      install.install(enriched, builtins, load, loadscript);
-    } else {
-      enriched(function () { });
-    }
-    var wrapped = wrapper(reporter, testfile, name, fn, next);
-    ephox.bolt.module.api.require(deps, wrapped);
+  var processQUnit = function (html) {
+    // Required to make <del> and <ins> stay as tags.
+    return html.replace(/&lt;del&gt;/g, '<del>').replace(/&lt;\/del&gt;/g, '</del>').replace(/&lt;ins&gt;/g, '<ins>').replace(/&lt;\/ins&gt;/g, '</ins>');
   };
 
-  var bomb = function (e) {
+  var failhtml = function (e) {
+    // Provide detailed HTML comparison information
+    return 'Test failure: ' + e.message +
+      '\nExpected: ' + htmlentities(e.diff.expected) +
+      '\nActual: ' + htmlentities(e.diff.actual) +
+      '\n\nHTML Diff: ' + processQUnit(htmlentities(e.diff.comparison)) + '\n\nStack: ' + e.stack;
+  };
+
+  var failnormal = function (e) {
+    return htmlentities(errors.clean(e));
+  };
+
+  var initError = function (e) {
     $('body').append('<div class="failed done">ajax error: ' + JSON.stringify(e) + '</div>');
   };
 
   var runGlobalTests = function () {
+
+    var loadNextChunk = function() {
+      if (globalTests.length > (params.offset + chunk)) {
+        var url = makeUrl(params.session, params.offset + chunk, reporter.summary().failed, 0);
+        window.location.assign(url);
+      } else {
+        reporter.done();
+        // for easy rerun reset the URL
+        window.history.pushState({}, '', makeUrl(params.session, 0, 0, 0));
+      }
+    };
+
+    var retryTest = function() {
+      var sum = reporter.summary();
+      window.location.assign(
+        makeUrl(
+          params.session,
+          sum.passed + sum.failed - 1,
+          sum.failed - 1,
+          params.retry + 1
+        )
+      );
+    };
+
+    var loadNextTest = function() {
+      var sum = reporter.summary();
+      window.location.assign(
+        makeUrl(
+          params.session,
+          sum.passed + sum.failed,
+          sum.failed,
+          0
+        )
+      );
+    };
+
+    var afterFail = function() {
+      if (reporter.shouldStopOnFailure()) {
+        reporter.done();
+        // make it easy to restart at this test
+        var sum = reporter.summary();
+        var url = makeUrl(params.session, sum.passed + sum.failed - 1, sum.failed - 1, 0);
+        window.history.pushState({}, '', url);
+      } else if (params.retry < retries) {
+        retryTest();
+      } else {
+        loadNextTest();
+      }
+    };
+
     var loop = function (tests) {
       if (tests.length > 0) {
         var test = tests.shift();
@@ -268,51 +328,34 @@
 
         try {
           test.test(function () {
-            loop(tests);
-            report.pass();
+            report.pass(function() {
+              params.retry = 0;
+              var url = makeUrl(params.session, params.offset, params.failed, params.retry);
+              window.history.pushState({}, '', url);
+              loop(tests);
+            });
           }, function (e) {
             console.error(e);
-            report.fail(e);
-
-            if (!reporter.shouldStopOnFailure()) {
-              loop(tests);
-            } else {
-              reporter.done();
-            }
+            report.fail(e, afterFail);
           });
         } catch (e) {
           console.error(e);
-          report.fail(e);
+          report.fail(e, afterFail);
 
-          if (!reporter.shouldStopOnFailure()) {
-            loop(tests);
-          } else {
-            reporter.done();
-          }
         }
       } else {
-        reporter.done();
+        loadNextChunk();
       }
     };
 
-    loop(globalTests.slice());
+    loop(globalTests.slice(params.offset, params.offset + chunk));
   };
 
   api.loadtests = function (data) {
-    testconfig = data.config;  // intentional, see top of file for var decl.
-    var scripts = data.scripts;
+    chunk = data.chunk;
+    retries = data.retries;
     reporter.setStopOnFailure(data.stopOnFailure);
-    var loop = function () {
-      if (scripts.length > 0) {
-        var testfile = 'project/' + scripts.shift();
-        accumulator.register(testfile, wrapper.sync, wrapper.async);
-        loadscript(testfile, loop, bomb);
-      } else {
-        testcount.text(accumulator.length() + globalTests.length); // intentional, see top of file for var decl.
-        accumulator.drain(runtest, runGlobalTests);
-      }
-    };
-    loop();
+    runGlobalTests();
   };
 
   api.testrunner = function () {
@@ -322,7 +365,7 @@
         url: 'harness',
         dataType: 'json',
         success: api.loadtests,
-        error: bomb
+        error: initError
       });
     });
   };

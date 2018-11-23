@@ -1,16 +1,16 @@
-var create = function (files, loglevel) {
+var create = function (testfiles, loglevel) {
   var started = false;
 
   var stream = process.stdout;
 
-  var totalFiles = files.length > 0 ? files.length : '?';
+  var totalFiles = testfiles.length > 0 ? testfiles.length : '?';
 
-  var writeProgress = function (numPassed, numFailed, total) {
+  var writeProgress = function (id, stopped, numPassed, numFailed, total) {
     var numRun = numPassed + numFailed;
+    var status = stopped ? (numRun < total ? 'STOPPED' : 'COMPLETE') : 'RUNNING';
     stream.write(
-      'Passed: ' + numPassed + '/' + total +
-      ', Failed: ' + numFailed + '/' + total +
-      ' [' + numRun + ']  ... ' + '\n'
+      'Session: ' + id + ', Status: ' + status + ', Progress: ' + numRun + '/' + total +
+      ', Failed: ' + numFailed + ' ... ' + '\n'
     );
     stream.clearLine(2);
     return Promise.resolve({});
@@ -25,8 +25,8 @@ var create = function (files, loglevel) {
     }
     stream.clearLine(0);
     stream.cursorTo(0);
-    stream.write('Current test: ' + (data.test !== undefined ? data.test : 'Unknown') + '\n');
-    return writeProgress(data.numPassed, data.numFailed, data.totalFiles !== undefined ? data.totalFiles : totalFiles);
+    stream.write('Current test: ' + (data.test !== undefined ? data.test.substring(0, 60) : 'Unknown') + '\n');
+    return writeProgress(data.id, data.done, data.numPassed, data.numFailed, data.totalFiles !== undefined ? data.totalFiles : totalFiles);
   };
 
   var complete = function () {

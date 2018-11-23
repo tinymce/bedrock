@@ -1,8 +1,8 @@
 var keys = require('./keyeffects');
 var mouse = require('./mouseeffects');
 var clipboard = require('./clipboardeffects');
-var mHud = require('../cli/hud');
 var routes = require('./routes');
+var mController = require('./controller');
 var attempt = require('../core/attempt');
 var waiter = require('../util/waiter');
 var coverage = require('../core/coverage');
@@ -13,7 +13,7 @@ var pollRate = 2000;
 var maxInvalidAttempts = 300;
 
 // TODO: Do not use files here.
-var create = function (master, maybeDriver, projectdir, basedir, files, loglevel) {
+var create = function (master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel) {
 
   // On IE, the webdriver seems to load the page before it's ready to start
   // responding to commands. If the testing page itself tries to interact with
@@ -48,25 +48,35 @@ var create = function (master, maybeDriver, projectdir, basedir, files, loglevel
     });
   };
 
+
   var pageHasLoaded = false;
 
   var markLoaded = function () {
     pageHasLoaded = true;
   };
 
-  var hud = mHud.create(files, loglevel);
+  const controller = mController.create(stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel);
 
   var routers = [
 
     driverRouter('/keys', 'Keys', keys.executor),
     driverRouter('/mouse', 'Mouse', mouse.executor),
-    // Update the HUD with current testing process
-    routes.effect('POST', '/tests/progress', function (data) {
-      return hud.update(data);
+    routes.effect('POST', '/tests/alive', function (data) {
+      controller.recordAlive(data.session);
+      return Promise.resolve({});
+    }),
+    routes.effect('POST', '/tests/start', function (data) {
+      controller.recordTestStart(data.session, data.name, data.file);
+      return Promise.resolve({});
+    }),
+    routes.effect('POST', '/tests/result', function (data) {
+      controller.recordTestResult(data.session, data.name, data.file, data.passed, data.time, data.error);
+      return Promise.resolve({});
     }),
     routes.effect('POST', '/tests/done', function (data) {
       coverage.writeCoverageData(data.coverage);
-      return hud.complete();
+      controller.recordDone(data.session);
+      return Promise.resolve({});
     }),
     // This does not need the webdriver.
     routes.effect('POST', '/clipboard', clipboard.route(basedir, projectdir))
@@ -74,7 +84,9 @@ var create = function (master, maybeDriver, projectdir, basedir, files, loglevel
 
   return {
     routers: routers,
-    markLoaded: markLoaded
+    markLoaded: markLoaded,
+    enableHud: controller.enableHud,
+    awaitDone: controller.awaitDone
   };
 };
 
