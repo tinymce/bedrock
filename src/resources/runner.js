@@ -329,9 +329,11 @@
         try {
           test.test(function () {
             report.pass(function() {
-              params.retry = 0;
-              var url = makeUrl(params.session, params.offset, params.failed, params.retry);
-              window.history.pushState({}, '', url);
+              if (params.retry > 0) {
+                params.retry = 0;
+                var url = makeUrl(params.session, params.offset, params.failed, params.retry);
+                window.history.pushState({}, '', url);
+              }
               loop(tests);
             });
           }, function (e) {
