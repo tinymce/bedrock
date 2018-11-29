@@ -1,4 +1,4 @@
-var generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, chunk, retries, stopOnFailure, basePage, coverage) {
+var generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, chunk, retries, singleTimeout, stopOnFailure, basePage, coverage) {
   var path = require('path');
   var routes = require('./routes');
   var compiler = require('../compiler/compiler');
@@ -41,7 +41,8 @@ var generate = function (mode, projectdir, basedir, configFile, bundler, testfil
           scripts: [],
           stopOnFailure: stopOnFailure,
           chunk: chunk,
-          retries: retries
+          retries: retries,
+          timeout: singleTimeout
         })
       ];
     
