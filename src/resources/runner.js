@@ -260,16 +260,22 @@
     return html.replace(/&lt;del&gt;/g, '<del>').replace(/&lt;\/del&gt;/g, '</del>').replace(/&lt;ins&gt;/g, '<ins>').replace(/&lt;\/ins&gt;/g, '</ins>');
   };
 
+  var formatLogs = function (e) {
+    return e.logs === undefined ? 'Stack: ' + e.stack : 'Logs: ' + JSON.stringify(e.logs, null, 2);
+  };
+
   var failhtml = function (e) {
     // Provide detailed HTML comparison information
     return 'Test failure: ' + e.message +
       '\nExpected: ' + htmlentities(e.diff.expected) +
       '\nActual: ' + htmlentities(e.diff.actual) +
-      '\n\nHTML Diff: ' + processQUnit(htmlentities(e.diff.comparison)) + '\n\nStack: ' + e.stack;
+      '\n\nHTML Diff: ' + processQUnit(htmlentities(e.diff.comparison)) +
+      '\n\n' + htmlentities(formatLogs(e));
   };
 
   var failnormal = function (e) {
-    return htmlentities(errors.clean(e));
+    var message = e.logs !== undefined ? e.message + '\n\n' + formatLogs(e) : errors.clean(e);
+    return htmlentities(message);
   };
 
   var initError = function (e) {

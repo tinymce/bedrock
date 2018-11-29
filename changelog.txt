@@ -1,9 +1,14 @@
+Version 4.0.4
+
+Date 2018-11-30
+
+* Fixed diff error message reporting
+
 Version 4.0.3
 
 Date 2018-11-30
 
 * Gracefully timeout individual tests
-
 
 Version 4.0.0
 

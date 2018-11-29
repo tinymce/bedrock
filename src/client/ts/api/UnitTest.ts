@@ -17,6 +17,33 @@ var register = function (name, test) {
   Global.__tests.push({ name: name, test: test });
 };
 
+const cleanStack = (error, linesToRemove=1) => {
+  if (error.stack === undefined) {
+    return '';
+  }
+
+  const lines = error.stack.split('\n');
+  const message = lines[0];
+  const stack = lines.slice(1 + linesToRemove);
+  return message + '\n' + stack.join('\n');
+};
+
+const normalizeError = (err) => {
+  if (typeof err === 'string') {
+    // Create an error object, but strip the stack of the 2 latest calls as it'll
+    // just be this function and the previous function that called this (ie asyncTest)
+    const error = new Error(err);
+    const stack = cleanStack(error, 2);
+    return {
+      message: error.message,
+      stack: stack,
+      name: error.name,
+      toString: () => stack
+    };
+  } else {
+    return err;
+  }
+};
 
 const processLog = (err, logs) => {
   const outputToStr = function (numIndent, entries) {
@@ -51,16 +78,14 @@ const processLog = (err, logs) => {
 
   const processed = outputToStr(2, logs.history);
 
-  return (err instanceof Error ? err.message : err) + '\n\n' + JSON.stringify({
-    error: err,
-    logs: processed
-  }, null, 2);
+  return { logs: processed, ...err };
 };
 
 var asynctest = function (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) {
   register(name, function (success, failure) {
     test(success, function (err, logs?) {
-      const failureMessage = logs !== undefined ? processLog(err, logs) : err;
+      const normalizedErr = normalizeError(err);
+      const failureMessage = logs !== undefined ? processLog(normalizedErr, logs) : normalizedErr;
       failure(failureMessage);
     });
   });
