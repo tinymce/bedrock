@@ -74,6 +74,7 @@ const create = function(stickyFirstSession, singleTimeout, overallTimeout, testf
   };
 
   const recordTestResult = function(id, name, file, passed, time, error) {
+    const now = Date.now();
     const session = getSession(id);
     const record = { name, file, passed, time, error };
     if (session.lookup[file] !== undefined && session.lookup[file][name] !== undefined) {
@@ -89,8 +90,9 @@ const create = function(stickyFirstSession, singleTimeout, overallTimeout, testf
     if (session.inflight !== null && session.inflight.file === file && session.inflight.name === name) {
       session.previous = session.inflight;
       session.inflight = null;
+      session.previous.end = now;
     }
-    session.updated = Date.now();
+    session.updated = now;
     session.done = false;
     updateHud(session);
   };
@@ -106,9 +108,9 @@ const create = function(stickyFirstSession, singleTimeout, overallTimeout, testf
     return (time / 1000) + 's';
   };
 
-  const currentTest = function(session) {
-    if (session.inflight !== null) {
-      return session.inflight.name + ' [' + session.inflight.file + ']';
+  const testName = function(test) {
+    if (test !== null) {
+      return test.name + ' [' + test.file + ']';
     } else {
       return 'UNKNOWN???'
     }
@@ -136,13 +138,29 @@ const create = function(stickyFirstSession, singleTimeout, overallTimeout, testf
             if (session.inflight !== null && (now - session.inflight.start) > singleTimeout) {
               // one test took too long
               const elapsed = formatTime(now - session.inflight.start);
-              const message = 'Test: ' + currentTest(session) + ' ran too long (' + elapsed + '). Limit for an individual test is set to: ' + formatTime(singleTimeout);
+              const message = 'Test: ' + testName(session.inflight) + ' ran too long (' + elapsed + '). Limit for an individual test is set to: ' + formatTime(singleTimeout);
               reject({ message, results, start, now });
               clearInterval(poller);
               timeoutError = true;
             } else if (allElapsed > overallTimeout) {
               // combined tests took too long
-              const message = 'Tests timed out: ' + formatTime(allElapsed) + '. Limit is set to ' + formatTime(overallTimeout) + '. Current test: ' + currentTest(session);
+              let lastTest;
+              if (session.inflight !== null) {
+                const runningTime = now - session.inflight.start;
+                lastTest = 'Current test: ' + testName(session.inflight) + ' running ' + formatTime(runningTime) + '.';
+              } else if (session.previous !== null) {
+                const sincePrevious = now - session.previous.end;
+                lastTest = 'Previous test: ' + testName(session.previous) + ' finished ' + formatTime(sincePrevious) + ' ago.'
+              } else {
+                lastTest = "No tests have been run.";
+              }
+              // find the top 10 longest running tests
+              const time2num = (time) => parseFloat(time.charAt(time.length - 1) === 's' ? time.substr(0, time.length - 2) : time);
+              const top10 = session.results.slice(0).sort((a, b) => time2num(b.time) - time2num(a.time)).slice(0, 10);
+              const longest = top10.map((result, i) => '' + (i + 1) + '. ' + testName(result) + ' in ' + result.time).join('\n');
+              const estimatedTotal = Math.ceil(((allElapsed / session.results.length) * testfiles.length) / 1000) * 1000;
+              const message = 'Tests timed out: ' + formatTime(allElapsed) + '. Limit is set to ' + formatTime(overallTimeout) +
+                  '. Estimated required time ' + formatTime(estimatedTotal) + '.\n' + lastTest + '\nTop 10 longest running tests:\n' + longest;
               reject({ message, results, start, now });
               clearInterval(poller);
               timeoutError = true;
