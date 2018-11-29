@@ -1,3 +1,10 @@
+Version 4.0.3
+
+Date 2018-11-30
+
+* Gracefully timeout individual tests
+
+
 Version 4.0.0
 
 Date 2018-11-23
