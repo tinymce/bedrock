@@ -43,6 +43,7 @@
 
   var chunk; // set during loadtests
   var retries; // set during loadtests
+  var timeout; // set during loadtests
   var testscratch = null; // set per test, private dom scratch area for the current test to use.
   var globalTests = global.__tests ? global.__tests : [];
 
@@ -164,6 +165,7 @@
     };
 
     var test = function (file, name) {
+      var reported = false;
       sendTestStart(params.session, file, name);
       var starttime = new Date();
       var el = $('<div />').addClass('test running');
@@ -182,6 +184,8 @@
       testscratch = scratch.get(0);  // intentional, see top of file for var decl.
 
       var pass = function (onDone) {
+        if (reported) return;
+        reported = true;
         passCount++;
         el.removeClass('running').addClass('passed').addClass('hidden');
         marker.text('[passed]').addClass('passed');
@@ -192,6 +196,8 @@
       };
 
       var fail = function (e, onDone) {
+        if (reported) return;
+        reported = true;
         failCount++;
         el.removeClass('running').addClass('failed');
         marker.text('[failed]').addClass('failed');
@@ -325,9 +331,12 @@
       if (tests.length > 0) {
         var test = tests.shift();
         var report = reporter.test(test.filePath, test.name);
-
+        var timer = setTimeout(function() {
+          report.fail('Test ran too long', afterFail);
+        }, timeout);
         try {
           test.test(function () {
+            clearTimeout(timer);
             report.pass(function() {
               if (params.retry > 0) {
                 params.retry = 0;
@@ -337,10 +346,12 @@
               loop(tests);
             });
           }, function (e) {
+            clearTimeout(timer);
             console.error(e);
             report.fail(e, afterFail);
           });
         } catch (e) {
+          clearTimeout(timer);
           console.error(e);
           report.fail(e, afterFail);
 
@@ -356,6 +367,7 @@
   api.loadtests = function (data) {
     chunk = data.chunk;
     retries = data.retries;
+    timeout = data.timeout;
     reporter.setStopOnFailure(data.stopOnFailure);
     runGlobalTests();
   };

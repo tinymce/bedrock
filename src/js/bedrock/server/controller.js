@@ -1,5 +1,7 @@
 var mHud = require('../cli/hud');
 
+// allow a little extra time for a test timeout so the runner can handle it gracefully
+const timeoutGrace = 2000;
 const create = function(stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel) {
   const hud = mHud.create(testfiles, loglevel);
   const sessions = {};
@@ -135,7 +137,7 @@ const create = function(stickyFirstSession, singleTimeout, overallTimeout, testf
             resolve({ results, start, now });
             clearInterval(poller);
           } else {
-            if (session.inflight !== null && (now - session.inflight.start) > singleTimeout) {
+            if (session.inflight !== null && (now - session.inflight.start) > (singleTimeout + timeoutGrace)) {
               // one test took too long
               const elapsed = formatTime(now - session.inflight.start);
               const message = 'Test: ' + testName(session.inflight) + ' ran too long (' + elapsed + '). Limit for an individual test is set to: ' + formatTime(singleTimeout);

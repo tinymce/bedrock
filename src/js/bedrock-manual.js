@@ -5,7 +5,7 @@ var go = function (settings) {
   var boltroutes = require('./bedrock/server/boltroutes');
   var webpack = require('./bedrock/compiler/webpack');
 
-  var routes = boltroutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.stopOnFailure, 'src/resources/bedrock.html');
+  var routes = boltroutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, 'src/resources/bedrock.html');
 
   routes.then((runner) => {
     var serveSettings = {
