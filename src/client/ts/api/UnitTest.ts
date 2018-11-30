@@ -76,9 +76,9 @@ const processLog = (err, logs) => {
     return everything;
   };
 
-  const processed = outputToStr(2, logs.history);
+  err.logs = outputToStr(2, logs.history);
 
-  return { logs: processed, ...err };
+  return err;
 };
 
 var asynctest = function (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) {

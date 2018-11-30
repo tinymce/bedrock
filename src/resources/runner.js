@@ -203,9 +203,10 @@
         marker.text('[failed]').addClass('failed');
         // Don't use .text() as it strips out newlines in IE, even when used
         // on a pre tag.
+        var errorMessage = (e.diff !== undefined ? failhtml : failnormal)(e);
         var pre = $('<pre/>')
           .addClass('error')
-          .html((e.diff !== undefined ? failhtml : failnormal)(e));
+          .html(errorMessage);
         error.append(pre);
         var testTime = timer.elapsed(starttime);
         time.text(testTime);
@@ -215,7 +216,7 @@
           retryBtn.show();
           skipBtn.show();
         }
-        sendTestResult(params.session, file, name, false, testTime, errors.clean(e), onDone, onDone);
+        sendTestResult(params.session, file, name, false, testTime, errorMessage, onDone, onDone);
       };
 
       return {
