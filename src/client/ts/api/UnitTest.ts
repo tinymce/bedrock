@@ -76,7 +76,7 @@ const processLog = (err, logs) => {
     return everything;
   };
 
-  err.logs = outputToStr(2, logs.history);;
+  err.logs = outputToStr(2, logs.history);
 
   return err;
 };
