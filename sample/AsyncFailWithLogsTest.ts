@@ -1,7 +1,5 @@
 import * as UnitTest from '../src/client/ts/api/UnitTest';
 
-declare let assert;
-
 UnitTest.asynctest('AsyncFail with Logs Test', (success, failure) => {
 
   failure('This is a fake failure', {
