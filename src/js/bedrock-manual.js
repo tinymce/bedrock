@@ -7,6 +7,8 @@ var go = function (settings) {
 
   var routes = runnerroutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, 'src/resources/bedrock.html');
 
+  console.log('bedrock-manual ' + version + ' starting...');
+
   routes.then((runner) => {
     var serveSettings = {
       projectdir: settings.projectdir,

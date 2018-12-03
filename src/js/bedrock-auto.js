@@ -17,6 +17,8 @@ var go = function (settings) {
   var lifecycle = require('./bedrock/core/lifecycle');
   var routes = runnerroutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage);
 
+  console.log('bedrock-auto ' + version + ' starting...');
+
   routes.then((runner) => {
     driver.create({
       browser: settings.browser,
