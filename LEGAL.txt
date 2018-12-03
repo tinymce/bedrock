@@ -1,6 +1,6 @@
 Dependency: 
   name: @ephox/bedrock
-  version: 4.0.0
+  version: 4.0.6
   repository: https://github.com/ephox/bedrock
   licenses: Apache-2.0
 

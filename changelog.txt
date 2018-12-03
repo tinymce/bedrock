@@ -1,3 +1,12 @@
+Version 4.0.6
+
+Date 2018-12-03
+
+* Improved over-escaping of error messages
+* Added startup message listing version for quicker feedback
+* Removed bedrock-repl as it didn't make sense without bolt
+* Removed all dependence on bolt
+
 Version 4.0.5
 
 Date 2018-11-30
