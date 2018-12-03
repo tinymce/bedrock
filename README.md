@@ -42,7 +42,7 @@ A local install will not put the bedrock commands automatically on your path. Af
 
 ## Test mode (bedrock-auto)
 
-*Test* mode allows the user to run tests in an automated fashion. Bedrock will spin up the browser itself (assuming the user has the right Webdrivers on the path), establish a WebDriver connection with this browser and close the browser once the tests have completed. Information on installing Webdrivers can be found [here](https://www.npmjs.com/package/selenium-webdriver).
+*Test* mode allows the user to run tests in an automated fashion. Bedrock will spin up the browser itself (assuming the user has the right web-drivers on the path), establish a web-driver connection with this browser and close the browser once the tests have completed. Information on installing web-drivers can be found [here](https://www.npmjs.com/package/selenium-webdriver).
 
 BROWSER: chrome | firefox | safari | MicrosoftEdge | ie | phantomjs
 

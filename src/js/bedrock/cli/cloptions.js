@@ -57,7 +57,7 @@
       alias: 'c',
       type: String,
       defaultValue: defaultValue,
-      description: 'The location of the bolt config file',
+      description: 'The location of the typescript config file',
       validate: extraction.file
     };
   };
