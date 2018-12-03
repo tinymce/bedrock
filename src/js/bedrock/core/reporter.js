@@ -59,7 +59,7 @@ var write = function (settings) {
           elem.startElement('failure')
             .writeAttribute('Test FAILED: some failed assert')
             .writeAttribute('type', 'failure')
-            .text(res.error)
+            .writeCData(res.error)
             .endElement();
         }
         elem.endElement();
