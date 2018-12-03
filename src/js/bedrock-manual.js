@@ -2,10 +2,12 @@ var go = function (settings) {
   settings.stopOnFailure = true;
   var attempt = require('./bedrock/core/attempt');
   var version = require('./bedrock/core/version');
-  var boltroutes = require('./bedrock/server/boltroutes');
+  var runnerroutes = require('./bedrock/server/runnerroutes');
   var webpack = require('./bedrock/compiler/webpack');
 
-  var routes = boltroutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, 'src/resources/bedrock.html');
+  var routes = runnerroutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, 'src/resources/bedrock.html');
+
+  console.log('bedrock-manual ' + version + ' starting...');
 
   routes.then((runner) => {
     var serveSettings = {

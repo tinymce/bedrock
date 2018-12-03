@@ -1,7 +1,5 @@
 import * as UnitTest from '../src/client/ts/api/UnitTest';
 
-declare let assert;
-
 UnitTest.asynctest('Clipboard Test', (success, failure) => {
 
   if (window.fetch === undefined) return failure('This sample only runs on Chrome');

@@ -1,7 +1,5 @@
 import * as UnitTest from '../src/client/ts/api/UnitTest';
 
-declare let assert;
-
 UnitTest.asynctest('AsyncFail Test', (success, failure) => {
 
   new Promise(function (resolve, reject) {

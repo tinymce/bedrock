@@ -1,6 +1,6 @@
 # Description
 
-`bedrock` is a test runner for JavaScript projects. Its primary use is to test `bolt` ([github](https://github.com/ephox/bolt), [npm](https://www.npmjs.com/package/@ephox/bolt)) projects, but it also has a `qunit` wrapper. It can run manually (where the user navigates to the browser themselves), or automatically (where `bedrock` starts the browser and runs the tests automatically). Note, in order to run the tests automatically, the appropriate webdrivers need to be installed and available. For more information on setting up webdrivers, see [here](https://www.npmjs.com/package/selenium-webdriver).
+`bedrock` is a test runner for JavaScript projects. Its primary use is to test Javascript projects, but it also has a `qunit` wrapper. It can run manually (where the user navigates to the browser themselves), or automatically (where `bedrock` starts the browser and runs the tests automatically). Note, in order to run the tests automatically, the appropriate web-drivers need to be installed and available. For more information on setting up web-drivers, see [here](https://www.npmjs.com/package/selenium-webdriver).
 
 # Installation
 
@@ -42,7 +42,7 @@ A local install will not put the bedrock commands automatically on your path. Af
 
 ## Test mode (bedrock-auto)
 
-*Test* mode allows the user to run tests in an automated fashion. Bedrock will spin up the browser itself (assuming the user has the right Webdrivers on the path), establish a WebDriver connection with this browser and close the browser once the tests have completed. Information on installing Webdrivers can be found [here](https://www.npmjs.com/package/selenium-webdriver).
+*Test* mode allows the user to run tests in an automated fashion. Bedrock will spin up the browser itself (assuming the user has the right web-drivers on the path), establish a web-driver connection with this browser and close the browser once the tests have completed. Information on installing web-drivers can be found [here](https://www.npmjs.com/package/selenium-webdriver).
 
 BROWSER: chrome | firefox | safari | MicrosoftEdge | ie | phantomjs
 
@@ -69,11 +69,6 @@ e.g. Run existing tests on a qunit page using phantom
 `bedrock-framework --page tests/index.html --browser phantomjs`
 
 Use `bedrock-framework --help` to see all arguments possible.
-
-
-## Experimental modes
-
-Note, `bedrock` also has other *experimental* modes including [REPL Simulation](doc/repl_mode.md). These features are not yet stable enough to be reliable.
 
 # Tests
 

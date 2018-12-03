@@ -7,7 +7,7 @@ var accessor = require('../core/accessor');
  * testfiles: the test files to test (an array)
  * driver: (optional). Required for supporting keys,
  * master (can be null) The driver master (locking and unlocking)
- * runner: runner (e.g. boltroutes, pageroutes etc). Has fallback and routers.
+ * runner: runner (e.g. runnerroutes, pageroutes etc). Has fallback and routers.
  */
 var startCustom = function (settings, createServer, f) {
   var Prefs = accessor.create([

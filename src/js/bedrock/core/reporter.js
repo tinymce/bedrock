@@ -16,9 +16,9 @@ var writePollExit = function (settings, results) {
   });
 };
 
-var outputTime = function (boltTime) {
-  // Bolt adds 's' to the time for human readability, but junit needs just a float value in seconds
-  var time = boltTime;
+var outputTime = function (runnerTime) {
+  // runner adds 's' to the time for human readability, but junit needs just a float value in seconds
+  var time = runnerTime;
   return time.charAt(time.length - 1) === 's' ? time.substr(0, time.length - 2) : time;
 };
 
@@ -59,7 +59,7 @@ var write = function (settings) {
           elem.startElement('failure')
             .writeAttribute('Test FAILED: some failed assert')
             .writeAttribute('type', 'failure')
-            .text(res.error)
+            .writeCData(res.error)
             .endElement();
         }
         elem.endElement();

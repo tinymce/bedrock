@@ -47,9 +47,6 @@
   var testscratch = null; // set per test, private dom scratch area for the current test to use.
   var globalTests = global.__tests ? global.__tests : [];
 
-  var timer = ephox.bolt.test.report.timer;
-  var errors = ephox.bolt.test.report.errors;
-
   var params = getParams();
 
   var makeUrl = function(session, offset, failed, retry) {
@@ -183,13 +180,25 @@
 
       testscratch = scratch.get(0);  // intentional, see top of file for var decl.
 
+      var elapsed = function (since) {
+        var end = new Date();
+        var millis = end - since;
+        var seconds = Math.floor(millis / 1000);
+        var point = Math.floor(millis - (seconds * 1000) / 100);
+        var printable = 
+          point < 10 ? '00' + point :
+                point < 100 ? '0' + point :
+                              '' + point;
+        return seconds + '.' + printable + 's';
+      };
+
       var pass = function (onDone) {
         if (reported) return;
         reported = true;
         passCount++;
         el.removeClass('running').addClass('passed').addClass('hidden');
         marker.text('[passed]').addClass('passed');
-        var testTime = timer.elapsed(starttime);
+        var testTime = elapsed(starttime);
         time.text(testTime);
         current.text(params.offset + passCount + failCount);
         sendTestResult(params.session, file, name, true, testTime, null, onDone, onDone);
@@ -203,12 +212,12 @@
         marker.text('[failed]').addClass('failed');
         // Don't use .text() as it strips out newlines in IE, even when used
         // on a pre tag.
-        var errorMessage = (e.diff !== undefined ? failhtml : failnormal)(e);
+        var errorMessage = clean(e);
         var pre = $('<pre/>')
           .addClass('error')
           .html(errorMessage);
         error.append(pre);
-        var testTime = timer.elapsed(starttime);
+        var testTime = elapsed(starttime);
         time.text(testTime);
         current.text(params.offset + passCount + failCount);
         if (stopOnFailure) {
@@ -227,7 +236,7 @@
 
     var done = function () {
       var setAsDone = function () {
-        var totalTime = timer.elapsed(initial);
+        var totalTime = elapsed(initial);
         $('body').append('<div class="done">Test run completed in <span class="time">' + totalTime + '</span></div>');
         $('.passed.hidden').removeClass('hidden');
       };
@@ -261,22 +270,52 @@
     return html.replace(/&lt;del&gt;/g, '<del>').replace(/&lt;\/del&gt;/g, '</del>').replace(/&lt;ins&gt;/g, '<ins>').replace(/&lt;\/ins&gt;/g, '</ins>');
   };
 
-  var formatLogs = function (e) {
-    return e.logs === undefined ? 'Stack: ' + e.stack : 'Logs: ' + JSON.stringify(e.logs, null, 2);
+  var formatExtra = function (e) {
+    if (!e.logs) {
+      if (!e.stack) {
+        return '';
+      } else {
+        var lines = e.stack.split('\n').filter(function (line) {
+          return line.indexOf('at') !== -1;
+        });
+        return '\n\nStack:\n' + lines.join('\n');
+      }
+    } else {
+      var lines = e.logs.map(function(log) {
+        var noNewLines = log.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+        return noNewLines;
+      });
+      return '\n\nLogs:\n' + lines.join('\n');
+    }
   };
 
-  var failhtml = function (e) {
-    // Provide detailed HTML comparison information
-    return 'Test failure: ' + e.message +
-      '\nExpected: ' + htmlentities(e.diff.expected) +
-      '\nActual: ' + htmlentities(e.diff.actual) +
-      '\n\nHTML Diff: ' + processQUnit(htmlentities(e.diff.comparison)) +
-      '\n\n' + htmlentities(formatLogs(e));
-  };
+  var clean = function (err) {
+    var e = err === undefined ? new Error('no error given') : err;
 
-  var failnormal = function (e) {
-    var message = e.logs !== undefined ? e.message + '\n\n' + formatLogs(e) : errors.clean(e);
-    return htmlentities(message);
+    if (typeof e === 'string') {
+      return e;
+    }
+    var extra = formatExtra(e);
+    if (e.diff !== undefined) {
+      // Provide detailed HTML comparison information
+      return 'Test failure: ' + e.message +
+        '\nExpected: ' + htmlentities(e.diff.expected) +
+        '\nActual: ' + htmlentities(e.diff.actual) +
+        '\n\nHTML Diff: ' + processQUnit(htmlentities(e.diff.comparison)) +
+        extra;
+    }
+    if (e.name === 'AssertionError') {
+      return 'Assertion error' + (e.message ? ' [' + e.message + ']' : '') +
+      ': [' + JSON.stringify(e.expected) + '] ' + e.operator +
+      ' [' + JSON.stringify(e.actual) + ']' + extra;
+    }
+    if (e.name && e.message) {
+      return e.name + ': ' + e.message + extra;
+    }
+    if (e.toString) {
+      return String(e) + extra;
+    }
+    return JSON.stringify(e) + extra;
   };
 
   var initError = function (e) {

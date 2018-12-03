@@ -57,7 +57,7 @@
       alias: 'c',
       type: String,
       defaultValue: defaultValue,
-      description: 'The location of the bolt config file',
+      description: 'The location of the typescript config file',
       validate: extraction.file
     };
   };
@@ -227,14 +227,6 @@
     hidden: true
   };
 
-  var repl = {
-    name: 'repl',
-    type: String,
-    description: 'The name of the repl configuration',
-    validate: extraction.file,
-    required: true
-  };
-
   var customRoutes = {
     name: 'customRoutes',
     type: String,
@@ -296,7 +288,5 @@
     stopOnFailure__hidden: stopOnFailure__hidden,
     delayExiting: delayExiting,
     page: page,
-    logging: logging,
-
-    repl: repl
+    logging: logging
   };
