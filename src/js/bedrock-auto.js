@@ -3,7 +3,7 @@ var go = function (settings) {
   var attempt = require('./bedrock/core/attempt');
   var version = require('./bedrock/core/version');
 
-  var boltroutes = require('./bedrock/server/boltroutes');
+  var runnerroutes = require('./bedrock/server/runnerroutes');
 
   var reporter = require('./bedrock/core/reporter');
 
@@ -15,7 +15,7 @@ var go = function (settings) {
   var basePage = isPhantom ? 'src/resources/bedrock-phantom.html' : 'src/resources/bedrock.html';
 
   var lifecycle = require('./bedrock/core/lifecycle');
-  var routes = boltroutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage);
+  var routes = runnerroutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage);
 
   routes.then((runner) => {
     driver.create({

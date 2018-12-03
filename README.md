@@ -1,6 +1,6 @@
 # Description
 
-`bedrock` is a test runner for JavaScript projects. Its primary use is to test `bolt` ([github](https://github.com/ephox/bolt), [npm](https://www.npmjs.com/package/@ephox/bolt)) projects, but it also has a `qunit` wrapper. It can run manually (where the user navigates to the browser themselves), or automatically (where `bedrock` starts the browser and runs the tests automatically). Note, in order to run the tests automatically, the appropriate webdrivers need to be installed and available. For more information on setting up webdrivers, see [here](https://www.npmjs.com/package/selenium-webdriver).
+`bedrock` is a test runner for JavaScript projects. Its primary use is to test Javascript projects, but it also has a `qunit` wrapper. It can run manually (where the user navigates to the browser themselves), or automatically (where `bedrock` starts the browser and runs the tests automatically). Note, in order to run the tests automatically, the appropriate web-drivers need to be installed and available. For more information on setting up web-drivers, see [here](https://www.npmjs.com/package/selenium-webdriver).
 
 # Installation
 

@@ -22,7 +22,6 @@ var generate = function (mode, projectdir, basedir, configFile, bundler, testfil
       var routers = [
         routes.routing('GET', '/project', projectdir),
         routes.routing('GET', '/js', path.join(basedir, 'src/resources')),
-        routes.routing('GET', '/lib/bolt', path.join(path.dirname(require.resolve('@ephox/bolt')), '../lib')),
         routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery'))),
         routes.routing('GET', '/lib/babel-polyfill', path.join(path.dirname(require.resolve('babel-polyfill')), '../dist')),
         routes.routing('GET', '/css', path.join(basedir, 'src/css')),
@@ -34,11 +33,7 @@ var generate = function (mode, projectdir, basedir, configFile, bundler, testfil
           }
         }),
         routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
-        // bolt tests won't work anymore, so until we have time to rewrite the runtime
-        // just return an empty array of scripts
         routes.json('GET', '/harness', {
-          config: path.relative(projectdir, configFile),
-          scripts: [],
           stopOnFailure: stopOnFailure,
           chunk: chunk,
           retries: retries,
