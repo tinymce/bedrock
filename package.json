@@ -8,7 +8,6 @@
   },
   "bin": {
     "bedrock-auto": "./bin/bedrock-auto.js",
-    "bedrock-repl": "./bin/bedrock-repl.js",
     "bedrock-framework": "./bin/bedrock-framework.js",
     "bedrock": "./bin/bedrock.js"
   },
