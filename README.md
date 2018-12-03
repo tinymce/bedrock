@@ -70,11 +70,6 @@ e.g. Run existing tests on a qunit page using phantom
 
 Use `bedrock-framework --help` to see all arguments possible.
 
-
-## Experimental modes
-
-Note, `bedrock` also has other *experimental* modes including [REPL Simulation](doc/repl_mode.md). These features are not yet stable enough to be reliable.
-
 # Tests
 
 You can run bedrock's tests by executing:
