@@ -1,3 +1,9 @@
+Version 4.0.7
+
+Date 2018-12-03
+
+* Removed bedrock-repl bin from package.json
+
 Version 4.0.6
 
 Date 2018-12-03
