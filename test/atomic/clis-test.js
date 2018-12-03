@@ -97,7 +97,6 @@ tape('Minimal specification of bedrock-manual', function (t) {
     overallTimeout: 600000,
     loglevel: 'advanced',
     version: false,
-    chunk: 100,
-    retries: 0
+    chunk: 100
   }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
 });
