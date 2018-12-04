@@ -161,6 +161,18 @@
       };
     };
 
+    var elapsed = function (since) {
+      var end = new Date();
+      var millis = end - since;
+      var seconds = Math.floor(millis / 1000);
+      var point = Math.floor(millis - (seconds * 1000) / 100);
+      var printable = 
+        point < 10 ? '00' + point :
+              point < 100 ? '0' + point :
+                            '' + point;
+      return seconds + '.' + printable + 's';
+    };
+
     var test = function (file, name) {
       var reported = false;
       sendTestStart(params.session, file, name);
@@ -179,18 +191,6 @@
       $('body').append(el);
 
       testscratch = scratch.get(0);  // intentional, see top of file for var decl.
-
-      var elapsed = function (since) {
-        var end = new Date();
-        var millis = end - since;
-        var seconds = Math.floor(millis / 1000);
-        var point = Math.floor(millis - (seconds * 1000) / 100);
-        var printable = 
-          point < 10 ? '00' + point :
-                point < 100 ? '0' + point :
-                              '' + point;
-        return seconds + '.' + printable + 's';
-      };
 
       var pass = function (onDone) {
         if (reported) return;
