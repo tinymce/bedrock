@@ -215,7 +215,7 @@
         var errorMessage = clean(e);
         var pre = $('<pre/>')
           .addClass('error')
-          .html(errorMessage);
+          .html(htmlentities(errorMessage));
         error.append(pre);
         var testTime = elapsed(starttime);
         time.text(testTime);
