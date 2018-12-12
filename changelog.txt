@@ -1,3 +1,9 @@
+Version 4.0.9
+
+Date 2018-12-12
+
+* Fixed encoding issue of raw error messages the if the error message contained html it would be rendered on page.
+
 Version 4.0.7
 
 Date 2018-12-03
