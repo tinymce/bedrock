@@ -166,7 +166,7 @@
       var millis = end - since;
       var seconds = Math.floor(millis / 1000);
       var point = Math.floor(millis - (seconds * 1000) / 100);
-      var printable = 
+      var printable =
         point < 10 ? '00' + point :
               point < 100 ? '0' + point :
                             '' + point;
@@ -215,7 +215,7 @@
         var errorMessage = clean(e);
         var pre = $('<pre/>')
           .addClass('error')
-          .html(htmlentities(errorMessage));
+          .html(errorMessage);
         error.append(pre);
         var testTime = elapsed(starttime);
         time.text(testTime);
@@ -306,16 +306,16 @@
     }
     if (e.name === 'AssertionError') {
       return 'Assertion error' + (e.message ? ' [' + e.message + ']' : '') +
-      ': [' + JSON.stringify(e.expected) + '] ' + e.operator +
-      ' [' + JSON.stringify(e.actual) + ']' + extra;
+      ': [' + htmlentities(JSON.stringify(e.expected)) + '] ' + e.operator +
+      ' [' + htmlentities(JSON.stringify(e.actual)) + ']' + extra;
     }
     if (e.name && e.message) {
-      return e.name + ': ' + e.message + extra;
+      return htmlentities(e.name + ': ' + e.message + extra);
     }
     if (e.toString) {
-      return String(e) + extra;
+      return htmlentities(String(e) + extra);
     }
-    return JSON.stringify(e) + extra;
+    return htmlentities(JSON.stringify(e) + extra);
   };
 
   var initError = function (e) {

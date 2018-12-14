@@ -1,3 +1,10 @@
+Version 4.0.10
+
+Date 2018-12-14
+
+* Fixed double encoding issue with html diffs.
+* Fixed issue where IE would throw split of undefiend when reporting errors since trace was sometimes an object.
+
 Version 4.0.9
 
 Date 2018-12-12

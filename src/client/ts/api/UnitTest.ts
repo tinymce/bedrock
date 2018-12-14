@@ -56,7 +56,7 @@ const processLog = (err, logs) => {
     for (let i = 0; i < entries.length; i++) {
       const entry = entries[i];
       const output = (function () {
-        const traceLines = entry.trace === null ? [ ] : [ '', '', '' ].concat(entry.trace.split('\n'));
+        const traceLines = entry.trace === null || typeof entry.trace !== 'string' ? [ ] : [ '', '', '' ].concat(entry.trace.split('\n'));
 
         if (entry.entries.length === 0) {
           if (entry.trace === null) {
