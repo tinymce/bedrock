@@ -3782,11 +3782,6 @@ onetime@^2.0.0:
   dependencies:
     mimic-fn "^1.0.0"
 
-openport@0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/openport/-/openport-0.0.4.tgz#1d6715d8a8789695f985fa84f68dd4cd1ba426cb"
-  integrity sha1-HWcV2Kh4lpX5hfqE9o3UzRukJss=
-
 opn@^5.1.0:
   version "5.4.0"
   resolved "https://registry.yarnpkg.com/opn/-/opn-5.4.0.tgz#cb545e7aab78562beb11aa3bfabc7042e1761035"

@@ -23,7 +23,7 @@ var startCustom = function (settings, createServer, f) {
 
   var finalhandler = require('finalhandler');
 
-  var openport = require('openport');
+  var portfinder = require('portfinder');
 
   var routes = require('./routes');
   var apis = require('./apis');
@@ -48,9 +48,9 @@ var startCustom = function (settings, createServer, f) {
 
   var fallback = runner.fallback;
 
-  openport.find({
-    startingPort: 8000,
-    endingPort: 20000
+  portfinder.getPort({
+    port: 8000,
+    stopPort: 20000
   }, function (err, port) {
     if (err) {
       console.log('Error looking for open port between 8000 and 20000: ' + err);
