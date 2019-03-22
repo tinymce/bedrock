@@ -92,7 +92,7 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
 let compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, coverage, success) {
   var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   var dest = path.join(scratchDir, 'compiled/tests.js');
-  console.log(`Loading ${srcFiles.length} tests...`)
+  console.log(`Compiling ${srcFiles.length} tests...`)
 
   mkdirp.sync(path.dirname(scratchFile));
   fs.writeFileSync(scratchFile, imports.generateImports(true, scratchFile, srcFiles));
@@ -141,7 +141,17 @@ let devserver = function (settings, done) {
     return new WebpackDevServer(compiler, {
       publicPath: '/compiled/',
       disableHostCheck: true,
-      stats: 'minimal',
+      stats: {
+        // copied from `'minimal'`
+        all: false,
+        modules: true,
+        maxModules: 0,
+        errors: true,
+        warnings: true,
+
+        // suppress type re-export warnings caused by `transpileOnly: true`
+        warningsFilter: /export .* was not found in/
+      },
       before: function (app) {
         app.all('*', (request, response, next) => {
           return isCompiledRequest(request) ? next() : handler(request, response);
