@@ -76,7 +76,9 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
       new ForkTsCheckerWebpackPlugin({
         tsconfig: tsConfigFile,
         colors: manualMode,
-        async: manualMode
+        async: manualMode,
+        useTypescriptIncrementalApi: manualMode,
+        measureCompilationTime: !manualMode
       })
     ],
 
@@ -90,6 +92,7 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
 let compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, coverage, success) {
   var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   var dest = path.join(scratchDir, 'compiled/tests.js');
+  console.log(`Loading ${srcFiles.length} tests...`)
 
   mkdirp.sync(path.dirname(scratchFile));
   fs.writeFileSync(scratchFile, imports.generateImports(true, scratchFile, srcFiles));
@@ -123,6 +126,7 @@ let devserver = function (settings, done) {
     var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
     var dest = path.join(scratchDir, 'compiled/tests.js');
     var tsConfigFile = settings.config;
+    console.log(`Loading ${settings.testfiles.length} tests...`)
 
     mkdirp.sync(path.dirname(scratchFile));
     fs.writeFileSync(scratchFile, imports.generateImports(true, scratchFile, settings.testfiles));
