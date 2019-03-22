@@ -1,4 +1,4 @@
-var path = require('path');
+const path = require('path');
 
 let filePathToImport = function (useRequire, scratchFile) {
   return function (filePath) {
@@ -15,20 +15,8 @@ let filePathToImport = function (useRequire, scratchFile) {
 
     return [
       useRequire ? `require("${relativePath}");` : `import "${relativePath}";`, // rollup doesn't support require
-      `if (__tests && __tests[__tests.length - 1]) {
-        var testFilePath = "${filePath}";
-        var lastTest = __tests[__tests.length - 1];
-        if (!lastTest.filePath) {
-          lastTest.filePath = testFilePath;
-        } else if (lastTest.filePath === testFilePath) {
-          // repeated test, duplicate the test entry
-          __tests.push(lastTest);
-        } else {
-          console.warn('file ' + testFilePath + ' did not add a new test to the list, ignoring');
-        }
-      } else {
-        console.error('no test list to add tests to');
-      }`
+
+      `addTest("${filePath}");`
     ].join('\n');
   };
 };
@@ -37,9 +25,27 @@ let generateImports = function (useRequire, scratchFile, srcFiles) {
   var imports = srcFiles.map(filePathToImport(useRequire, scratchFile)).join('\n');
 
   return [
-    'declare let require: any;',
-    'declare let __tests: any;',
-    'declare let console: any;',
+// header code for tests.ts
+    `
+declare let require: any;
+declare let __tests: any;
+declare let console: any;
+const addTest = (testFilePath) => {
+  if (__tests && __tests[__tests.length - 1]) {
+    const lastTest = __tests[__tests.length - 1];
+    if (!lastTest.filePath) {
+      lastTest.filePath = testFilePath;
+    } else if (lastTest.filePath === testFilePath) {
+      // repeated test, duplicate the test entry
+      __tests.push(lastTest);
+    } else {
+      console.warn('file ' + testFilePath + ' did not add a new test to the list, ignoring');
+    }
+  } else {
+    console.error('no test list to add tests to');
+  }
+};
+`,
     imports,
     'export {};'
   ].join('\n');
