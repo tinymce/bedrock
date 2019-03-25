@@ -9,12 +9,31 @@ var webpack = require("webpack");
 const WebpackDevServer = require('webpack-dev-server');
 const imports = require('./imports');
 
+function moduleAvailable(name) {
+  try {
+    require.resolve(name);
+    return true;
+  } catch (e) {}
+  return false;
+}
+
+const webpackRemap = moduleAvailable('@ephox/swag') ? [
+  {
+    test: /\.js|\.ts$/,
+    use: ['@ephox/swag/webpack/remapper']
+  }
+] : []
+
 let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manualMode) {
   return {
     stats: 'none',
     entry: scratchFile,
     devtool: manualMode ? 'source-map' : false,
     mode: manualMode ? 'development' : 'none',
+
+    optimization: {
+      usedExports: !manualMode
+    },
 
     resolve: {
       extensions: ['.ts', '.js'],
@@ -26,7 +45,7 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
     },
 
     module: {
-      rules: [
+      rules: webpackRemap.concat([
         {
           test: /\.js$/,
           use: ['source-map-loader'],
@@ -39,10 +58,11 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
             {
               loader: 'ts-loader',
               options: {
-                colors: false,
+                colors: manualMode,
                 configFile: tsConfigFile,
                 transpileOnly: true,
-                experimentalWatchApi: true,
+                experimentalWatchApi: manualMode,
+                onlyCompileBundledFiles: true,
                 projectReferences: true,
                 compilerOptions: {
                   rootDir: '.',
@@ -57,7 +77,7 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
           test: /\.(html|htm|css|bower|hex|rtf|xml|yml)$/,
           use: [ 'raw-loader' ]
         }
-      ].concat(
+      ]).concat(
         coverage ? [
           {
             test: /\.ts$/,
@@ -78,7 +98,7 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
         colors: manualMode,
         async: manualMode,
         useTypescriptIncrementalApi: manualMode,
-        measureCompilationTime: !manualMode
+        measureCompilationTime: true
       })
     ],
 
