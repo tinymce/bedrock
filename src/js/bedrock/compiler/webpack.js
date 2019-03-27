@@ -94,6 +94,7 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
 
     plugins: [
       new ForkTsCheckerWebpackPlugin({
+        memoryLimit: manualMode ? 4096 : 2048,
         tsconfig: tsConfigFile,
         colors: manualMode,
         async: manualMode,

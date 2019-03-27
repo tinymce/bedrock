@@ -12,9 +12,15 @@ Dependency:
 
 Dependency: 
   name: @ephox/bedrock
-  version: 4.0.13
+  version: 4.2.0
   repository: https://github.com/ephox/bedrock
   licenses: Apache-2.0
+
+Dependency: 
+  name: @types/json5
+  version: 0.0.29
+  repository: https://github.com/DefinitelyTyped/DefinitelyTyped
+  licenses: MIT
 
 Dependency: 
   name: @webassemblyjs/ast
@@ -411,12 +417,6 @@ Dependency:
   version: 2.1.2
   repository: http://git.coolaj86.com/coolaj86/atob.js
   licenses: (MIT OR Apache-2.0)
-
-Dependency: 
-  name: awesome-typescript-loader
-  version: 5.2.1
-  repository: https://github.com/s-panferov/awesome-typescript-loader
-  licenses: MIT
 
 Dependency: 
   name: babel-code-frame
@@ -977,12 +977,6 @@ Dependency:
   licenses: Unknown
 
 Dependency: 
-  name: d
-  version: 1.0.0
-  repository: http://github.com/medikoo/d
-  licenses: MIT
-
-Dependency: 
   name: date-now
   version: 0.1.4
   repository: http://github.com/Colingo/date-now
@@ -1064,6 +1058,12 @@ Dependency:
   name: deep-is
   version: 0.1.3
   repository: ssh://git@github.com/thlorenz/deep-is
+  licenses: MIT
+
+Dependency: 
+  name: deepmerge
+  version: 2.2.1
+  repository: http://github.com/KyleAMathews/deepmerge
   licenses: MIT
 
 Dependency: 
@@ -1262,24 +1262,6 @@ Dependency:
   name: es-to-primitive
   version: 1.2.0
   repository: http://github.com/ljharb/es-to-primitive
-  licenses: MIT
-
-Dependency: 
-  name: es5-ext
-  version: 0.10.48
-  repository: http://github.com/medikoo/es5-ext
-  licenses: ISC
-
-Dependency: 
-  name: es6-iterator
-  version: 2.0.3
-  repository: http://github.com/medikoo/es6-iterator
-  licenses: MIT
-
-Dependency: 
-  name: es6-symbol
-  version: 3.1.1
-  repository: http://github.com/medikoo/es6-symbol
   licenses: MIT
 
 Dependency: 
@@ -1637,6 +1619,12 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: fork-ts-checker-webpack-plugin
+  version: 1.0.0
+  repository: https://github.com/Realytics/fork-ts-checker-webpack-plugin
+  licenses: MIT
+
+Dependency: 
   name: forwarded
   version: 0.1.2
   repository: https://github.com/jshttp/forwarded
@@ -1785,6 +1773,12 @@ Dependency:
   version: 3.1.0
   repository: https://github.com/es128/glob-parent
   licenses: ISC
+
+Dependency: 
+  name: glob-to-regexp
+  version: 0.1.0
+  repository: https://github.com/fitzgen/glob-to-regexp
+  licenses: BSD
 
 Dependency: 
   name: globals
@@ -2621,21 +2615,9 @@ Dependency:
   licenses: MIT
 
 Dependency: 
-  name: log-symbols
-  version: 2.2.0
-  repository: https://github.com/sindresorhus/log-symbols
-  licenses: MIT
-
-Dependency: 
   name: loglevel
   version: 1.6.1
   repository: http://github.com/pimterry/loglevel
-  licenses: MIT
-
-Dependency: 
-  name: loglevelnext
-  version: 1.0.5
-  repository: https://github.com/shellscape/loglevelnext
   licenses: MIT
 
 Dependency: 
@@ -2933,12 +2915,6 @@ Dependency:
   licenses: MIT
 
 Dependency: 
-  name: next-tick
-  version: 1.0.0
-  repository: http://github.com/medikoo/next-tick
-  licenses: MIT
-
-Dependency: 
   name: nice-try
   version: 1.0.5
   repository: https://github.com/electerious/nice-try
@@ -2955,6 +2931,12 @@ Dependency:
   version: 0.7.5
   repository: https://github.com/digitalbazaar/forge
   licenses: (BSD-3-Clause OR GPL-2.0)
+
+Dependency: 
+  name: node-glob
+  version: 1.2.0
+  repository: https://github.com/Crafity/node-glob
+  licenses: BSD-3-Clause
 
 Dependency: 
   name: node-libs-browser
@@ -3066,12 +3048,6 @@ Dependency:
 
 Dependency: 
   name: object-keys
-  version: 1.0.11
-  repository: http://github.com/ljharb/object-keys
-  licenses: MIT
-
-Dependency: 
-  name: object-keys
   version: 1.1.0
   repository: http://github.com/ljharb/object-keys
   licenses: MIT
@@ -3080,12 +3056,6 @@ Dependency:
   name: object-visit
   version: 1.0.1
   repository: https://github.com/jonschlinkert/object-visit
-  licenses: MIT
-
-Dependency: 
-  name: object.assign
-  version: 4.1.0
-  repository: http://github.com/ljharb/object.assign
   licenses: MIT
 
 Dependency: 
@@ -3128,12 +3098,6 @@ Dependency:
   name: onetime
   version: 2.0.1
   repository: https://github.com/sindresorhus/onetime
-  licenses: MIT
-
-Dependency: 
-  name: openport
-  version: 0.0.4
-  repository: https://github.com/joeferner/node-openport
   licenses: MIT
 
 Dependency: 
@@ -4044,12 +4008,6 @@ Dependency:
 
 Dependency: 
   name: source-map-support
-  version: 0.5.9
-  repository: https://github.com/evanw/node-source-map-support
-  licenses: MIT
-
-Dependency: 
-  name: source-map-support
   version: 0.5.10
   repository: https://github.com/evanw/node-source-map-support
   licenses: MIT
@@ -4219,6 +4177,12 @@ Dependency:
 Dependency: 
   name: strip-bom
   version: 2.0.0
+  repository: https://github.com/sindresorhus/strip-bom
+  licenses: MIT
+
+Dependency: 
+  name: strip-bom
+  version: 3.0.0
   repository: https://github.com/sindresorhus/strip-bom
   licenses: MIT
 
@@ -4397,6 +4361,24 @@ Dependency:
   licenses: MIT
 
 Dependency: 
+  name: ts-loader
+  version: 5.3.3
+  repository: https://github.com/TypeStrong/ts-loader
+  licenses: MIT
+
+Dependency: 
+  name: tsconfig-paths
+  version: 3.8.0
+  repository: https://github.com/dividab/tsconfig-paths
+  licenses: MIT
+
+Dependency: 
+  name: tsconfig-paths-webpack-plugin
+  version: 3.2.0
+  repository: https://github.com/dividab/tsconfig-paths-webpack-plugin
+  licenses: MIT
+
+Dependency: 
   name: tslib
   version: 1.9.2
   repository: https://github.com/Microsoft/tslib
@@ -4560,12 +4542,6 @@ Dependency:
 
 Dependency: 
   name: uuid
-  version: 3.1.0
-  repository: https://github.com/kelektiv/node-uuid
-  licenses: MIT
-
-Dependency: 
-  name: uuid
   version: 3.3.2
   repository: https://github.com/kelektiv/node-uuid
   licenses: MIT
@@ -4616,12 +4592,6 @@ Dependency:
   name: webpack-dev-server
   version: 3.2.1
   repository: https://github.com/webpack/webpack-dev-server
-  licenses: MIT
-
-Dependency: 
-  name: webpack-log
-  version: 1.2.0
-  repository: https://github.com/webpack-contrib/webpack-log
   licenses: MIT
 
 Dependency: 
