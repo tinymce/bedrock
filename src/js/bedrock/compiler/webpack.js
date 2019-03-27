@@ -1,4 +1,5 @@
-var { CheckerPlugin, TsConfigPathsPlugin } = require('awesome-typescript-loader');
+const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var path = require('path');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
@@ -8,27 +9,43 @@ var webpack = require("webpack");
 const WebpackDevServer = require('webpack-dev-server');
 const imports = require('./imports');
 
-let getWebPackConfig = function (tsConfigFile, scratchDir, scratchFile, dest, coverage) {
+function moduleAvailable(name) {
+  try {
+    require.resolve(name);
+    return true;
+  } catch (e) {}
+  return false;
+}
+
+const webpackRemap = moduleAvailable('@ephox/swag') ? [
+  {
+    test: /\.js|\.ts$/,
+    use: ['@ephox/swag/webpack/remapper']
+  }
+] : []
+
+let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manualMode) {
   return {
-    context: path.resolve(__dirname),
     stats: 'none',
     entry: scratchFile,
-    devtool: 'eval-cheap-module-source-map',
-    mode: 'development',
+    devtool: manualMode ? 'source-map' : false,
+    mode: manualMode ? 'development' : 'none',
+
+    optimization: {
+      usedExports: !manualMode
+    },
 
     resolve: {
       extensions: ['.ts', '.js'],
       plugins: [
         new TsConfigPathsPlugin({
-          options: {
-            configFileName: tsConfigFile
-          }
+          configFile: tsConfigFile
         })
       ]
     },
 
     module: {
-      rules: [
+      rules: webpackRemap.concat([
         {
           test: /\.js$/,
           use: ['source-map-loader'],
@@ -39,13 +56,18 @@ let getWebPackConfig = function (tsConfigFile, scratchDir, scratchFile, dest, co
           test: /\.ts$/,
           use: [
             {
-              loader: 'awesome-typescript-loader',
+              loader: 'ts-loader',
               options: {
-                configFileName: tsConfigFile,
-                compiler: 'typescript',
-                useCache: false,
-                transpileOnly: false,
-                cacheDirectory: path.join(scratchDir, 'awcache')
+                colors: manualMode,
+                configFile: tsConfigFile,
+                transpileOnly: true,
+                experimentalWatchApi: manualMode,
+                onlyCompileBundledFiles: true,
+                projectReferences: true,
+                compilerOptions: {
+                  rootDir: '.',
+                  declarationMap: false
+                }
               }
             }
           ]
@@ -55,7 +77,7 @@ let getWebPackConfig = function (tsConfigFile, scratchDir, scratchFile, dest, co
           test: /\.(html|htm|css|bower|hex|rtf|xml|yml)$/,
           use: [ 'raw-loader' ]
         }
-      ].concat(
+      ]).concat(
         coverage ? [
           {
             test: /\.ts$/,
@@ -71,7 +93,13 @@ let getWebPackConfig = function (tsConfigFile, scratchDir, scratchFile, dest, co
     },
 
     plugins: [
-      new CheckerPlugin({})
+      new ForkTsCheckerWebpackPlugin({
+        tsconfig: tsConfigFile,
+        colors: manualMode,
+        async: manualMode,
+        useTypescriptIncrementalApi: manualMode,
+        measureCompilationTime: true
+      })
     ],
 
     output: {
@@ -84,18 +112,19 @@ let getWebPackConfig = function (tsConfigFile, scratchDir, scratchFile, dest, co
 let compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, coverage, success) {
   var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   var dest = path.join(scratchDir, 'compiled/tests.js');
+  console.log(`Compiling ${srcFiles.length} tests...`)
 
   mkdirp.sync(path.dirname(scratchFile));
   fs.writeFileSync(scratchFile, imports.generateImports(true, scratchFile, srcFiles));
 
-  webpack(getWebPackConfig(tsConfigFile, scratchDir, scratchFile, dest, coverage), (err, stats) => {
+  webpack(getWebPackConfig(tsConfigFile, scratchFile, dest, coverage, false), (err, stats) => {
     if (err || stats.hasErrors()) {
       let msg = stats.toString({
         all: false,
         errors: true,
         moduleTrace: true,
         chunks: false,
-        colors: true
+        colors: false
       });
 
       console.log(msg);
@@ -117,22 +146,32 @@ let devserver = function (settings, done) {
     var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
     var dest = path.join(scratchDir, 'compiled/tests.js');
     var tsConfigFile = settings.config;
+    console.log(`Loading ${settings.testfiles.length} tests...`)
 
     mkdirp.sync(path.dirname(scratchFile));
     fs.writeFileSync(scratchFile, imports.generateImports(true, scratchFile, settings.testfiles));
 
-    const compiler = webpack(getWebPackConfig(tsConfigFile, scratchDir, scratchFile, dest, settings.coverage));
+    const compiler = webpack(getWebPackConfig(tsConfigFile, scratchFile, dest, settings.coverage, true));
 
     // Prevents webpack from doing a recompilation of a change of tests.ts over and over
-    compiler.plugin('emit', function(compilation, callback) {
+    compiler.hooks.emit.tap('bedrock', function (compilation) {
       compilation.fileDependencies.delete(scratchFile);
-      callback();
     });
 
     return new WebpackDevServer(compiler, {
       publicPath: '/compiled/',
       disableHostCheck: true,
-      stats: 'minimal',
+      stats: {
+        // copied from `'minimal'`
+        all: false,
+        modules: true,
+        maxModules: 0,
+        errors: true,
+        warnings: true,
+
+        // suppress type re-export warnings caused by `transpileOnly: true`
+        warningsFilter: /export .* was not found in/
+      },
       before: function (app) {
         app.all('*', (request, response, next) => {
           return isCompiledRequest(request) ? next() : handler(request, response);

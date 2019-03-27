@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock",
-  "version": "4.0.14",
+  "version": "4.1.0",
   "description": "NodeJS test runner",
   "repository": {
     "type": "git",
@@ -22,11 +22,11 @@
   "private": false,
   "dependencies": {
     "async": "^1.5.2",
-    "awesome-typescript-loader": "^5.2.1",
     "babel-polyfill": "^6.23.0",
     "command-line-args": "^3.0.0",
     "command-line-usage": "^3.0.1",
     "finalhandler": "^0.4.1",
+    "fork-ts-checker-webpack-plugin": "^1.0.0",
     "istanbul-instrumenter-loader": "^3.0.1",
     "jquery": "^3.0.0",
     "mkdirp": "^0.5.1",
@@ -36,6 +36,8 @@
     "selenium-webdriver": "^3",
     "serve-static": "^1.10.2",
     "source-map-loader": "^0.2.3",
+    "ts-loader": "^5.3.3",
+    "tsconfig-paths-webpack-plugin": "^3.2.0",
     "typescript": "^3.1.6",
     "webpack": "^4.25.1",
     "webpack-dev-server": "^3.2.1",
