@@ -3,8 +3,6 @@ var child_process = require('child_process');
 var os = require('os');
 var webdriver = require('selenium-webdriver');
 
-var webdriver = require('selenium-webdriver');
-
 var browserVariants = {
   'chrome-headless': 'chrome',
   'firefox-headless': 'firefox'
@@ -49,11 +47,11 @@ var focusFirefox = function (basedir) {
   else return Promise.resolve();
 };
 
-// Sets logging level to WARNING instead of the verbose default for phantomjs. 
+// Sets logging level to WARNING instead of the verbose default for phantomjs.
 var addPhantomCapabilities = function (blueprints, settings) {
   var prefs = new webdriver.logging.Preferences();
   prefs.setLevel(webdriver.logging.Type.DRIVER, webdriver.logging.Level.WARNING);
-  
+
   var caps = webdriver.Capabilities.phantomjs();
   caps.setLoggingPrefs(prefs);
   caps.set('phantomjs.cli.args', '--remote-debugger-port=' + settings.debuggingPort);
@@ -114,7 +112,7 @@ var create = function (settings) {
   var chrome = require('selenium-webdriver/chrome');
   var chromeOptions = new chrome.Options();
   chromeOptions.addArguments('chrome.switches', '--disable-extensions');
-  
+
   // https://stackoverflow.com/questions/43261516/selenium-chrome-i-just-cant-use-driver-maximize-window-to-maximize-window
   chromeOptions.addArguments('start-maximized');
 

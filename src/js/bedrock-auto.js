@@ -25,7 +25,7 @@ var go = function (settings) {
 
   // If the browser is Safari, then we need to skip the tests because in v12.1 they removed
   // the --legacy flag in safaridriver which was required to run webdriver.
-  // aee https://github.com/SeleniumHQ/selenium/issues/6431#issuecomment-477408650
+  // see https://github.com/SeleniumHQ/selenium/issues/6431#issuecomment-477408650
   if (settings.browser === 'safari') {
     console.warn('Skipping tests as webdriver is currently broken on Safari');
     skipTests(reporter, settings);
