@@ -30,17 +30,24 @@ let generateImports = function (useRequire, scratchFile, srcFiles) {
 declare let require: any;
 declare let __tests: any;
 declare let console: any;
+let __lastTestIndex: number = -1;
 const addTest = (testFilePath) => {
   if (__tests && __tests[__tests.length - 1]) {
     const lastTest = __tests[__tests.length - 1];
     if (!lastTest.filePath) {
-      lastTest.filePath = testFilePath;
+      const tests = __tests.slice(__lastTestIndex + 1);
+      tests.forEach((test) => {
+        test.filePath = testFilePath;
+      });
     } else if (lastTest.filePath === testFilePath) {
       // repeated test, duplicate the test entry
-      __tests.push(lastTest);
+      __tests.push(__tests.slice(__lastTestIndex + 1));
     } else {
       console.warn('file ' + testFilePath + ' did not add a new test to the list, ignoring');
     }
+    
+    // Save the last test index
+    __lastTestIndex = __tests.length - 1;
   } else {
     console.error('no test list to add tests to');
   }
