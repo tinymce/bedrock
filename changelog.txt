@@ -1,3 +1,9 @@
+Version 4.1.1
+
+Date 2019-03-28
+
+* Disable bedrock-auto tests on Safari as webdriver no longer runs on v12.1.0 due to the --legacy argument being removed.
+
 Version 4.0.12
 
 Date 2019-02-06
