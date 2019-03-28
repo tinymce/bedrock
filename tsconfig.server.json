@@ -6,7 +6,11 @@
     "lib": ["es2018", "dom"],
     "declaration": true,
     "sourceMap": true,
-    "outDir": "lib/server/ts"
+    "outDir": "lib/server/ts",
+    "types": [
+      "node",
+      "webdriverio"
+    ]
   },
   "include": [
     "src/server/ts"

@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock",
-  "version": "7.0.4",
+  "version": "8.0.0",
   "description": "NodeJS test runner",
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
     "babel-polyfill": "^6.23.0",
     "command-line-args": "^3.0.0",
     "command-line-usage": "^4.1.0",
+    "cross-spawn": "^7.0.0",
     "finalhandler": "^1.1.2",
     "fork-ts-checker-webpack-plugin": "~1.0.4",
     "istanbul-instrumenter-loader": "^3.0.1",
@@ -37,12 +38,12 @@
     "raw-loader": "^0.5.1",
     "recursive-readdir-sync": "^1.0.6",
     "rollup-plugin-typescript2": "^0.24.0",
-    "selenium-webdriver": "^3",
     "serve-static": "^1.10.2",
     "source-map-loader": "^0.2.3",
     "ts-loader": "^5.3.3",
     "tsconfig-paths-webpack-plugin": "^3.2.0",
     "typescript": "^3.3.0",
+    "webdriverio": "5.11.10",
     "webpack": "^4.25.1",
     "webpack-dev-server": "^3.2.1",
     "xml-writer": "^1.6.0"
@@ -65,6 +66,9 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-sourcemaps": "^0.4.2",
     "tape": "^4.5.1"
+  },
+  "resolutions": {
+    "webdriver": "5.11.10"
   },
   "author": "Ephox Corporation",
   "license": "Apache-2.0",

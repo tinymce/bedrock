@@ -15,8 +15,8 @@ import * as http from 'http';
  * master (can be null) The driver master (locking and unlocking)
  * runner: runner (e.g. runnerroutes, pageroutes etc). Has fallback and routers.
  */
-export const startCustom = function (settings, createServer, f) {
-  
+export const startCustom = function (settings, createServer) {
+
   const pref = (f: string): any => {
     const v = settings[f];
     if (v === undefined) {
@@ -47,32 +47,35 @@ export const startCustom = function (settings, createServer, f) {
 
   const fallback = runner.fallback;
 
-  portfinder.getPort({
+  return portfinder.getPortPromise({
     port: 8000,
     stopPort: 20000
-  }, function (err, port) {
-    if (err) {
-      console.log('Error looking for open port between 8000 and 20000: ' + err);
-      return;
-    }
-
+  }).then(function (port) {
     const server = createServer(function (request, response) {
       const done = finalhandler(request, response);
       Routes.route(routers, fallback, request, response, done);
     }).listen(port);
 
-    f({
+    return {
       port: port,
       server: server,
       markLoaded: api.markLoaded,
       enableHud: api.enableHud,
-      awaitDone: api.awaitDone
-    }, function () {
-      server.close();
-    });
+      awaitDone: api.awaitDone,
+      shutdown: function () {
+        return new Promise(function (resolve) {
+          server.close();
+          // TODO: Find out why this doesn't shutdown quickly as we may not be closing connections properly
+          // For now though give the server 1 sec to shutdown gracefully
+          setTimeout(resolve, 1000);
+        });
+      }
+    };
+  }).catch(function (err) {
+    return Promise.reject('Error looking for open port between 8000 and 20000: ' + err);
   });
 };
 
-export const start = function (settings, f) {
-  startCustom(settings, http.createServer, f);
+export const start = function (settings) {
+  return startCustom(settings, http.createServer);
 };

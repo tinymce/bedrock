@@ -1,48 +1,41 @@
 import { ExitCodes } from '../util/ExitCodes';
 import { Attempt } from './Attempt';
 
-export const shutdown = function (promise, driver, done, gruntDone, delayExiting) {
+export const shutdown = function (promise: Promise<Attempt<string[], any>>, driver, done, gruntDone, delayExiting) {
   const exitDelay = function () {
-    if (delayExiting) {
-      // 17 minutes should be enough, if it's not we can make this configurable later.
-      driver.sleep(17 * 60 * 1000);
-    }
+    // 17 minutes should be enough, if it's not we can make this configurable later.
+    return delayExiting ? driver.pause(17 * 60 * 1000) : Promise.resolve();
   };
 
-  promise.then(function (res) {
+  const exit = function (exitCode) {
+    return function () {
+      if (gruntDone !== null) gruntDone(exitCode === 0);
+      else process.exit(exitCode);
+    };
+  };
+
+  return promise.then(function (res) {
     // Only check the delay exit option if tests failed.
-    Attempt.cata(res, function (_errs) {
-      exitDelay();
+    const delay = Attempt.cata(res, function (_errs) {
+      return exitDelay();
     }, function () {
-      // TODO: maybe an Attempt.isFailure would work better here
+      return Promise.resolve();
     });
 
-    // we always need at least 1s delay here
-    driver.sleep(1000);
-
-    driver.quit().then(function () {
-      done();
-      Attempt.cata(res, function (errs) {
+    return delay.then(function () {
+      return Attempt.cata(res, function (errs) {
         console.log(errs.join('\n'));
-        if (gruntDone !== null) gruntDone(false);
-        else process.exit(ExitCodes.failures.tests);
+        return done().then(exit(ExitCodes.failures.tests));
       }, function () {
         console.log('All tests passed.');
-        if (gruntDone !== null) gruntDone(true);
-        else process.exit(0); // I don't know why it won't exit without this.
+        return done().then(exit(ExitCodes.success));
       });
     });
-  }, function (err) {
-    exitDelay();
-    // we always need at least 1s delay here
-    driver.sleep(1000);
-
-    driver.quit().then(function () {
+  }).catch(function (err) {
+    return exitDelay().then(function () {
       console.error('********** Unexpected Bedrock Error -> Server Quitting **********');
       console.error(err);
-      done();
-      if (gruntDone !== null) gruntDone(false);
-      else process.exit(ExitCodes.failures.tests);
+      return done().then(exit(ExitCodes.failures.unexpected));
     });
   });
 };

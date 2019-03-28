@@ -1,8 +1,8 @@
-export interface Attempt<E, A> {
+export interface Attempt<E  extends any[], A> {
   foldAttempt: <B> (onFailed: (e: E) => B, onPassed: (a: A) => B) => B;
 }
 
-const failed = function <E, A> (err): Attempt<E, A> {
+const failed = function <E extends any[]> (err): Attempt<E, never> {
   const foldAttempt = function (onFailed, onPassed) {
     return onFailed(err);
   };
@@ -12,7 +12,7 @@ const failed = function <E, A> (err): Attempt<E, A> {
   };
 };
 
-const passed = function <E, A> (value): Attempt<E, A> {
+const passed = function <A> (value): Attempt<never, A> {
   const foldAttempt = function (onFailed, onPassed) {
     return onPassed(value);
   };
@@ -22,7 +22,7 @@ const passed = function <E, A> (value): Attempt<E, A> {
   };
 };
 
-const cata = function <E, A, B> (attempt: Attempt<E, A>, onFailed, onPassed) {
+const cata = function <E extends any[], A, B> (attempt: Attempt<E, A>, onFailed: (e: E) => B, onPassed: (a: A) => B) {
   return attempt.foldAttempt(onFailed, onPassed);
 };
 
@@ -44,7 +44,7 @@ const list = function (firstAttempt, fs) {
   }, firstAttempt);
 };
 
-const carry = function (firstAttempt, secondAttempt, f) {
+const carry = function <E extends any[], A> (firstAttempt: Attempt<E, A>, secondAttempt: Attempt<E, A>, f) {
   return cata(firstAttempt, function (errs) {
     return cata(secondAttempt, function (sErrs) {
       return failed(errs.concat(sErrs));

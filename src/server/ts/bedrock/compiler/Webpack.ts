@@ -155,7 +155,7 @@ export const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompil
 
 const isCompiledRequest = (request) => request.url.startsWith('/compiled/');
 
-export const devserver = function (settings, done) {
+export const devserver = function (settings) {
   return Serve.startCustom(settings, function (handler) {
     const scratchDir = path.resolve('scratch');
     const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
@@ -193,5 +193,5 @@ export const devserver = function (settings, done) {
         });
       }
     });
-  }, done);
+  });
 };

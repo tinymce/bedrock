@@ -10,7 +10,7 @@ const outputTime = function (runnerTime) {
 
 export const write = function (settings) {
   return function (data) {
-    return new Promise(function (resolve, reject) {
+    return new Promise<Attempt<string[], any>>(function (resolve) {
       const results = data.results;
       const time = (data.now - data.start) / 1000;
       const skipped = results.filter(function (result) {

@@ -1,23 +1,34 @@
-import * as webdriver from 'selenium-webdriver';
-import * as until from 'selenium-webdriver/lib/until';
-
-const By = webdriver.By;
+const frameSelected = function (driver, frame) {
+  return function () {
+    return driver.switchToFrame(frame).then(function () {
+      return true;
+    }).catch(function (e) {
+      if (!(e.name && e.name === 'no such frame')) {
+        throw e;
+      }
+      return false;
+    });
+  }
+};
 
 const getTargetFromFrame = function (driver, selector) {
   const sections = selector.split('=>');
   const frameSelector = sections[0];
   const targetSelector = sections[1];
-  return driver.findElement(By.css(frameSelector)).then(function (frame) {
-    return driver.wait(until.ableToSwitchToFrame(frame), 100).then(function (f) {
-      return driver.findElement(By.css(targetSelector)).then(function (target) {
-        return driver.wait(until.elementIsVisible(target), 100);
+  // Note: Don't use driver.$() here as it doesn't work on Edge
+  return driver.findElement('css selector', frameSelector).then(function (frame) {
+    return driver.waitUntil(frameSelected(driver, frame), 100).then(function () {
+      return driver.$(targetSelector).then(function (target) {
+        return target.waitForDisplayed(100).then(function () {
+          return target;
+        });
       });
     });
   });
 };
 
 const getTargetFromMain = function (driver, selector) {
-  return driver.findElement(By.css(selector));
+  return driver.$(selector);
 };
 
 export const getTarget = function (driver, data) {

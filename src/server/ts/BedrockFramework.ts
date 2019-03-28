@@ -17,10 +17,11 @@ export const go = function (settings) {
   Driver.create({
     browser: settings.browser
   }).then(function (driver) {
+    const webdriver = driver.webdriver;
     const serveSettings = {
       projectdir: settings.projectdir,
       basedir: settings.basedir,
-      driver: Attempt.passed(driver),
+      driver: Attempt.passed(webdriver),
       testfiles: [],
       master: master,
       runner: runner,
@@ -33,7 +34,7 @@ export const go = function (settings) {
 
     const addFramework = function (framework) {
       const source = path.join('/page', 'src', 'resources', framework + '-wrapper.js');
-      return driver.executeScript(function (src) {
+      return webdriver.execute(function (src) {
         const script = document.createElement('script');
         script.setAttribute('src', src);
         document.head.appendChild(script);
@@ -42,11 +43,10 @@ export const go = function (settings) {
 
     const isPhantom = settings.browser === 'phantomjs';
 
-    Serve.start(serveSettings, function (service, done) {
+    return Serve.start(serveSettings).then(function (service) {
       if (!isPhantom) console.log('bedrock-framework ' + Version.get() + ' available at: http://localhost:' + service.port);
-      const result = driver.get('http://localhost:' + service.port + '/' + settings.page).then(function () {
-        const message = isPhantom ? '\nPhantom tests loading ...\n' : '\n ... Initial page has loaded ...';
-        console.log(message);
+      const result = webdriver.url('http://localhost:' + service.port + '/' + settings.page).then(function () {
+        console.log(isPhantom ? '\nPhantom tests loading ...\n' : '\n ... Initial page has loaded ...');
         service.markLoaded();
 
         return addFramework(settings.framework).then(function () {
@@ -63,9 +63,13 @@ export const go = function (settings) {
           });
         });
       });
+
       // TODO: where should this setting come from? Is it used?
       const delayExiting = false;
-      Lifecycle.shutdown(result, driver, done, settings.gruntDone !== undefined ? settings.gruntDone : null, delayExiting);
+      const gruntDone = settings.gruntDone !== undefined ? settings.gruntDone : null;
+      const done = () => Promise.all([ service.shutdown(), driver.shutdown() ]);
+
+      return Lifecycle.shutdown(result, driver, done, gruntDone, delayExiting);
     });
   });
 };

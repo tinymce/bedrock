@@ -391,6 +391,10 @@ const loadtests = (data): void => {
   retries = data.retries;
   timeout = data.timeout;
   reporter.setStopOnFailure(data.stopOnFailure);
+  if (data.mode === 'auto') {
+    // Try to ensure the page has focus
+    window.focus();
+  }
   runGlobalTests();
 };
 

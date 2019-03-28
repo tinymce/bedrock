@@ -9,7 +9,7 @@ import * as Waiter from '../util/Waiter';
 import * as Coverage from '../core/Coverage';
 
 // This is how long to wait before checking if the driver is ready again
-const pollRate = 2000;
+const pollRate = 200;
 // This is how many times to fail the driver check before the process fails
 const maxInvalidAttempts = 300;
 
@@ -46,16 +46,14 @@ export const create = function (master, maybeDriver, projectdir, basedir, sticky
 
   const setInitialMousePosition = function (driver) {
     return function () {
-      return driver.getCapabilities().then(function (caps) {
-        // TODO re-enable resetting the mouse on other browsers when mouseMove gets fixed on Firefox/IE
-        if (caps.get('browserName') === 'chrome') {
-          return EffectUtils.getTarget(driver, {selector: '.bedrock-mouse-reset'}).then(function (tgt) {
-            return driver.actions().mouseMove(tgt).perform();
-          });
-        } else {
-          return Promise.resolve({});
-        }
-      });
+      // TODO re-enable resetting the mouse on other browsers when mouseMove gets fixed on Firefox/IE
+      if (driver.capabilities.browserName === 'chrome') {
+        return EffectUtils.getTarget(driver, {selector: '.bedrock-mouse-reset'}).then(function (target) {
+          return target.moveTo();
+        });
+      } else {
+        return Promise.resolve({});
+      }
     };
   };
 

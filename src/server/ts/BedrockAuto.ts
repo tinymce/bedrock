@@ -6,43 +6,9 @@ import * as Reporter from './bedrock/core/Reporter';
 import * as DriverMaster from './bedrock/server/DriverMaster';
 import * as Driver from './bedrock/auto/Driver';
 import * as Lifecycle from './bedrock/core/Lifecycle';
-
-const skipTests = function (reporter, settings, message) {
-  // Write results
-  reporter.write({
-    name: settings.name,
-    output: settings.output
-  })({
-    // Need to add a dummy result, otherwise JUnit fails by default
-    results: [
-      {
-        name: 'SkippedTest',
-        file: 'SkippedTest.ts',
-        passed: false,
-        skipped: message,
-        time: '0',
-        error: null
-      }
-    ],
-    start: Date.now(),
-    now: Date.now()
-  });
-
-  if (settings.gruntDone !== undefined) {
-    settings.gruntDone(true);
-  }
-};
+import { ExitCodes } from './bedrock/util/ExitCodes';
 
 export const go = function (settings) {
-  // If the browser is Safari, then we need to skip the tests because in v12.1 they removed
-  // the --legacy flag in safaridriver which was required to run webdriver.
-  // see https://github.com/SeleniumHQ/selenium/issues/6431#issuecomment-477408650
-  if (settings.browser === 'safari') {
-    console.warn('Skipping tests as webdriver is currently broken on Safari');
-    skipTests(Reporter, settings, 'Selenium webdriver is currently broken on Safari, see: https://github.com/SeleniumHQ/selenium/issues/6431#issuecomment-477408650');
-    return;
-  }
-
   const master = DriverMaster.create();
 
   const isPhantom = settings.browser === 'phantomjs';
@@ -52,18 +18,19 @@ export const go = function (settings) {
 
   console.log('bedrock-auto ' + Version.get() + ' starting...');
 
-  routes.then((runner) => {
+  routes.then(function (runner) {
     Driver.create({
       browser: settings.browser,
       basedir: settings.basedir,
       debuggingPort: settings.debuggingPort,
       useSandboxForHeadless: settings.useSandboxForHeadless
     }).then(function (driver) {
+      const webdriver = driver.webdriver;
       const serveSettings = {
         projectdir: settings.projectdir,
         basedir: settings.basedir,
         testfiles: settings.testfiles,
-        driver: Attempt.passed(driver),
+        driver: Attempt.passed(webdriver),
         master: master,
         runner: runner,
         loglevel: settings.loglevel,
@@ -74,32 +41,35 @@ export const go = function (settings) {
         skipResetMousePosition: settings.skipResetMousePosition
       };
 
-      Serve.start(serveSettings, function (service, done) {
+      return Serve.start(serveSettings).then(function (service) {
         if (!isPhantom) console.log('bedrock-auto ' + Version.get() + ' available at: http://localhost:' + service.port);
-        const result = driver.get('http://localhost:' + service.port)
-          .then(() => driver.executeScript('window.focus();'))
-          .then(() => {
-            const message = isPhantom ? '\nPhantom tests loading ...\n' : '\nInitial page has loaded ...\n';
-            console.log(message);
-            service.markLoaded();
-            service.enableHud();
-            return service.awaitDone().then(function (data) {
-              return Reporter.write({
-                name: settings.name,
-                output: settings.output
-              })(data);
-            }, function (pollExit) {
-              return Reporter.writePollExit({
-                name: settings.name,
-                output: settings.output
-              }, pollExit);
-            });
+        const result = webdriver.url('http://localhost:' + service.port).then(function () {
+          console.log(isPhantom ? '\nPhantom tests loading ...\n' : '\nInitial page has loaded ...\n');
+          service.markLoaded();
+          service.enableHud();
+          return service.awaitDone().then(function (data) {
+            return Reporter.write({
+              name: settings.name,
+              output: settings.output
+            })(data);
+          }).catch(function (pollExit) {
+            return Reporter.writePollExit({
+              name: settings.name,
+              output: settings.output
+            }, pollExit);
           });
+        });
 
-        Lifecycle.shutdown(result, driver, done, settings.gruntDone !== undefined ? settings.gruntDone : null, settings.delayExit !== undefined ? settings.delayExit : false);
+        const delayExit = settings.delayExit !== undefined ? settings.delayExit : false;
+        const gruntDone = settings.gruntDone !== undefined ? settings.gruntDone : null;
+        const done = () => Promise.all([ service.shutdown(), driver.shutdown() ]);
+
+        return Lifecycle.shutdown(result, webdriver, done, gruntDone, delayExit);
       });
-    }, function (err) {
-      console.error('Unable to create driver', err);
+    }).catch(function (err) {
+      console.error(err);
+      if (settings.gruntDone !== undefined) settings.gruntDone(false);
+      else process.exit(ExitCodes.failures.unexpected);
     });
   });
 };

@@ -31,7 +31,7 @@ export const go = function (settings) {
       skipResetMousePosition: true
     };
 
-    Webpack.devserver(serveSettings, function (service/* , done */) {
+    Webpack.devserver(serveSettings).then(function (service) {
       service.enableHud();
       console.log('bedrock-manual ' + Version.get() + ' available at: http://localhost:' + service.port);
     });

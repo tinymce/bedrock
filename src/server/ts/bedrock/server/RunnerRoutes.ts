@@ -79,7 +79,8 @@ export const generate = function (mode, projectdir, basedir, configFile, bundler
           stopOnFailure: stopOnFailure,
           chunk: chunk,
           retries: retries,
-          timeout: singleTimeout
+          timeout: singleTimeout,
+          mode: mode
         })
       ]);
 
