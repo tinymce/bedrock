@@ -1,3 +1,10 @@
+Version 4.2.4
+
+Date 2019-04-01
+
+* Fixed progress reporting the incorrect total number of tests.
+* Fixed missing name attributes in junit reports if a file contained multiple tests.
+
 Version 4.2.2
 
 Date 2019-03-29

@@ -66,7 +66,7 @@ var create = function (master, maybeDriver, projectdir, basedir, stickyFirstSess
       return Promise.resolve({});
     }),
     routes.effect('POST', '/tests/start', function (data) {
-      controller.recordTestStart(data.session, data.name, data.file);
+      controller.recordTestStart(data.session, data.name, data.file, data.totalTests);
       return Promise.resolve({});
     }),
     routes.effect('POST', '/tests/result', function (data) {
