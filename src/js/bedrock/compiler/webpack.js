@@ -39,7 +39,10 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
       extensions: ['.ts', '.js'],
       plugins: [
         new TsConfigPathsPlugin({
-          configFile: tsConfigFile
+          configFile: tsConfigFile,
+          // awesome-typescript-loader could read this from above, but the new plugin can't?
+          // lol whatever
+          extensions: ['.ts', '.js'],
         })
       ]
     },
