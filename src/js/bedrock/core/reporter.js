@@ -62,7 +62,7 @@ var write = function (settings) {
         if (res.passed !== true) {
           if (res.skipped) {
             elem.startElement('skipped')
-              .text(res.skipped)
+              .writeAttribute('message', res.skipped)
           } else {
             elem.startElement('failure')
               .writeAttribute('Test FAILED: some failed assert')
