@@ -1,10 +1,20 @@
-var skipTests = function (reporter, settings) {
+var skipTests = function (reporter, settings, message) {
   // Write results
   reporter.write({
     name: settings.name,
     output: settings.output
   })({
-    results: [],
+    // Need to add a dummy result, otherwise JUnit fails by default
+    results: [
+      {
+        name: 'SkippedTest',
+        file: 'SkippedTest.ts',
+        passed: false,
+        skipped: message,
+        time: '0',
+        error: null
+      }
+    ],
     start: Date.now(),
     now: Date.now()
   });
@@ -28,7 +38,7 @@ var go = function (settings) {
   // see https://github.com/SeleniumHQ/selenium/issues/6431#issuecomment-477408650
   if (settings.browser === 'safari') {
     console.warn('Skipping tests as webdriver is currently broken on Safari');
-    skipTests(reporter, settings);
+    skipTests(reporter, settings, 'Selenium webdriver is currently broken on Safari, see: https://github.com/SeleniumHQ/selenium/issues/6431#issuecomment-477408650');
     return;
   }
 

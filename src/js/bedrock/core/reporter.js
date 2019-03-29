@@ -27,8 +27,11 @@ var write = function (settings) {
     return new Promise(function (resolve, reject) {
       var results = data.results;
       var time = (data.now - data.start) / 1000;
+      var skipped = results.filter(function (result) {
+        return result.passed !== true && result.skipped;
+      });
       var failed = results.filter(function (result) {
-        return result.passed !== true;
+        return result.passed !== true && !result.skipped;
       });
 
       var w = new XMLWriter(true);
@@ -46,6 +49,7 @@ var write = function (settings) {
         .writeAttribute('host', 'localhost')
         .writeAttribute('id', 0)
         .writeAttribute('failures', failed.length)
+        .writeAttribute('skipped', skipped.length)
         .writeAttribute('timestamp', data.start)
         .writeAttribute('time', time);
 
@@ -56,11 +60,16 @@ var write = function (settings) {
           .writeAttribute('time', outputTime(res.time));
 
         if (res.passed !== true) {
-          elem.startElement('failure')
-            .writeAttribute('Test FAILED: some failed assert')
-            .writeAttribute('type', 'failure')
-            .writeCData(res.error)
-            .endElement();
+          if (res.skipped) {
+            elem.startElement('skipped')
+              .writeAttribute('message', res.skipped)
+          } else {
+            elem.startElement('failure')
+              .writeAttribute('Test FAILED: some failed assert')
+              .writeAttribute('type', 'failure')
+              .writeCData(res.error)
+              .endElement();
+          }
         }
         elem.endElement();
       });
