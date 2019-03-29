@@ -4,7 +4,16 @@ var skipTests = function (reporter, settings) {
     name: settings.name,
     output: settings.output
   })({
-    results: [],
+    // Need to add a dummy result, otherwise JUnit fails by default
+    results: [
+      {
+        name: 'Dummy Test',
+        file: 'DummyTest.ts',
+        passed: true,
+        time: '0',
+        error: null
+      }
+    ],
     start: Date.now(),
     now: Date.now()
   });
