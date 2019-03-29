@@ -1,3 +1,22 @@
+Version 4.2.1
+
+Date 2019-03-28
+
+* Disable bedrock-auto tests on Safari as webdriver no longer runs on v12.1.0 due to the --legacy argument being removed.
+
+Version 4.2.0
+
+Date 2019-03-28
+
+* Use the `name` property of package.json to add the package name to `/project/` for stable resource URLs
+* Add stable URLs for package resources in yarn workspace packages using the package.json name
+
+Version 4.1.0
+
+Date 2019-03-20
+
+* Switched from awesome-typescript-loader to ts-loader + fork-ts-checker-webpack-plugin + tsconfig-paths-webpack-plugin
+
 Version 4.0.12
 
 Date 2019-02-06

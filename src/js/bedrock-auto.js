@@ -1,3 +1,19 @@
+var skipTests = function (reporter, settings) {
+  // Write results
+  reporter.write({
+    name: settings.name,
+    output: settings.output
+  })({
+    results: [],
+    start: Date.now(),
+    now: Date.now()
+  });
+
+  if (settings.gruntDone !== undefined) {
+    settings.gruntDone(true);
+  }
+};
+
 var go = function (settings) {
   var serve = require('./bedrock/server/serve');
   var attempt = require('./bedrock/core/attempt');
@@ -6,6 +22,15 @@ var go = function (settings) {
   var runnerroutes = require('./bedrock/server/runnerroutes');
 
   var reporter = require('./bedrock/core/reporter');
+
+  // If the browser is Safari, then we need to skip the tests because in v12.1 they removed
+  // the --legacy flag in safaridriver which was required to run webdriver.
+  // see https://github.com/SeleniumHQ/selenium/issues/6431#issuecomment-477408650
+  if (settings.browser === 'safari') {
+    console.warn('Skipping tests as webdriver is currently broken on Safari');
+    skipTests(reporter, settings);
+    return;
+  }
 
   var master = require('./bedrock/server/drivermaster').create();
   var driver = require('./bedrock/auto/driver');
@@ -38,7 +63,7 @@ var go = function (settings) {
         overallTimeout: settings.overallTimeout,
         singleTimeout: settings.singleTimeout
       };
-  
+
       serve.start(serveSettings, function (service, done) {
         if (!isPhantom) console.log('bedrock-auto ' + version + ' available at: http://localhost:' + service.port);
         var result = driver.get('http://localhost:' + service.port)
@@ -60,13 +85,13 @@ var go = function (settings) {
             }, pollExit);
           });
         });
-  
+
         lifecycle.shutdown(result, driver, done, settings.gruntDone !== undefined ? settings.gruntDone : null, settings.delayExit !== undefined ? settings.delayExit : false);
       });
     }, function (err) {
       console.error('Unable to create driver', err);
     });
-  })
+  });
 
 };
 

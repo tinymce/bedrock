@@ -84,19 +84,6 @@ var logBrowserDetails = function (driver) {
   };
 };
 
-async function makeBuilder (browserFamily) {
-  var builder = new webdriver.Builder()
-  if (browserFamily === 'safari') {
-    const safari = require('selenium-webdriver/safari');
-    // temporary patch until the JS selenium webdriver is updated (still 4.0 alpha 1, eight months old as of this change)
-    // see https://github.com/SeleniumHQ/selenium/issues/6431#issuecomment-423597437
-    // forBrowser() is already done back in the create() function
-    return builder.usingServer(await new safari.ServiceBuilder().addArguments('--legacy').build().start())
-  } else {
-    return builder;
-  }
-};
-
 /* Settings:
  *
  * browser: the name of the browser
@@ -129,47 +116,48 @@ var create = function (settings) {
   // https://stackoverflow.com/questions/43261516/selenium-chrome-i-just-cant-use-driver-maximize-window-to-maximize-window
   chromeOptions.addArguments('start-maximized');
 
-  return makeBuilder(browserFamily).then((builder) => builder.forBrowser(browserFamily).setChromeOptions(chromeOptions)).then((rawBlueprints) => {
-    var blueprint = browser === 'phantomjs' ? addPhantomCapabilities(rawBlueprints, settings) : rawBlueprints;
+  var rawBlueprints = new webdriver.Builder()
+    .forBrowser(browserFamily).setChromeOptions(chromeOptions);
 
-    var driver = blueprint.build();
+  var blueprint = browser === 'phantomjs' ? addPhantomCapabilities(rawBlueprints, settings) : rawBlueprints;
 
-    setupHeadlessModes(browser, chromeOptions);
+  var driver = blueprint.build();
 
-    var setSize = function () {
-      /* If maximize does not work on your system (esp. firefox hangs), hard-code the size (like so) */
-      // return driver.manage().window().setSize(800, 600);
-      return driver.manage().window().maximize();
-    };
+  setupHeadlessModes(browser, chromeOptions);
 
-    var resume = function () {
-      return Promise.resolve(driver);
-    };
+  var setSize = function () {
+    /* If maximize does not work on your system (esp. firefox hangs), hard-code the size (like so) */
+    // return driver.manage().window().setSize(800, 600);
+    return driver.manage().window().maximize();
+  };
 
-    // Andy made some attempt to catch errors in this code but it never worked, I suspect the webdriver implementation
-    // of promise is broken. Node gives 'unhandled rejection' errors no matter where I put the rejection handlers.
-    return new Promise(function (resolve) {
-      // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
-      // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
-      setTimeout(function () {
-        // Some tests require large windows, so make it as large as it can be.
-        return setSize().then(resume, resume).then(function () {
-          var systemFocus = os.platform() === 'darwin' && browser !== 'phantomjs' ? focusMac(settings.basedir, browser) : Promise.resolve();
+  var resume = function () {
+    return Promise.resolve(driver);
+  };
 
-          var browserFocus = browser === 'MicrosoftEdge' ? focusEdge(settings.basedir) :
-                            browser === 'firefox' ? focusFirefox(settings.basedir) :
-                            Promise.resolve();
+  // Andy made some attempt to catch errors in this code but it never worked, I suspect the webdriver implementation
+  // of promise is broken. Node gives 'unhandled rejection' errors no matter where I put the rejection handlers.
+  return new Promise(function (resolve) {
+    // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
+    // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
+    setTimeout(function () {
+      // Some tests require large windows, so make it as large as it can be.
+      return setSize().then(resume, resume).then(function () {
+        var systemFocus = os.platform() === 'darwin' && browser !== 'phantomjs' ? focusMac(settings.basedir, browser) : Promise.resolve();
 
-          systemFocus
-            .then(browserFocus)
-            .then(logBrowserDetails(driver))
-            .then(function () {
-              resolve(driver);
-            });
-        });
-      }, 1500);
-    });
-  })
+        var browserFocus = browser === 'MicrosoftEdge' ? focusEdge(settings.basedir) :
+                          browser === 'firefox' ? focusFirefox(settings.basedir) :
+                          Promise.resolve();
+
+        systemFocus
+          .then(browserFocus)
+          .then(logBrowserDetails(driver))
+          .then(function () {
+            resolve(driver);
+          });
+      });
+    }, 1500);
+  });
 };
 
 module.exports = {
