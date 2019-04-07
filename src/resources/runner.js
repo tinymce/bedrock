@@ -80,6 +80,7 @@
 
   var sendTestStart = function (session, file, name, onSuccess, onError) {
     sendJson('/tests/start', {
+      totalTests: globalTests.length,
       session: session,
       file: file,
       name: name,

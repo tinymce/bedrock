@@ -59,18 +59,19 @@ const create = function(stickyFirstSession, singleTimeout, overallTimeout, testf
     const numPassed = session.results.length - numFailed;
     const test = session.inflight !== null ? session.inflight.name : (session.previous !== null ? session.previous.name : '');
     const done = session.done;
-    hud.update({ id, test, numPassed, numFailed, done });
+    hud.update({ id, test, numPassed, numFailed, done, totalTests: session.totalTests });
   };
 
   const recordAlive = function(sessionId) {
     getSession(sessionId);
   };
 
-  const recordTestStart = function(id, name, file) {
+  const recordTestStart = function(id, name, file, totalTests) {
     const session = getSession(id);
     const start = Date.now();
     session.inflight = { name, file, start };
     session.updated = Date.now();
+    session.totalTests = totalTests;
     session.done = false;
     updateHud(session);
   };

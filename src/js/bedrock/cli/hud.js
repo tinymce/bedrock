@@ -3,7 +3,7 @@ var create = function (testfiles, loglevel) {
 
   var stream = process.stdout;
 
-  var totalFiles = testfiles.length > 0 ? testfiles.length : '?';
+  var numFiles = testfiles.length > 0 ? testfiles.length : '?';
 
   var writeProgress = function (id, stopped, numPassed, numFailed, total) {
     var numRun = numPassed + numFailed;
@@ -26,7 +26,9 @@ var create = function (testfiles, loglevel) {
     stream.clearLine(0);
     stream.cursorTo(0);
     stream.write('Current test: ' + (data.test !== undefined ? data.test.substring(0, 60) : 'Unknown') + '\n');
-    return writeProgress(data.id, data.done, data.numPassed, data.numFailed, data.totalFiles !== undefined ? data.totalFiles : totalFiles);
+    var totalFiles = data.totalFiles !== undefined ? data.totalFiles : numFiles;
+    var totalTests = data.totalTests !== undefined ? data.totalTests : totalFiles;
+    return writeProgress(data.id, data.done, data.numPassed, data.numFailed, totalTests);
   };
 
   var complete = function () {
