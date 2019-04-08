@@ -22,7 +22,7 @@ const webpackRemap = moduleAvailable('@ephox/swag') ? [
     test: /\.js|\.ts$/,
     use: ['@ephox/swag/webpack/remapper']
   }
-] : []
+] : [];
 
 let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manualMode) {
   return {
@@ -44,6 +44,15 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
           // lol whatever
           extensions: ['.ts', '.js'],
         })
+      ]
+    },
+
+    // Webpack by default only resolves from the ./node_modules directory which will cause issues if the project that uses bedrock
+    // doesn't also depend on the webpack loaders. So we need to add the path to the bedrock node_modules directory as well.
+    resolveLoader: {
+      modules: [
+        'node_modules/@ephox/bedrock/node_modules',
+        'node_modules'
       ]
     },
 
