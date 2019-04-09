@@ -47,6 +47,19 @@ var focusFirefox = function (basedir) {
   else return Promise.resolve();
 };
 
+var getWinVersion = function () {
+  if (process.platform === 'win32') {
+    var release = os.release().split('.');
+    return {
+      major: parseInt(release[0]),
+      minor: parseInt(release[1]),
+      build: parseInt(release[2]),
+    }
+  } else {
+    throw new Error('Unable to determine windows version');
+  }
+};
+
 // Sets logging level to WARNING instead of the verbose default for phantomjs.
 var addPhantomCapabilities = function (blueprints, settings) {
   var prefs = new webdriver.logging.Preferences();
@@ -119,6 +132,18 @@ var create = function (settings) {
 
   // https://stackoverflow.com/questions/43261516/selenium-chrome-i-just-cant-use-driver-maximize-window-to-maximize-window
   chromeOptions.addArguments('start-maximized');
+
+  // As of Windows build 1809 the edge driver starts in W3C mode instead of JSON Wire Protocol, so we need to start the driver with the '--jwp' flag
+  // https://github.com/SeleniumHQ/selenium/issues/6464
+  if (process.platform === 'win32' && browser === 'MicrosoftEdge') {
+    var winVersion = getWinVersion();
+    // The "--jwp" argument doesn't exist in older versions of `MicrosoftWebDriver` so we need to detect the windows version
+    if (winVersion.major > 10 || winVersion.major === 10 && winVersion.build >= 17763) {
+      var edge = require('selenium-webdriver/edge');
+      var edgeService = new edge.ServiceBuilder().addArguments('--jwp').build();
+      edge.setDefaultService(edgeService);
+    }
+  }
 
   var rawBlueprints = new webdriver.Builder()
     .forBrowser(browserFamily).setChromeOptions(chromeOptions);
