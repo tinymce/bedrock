@@ -13,16 +13,10 @@ function moduleAvailable(name) {
   try {
     require.resolve(name);
     return true;
-  } catch (e) { }
+  } catch (e) {}
   return false;
 }
 
-// available when deployed, but not when running tests
-const bedrockModules = moduleAvailable('@ephox/bedrock') ? [
-  path.join(require.resolve('@ephox/bedrock'), 'node_modules')
-] : [];
-
-// optional dependency that makes everything better
 const webpackRemap = moduleAvailable('@ephox/swag') ? [
   {
     test: /\.js|\.ts$/,
@@ -30,7 +24,7 @@ const webpackRemap = moduleAvailable('@ephox/swag') ? [
   }
 ] : [];
 
-let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manualMode) {
+let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manualMode, basedir) {
   return {
     stats: 'none',
     entry: scratchFile,
@@ -56,9 +50,10 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
     // Webpack by default only resolves from the ./node_modules directory which will cause issues if the project that uses bedrock
     // doesn't also depend on the webpack loaders. So we need to add the path to the bedrock node_modules directory as well.
     resolveLoader: {
-      modules: bedrockModules.concat([
+      modules: [
+        path.join(basedir, 'node_modules'),
         'node_modules'
-      ])
+      ]
     },
 
     module: {
@@ -92,7 +87,7 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
 
         {
           test: /\.(html|htm|css|bower|hex|rtf|xml|yml)$/,
-          use: ['raw-loader']
+          use: [ 'raw-loader' ]
         }
       ]).concat(
         coverage ? [
@@ -127,7 +122,7 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
   };
 };
 
-let compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, coverage, success) {
+let compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, srcFiles, coverage, success) {
   var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   var dest = path.join(scratchDir, 'compiled/tests.js');
   console.log(`Compiling ${srcFiles.length} tests...`)
@@ -135,7 +130,7 @@ let compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, 
   mkdirp.sync(path.dirname(scratchFile));
   fs.writeFileSync(scratchFile, imports.generateImports(true, scratchFile, srcFiles));
 
-  webpack(getWebPackConfig(tsConfigFile, scratchFile, dest, coverage, false), (err, stats) => {
+  webpack(getWebPackConfig(tsConfigFile, scratchFile, dest, coverage, false, basedir), (err, stats) => {
     if (err || stats.hasErrors()) {
       let msg = stats.toString({
         all: false,
@@ -169,7 +164,7 @@ let devserver = function (settings, done) {
     mkdirp.sync(path.dirname(scratchFile));
     fs.writeFileSync(scratchFile, imports.generateImports(true, scratchFile, settings.testfiles));
 
-    const compiler = webpack(getWebPackConfig(tsConfigFile, scratchFile, dest, settings.coverage, true));
+    const compiler = webpack(getWebPackConfig(tsConfigFile, scratchFile, dest, settings.coverage, true, settings.basedir));
 
     // Prevents webpack from doing a recompilation of a change of tests.ts over and over
     compiler.hooks.emit.tap('bedrock', function (compilation) {

@@ -3,7 +3,7 @@ var fs = require('fs');
 // var rollup = require('../compiler/rollup');
 var webpack = require('../compiler/webpack');
 
-module.exports = function (tsConfigFile, scratchDir, exitOnCompileError, files, coverage) {
+module.exports = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, files, coverage) {
   var getCompileFunc = function () {
     // return bundler === 'webpack' ? webpack.compile : rollup.compile;
     return webpack.compile;
@@ -20,6 +20,7 @@ module.exports = function (tsConfigFile, scratchDir, exitOnCompileError, files, 
         compile(
           tsConfigFile,
           scratchDir,
+          basedir,
           exitOnCompileError,
           tsFiles,
           coverage,
