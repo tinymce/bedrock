@@ -13,10 +13,16 @@ function moduleAvailable(name) {
   try {
     require.resolve(name);
     return true;
-  } catch (e) {}
+  } catch (e) { }
   return false;
 }
 
+// available when deployed, but not when running tests
+const bedrockModules = moduleAvailable('@ephox/bedrock') ? [
+  path.join(require.resolve('@ephox/bedrock'), 'node_modules')
+] : [];
+
+// optional dependency that makes everything better
 const webpackRemap = moduleAvailable('@ephox/swag') ? [
   {
     test: /\.js|\.ts$/,
@@ -50,10 +56,9 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
     // Webpack by default only resolves from the ./node_modules directory which will cause issues if the project that uses bedrock
     // doesn't also depend on the webpack loaders. So we need to add the path to the bedrock node_modules directory as well.
     resolveLoader: {
-      modules: [
-        'node_modules/@ephox/bedrock/node_modules',
+      modules: bedrockModules.concat([
         'node_modules'
-      ]
+      ])
     },
 
     module: {
@@ -87,7 +92,7 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
 
         {
           test: /\.(html|htm|css|bower|hex|rtf|xml|yml)$/,
-          use: [ 'raw-loader' ]
+          use: ['raw-loader']
         }
       ]).concat(
         coverage ? [
