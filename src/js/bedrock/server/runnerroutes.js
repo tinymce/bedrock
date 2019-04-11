@@ -24,6 +24,7 @@ var generate = function (mode, projectdir, basedir, configFile, bundler, testfil
   var testGenerator = compiler(
     path.join(projectdir, configFile),
     path.join(projectdir, 'scratch'),
+    basedir,
     mode === 'auto',
     files,
     coverage
