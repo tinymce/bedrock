@@ -1,3 +1,9 @@
+Version 4.2.8
+
+Date 2019-04-23
+
+* Pinned `fork-ts-checker-webpack-plugin` to use version 1.0.x as 1.1.0 and higher appears to have introduced a regression on Windows.
+
 Version 4.2.5
 
 Date 2019-04-09
