@@ -1,3 +1,9 @@
+Version 4.2.9
+
+Date 2019-05-05
+
+* Fixed so that tsx files are handled by loaders and remapper
+
 Version 4.2.8
 
 Date 2019-04-23

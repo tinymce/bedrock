@@ -56,7 +56,7 @@ Use `bedrock-auto --help` to see all arguments possible.
 
 *Server* mode allows the user to host the tests on localhost:{port} where port is the first free port found between 8000 and 20000. It is the most commonly used mode, and therefore is the default bedrock executable.
 
-`bedrock --files src/test/js/browser/TwoTest.js`
+`bedrock --files src/test/js/browser/TwoTest.ts`
 
 Use `bedrock --help` to see all arguments possible.
 
@@ -76,4 +76,7 @@ You can run bedrock's tests by executing:
 
 `$ npm run test`
 
-If you just want to run the basic tests (not property-based), use `$ npm run test-atomic`. If you want to run only the property-based tests, use `$ npm run test-props`.
+This will not run `test-samples-fail` which will need to be run and verified manually. (All should fail)
+
+If you just want to run the basic tests (not property-based), use `$ npm run test-atomic`. If you want to run only the property-based tests, use `$ npm run test-props`. If you want to run the sample tests use `$ npm run test-samples-pass` and `$ npm run test-samples-fail`.
+

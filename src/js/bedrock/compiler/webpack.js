@@ -19,7 +19,7 @@ function moduleAvailable(name) {
 
 const webpackRemap = moduleAvailable('@ephox/swag') ? [
   {
-    test: /\.js|\.ts$/,
+    test: /\.js|\.tsx?$/,
     use: ['@ephox/swag/webpack/remapper']
   }
 ] : [];
@@ -36,13 +36,13 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
     },
 
     resolve: {
-      extensions: ['.ts', '.js'],
+      extensions: ['.ts', '.tsx', '.js'],
       plugins: [
         new TsConfigPathsPlugin({
           configFile: tsConfigFile,
           // awesome-typescript-loader could read this from above, but the new plugin can't?
           // lol whatever
-          extensions: ['.ts', '.js'],
+          extensions: ['.ts', '.tsx', '.js'],
         })
       ]
     },
@@ -65,7 +65,7 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
         },
 
         {
-          test: /\.ts$/,
+          test: /\.tsx?$/,
           use: [
             {
               loader: 'ts-loader',
@@ -92,7 +92,7 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
       ]).concat(
         coverage ? [
           {
-            test: /\.ts$/,
+            test: /\.tsx?$/,
             enforce: 'post',
             loader: 'istanbul-instrumenter-loader',
             include: coverage.map((p) => path.resolve(p)),

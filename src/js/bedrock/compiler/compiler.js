@@ -9,9 +9,12 @@ module.exports = function (tsConfigFile, scratchDir, basedir, exitOnCompileError
     return webpack.compile;
   };
 
-  var tsFiles = files.filter(function (filePath) {
-    return path.extname(filePath) === '.ts';
-  });
+  const isTs = function (filePath) {
+    const ext = path.extname(filePath);
+    return ext === '.ts' || ext === '.tsx';
+  };
+
+  var tsFiles = files.filter(isTs);
 
   var generate = function () {
     return new Promise((resolve) => {
@@ -36,7 +39,7 @@ module.exports = function (tsConfigFile, scratchDir, basedir, exitOnCompileError
 
   return {
     jsFiles: files.filter(function (filePath) {
-      return path.extname(filePath) !== '.ts';
+      return !isTs(filePath);
     }),
     generate: generate
   };

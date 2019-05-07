@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock",
-  "version": "4.2.8",
+  "version": "4.2.9",
   "description": "NodeJS test runner",
   "repository": {
     "type": "git",
@@ -12,12 +12,14 @@
     "bedrock": "./bin/bedrock.js"
   },
   "scripts": {
+    "preinstall": "node -e \"if(process.env.npm_execpath.indexOf('yarn') === -1) throw new Error('You must use Yarn to install, not NPM')\"",
     "prepublishOnly": "tsc",
     "build": "tsc",
     "test-atomic": "tape test/atomic/*.js",
     "test-props": "tape test/props/*.js",
-    "test-samples": "bin/bedrock-auto.js -b phantomjs --config sample/config.js --files sample/AsyncPassTest.ts sample/IFrameTest.ts sample/TabbingTest.ts",
-    "test": "npm run test-atomic && npm run test-props && npm run test-samples"
+    "test-samples-pass": "bin/bedrock-auto.js -b phantomjs --config sample/tsconfig.json --files sample/ts/**/*PassTest.ts sample/ts/**/*PassTest.tsx",
+    "test-samples-fail": "bin/bedrock-auto.js -b phantomjs --config sample/tsconfig.json --files sample/ts/**/*FailTest.ts",
+    "test": "npm run test-atomic && npm run test-props && npm run test-samples-pass"
   },
   "private": false,
   "dependencies": {
