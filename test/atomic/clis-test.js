@@ -43,13 +43,13 @@ tape('Minimal specification of bedrock-auto', function (t) {
   mutateArgs([
     "--browser", "MicrosoftEdge",
     "--files", "test/resources/test.file1",
-    "--config", "sample/config.js"
+    "--config", "sample/tsconfig.json"
   ]);
   var actual = clis.forAuto(directories);
   attemptutils.assertResult(t, {
     browser: 'MicrosoftEdge',
     bundler: 'webpack',
-    config: 'sample/config.js',
+    config: 'sample/tsconfig.json',
     name: 'bedrock-run',
     output: 'scratch',
     help: false,
@@ -71,7 +71,7 @@ tape('Minimal specification of bedrock-auto', function (t) {
 tape('Specification of bedrock-auto missing required field: browser', function (t) {
   mutateArgs([
     "--files", "test/resources/test.file1",
-    "--config", "sample/config.js"
+    "--config", "sample/tsconfig.json"
   ]);
   var actual = clis.forAuto(directories);
   attemptutils.assertErrors(t, [
@@ -82,11 +82,11 @@ tape('Specification of bedrock-auto missing required field: browser', function (
 tape('Minimal specification of bedrock-manual', function (t) {
   mutateArgs([
     "--files", "test/resources/test.file1",
-    "--config", "sample/config.js"
+    "--config", "sample/tsconfig.json"
   ]);
   var actual = clis.forManual(directories);
   attemptutils.assertResult(t, {
-    config: 'sample/config.js',
+    config: 'sample/tsconfig.json',
     testfiles: [
       'test/resources/test.file1'
     ],

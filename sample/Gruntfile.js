@@ -2,21 +2,21 @@ module.exports = function(grunt) {
   grunt.initConfig({
     'bedrock-manual': {
       core: {
-        config: 'config.js',
+        config: 'sample/ts/tsconfig.json',
         projectdir: '../',
         files: {
           src: ['*Test.js']
         },
-        testfiles: ['*PassTest.js']
+        testfiles: ['*PassTest.ts']
       }
     },
 
     'bedrock-auto': {
       phantomjs: {
         browser: 'phantomjs',
-        config: 'config.js',
+        config: 'sample/ts/tsconfig.json',
         projectdir: '../',
-        testfiles: ['*PassTest.js'],
+        testfiles: ['*PassTest.ts'],
         name: 'phantomjs'
       }
     }

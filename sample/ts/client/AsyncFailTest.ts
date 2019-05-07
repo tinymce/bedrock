@@ -1,4 +1,4 @@
-import * as UnitTest from '../src/client/ts/api/UnitTest';
+import * as UnitTest from '../../../src/client/ts/api/UnitTest';
 
 UnitTest.asynctest('AsyncFail Test', (success, failure) => {
 
