@@ -58,11 +58,12 @@ var addPhantomCapabilities = function (blueprints, settings) {
   return blueprints.withCapabilities(caps);
 };
 
-var setupHeadlessModes = function (browser, chromeOptions) {
+var setupHeadlessModes = function (settings, browser, chromeOptions) {
   if (browser === 'firefox-headless') {
     process.env.MOZ_HEADLESS = '1';
   } else if (browser === 'chrome-headless') {
     chromeOptions.addArguments('headless');
+    chromeOptions.addArguments('remote-debugging-port=' + settings.debuggingPort);
   }
 };
 
@@ -123,7 +124,7 @@ var create = function (settings) {
 
   var driver = blueprint.build();
 
-  setupHeadlessModes(browser, chromeOptions);
+  setupHeadlessModes(settings, browser, chromeOptions);
 
   var setSize = function () {
     /* If maximize does not work on your system (esp. firefox hangs), hard-code the size (like so) */

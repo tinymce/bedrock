@@ -134,7 +134,7 @@
   var debuggingPort = {
     name: 'debuggingPort',
     type: Number,
-    description: 'The port for remote debugging (used for phantom)',
+    description: 'The port for remote debugging (used for phantom and chrome-headless)',
     validate: extraction.any,
     defaultValue: 9000,
     uncommon: true
