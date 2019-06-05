@@ -64,6 +64,9 @@ var setupHeadlessModes = function (settings, browser, chromeOptions) {
   } else if (browser === 'chrome-headless') {
     chromeOptions.addArguments('headless');
     chromeOptions.addArguments('remote-debugging-port=' + settings.debuggingPort);
+    if (settings.useSandboxForHeadless) {
+      chromeOptions.addArguments('no-sandbox');
+    }
   }
 };
 

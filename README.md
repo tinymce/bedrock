@@ -80,3 +80,6 @@ This will not run `test-samples-fail` which will need to be run and verified man
 
 If you just want to run the basic tests (not property-based), use `$ npm run test-atomic`. If you want to run only the property-based tests, use `$ npm run test-props`. If you want to run the sample tests use `$ npm run test-samples-pass` and `$ npm run test-samples-fail`.
 
+## Docker
+
+The `dockerfile` is just to test the no-sandbox option for chrome-headless. We should build automated tests for it.
