@@ -33,6 +33,7 @@ var forAuto = function (directories) {
       cloptions.stopOnFailure,
       cloptions.retries,
       cloptions.delayExiting,
+      cloptions.useSandboxForHeadless,
       cloptions.coverage
     ])
   );

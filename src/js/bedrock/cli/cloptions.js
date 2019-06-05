@@ -243,6 +243,14 @@
     validate: extraction.any
   };
 
+  var useSandboxForHeadless = {
+    name: 'useSandboxForHeadless',
+    type: Boolean,
+    defaultValue: false,
+    description: 'Pass --no-sandbox through to chrome headless options',
+    validate: extraction.any
+  };
+
   var coverage = {
     name: 'coverage',
     output: 'coverage',
@@ -287,6 +295,7 @@
     stopOnFailure: stopOnFailure,
     stopOnFailure__hidden: stopOnFailure__hidden,
     delayExiting: delayExiting,
+    useSandboxForHeadless: useSandboxForHeadless,
     page: page,
     logging: logging
   };
