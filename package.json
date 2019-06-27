@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock",
-  "version": "4.3.0",
+  "version": "4.3.1",
   "description": "NodeJS test runner",
   "repository": {
     "type": "git",
@@ -12,7 +12,6 @@
     "bedrock": "./bin/bedrock.js"
   },
   "scripts": {
-    "preinstall": "node -e \"if(process.env.npm_execpath.indexOf('yarn') === -1) throw new Error('You must use Yarn to install, not NPM')\"",
     "prepublishOnly": "tsc",
     "build": "tsc",
     "test-atomic": "tape test/atomic/*.js",
