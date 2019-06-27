@@ -1,5 +1,9 @@
 Version 4.3.0
 
+* Removed preinstall script requiring yarn over npm
+
+Version 4.3.0
+
 * Added a configuration option to pass `no-sandbox` through to chrome-headless. Used for docker tests.
 
 Version 4.2.11
