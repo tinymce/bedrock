@@ -48,7 +48,7 @@ var focusFirefox = function (basedir) {
 };
 
 var getWinVersion = function () {
-  if (process.platform === 'win32') {
+  if (os.platform() === 'win32') {
     var release = os.release().split('.');
     return {
       major: parseInt(release[0]),
@@ -135,7 +135,7 @@ var create = function (settings) {
 
   // As of Windows build 1809 the edge driver starts in W3C mode instead of JSON Wire Protocol, so we need to start the driver with the '--jwp' flag
   // https://github.com/SeleniumHQ/selenium/issues/6464
-  if (process.platform === 'win32' && browser === 'MicrosoftEdge') {
+  if (os.platform() === 'win32' && browser === 'MicrosoftEdge') {
     var winVersion = getWinVersion();
     // The "--jwp" argument doesn't exist in older versions of `MicrosoftWebDriver` so we need to detect the windows version
     if (winVersion.major > 10 || winVersion.major === 10 && winVersion.build >= 17763) {
