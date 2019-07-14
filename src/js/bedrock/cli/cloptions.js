@@ -144,7 +144,7 @@
     name: 'totalTimeout',
     type: Number,
     output: 'overallTimeout',
-    description: 'The total amount of time the test can take before bedrock times out.',
+    description: 'The total amount of time in milliseconds the test can take before bedrock times out.',
     validate: extraction.any,
     defaultValue: 10 * 60 * 1000,
     uncommon: true
@@ -153,7 +153,7 @@
   var singleTimeout = {
     name: 'singleTimeout',
     type: Number,
-    description: 'The total amount of time a single test can take before bedrock times out.',
+    description: 'The total amount of time in milliseconds a single test can take before bedrock times out.',
     validate: extraction.any,
     defaultValue: 30 * 1000,
     uncommon: true

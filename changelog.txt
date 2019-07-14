@@ -1,3 +1,7 @@
+Version 4.3.2
+
+* Fixed tests failing to run on Microsoft Edge 18 due to MicrosoftWebDriver.exe changing to W3C mode by default.
+
 Version 4.3.1
 
 * Removed preinstall script requiring yarn over npm
