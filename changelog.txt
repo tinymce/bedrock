@@ -1,3 +1,7 @@
+Version 4.3.3
+  * Upgraded finalhandler to 1.1.2
+  * Upgraded command-line-usage to 4.1.0
+
 Version 4.3.2
 
 * Fixed tests failing to run on Microsoft Edge 18 due to MicrosoftWebDriver.exe changing to W3C mode by default.
