@@ -64,7 +64,8 @@ tape('Minimal specification of bedrock-auto', function (t) {
     loglevel: 'advanced',
     version: false,
     chunk: 100,
-    retries: 0
+    retries: 0,
+    useSandboxForHeadless: false
   }, cleanResult(actual));
 });
 
