@@ -1,6 +1,8 @@
 Version 4.3.3
-  * Upgraded finalhandler to 1.1.2
-  * Upgraded command-line-usage to 4.1.0
+
+* Fixed failing atomic tests
+* Upgraded finalhandler to 1.1.2
+* Upgraded command-line-usage to 4.1.0
 
 Version 4.3.2
 
