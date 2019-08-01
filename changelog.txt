@@ -1,3 +1,7 @@
+Version 4.4.0
+
+* Added "bucket" and "buckets" options to grunt task. These options let you run a subset of tests.
+
 Version 4.3.3
 
 * Fixed failing atomic tests
