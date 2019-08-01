@@ -12,9 +12,7 @@ var commonOptions = function (directories) {
     cloptions.help,
     cloptions.logging,
     cloptions.version,
-    cloptions.bundler,
-    cloptions.bucket,
-    cloptions.buckets
+    cloptions.bundler
   ];
 };
 
@@ -36,7 +34,7 @@ var forAuto = function (directories) {
       cloptions.retries,
       cloptions.delayExiting,
       cloptions.useSandboxForHeadless,
-      cloptions.coverage,
+      cloptions.coverage
     ])
   );
 };
