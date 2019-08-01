@@ -7,6 +7,12 @@ module.exports = function(grunt) {
   var path = require('path');
   var fs = require('fs');
 
+  var bucketize = function(array, bucket, buckets) {
+    return array.filter(function(x, i) {
+      return i % buckets === (bucket - 1);
+    })
+  };
+
   var enrichSettings = function (settings) {
     var newSettings = { };
 
@@ -20,7 +26,20 @@ module.exports = function(grunt) {
       newSettings[k] = settings[k];
     }
 
-    var testfiles = getFiles(settings.testfiles);
+    if (newSettings.bucket > newSettings.buckets) {
+      // TODO: does this validation belong elsewhere?
+      throw new Error("Bucket number too high. Can't run bucket " + settings.bucket + " of " + settings.buckets + ". Note: bucket numbers are 1-based.");
+    }
+
+    if (newSettings.bucket <= 0) {
+      // TODO: does this validation belong elsewhere?
+      throw new Error("Bucket number too low. Note: bucket numbers are 1-based.");
+    }
+
+    console.log("Running bucket " + newSettings.bucket + " of " + newSettings.buckets);
+
+    var testfiles = getFiles(settings.testfiles, newSettings.bucket, newSettings.buckets);
+
     newSettings.testfiles = testfiles;
 
     newSettings.projectdir = settings.projectdir !== undefined ? settings.projectdir : process.cwd();
@@ -29,8 +48,9 @@ module.exports = function(grunt) {
     return newSettings;
   };
 
-  var getFiles = function (testfiles) {
-    return grunt.file.expand(testfiles);
+  var getFiles = function (testfiles, bucket, buckets) {
+    const all = grunt.file.expand(testfiles);
+    return bucketize(all, bucket, buckets);
   };
 
   grunt.registerMultiTask('bedrock-manual', 'Bedrock manual test runner', function () {
