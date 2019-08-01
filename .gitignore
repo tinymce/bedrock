@@ -5,3 +5,4 @@
 /lib
 *.sublime-workspace
 package-lock.json
+/.idea

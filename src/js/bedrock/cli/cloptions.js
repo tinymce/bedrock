@@ -140,6 +140,24 @@
     uncommon: true
   };
 
+  var bucket = {
+    name: 'bucket',
+    type: Number,
+    description: 'Which "bucket" of tests to run, if you split the test runs with "buckets" setting. 1-based.',
+    validate: extraction.any,
+    defaultValue: 1,
+    uncommon: true
+  };
+
+  var buckets = {
+    name: 'buckets',
+    type: Number,
+    description: 'Number of "buckets" to split tests into. You can specify which bucket number to run, using the "bucket" setting. Useful for parallelizing tests over multiple build nodes.',
+    validate: extraction.any,
+    defaultValue: 1,
+    uncommon: true
+  };
+
   var overallTimeout = {
     name: 'totalTimeout',
     type: Number,
@@ -269,6 +287,8 @@
     files: files,
     testdir: testdir,
     testdirs: testdirs,
+    bucket,
+    buckets,
     customRoutes: customRoutes,
     bundler: bundler,
     coverage,
