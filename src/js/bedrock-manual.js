@@ -23,9 +23,11 @@ var go = function (settings) {
       config: settings.config,
       coverage: settings.coverage,
       overallTimeout: settings.overallTimeout,
-      singleTimeout: settings.singleTimeout
+      singleTimeout: settings.singleTimeout,
+      // reset mouse position will never work on manual
+      resetMousePosition: false
     };
-  
+
     webpack.devserver(serveSettings, function (service/* , done */) {
       service.enableHud();
       console.log('bedrock-manual ' + version + ' available at: http://localhost:' + service.port);

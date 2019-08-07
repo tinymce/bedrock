@@ -266,7 +266,8 @@
     type: Boolean,
     defaultValue: false,
     description: 'Pass --no-sandbox through to chrome headless options',
-    validate: extraction.any
+    validate: extraction.any,
+    uncommon: true
   };
 
   var coverage = {
@@ -278,6 +279,15 @@
     multiple: true,
     flatten: true,
     validate: extraction.directory
+  };
+
+  var resetMousePosition = {
+    name: 'resetMousePosition',
+    type: Boolean,
+    defaultValue: false,
+    description: 'Reset the mouse position to the top left corner of the screen between each test',
+    validate: extraction.any,
+    uncommon: true
   };
 
   module.exports = {
@@ -317,5 +327,6 @@
     delayExiting: delayExiting,
     useSandboxForHeadless: useSandboxForHeadless,
     page: page,
-    logging: logging
+    logging: logging,
+    resetMousePosition: resetMousePosition
   };

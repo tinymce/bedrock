@@ -34,6 +34,7 @@ var forAuto = function (directories) {
       cloptions.retries,
       cloptions.delayExiting,
       cloptions.useSandboxForHeadless,
+      cloptions.resetMousePosition,
       cloptions.coverage
     ])
   );

@@ -72,7 +72,8 @@ var go = function (settings) {
         customRoutes: settings.customRoutes,
         stickyFirstSession: true,
         overallTimeout: settings.overallTimeout,
-        singleTimeout: settings.singleTimeout
+        singleTimeout: settings.singleTimeout,
+        resetMousePosition: settings.resetMousePosition
       };
 
       serve.start(serveSettings, function (service, done) {
