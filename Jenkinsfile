@@ -1,8 +1,6 @@
 properties([
   disableConcurrentBuilds(),
-  pipelineTriggers([
-    pollSCM('H 0 1 1 1')
-  ])
+  pipelineTriggers([])
 ])
 
 node("primary") {
@@ -13,6 +11,19 @@ node("primary") {
       git([branch: "master", url:'ssh://git@stash:7999/van/jenkins-plumbing.git', credentialsId: '8aa93893-84cc-45fc-a029-a42f21197bb3'])
     }
   }
+
   def runBuild = load("jenkins-plumbing/standard-build.groovy")
-  runBuild()
+
+  notifyBitbucket()
+  try {
+    runBuild()
+
+    // bitbucket plugin requires the result to explicitly be success
+    if (currentBuild.resultIsBetterOrEqualTo("SUCCESS")) {
+      currentBuild.result = "SUCCESS"
+    }
+  } catch (err) {
+    currentBuild.result = "FAILED"
+  }
+  notifyBitbucket()
 }
