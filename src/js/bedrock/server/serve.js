@@ -19,7 +19,7 @@ var startCustom = function (settings, createServer, f) {
     'runner',
     'singleTimeout',
     'overallTimeout',
-    'resetMousePosition'
+    'skipResetMousePosition'
   ]);
 
   var finalhandler = require('finalhandler');
@@ -38,7 +38,7 @@ var startCustom = function (settings, createServer, f) {
   var stickyFirstSession = settings.stickyFirstSession;
   var singleTimeout = Prefs.singleTimeout(settings);
   var overallTimeout = Prefs.overallTimeout(settings);
-  var resetMousePosition = Prefs.resetMousePosition(settings);
+  var resetMousePosition = !Prefs.skipResetMousePosition(settings);
 
   var runner = Prefs.runner(settings);
   var api = apis.create(master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, settings.loglevel, resetMousePosition);

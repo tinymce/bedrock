@@ -31,7 +31,7 @@ var go = function (settings) {
       customRoutes: settings.customRoutes,
       overallTimeout: settings.overallTimeout,
       singleTimeout: settings.singleTimeout,
-      resetMousePosition: settings.resetMousePosition
+      skipResetMousePosition: settings.skipResetMousePosition
     };
 
     var addFramework = function (framework) {

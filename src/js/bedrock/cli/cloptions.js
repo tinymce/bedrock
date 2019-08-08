@@ -281,11 +281,11 @@
     validate: extraction.directory
   };
 
-  var resetMousePosition = {
-    name: 'resetMousePosition',
+  var skipResetMousePosition = {
+    name: 'skipResetMousePosition',
     type: Boolean,
     defaultValue: false,
-    description: 'Reset the mouse position to the top left corner of the screen between each test',
+    description: 'Prevent bedrock from resetting the mouse position to the top left corner of the screen between each test',
     validate: extraction.any,
     uncommon: true
   };
@@ -328,5 +328,5 @@
     useSandboxForHeadless: useSandboxForHeadless,
     page: page,
     logging: logging,
-    resetMousePosition: resetMousePosition
+    skipResetMousePosition: skipResetMousePosition
   };

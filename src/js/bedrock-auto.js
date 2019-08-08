@@ -73,7 +73,7 @@ var go = function (settings) {
         stickyFirstSession: true,
         overallTimeout: settings.overallTimeout,
         singleTimeout: settings.singleTimeout,
-        resetMousePosition: settings.resetMousePosition
+        skipResetMousePosition: settings.skipResetMousePosition
       };
 
       serve.start(serveSettings, function (service, done) {

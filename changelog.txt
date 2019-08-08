@@ -1,6 +1,6 @@
 Version 4.5.0
 
-* Added new `--resetMousePosition` option to reset the mouse position before each test when running in auto mode.
+* Changed bedrock to reset the mouse position before each test when running in auto mode. This can be disabled with the new `--skipResetMousePosition` option.
 
 Version 4.4.0
 

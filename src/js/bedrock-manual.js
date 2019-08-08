@@ -25,7 +25,7 @@ var go = function (settings) {
       overallTimeout: settings.overallTimeout,
       singleTimeout: settings.singleTimeout,
       // reset mouse position will never work on manual
-      resetMousePosition: false
+      skipResetMousePosition: false
     };
 
     webpack.devserver(serveSettings, function (service/* , done */) {
