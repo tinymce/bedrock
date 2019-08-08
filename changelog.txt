@@ -1,6 +1,6 @@
 Versions 4.4.2
 
-* Upgrade bedrock to use typescript 3.5.3.
+* Don't pin bedrock to use typescript 3.3.x anymore.
 
 Version 4.4.0
 
