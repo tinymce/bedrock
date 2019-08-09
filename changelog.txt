@@ -2,6 +2,10 @@ Version 4.5.0
 
 * Changed bedrock to reset the mouse position before each test when running in auto mode. This can be disabled with the new `--skipResetMousePosition` option.
 
+Versions 4.4.2
+
+* Don't pin bedrock to use typescript 3.3.x anymore.
+
 Version 4.4.0
 
 * Added "bucket" and "buckets" options to grunt task. These options let you run a subset of tests.
