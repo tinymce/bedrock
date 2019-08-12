@@ -175,23 +175,27 @@
     };
 
     var test = function (file, name) {
-      var reported = false;
-      sendTestStart(params.session, file, name);
-      var starttime = new Date();
-      var el = $('<div />').addClass('test running');
+      var starttime, el, output, marker, testfile, nameSpan, error, time, scratch, reported;
 
-      var output = $('<div />').addClass('output');
-      var marker = $('<span />').text('[running]').addClass('result');
-      var testfile = $('<span />').text(file).addClass('testfile');
-      var nameSpan = $('<span />').text(name).addClass('name');
-      var error = $('<span />').addClass('error-container');
-      var time = $('<span />').addClass('time');
-      output.append(marker, ' ', nameSpan, ' [', time, '] ', error, ' ', testfile);
-      var scratch = $('<div />').addClass('scratch');
-      el.append(output, scratch);
-      $('body').append(el);
+      var start = function (onDone) {
+        starttime = new Date();
+        el = $('<div />').addClass('test running');
 
-      testscratch = scratch.get(0);  // intentional, see top of file for var decl.
+        output = $('<div />').addClass('output');
+        marker = $('<span />').text('[running]').addClass('result');
+        testfile = $('<span />').text(file).addClass('testfile');
+        nameSpan = $('<span />').text(name).addClass('name');
+        error = $('<span />').addClass('error-container');
+        time = $('<span />').addClass('time');
+        output.append(marker, ' ', nameSpan, ' [', time, '] ', error, ' ', testfile);
+        scratch = $('<div />').addClass('scratch');
+        el.append(output, scratch);
+        $('body').append(el);
+
+        reported = false;
+        testscratch = scratch.get(0);  // intentional, see top of file for var decl.
+        sendTestStart(params.session, file, name, onDone, onDone);
+      };
 
       var pass = function (onDone) {
         if (reported) return;
@@ -230,6 +234,7 @@
       };
 
       return {
+        start: start,
         pass: pass,
         fail: fail
       };
@@ -382,20 +387,22 @@
           report.fail('Test ran too long', afterFail);
         }, timeout);
         try {
-          test.test(function () {
-            clearTimeout(timer);
-            report.pass(function() {
-              if (params.retry > 0) {
-                params.retry = 0;
-                var url = makeUrl(params.session, params.offset, params.failed, params.retry);
-                window.history.pushState({}, '', url);
-              }
-              loop(tests);
+          report.start(function () {
+            test.test(function () {
+              clearTimeout(timer);
+              report.pass(function () {
+                if (params.retry > 0) {
+                  params.retry = 0;
+                  var url = makeUrl(params.session, params.offset, params.failed, params.retry);
+                  window.history.pushState({}, '', url);
+                }
+                loop(tests);
+              });
+            }, function (e) {
+              clearTimeout(timer);
+              console.error(e);
+              report.fail(e, afterFail);
             });
-          }, function (e) {
-            clearTimeout(timer);
-            console.error(e);
-            report.fail(e, afterFail);
           });
         } catch (e) {
           clearTimeout(timer);

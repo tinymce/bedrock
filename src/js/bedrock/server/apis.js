@@ -13,7 +13,7 @@ var pollRate = 2000;
 var maxInvalidAttempts = 300;
 
 // TODO: Do not use files here.
-var create = function (master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel) {
+var create = function (master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel, resetMousePosition) {
 
   // On IE, the webdriver seems to load the page before it's ready to start
   // responding to commands. If the testing page itself tries to interact with
@@ -28,15 +28,21 @@ var create = function (master, maybeDriver, projectdir, basedir, stickyFirstSess
     });
   };
 
-  var driverRouter = function (url, apiLabel, executor) {
-    var effect = function (driver) {
-      return function (data) {
-        return waitForDriverReady(maxInvalidAttempts, function () {
-          return executor(driver)(data);
-        });
-      };
-    };
+  var effect = function (executor, driver) {
+    return function (data) {
+      return waitForDriverReady(maxInvalidAttempts, function () {
+        return executor(driver)(data);
+      });
+    }
+  };
 
+  var setInitialMousePosition = function (driver) {
+    return function () {
+      return driver.actions().mouseMove({ x: 0, y: 0 }).perform();
+    };
+  };
+
+  var driverRouter = function (url, apiLabel, executor) {
     return attempt.cata(maybeDriver, function () {
       return routes.unsupported(
         'POST',
@@ -44,7 +50,7 @@ var create = function (master, maybeDriver, projectdir, basedir, stickyFirstSess
         apiLabel + ' API not supported without webdriver running. Use bedrock-auto to get this feature.'
       );
     }, function (driver) {
-      return routes.effect('POST', url, effect(driver));
+      return routes.effect('POST', url, effect(executor, driver));
     });
   };
 
@@ -67,7 +73,15 @@ var create = function (master, maybeDriver, projectdir, basedir, stickyFirstSess
     }),
     routes.effect('POST', '/tests/start', function (data) {
       controller.recordTestStart(data.session, data.name, data.file, data.totalTests);
-      return Promise.resolve({});
+      if (resetMousePosition) {
+        return attempt.cata(maybeDriver, function () {
+          return Promise.reject('Resetting mouse position not supported without webdriver running. Use bedrock-auto to get this feature.');
+        }, function (driver) {
+          return effect(setInitialMousePosition, driver)({});
+        });
+      } else {
+        return Promise.resolve({});
+      }
     }),
     routes.effect('POST', '/tests/result', function (data) {
       controller.recordTestResult(data.session, data.name, data.file, data.passed, data.time, data.error);
