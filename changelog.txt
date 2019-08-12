@@ -1,3 +1,7 @@
+Version 4.5.2
+
+* Fixed bedrock manual throwing incorrect warnings about needing to run with bedrock-auto.
+
 Version 4.5.1
 
 * Changed resetting the mouse position to only run on Chrome, as it's currently the only browser that uses the hosts mouse position.
