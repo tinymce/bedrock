@@ -38,7 +38,14 @@ var create = function (master, maybeDriver, projectdir, basedir, stickyFirstSess
 
   var setInitialMousePosition = function (driver) {
     return function () {
-      return driver.actions().mouseMove({ x: 0, y: 0 }).perform();
+      return driver.getCapabilities().then(function (caps) {
+        // TODO re-enable resetting the mouse on other browsers when mouseMove gets fixed on Firefox/IE
+        if (caps.get("browserName") === "chrome") {
+          return driver.actions().mouseMove({ x: 0, y: 0 }).perform();
+        } else {
+          return Promise.resolve({});
+        }
+      });
     };
   };
 
