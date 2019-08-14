@@ -9,12 +9,12 @@ const Global = (function () {
   }
 })();
 
-var register = function (name, test) {
+const register = (name, test) => {
   if (typeof Global.__tests === 'undefined') {
     Global.__tests = [];
   }
 
-  Global.__tests.push({ name: name, test: test });
+  Global.__tests.push({name: name, test: test});
 };
 
 const cleanStack = (error, linesToRemove=1) => {
@@ -55,7 +55,7 @@ const processLog = (err, logs) => {
 
     for (let i = 0; i < entries.length; i++) {
       const entry = entries[i];
-      const output = (function () {
+      const output = (() => {
         const traceLines = entry.trace === null || typeof entry.trace !== 'string' ? [ ] : [ '', '', '' ].concat(entry.trace.split('\n'));
 
         if (entry.entries.length === 0) {
@@ -81,7 +81,7 @@ const processLog = (err, logs) => {
   return err;
 };
 
-var asynctest = function (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) {
+const asynctest = (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) => {
   register(name, function (success, failure) {
     test(success, function (err, logs?) {
       const normalizedErr = normalizeError(err);
@@ -92,8 +92,7 @@ var asynctest = function (name: string, test: (success: SuccessCallback, failure
 };
 
 
-
-var test = function (name: string, test: SuccessCallback) {
+const test = (name: string, test: SuccessCallback) => {
   register(name, function (success, failure) {
     try {
       test();
@@ -104,10 +103,10 @@ var test = function (name: string, test: SuccessCallback) {
   });
 };
 
-var domtest = function (name: string, test: () => Promise<void>) {
+const domtest = (name: string, test: () => Promise<void>) => {
   register(name, function (success, failure) {
     // This would later include setup/teardown of jsdoc for atomic tests
-    var promise = test();
+    const promise = test();
 
     if (!(promise instanceof Global.Promise)) {
       throw 'dom tests must return a promise';
