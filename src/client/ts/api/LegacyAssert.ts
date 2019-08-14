@@ -3,8 +3,7 @@ import * as Compare from '../core/Compare';
 const eq = function (expected: any, actual: any, message?: string) {
   const result = Compare.compare(expected, actual);
   if (!result.eq) {
-    const prefix = message === undefined ? '' : (message + "\n");
-    const e = prefix + result.why();
+    const e = message !== undefined ? message : result.why();
     throw new Error(e);
   }
 };

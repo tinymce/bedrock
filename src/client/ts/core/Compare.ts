@@ -25,7 +25,8 @@ const trueType = (x: any): string => {
 const pass = (): Comparison =>
   ({eq: true, why: () => ''});
 
-const fail = (why: () => string): Comparison => ({eq: false, why: why});
+const fail = (why: () => string): Comparison =>
+  ({eq: false, why: why});
 
 const failCompare = (x: any, y: any, prefix ?: string): Comparison => {
   return fail(()  => (prefix || 'Values were different') + ': [' + String(x) + '] vs [' + String(y) + ']');
@@ -42,7 +43,7 @@ const compareArrays = (x: any[], y: any[]): Comparison => {
   for (let i = 0; i < x.length; i++) {
     const result = doCompare(x[i], y[i]);
     if (!result.eq)
-      return fail(() => 'Array elements ' + i + ' were different: ' + result.why);
+      return fail(() => 'Array elements ' + i + ' were different: ' + result.why());
   }
   return pass();
 };
@@ -75,7 +76,7 @@ const compareObjects = (x, y) => {
       const yValue = y[i];
       const valueResult = doCompare(xValue, yValue);
       if (!valueResult.eq)
-        return fail(() => 'Objects were different for key: [' + i + ']: ' + valueResult.why);
+        return fail(() => 'Objects were different for key: [' + i + ']: ' + valueResult.why());
     }
   }
   return pass();
@@ -112,6 +113,6 @@ export const compare = (x: any, y: any): Comparison => {
 
   return {
     eq: result.eq,
-    why: () => result.why + '\n' + bar + '\n' + JSON.stringify(x) + '\n' + bar + '\n' + JSON.stringify(y) + '\n' + bar + '\n'
+    why: () => result.why() + '\n' + bar + '\n' + JSON.stringify(x) + '\n' + bar + '\n' + JSON.stringify(y) + '\n' + bar + '\n'
   };
 };
