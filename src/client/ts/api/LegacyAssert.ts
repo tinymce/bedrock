@@ -47,10 +47,8 @@ const succeeds = function (f: () => void, message: string) {
 };
 
 const fail = function (message?: string) {
-  if (message !== undefined)
-    throw new Error(message);
-  else
-    throw new Error('Test failed.');
+  const e = message !== undefined ? message : 'Test failed';
+  throw new Error(e);
 };
 
 const html = function (expected: string, actual: string, message: string) {
