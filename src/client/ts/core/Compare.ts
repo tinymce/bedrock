@@ -8,7 +8,7 @@ var Obj = {
   keys: function (obj) {
     return Object.keys(obj);
   }
-}
+};
 
 var trueType = function (x) {
   var t = typeof x;
