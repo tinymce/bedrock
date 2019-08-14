@@ -38,7 +38,7 @@ var shutdown = function (promise, driver, done, gruntDone, delayExiting) {
 
     driver.quit().then(function () {
       console.error('********** Unexpected Bedrock Error -> Server Quitting **********');
-      console.error(err)
+      console.error(err);
       done();
       if (gruntDone !== null) gruntDone(false);
       else process.exit(exitcodes.failures.tests);

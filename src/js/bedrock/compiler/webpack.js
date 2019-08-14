@@ -125,7 +125,7 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
 let compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, srcFiles, coverage, success) {
   var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   var dest = path.join(scratchDir, 'compiled/tests.js');
-  console.log(`Compiling ${srcFiles.length} tests...`)
+  console.log(`Compiling ${srcFiles.length} tests...`);
 
   mkdirp.sync(path.dirname(scratchFile));
   fs.writeFileSync(scratchFile, imports.generateImports(true, scratchFile, srcFiles));
@@ -159,7 +159,7 @@ let devserver = function (settings, done) {
     var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
     var dest = path.join(scratchDir, 'compiled/tests.js');
     var tsConfigFile = settings.config;
-    console.log(`Loading ${settings.testfiles.length} tests...`)
+    console.log(`Loading ${settings.testfiles.length} tests...`);
 
     mkdirp.sync(path.dirname(scratchFile));
     fs.writeFileSync(scratchFile, imports.generateImports(true, scratchFile, settings.testfiles));
