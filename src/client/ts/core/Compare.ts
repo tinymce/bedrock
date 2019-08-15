@@ -32,9 +32,8 @@ const failCompare = (x: any, y: any, prefix ?: string): Comparison => {
   return fail(()  => (prefix || 'Values were different') + ': [' + String(x) + '] vs [' + String(y) + ']');
 };
 
-const isEquatableType = (x: string): boolean =>
-  x === 'string' || x === 'boolean' ||  x === 'number' || x === 'undefined' || x === 'null' || x ===  'function' || x === 'xml';
-
+var isEquatableType = (x: string): boolean =>
+  Arr.contains([ 'undefined', 'boolean', 'number', 'string', 'function', 'xml', 'null' ], x);
 
 const compareArrays = (x: any[], y: any[]): Comparison => {
   if (x.length !== y.length)
