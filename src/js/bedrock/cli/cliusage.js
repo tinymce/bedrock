@@ -3,7 +3,7 @@ var usage = require('command-line-usage');
 var generateUsage = function (command, desc, definitions) {
   var visibleDefinitions = definitions.filter(function (defn) {
     return defn.hidden !== true;
-  })
+  });
   var commonDefs = visibleDefinitions.filter(function (defn) {
     return defn.uncommon !== true;
   });

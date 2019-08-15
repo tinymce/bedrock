@@ -1,20 +1,19 @@
-import Compare from '../core/Compare';
+import * as Compare from '../core/Compare';
 
-var eq = function (expected: any, actual: any, message?: string) {
-  var result = Compare.compare(expected, actual);
+const eq = function (expected: any, actual: any, message?: string) {
+  const result = Compare.compare(expected, actual);
   if (!result.eq) {
-    if (message !== undefined)
-      throw new Error(message);
-    else
-      throw new Error(result.why);
+    const e = message !== undefined ? message : result.why();
+    throw new Error(e);
   }
 };
 
-var throws = function (f: () => void, expected?: string, message?: string) {
-  var token = {};
+const throws = function (f: () => void, expected?: string, message?: string) {
+  const token = {};
 
   try {
     f();
+    // noinspection ExceptionCaughtLocallyJS
     throw token;
   } catch (e) {
     if (e === token)
@@ -24,11 +23,12 @@ var throws = function (f: () => void, expected?: string, message?: string) {
   }
 };
 
-var throwsError = function (f: () => void, expected?: string, message?: string) {
-  var token = {};
+const throwsError = function (f: () => void, expected?: string, message?: string) {
+  const token = {};
 
   try {
     f();
+    // noinspection ExceptionCaughtLocallyJS
     throw token;
   } catch (e) {
     if (e === token)
@@ -36,9 +36,9 @@ var throwsError = function (f: () => void, expected?: string, message?: string) 
     if (expected !== undefined)
       eq(expected, e.message, message);
   }
-}
+};
 
-var succeeds = function (f: () => void, message: string) {
+const succeeds = function (f: () => void, message: string) {
   try {
     f();
   } catch (e) {
@@ -46,14 +46,12 @@ var succeeds = function (f: () => void, message: string) {
   }
 };
 
-var fail = function (message?: string) {
-  if (message !== undefined)
-    throw new Error(message);
-  else
-    throw new Error('Test failed.');
+const fail = function (message?: string) {
+  const e = message !== undefined ? message : 'Test failed';
+  throw new Error(e);
 };
 
-var html = function (expected: string, actual: string, message: string) {
+const html = function (expected: string, actual: string, message: string) {
   return {
     expected: expected,
     actual: actual,

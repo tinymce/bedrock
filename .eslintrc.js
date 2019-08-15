@@ -1,6 +1,5 @@
 module.exports = {
     "extends": "google",
-    "installedESLint": true,
     "rules": {
       "curly": ["error", "multi-line"],
       "object-curly-spacing": "off",

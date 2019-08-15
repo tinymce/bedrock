@@ -3,7 +3,7 @@ if (!Array.prototype.flatMap) {
   // not at all to ES2019 spec, but if you're relying on that you should use node 11 /shrug
   const concat = (x, y) => x.concat(y);
 
-  const flatMap = (f, xs) => xs.map(f).reduce(concat, [])
+  const flatMap = (f, xs) => xs.map(f).reduce(concat, []);
 
   Array.prototype.flatMap = function (f) {
     return flatMap(f, this);

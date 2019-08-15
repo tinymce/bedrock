@@ -1,3 +1,7 @@
+Version 4.5.3
+
+* Added types internally, and made minor performance tweaks.
+
 Version 4.5.2
 
 * Fixed bedrock manual throwing incorrect warnings about needing to run with bedrock-auto.

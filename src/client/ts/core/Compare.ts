@@ -1,17 +1,20 @@
-var Arr = {
-  contains: function (values, value) {
-    return values.indexOf(value) > -1;
-  }
+const Arr = {
+  contains: (values: any[], value: any): boolean =>
+    values.indexOf(value) > -1
 };
 
-var Obj = {
-  keys: function (obj) {
-    return Object.keys(obj);
-  }
+const Obj = {
+  keys: (obj: object): string[] =>
+    Object.keys(obj)
+};
+
+export interface Comparison {
+  eq: boolean;
+  why: () => string
 }
 
-var trueType = function (x) {
-  var t = typeof x;
+const trueType = (x: any): string => {
+  const t = typeof x;
   if (t === 'object' && Array.prototype.isPrototypeOf(x))
     return 'array';
   if (x === null)
@@ -19,73 +22,70 @@ var trueType = function (x) {
   return t;
 };
 
-var pass = function () {
-  return { eq: true };
+const pass = (): Comparison =>
+  ({eq: true, why: () => ''});
+
+const fail = (why: () => string): Comparison =>
+  ({eq: false, why: why});
+
+const failCompare = (x: any, y: any, prefix ?: string): Comparison => {
+  return fail(()  => (prefix || 'Values were different') + ': [' + String(x) + '] vs [' + String(y) + ']');
 };
 
-var fail = function (why) {
-  return { eq: false, why: why };
-};
+const isEquatableType = (x: string): boolean =>
+  Arr.contains([ 'undefined', 'boolean', 'number', 'string', 'function', 'xml', 'null' ], x);
 
-var failCompare = function (x, y, prefix?) {
-  var prefix_ = prefix || 'Values were different';
-  return fail(prefix_ + ': [' + String(x) + '] vs [' + String(y) + ']');
-};
-
-var isEquatableType = function (x) {
-  return Arr.contains([ 'undefined', 'boolean', 'number', 'string', 'function', 'xml', 'null' ], x);
-};
-
-var compareArrays = function (x, y) {
+const compareArrays = (x: any[], y: any[]): Comparison => {
   if (x.length !== y.length)
     return failCompare(x.length, y.length, 'Array lengths were different');
 
-  for (var i = 0; i < x.length; i++) {
-    var result = doCompare(x[i], y[i]);
+  for (let i = 0; i < x.length; i++) {
+    const result = doCompare(x[i], y[i]);
     if (!result.eq)
-      return fail('Array elements ' + i + ' were different: ' + result.why);
+      return fail(() => 'Array elements ' + i + ' were different: ' + result.why());
   }
   return pass();
 };
 
-var sortArray = function (x) {
-  var y = x.slice();
+const sortArray = (x: any[]): any[] => {
+  const y = x.slice();
   y.sort();
   return y;
 };
 
-var sortedKeys = function (o) {
-  return sortArray(Obj.keys(o));
-};
+const sortedKeys = (o: object) =>
+  sortArray(Obj.keys(o));
 
-var compareObjects = function (x, y) {
-  var constructorX = x.constructor;
-  var constructorY = y.constructor;
+const compareObjects = (x, y) => {
+  const constructorX = x.constructor;
+  const constructorY = y.constructor;
   if (constructorX !== constructorY)
     return failCompare(constructorX, constructorY, 'Constructors were different');
 
-  var keysX = sortedKeys(x);
-  var keysY = sortedKeys(y);
+  const keysX = sortedKeys(x);
+  const keysY = sortedKeys(y);
 
-  var keysResult = compareArrays(keysX, keysY);
+  const keysResult = compareArrays(keysX, keysY);
   if (!keysResult.eq)
     return failCompare(JSON.stringify(keysX), JSON.stringify(keysY), 'Object keys were different');
 
-  for (var i in x) {
+  for (let i in x) {
     if (x.hasOwnProperty(i)) {
-      var xValue = x[i];
-      var yValue = y[i];
-      var valueResult = doCompare(xValue, yValue);
+      const xValue = x[i];
+      const yValue = y[i];
+      const valueResult = doCompare(xValue, yValue);
       if (!valueResult.eq)
-        return fail('Objects were different for key: [' + i + ']: ' + valueResult.why);
+        return fail(() => 'Objects were different for key: [' + i + ']: ' + valueResult.why());
     }
   }
   return pass();
 };
 
-var doCompare = function (x, y) {
-  var typeX = trueType(x);
-  var typeY = trueType(y);
+const doCompare = (x: any, y: any): Comparison => {
+  if (x === y) return pass();
+
+  const typeX = trueType(x);
+  const typeY = trueType(y);
 
   if (typeX !== typeY) return failCompare(typeX, typeY, 'Types were different');
 
@@ -96,26 +96,22 @@ var doCompare = function (x, y) {
     if (y !== null) return failCompare(x, y, 'Both values were not null');
 
   } else if (typeX === 'array') {
-    var arrayResult = compareArrays(x, y);
+    const arrayResult = compareArrays(x, y);
     if (!arrayResult.eq) return arrayResult;
 
   } else if (typeX === 'object') {
-    var objectResult = compareObjects(x, y);
+    const objectResult = compareObjects(x, y);
     if (!objectResult.eq) return objectResult;
   }
   return pass();
 };
 
-var compare = function (x, y) {
-  var result = doCompare(x, y);
-  var bar = '-----------------------------------------------------------------------';
+export const compare = (x: any, y: any): Comparison => {
+  const result = doCompare(x, y);
+  const bar = '-----------------------------------------------------------------------';
 
   return {
     eq: result.eq,
-    why: result.why + '\n' + bar + '\n' + JSON.stringify(x) + '\n' + bar + '\n' + JSON.stringify(y) + '\n' + bar + '\n'
+    why: () => result.why() + '\n' + bar + '\n' + JSON.stringify(x) + '\n' + bar + '\n' + JSON.stringify(y) + '\n' + bar + '\n'
   };
-};
-
-export default <any> {
-  compare: compare
 };
