@@ -1,3 +1,5 @@
+import * as Type from './Type';
+
 const Arr = {
   contains: (values: any[], value: any): boolean =>
     values.indexOf(value) > -1
@@ -12,15 +14,6 @@ export interface Comparison {
   eq: boolean;
   why: () => string
 }
-
-const trueType = (x: any): string => {
-  const t = typeof x;
-  if (t === 'object' && Array.prototype.isPrototypeOf(x))
-    return 'array';
-  if (x === null)
-    return 'null';
-  return t;
-};
 
 const pass = (): Comparison =>
   ({eq: true, why: () => ''});
@@ -84,8 +77,8 @@ const compareObjects = (x, y) => {
 const doCompare = (x: any, y: any): Comparison => {
   if (x === y) return pass();
 
-  const typeX = trueType(x);
-  const typeY = trueType(y);
+  const typeX = Type.typeOf(x);
+  const typeY = Type.typeOf(y);
 
   if (typeX !== typeY) return failCompare(typeX, typeY, 'Types were different');
 

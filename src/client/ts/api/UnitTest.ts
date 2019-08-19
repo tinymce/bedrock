@@ -17,7 +17,7 @@ const register = (name, test) => {
   Global.__tests.push({name: name, test: test});
 };
 
-const cleanStack = (error, linesToRemove=1) => {
+const cleanStack = (error, linesToRemove = 1) => {
   if (error.stack === undefined) {
     return '';
   }
@@ -103,7 +103,7 @@ const test = (name: string, test: SuccessCallback) => {
   });
 };
 
-const domtest = (name: string, test: () => Promise<void>) => {
+const domtest = (name: string, test: () => Promise<void>): void => {
   register(name, function (success, failure) {
     // This would later include setup/teardown of jsdoc for atomic tests
     const promise = test();
