@@ -2,7 +2,6 @@ Version 5.0.0
 
 * Test methods now accept a "string | (() => string)" as the test failure message. See TestLabel.ts
 * Rename LegacyAssert to Assert
-* Expose Assert as "Assert" instead of "assert", for consistency.
 * Remove Assert.html - it just made a struct. Not very useful.
 
 Version 4.5.3
