@@ -32,7 +32,7 @@
     "jquery": "^3.0.0",
     "mkdirp": "^0.5.1",
     "node-glob": "^1.2.0",
-    "portfinder": "^1.0.9",
+    "portfinder": "1.0.21",
     "raw-loader": "^0.5.1",
     "recursive-readdir-sync": "^1.0.6",
     "selenium-webdriver": "^3",
