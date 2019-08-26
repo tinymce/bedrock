@@ -1,5 +1,8 @@
-type SuccessCallback = () => void;
-type FailureCallback = (error: string | Error, logs?) => void;
+import { TestLabel } from "./TestLabel";
+
+export type SuccessCallback = () => void;
+export type TestError = TestLabel | Error;
+export type FailureCallback = (error: TestError, logs?) => void;
 
 const Global = (function () {
   if (typeof window !== 'undefined') {
@@ -81,7 +84,7 @@ const processLog = (err, logs) => {
   return err;
 };
 
-const asynctest = (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) => {
+export const asynctest = (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) => {
   register(name, function (success, failure) {
     test(success, function (err, logs?) {
       const normalizedErr = normalizeError(err);
@@ -92,7 +95,7 @@ const asynctest = (name: string, test: (success: SuccessCallback, failure: Failu
 };
 
 
-const test = (name: string, test: SuccessCallback) => {
+export const test = (name: string, test: SuccessCallback) => {
   register(name, function (success, failure) {
     try {
       test();
@@ -103,7 +106,7 @@ const test = (name: string, test: SuccessCallback) => {
   });
 };
 
-const domtest = (name: string, test: () => Promise<void>): void => {
+export const domtest = (name: string, test: () => Promise<void>): void => {
   register(name, function (success, failure) {
     // This would later include setup/teardown of jsdoc for atomic tests
     const promise = test();
@@ -116,10 +119,4 @@ const domtest = (name: string, test: () => Promise<void>): void => {
       success();
     }, failure);
   });
-};
-
-export {
-  test,
-  asynctest,
-  domtest
 };
