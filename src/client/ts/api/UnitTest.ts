@@ -1,8 +1,9 @@
 import { TestLabel } from "./TestLabel";
+import { TestLogEntry, TestLogs } from "./TestLogs";
 
 export type SuccessCallback = () => void;
 export type TestError = TestLabel | Error;
-export type FailureCallback = (error: TestError, logs?) => void;
+export type FailureCallback = (error: TestError, logs?: TestLogs) => void;
 
 const Global = (function () {
   if (typeof window !== 'undefined') {
@@ -12,7 +13,7 @@ const Global = (function () {
   }
 })();
 
-const register = (name, test) => {
+const register = (name: string, test: (success: () => void, failure: (e: string | LoggedError) => void) => void) => {
   if (typeof Global.__tests === 'undefined') {
     Global.__tests = [];
   }
@@ -31,25 +32,37 @@ const cleanStack = (error, linesToRemove = 1) => {
   return message + '\n' + stack.join('\n');
 };
 
-const normalizeError = (err) => {
+interface ReportedError extends Error {
+  toString: () => string;
+}
+
+interface LoggedError extends ReportedError {
+  logs: string[]
+}
+
+const reportedError = (message: string, stack: string, name: string): ReportedError => ({
+  message,
+  stack,
+  name,
+  toString: () => stack
+});
+
+const normalizeError = (err: TestError): ReportedError => {
   if (typeof err === 'string') {
     // Create an error object, but strip the stack of the 2 latest calls as it'll
     // just be this function and the previous function that called this (ie asyncTest)
     const error = new Error(err);
     const stack = cleanStack(error, 2);
-    return {
-      message: error.message,
-      stack: stack,
-      name: error.name,
-      toString: () => stack
-    };
-  } else {
-    return err;
+    return reportedError(error.message, stack, error.name);
+  } else if (typeof err === 'function') {
+    return normalizeError(err());
+  } else if (err instanceof Error) {
+    return reportedError(err.message, err.stack, err.name);
   }
 };
 
-const processLog = (err, logs) => {
-  const outputToStr = function (numIndent, entries) {
+const processLog = (err: ReportedError, logs: TestLogs): LoggedError => {
+  const outputToStr = function (numIndent: number, entries: TestLogEntry[]) {
     let everything = [ ];
     let indentString = '';
     for (let i = 0; i < numIndent; i++) {
@@ -79,16 +92,17 @@ const processLog = (err, logs) => {
     return everything;
   };
 
-  err.logs = outputToStr(2, logs.history);
-
-  return err;
+  return {
+    ...err,
+    logs: outputToStr(2, logs.history)
+  };
 };
 
 export const asynctest = (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) => {
-  register(name, function (success, failure) {
-    test(success, function (err, logs?) {
+  register(name, function (success: () => void, failure: (e: string | LoggedError) => void) {
+    test(success, function (err: TestError, logs: TestLogs = TestLogs.emptyLogs()) {
       const normalizedErr = normalizeError(err);
-      const failureMessage = logs !== undefined ? processLog(normalizedErr, logs) : normalizedErr;
+      const failureMessage = processLog(normalizedErr, logs);
       failure(failureMessage);
     });
   });
