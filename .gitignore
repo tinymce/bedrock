@@ -6,3 +6,4 @@
 *.sublime-workspace
 package-lock.json
 /.idea
+/dist

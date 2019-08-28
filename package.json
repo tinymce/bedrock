@@ -13,7 +13,7 @@
   },
   "scripts": {
     "prepublishOnly": "tsc",
-    "build": "tsc",
+    "build": "tsc && rollup --config",
     "test-atomic": "tape test/atomic/*.js",
     "test-props": "tape test/props/*.js",
     "test-samples-pass": "bin/bedrock-auto.js -b phantomjs --config sample/tsconfig.json --files sample/ts/**/*PassTest.ts sample/ts/**/*PassTest.tsx",
@@ -22,6 +22,7 @@
   },
   "private": false,
   "dependencies": {
+    "@types/jquery": "^3.3.31",
     "async": "^1.5.2",
     "babel-polyfill": "^6.23.0",
     "command-line-args": "^3.0.0",
@@ -53,17 +54,17 @@
     "jsverify": "^0.7.1",
     "load-grunt-tasks": "^3.5.0",
     "nlf": "^1.4.2",
-    "rollup": "^0.52.3",
+    "rollup": "^1.20.2",
     "rollup-plugin-node-resolve": "^3.0.2",
     "rollup-plugin-sourcemaps": "^0.4.2",
-    "rollup-plugin-typescript2": "^0.15.0",
+    "rollup-plugin-typescript2": "^0.23.0",
     "tape": "^4.5.1"
   },
   "author": "Ephox Corporation",
   "license": "Apache-2.0",
-  "main": "./lib/api/Main.js",
-  "module": "./lib/api/Main.js",
-  "types": "./lib/api/Main.d.ts",
+  "main": "./lib/client/ts/api/Main.js",
+  "module": "./lib/client/ts/api/Main.js",
+  "types": "./lib/client/ts/api/Main.d.ts",
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   }
