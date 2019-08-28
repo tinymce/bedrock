@@ -1,5 +1,30 @@
-type SuccessCallback = () => void;
-type FailureCallback = (error: string | Error, logs?) => void;
+import { TestLabel } from "./TestLabel";
+import { TestLogEntry, TestLogs } from "./TestLogs";
+
+interface JsError extends Error {
+  toString?: () => string;
+}
+
+export interface HtmlDiffError extends JsError {
+  name: string;
+  message: string;
+  diff: {
+    expected: string,
+    actual: string,
+    comparison: string
+  };
+  label: string;
+  stack: string;
+}
+
+export type SuccessCallback = () => void;
+export type TestError = TestLabel | HtmlDiffError | Error;
+export type FailureCallback = (error: TestError, logs?: TestLogs) => void;
+
+interface LoggedError {
+  error: JsError | HtmlDiffError;
+  logs: string[];
+}
 
 const Global = (function () {
   if (typeof window !== 'undefined') {
@@ -9,7 +34,7 @@ const Global = (function () {
   }
 })();
 
-const register = (name, test) => {
+const register = (name: string, test: (success: () => void, failure: (e: LoggedError) => void) => void) => {
   if (typeof Global.__tests === 'undefined') {
     Global.__tests = [];
   }
@@ -17,7 +42,7 @@ const register = (name, test) => {
   Global.__tests.push({name: name, test: test});
 };
 
-const cleanStack = (error, linesToRemove = 1) => {
+const cleanStack = (error: Error, linesToRemove = 1) => {
   if (error.stack === undefined) {
     return '';
   }
@@ -28,25 +53,26 @@ const cleanStack = (error, linesToRemove = 1) => {
   return message + '\n' + stack.join('\n');
 };
 
-const normalizeError = (err) => {
+const normalizeError = (err: TestError): JsError | HtmlDiffError => {
   if (typeof err === 'string') {
     // Create an error object, but strip the stack of the 2 latest calls as it'll
     // just be this function and the previous function that called this (ie asyncTest)
     const error = new Error(err);
-    const stack = cleanStack(error, 2);
-    return {
-      message: error.message,
-      stack: stack,
-      name: error.name,
-      toString: () => stack
-    };
+    error.stack = cleanStack(error, 2);
+    return error;
+  } else if (typeof err === 'function') {
+    return normalizeError(err());
+  } else if (err instanceof Error) {
+    // types might not be quite right here...
+    return err;
   } else {
+    // types might not be quite right here...
     return err;
   }
 };
 
-const processLog = (err, logs) => {
-  const outputToStr = function (numIndent, entries) {
+const processLog = (logs: TestLogs): string[] => {
+  const outputToStr = function (numIndent: number, entries: TestLogEntry[]) {
     let everything = [ ];
     let indentString = '';
     for (let i = 0; i < numIndent; i++) {
@@ -76,50 +102,35 @@ const processLog = (err, logs) => {
     return everything;
   };
 
-  err.logs = outputToStr(2, logs.history);
-
-  return err;
+  return outputToStr(2, logs.history);
 };
 
-const asynctest = (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) => {
-  register(name, function (success, failure) {
-    test(success, function (err, logs?) {
-      const normalizedErr = normalizeError(err);
-      const failureMessage = logs !== undefined ? processLog(normalizedErr, logs) : normalizedErr;
-      failure(failureMessage);
+const prepFailure = (err: TestError, logs: TestLogs = TestLogs.emptyLogs()): LoggedError => {
+  const normalizedErr = normalizeError(err);
+  const failureMessage = processLog(logs);
+  return {
+    error: normalizedErr,
+    logs: failureMessage,
+  }
+};
+
+export const asynctest = (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) => {
+  register(name, function (success: () => void, failure: (e: LoggedError) => void) {
+    test(success, function (err: TestError, logs: TestLogs = TestLogs.emptyLogs()) {
+      const r = prepFailure(err, logs);
+      failure(r);
     });
   });
 };
 
-
-const test = (name: string, test: SuccessCallback) => {
-  register(name, function (success, failure) {
+export const test = (name: string, test: () => void) => {
+  register(name, function (success: () => void, failure: (e: LoggedError) => void) {
     try {
       test();
       success();
     } catch (e) {
-      failure(e);
+      const r = prepFailure(e);
+      failure(r);
     }
   });
-};
-
-const domtest = (name: string, test: () => Promise<void>): void => {
-  register(name, function (success, failure) {
-    // This would later include setup/teardown of jsdoc for atomic tests
-    const promise = test();
-
-    if (!(promise instanceof Global.Promise)) {
-      throw 'dom tests must return a promise';
-    }
-
-    promise.then(function () {
-      success();
-    }, failure);
-  });
-};
-
-export {
-  test,
-  asynctest,
-  domtest
 };

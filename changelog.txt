@@ -1,6 +1,11 @@
+Version 5.1.0
+
+* Added types to client package.
+* Allow tests to fail with a TestLabel type.
+
 Version 5.0.2
- 
- * Changed the version range for portfinder to be an exact version that doesn't randomize the ports.
+
+* Changed the version range for portfinder to be an exact version that doesn't randomize the ports.
 
 Version 5.0.0
 
