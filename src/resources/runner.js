@@ -295,8 +295,10 @@
     }
   };
 
-  var clean = function (err) {
-    var e = err === undefined ? new Error('no error given') : err;
+  var clean = function (loggedError) {
+    var le = loggedError === undefined ? new Error('no error given') : loggedError;
+
+    var e = le.error;
 
     if (typeof e === 'string') {
       return e;
@@ -400,7 +402,16 @@
               });
             }, function (e) {
               clearTimeout(timer);
-              console.error(e);
+              if (e.logs || e.error) {
+                if (e.logs && e.logs.length > 0) {
+                  console.error(e.logs.join('\n'));
+                }
+                if (e.error) {
+                  console.error(e.error);
+                }
+              } else {
+                console.error(e);
+              }
               report.fail(e, afterFail);
             });
           });
@@ -408,7 +419,6 @@
           clearTimeout(timer);
           console.error(e);
           report.fail(e, afterFail);
-
         }
       } else {
         loadNextChunk();
