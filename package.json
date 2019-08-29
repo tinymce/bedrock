@@ -13,7 +13,7 @@
   },
   "scripts": {
     "prepublishOnly": "tsc",
-    "build": "tsc && rollup --config",
+    "build": "yarn eslint 'src/runner/**' && tsc && rollup --config",
     "test-atomic": "tape test/atomic/*.js",
     "test-props": "tape test/props/*.js",
     "test-samples-pass": "bin/bedrock-auto.js -b phantomjs --config sample/tsconfig.json --files sample/ts/**/*PassTest.ts sample/ts/**/*PassTest.tsx",
