@@ -8,21 +8,21 @@ const Global = (function () {
   }
 })();
 
-var urlParams = function() {
-  var params = {};
-  var qs = window.location.search;
+const urlParams = function () {
+  const params = {};
+  let qs = window.location.search;
   qs = qs.split('+').join(' ');
-  var re = /[?&]?([^=]+)=([^&]*)/g;
-  var m;
+  const re = /[?&]?([^=]+)=([^&]*)/g;
+  let m;
   while (m = re.exec(qs)) {
     params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
   }
   return params;
 };
 
-var posInt = function(str) {
+const posInt = function (str) {
   if (typeof str === 'string') {
-    var num = parseInt(str, 10);
+    const num = parseInt(str, 10);
     if (!isNaN(num) && num > 0) {
       return num;
     }
@@ -30,12 +30,12 @@ var posInt = function(str) {
   return 0;
 };
 
-var makeSessionId = function() {
+const makeSessionId = function () {
   return '' + Math.ceil((Math.random() * 100000000));
 };
 
-var getParams = function () {
-  var params = urlParams();
+const getParams = function () {
+  const params = urlParams();
   return {
     session: params['session'] || makeSessionId(),
     offset: posInt(params['offset']),
@@ -44,27 +44,29 @@ var getParams = function () {
   }
 };
 
-var chunk; // set during loadtests
-var retries; // set during loadtests
-var timeout; // set during loadtests
-var testscratch = null; // set per test, private dom scratch area for the current test to use.
-var globalTests = Global.__tests ? Global.__tests : [];
+let chunk; // set during loadtests
+let retries; // set during loadtests
+let timeout; // set during loadtests
+let testscratch = null; // set per test, private dom scratch area for the current test to use.
+const globalTests = Global.__tests ? Global.__tests : [];
 
 var params = getParams();
 
-var makeUrl = function(session, offset, failed, retry) {
-  var baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
+const makeUrl = function (session, offset, failed, retry) {
+  const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
   if (offset > 0) {
-    var rt = (retry > 0 ? '&retry=' + retry : '');
+    const rt = (retry > 0 ? '&retry=' + retry : '');
     return baseUrl + '?session=' + session + '&offset=' + offset + '&failed=' + failed + rt;
   } else {
     return baseUrl;
   }
 };
 
-var sendJson = function (url, data, onSuccess, onError) {
-  if (onSuccess === undefined) onSuccess = function() {};
-  if (onError === undefined) onError = function() {};
+const sendJson = function (url, data, onSuccess, onError) {
+  if (onSuccess === undefined) onSuccess = function () {
+  };
+  if (onError === undefined) onError = function () {
+  };
   $.ajax({
     method: 'post',
     url: url,
@@ -75,13 +77,13 @@ var sendJson = function (url, data, onSuccess, onError) {
   });
 };
 
-var sendKeepAlive = function(session, onSuccess, onError) {
+const sendKeepAlive = function (session, onSuccess, onError) {
   sendJson('/tests/alive', {
     session: session
   }, onSuccess, onError);
 };
 
-var sendTestStart = function (session, file, name, onSuccess, onError) {
+const sendTestStart = function (session, file, name, onSuccess, onError) {
   sendJson('/tests/start', {
     totalTests: globalTests.length,
     session: session,
@@ -90,7 +92,7 @@ var sendTestStart = function (session, file, name, onSuccess, onError) {
   }, onSuccess, onError);
 };
 
-var sendTestResult = function(session, file, name, passed, time, error, onSuccess, onError) {
+const sendTestResult = function (session, file, name, passed, time, error, onSuccess, onError) {
   sendJson('/tests/result', {
     session: session,
     file: file,
@@ -101,9 +103,9 @@ var sendTestResult = function(session, file, name, passed, time, error, onSucces
   }, onSuccess, onError);
 };
 
-var sendDone = function (session, onSuccess, onError) {
-  var getCoverage = function () {
-    return typeof Global.__coverage__ === 'undefined' ? { } : Global.__coverage__;
+const sendDone = function (session, onSuccess, onError) {
+  const getCoverage = function () {
+    return typeof Global.__coverage__ === 'undefined' ? {} : Global.__coverage__;
   };
 
   sendJson('/tests/done', {
@@ -112,75 +114,75 @@ var sendDone = function (session, onSuccess, onError) {
   }, onSuccess, onError);
 };
 
-var reporter = (function () {
-  var current = $('<span />').addClass('progress').text(params.offset);
-  var restartBtn = $('<button />').text('Restart').click(function () {
-    var url = makeUrl(null, 0, 0, 0);
+const reporter = (function () {
+  const current = $('<span />').addClass('progress').text(params.offset);
+  const restartBtn = $('<button />').text('Restart').click(function () {
+    const url = makeUrl(null, 0, 0, 0);
     window.location.assign(url);
   });
-  var retryBtn = $('<button />').text('Retry').click(function () {
-    var sum = summary();
-    var url = makeUrl(params.session, sum.passed + sum.failed - 1, sum.failed - 1, 0);
+  const retryBtn = $('<button />').text('Retry').click(function () {
+    const sum = summary();
+    const url = makeUrl(params.session, sum.passed + sum.failed - 1, sum.failed - 1, 0);
     window.location.assign(url);
   }).hide();
-  var skipBtn = $('<button />').text('Skip').click(function () {
-    var sum = summary();
-    var url = makeUrl(params.session, sum.passed + sum.failed, sum.failed, 0);
+  const skipBtn = $('<button />').text('Skip').click(function () {
+    const sum = summary();
+    const url = makeUrl(params.session, sum.passed + sum.failed, sum.failed, 0);
     window.location.assign(url);
   }).hide();
 
   $('document').ready(function () {
     $('body')
       .append($('<div />')
-      .append($('<span />').text('Suite progress: '))
-      .append(current)
-      .append($('<span />').text('/'))
-      .append($('<span />').text(globalTests.length))
-      .append('&nbsp;&nbsp;&nbsp;')
-      .append(restartBtn)
-      .append('&nbsp;&nbsp;&nbsp;')
-      .append(retryBtn)
-      .append('&nbsp;&nbsp;&nbsp;')
-      .append(skipBtn)
-    );
+        .append($('<span />').text('Suite progress: '))
+        .append(current)
+        .append($('<span />').text('/'))
+        .append($('<span />').text(globalTests.length))
+        .append('&nbsp;&nbsp;&nbsp;')
+        .append(restartBtn)
+        .append('&nbsp;&nbsp;&nbsp;')
+        .append(retryBtn)
+        .append('&nbsp;&nbsp;&nbsp;')
+        .append(skipBtn)
+      );
   });
 
-  var initial = new Date();
-  var passCount = 0;
-  var failCount = 0;
+  const initial = new Date();
+  const passCount = 0;
+  const failCount = 0;
 
-  var stopOnFailure = false;
+  const stopOnFailure = false;
 
-  var keepAliveTimer = setInterval(function() {
-    sendKeepAlive(params.session, undefined, function() {
+  const keepAliveTimer = setInterval(function () {
+    sendKeepAlive(params.session, undefined, function () {
       // if the server shutsdown stop trying to send messages
       clearInterval(keepAliveTimer);
     });
   }, 5000);
 
-  var summary = function() {
+  var summary = function () {
     return {
       passed: passCount + (params.offset - params.failed),
       failed: failCount + params.failed,
     };
   };
 
-  var elapsed = function (since: Date) {
-    var end = new Date();
-    var millis = end.getDate() - since.getDate();
-    var seconds = Math.floor(millis / 1000);
-    var point = Math.floor(millis - (seconds * 1000) / 100);
-    var printable =
+  const elapsed = function (since: Date) {
+    const end = new Date();
+    const millis = end.getDate() - since.getDate();
+    const seconds = Math.floor(millis / 1000);
+    const point = Math.floor(millis - (seconds * 1000) / 100);
+    const printable =
       point < 10 ? '00' + point :
-            point < 100 ? '0' + point :
-                          '' + point;
+        point < 100 ? '0' + point :
+          '' + point;
     return seconds + '.' + printable + 's';
   };
 
-  var test = function (file, name) {
-    var starttime, el, output, marker, testfile, nameSpan, error, time, scratch, reported;
+  const test = function (file, name) {
+    let starttime, el, output, marker, testfile, nameSpan, error, time, scratch, reported;
 
-    var start = function (onDone) {
+    const start = function (onDone) {
       starttime = new Date();
       el = $('<div />').addClass('test running');
 
@@ -200,19 +202,19 @@ var reporter = (function () {
       sendTestStart(params.session, file, name, onDone, onDone);
     };
 
-    var pass = function (onDone) {
+    const pass = function (onDone) {
       if (reported) return;
       reported = true;
       passCount++;
       el.removeClass('running').addClass('passed').addClass('hidden');
       marker.text('[passed]').addClass('passed');
-      var testTime = elapsed(starttime);
+      const testTime = elapsed(starttime);
       time.text(testTime);
       current.text(params.offset + passCount + failCount);
       sendTestResult(params.session, file, name, true, testTime, null, onDone, onDone);
     };
 
-    var fail = function (e, onDone) {
+    const fail = function (e, onDone) {
       if (reported) return;
       reported = true;
       failCount++;
@@ -220,12 +222,12 @@ var reporter = (function () {
       marker.text('[failed]').addClass('failed');
       // Don't use .text() as it strips out newlines in IE, even when used
       // on a pre tag.
-      var errorMessage = clean(e);
-      var pre = $('<pre/>')
+      const errorMessage = clean(e);
+      const pre = $('<pre/>')
         .addClass('error')
         .html(errorMessage);
       error.append(pre);
-      var testTime = elapsed(starttime);
+      const testTime = elapsed(starttime);
       time.text(testTime);
       current.text(params.offset + passCount + failCount);
       if (stopOnFailure) {
@@ -243,9 +245,9 @@ var reporter = (function () {
     };
   };
 
-  var done = function () {
-    var setAsDone = function () {
-      var totalTime = elapsed(initial);
+  const done = function () {
+    const setAsDone = function () {
+      const totalTime = elapsed(initial);
       $('body').append('<div class="done">Test run completed in <span class="time">' + totalTime + '</span></div>');
       $('.passed.hidden').removeClass('hidden');
     };
@@ -253,11 +255,11 @@ var reporter = (function () {
     sendDone(params.session, setAsDone, setAsDone);
   };
 
-  var setStopOnFailure = function (flag) {
+  const setStopOnFailure = function (flag) {
     stopOnFailure = flag;
   };
 
-  var shouldStopOnFailure = function () {
+  const shouldStopOnFailure = function () {
     return stopOnFailure;
   };
 
@@ -270,16 +272,16 @@ var reporter = (function () {
   };
 })();
 
-var htmlentities = function (str) {
+const htmlentities = function (str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 };
 
-var processQUnit = function (html) {
+const processQUnit = function (html) {
   // Required to make <del> and <ins> stay as tags.
   return html.replace(/&lt;del&gt;/g, '<del>').replace(/&lt;\/del&gt;/g, '</del>').replace(/&lt;ins&gt;/g, '<ins>').replace(/&lt;\/ins&gt;/g, '</ins>');
 };
 
-var formatExtra = function (e) {
+const formatExtra = function (e) {
   if (!e.logs) {
     if (!e.stack) {
       return '';
@@ -290,8 +292,8 @@ var formatExtra = function (e) {
       return '\n\nStack:\n' + lines.join('\n');
     }
   } else {
-    var lines = e.logs.map(function(log) {
-      var noNewLines = log.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+    var lines = e.logs.map(function (log) {
+      const noNewLines = log.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
       return noNewLines;
     });
     return '\n\nLogs:\n' + lines.join('\n');
@@ -299,12 +301,12 @@ var formatExtra = function (e) {
 };
 
 var clean = function (err) {
-  var e = err === undefined ? new Error('no error given') : err;
+  const e = err === undefined ? new Error('no error given') : err;
 
   if (typeof e === 'string') {
     return e;
   }
-  var extra = formatExtra(e);
+  const extra = formatExtra(e);
   if (e.diff !== undefined) {
     // Provide detailed HTML comparison information
     return 'Test failure: ' + e.message +
@@ -327,15 +329,15 @@ var clean = function (err) {
   return htmlentities(JSON.stringify(e) + extra);
 };
 
-var initError = function (e) {
+const initError = function (e) {
   $('body').append('<div class="failed done">ajax error: ' + JSON.stringify(e) + '</div>');
 };
 
-var runGlobalTests = function () {
+const runGlobalTests = function () {
 
-  var loadNextChunk = function() {
+  const loadNextChunk = function () {
     if (globalTests.length > (params.offset + chunk)) {
-      var url = makeUrl(params.session, params.offset + chunk, reporter.summary().failed, 0);
+      const url = makeUrl(params.session, params.offset + chunk, reporter.summary().failed, 0);
       window.location.assign(url);
     } else {
       reporter.done();
@@ -344,8 +346,8 @@ var runGlobalTests = function () {
     }
   };
 
-  var retryTest = function() {
-    var sum = reporter.summary();
+  const retryTest = function () {
+    const sum = reporter.summary();
     window.location.assign(
       makeUrl(
         params.session,
@@ -356,8 +358,8 @@ var runGlobalTests = function () {
     );
   };
 
-  var loadNextTest = function() {
-    var sum = reporter.summary();
+  const loadNextTest = function () {
+    const sum = reporter.summary();
     window.location.assign(
       makeUrl(
         params.session,
@@ -368,12 +370,12 @@ var runGlobalTests = function () {
     );
   };
 
-  var afterFail = function() {
+  const afterFail = function () {
     if (reporter.shouldStopOnFailure()) {
       reporter.done();
       // make it easy to restart at this test
-      var sum = reporter.summary();
-      var url = makeUrl(params.session, sum.passed + sum.failed - 1, sum.failed - 1, 0);
+      const sum = reporter.summary();
+      const url = makeUrl(params.session, sum.passed + sum.failed - 1, sum.failed - 1, 0);
       window.history.pushState({}, '', url);
     } else if (params.retry < retries) {
       retryTest();
@@ -382,11 +384,11 @@ var runGlobalTests = function () {
     }
   };
 
-  var loop = function (tests) {
+  const loop = function (tests) {
     if (tests.length > 0) {
-      var test = tests.shift();
-      var report = reporter.test(test.filePath, test.name);
-      var timer = setTimeout(function() {
+      const test = tests.shift();
+      const report = reporter.test(test.filePath, test.name);
+      const timer = setTimeout(function () {
         report.fail('Test ran too long', afterFail);
       }, timeout);
       try {
@@ -396,7 +398,7 @@ var runGlobalTests = function () {
             report.pass(function () {
               if (params.retry > 0) {
                 params.retry = 0;
-                var url = makeUrl(params.session, params.offset, params.failed, params.retry);
+                const url = makeUrl(params.session, params.offset, params.failed, params.retry);
                 window.history.pushState({}, '', url);
               }
               loop(tests);
