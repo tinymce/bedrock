@@ -60,7 +60,7 @@ var generate = function (mode, projectdir, basedir, configFile, bundler, testfil
         routes.routing('GET', '/project', projectdir),
 
         // bedrock resources
-        routes.routing('GET', '/js', path.join(basedir, 'src/resources')),
+        routes.routing('GET', '/runner', path.join(basedir, 'dist/www/runner')),
         routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery'))),
         routes.routing('GET', '/lib/babel-polyfill', path.join(path.dirname(require.resolve('babel-polyfill')), '../dist')),
         routes.routing('GET', '/css', path.join(basedir, 'src/css')),

@@ -1,6 +1,4 @@
-import * as jquery from 'jquery';
-
-const $ = jquery;
+import * as jQuery from 'jquery';
 
 const Global = (function () {
   if (typeof window !== 'undefined') {
@@ -423,7 +421,7 @@ var runGlobalTests = function () {
   loop(globalTests.slice(params.offset, params.offset + chunk));
 };
 
-export const loadtests = function (data) {
+const loadtests = function (data) {
   chunk = data.chunk;
   retries = data.retries;
   timeout = data.timeout;
@@ -431,7 +429,7 @@ export const loadtests = function (data) {
   runGlobalTests();
 };
 
-export const testrunner = function () {
+const testrunner = function () {
   // delay this ajax call until after the reporter status elements are in the page
   $('document').ready(function () {
     $.ajax({
@@ -443,6 +441,8 @@ export const testrunner = function () {
   });
 };
 
-export const getscratch = function () {
+const getscratch = function () {
   return testscratch;
 };
+
+testrunner();

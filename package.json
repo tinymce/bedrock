@@ -61,9 +61,9 @@
   },
   "author": "Ephox Corporation",
   "license": "Apache-2.0",
-  "main": "./lib/client/ts/api/Main.js",
-  "module": "./lib/client/ts/api/Main.js",
-  "types": "./lib/client/ts/api/Main.d.ts",
+  "main": "./dist/lib/client/ts/api/Main.js",
+  "module": "./dist/lib/client/ts/api/Main.js",
+  "types": "./dist/lib/client/ts/api/Main.d.ts",
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   }

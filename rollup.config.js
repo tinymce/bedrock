@@ -1,13 +1,13 @@
 import resolve from 'rollup-plugin-node-resolve';
 
 export default {
-  input: 'lib/runner/ts/Runner.js',
+  input: 'dist/lib/runner/ts/Runner.js',
   output: {
-    file: 'dist/runner/runner.js',
+    file: 'dist/www/runner/runner.js',
     format: 'iife',
     name: 'runner',
     globals: {
-      'jquery': 'jquery'
+      'jQuery': 'jQuery'
     },
   },
   context: 'window',
