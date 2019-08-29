@@ -1,14 +1,9 @@
-import * as jQuery from 'jquery';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 
-const Global = (function () {
-  if (typeof window !== 'undefined') {
-    return window;
-  } else {
-    return Function('return this;')();
-  }
-})();
+// webpack makes this available
+const Global: any = window;
 
-const urlParams = function () {
+const urlParams = () => {
   const params = {};
   let qs = window.location.search;
   qs = qs.split('+').join(' ');
@@ -20,7 +15,7 @@ const urlParams = function () {
   return params;
 };
 
-const posInt = function (str) {
+const posInt = (str): number => {
   if (typeof str === 'string') {
     const num = parseInt(str, 10);
     if (!isNaN(num) && num > 0) {
@@ -30,18 +25,24 @@ const posInt = function (str) {
   return 0;
 };
 
-const makeSessionId = function () {
-  return '' + Math.ceil((Math.random() * 100000000));
-};
+const makeSessionId = (): string =>
+  '' + Math.ceil((Math.random() * 100000000));
 
-const getParams = function () {
+interface Params {
+  readonly session: number;
+  readonly offset: number;
+  readonly failed: number;
+  retry: number;
+}
+
+const getParams = (): Params => {
   const params = urlParams();
   return {
     session: params['session'] || makeSessionId(),
     offset: posInt(params['offset']),
     failed: posInt(params['failed']),
     retry: posInt(params['retry']),
-  }
+  };
 };
 
 let chunk; // set during loadtests
@@ -50,9 +51,9 @@ let timeout; // set during loadtests
 let testscratch = null; // set per test, private dom scratch area for the current test to use.
 const globalTests = Global.__tests ? Global.__tests : [];
 
-var params = getParams();
+const params = getParams();
 
-const makeUrl = function (session, offset, failed, retry) {
+const makeUrl = (session, offset, failed, retry): string => {
   const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
   if (offset > 0) {
     const rt = (retry > 0 ? '&retry=' + retry : '');
@@ -62,28 +63,27 @@ const makeUrl = function (session, offset, failed, retry) {
   }
 };
 
-const sendJson = function (url, data, onSuccess, onError) {
-  if (onSuccess === undefined) onSuccess = function () {
-  };
-  if (onError === undefined) onError = function () {
-  };
+const noop = (): void => {};
+
+const sendJson = (url, data, onSuccess = noop, onError = noop): void => {
+  // noinspection JSIgnoredPromiseFromCall
   $.ajax({
     method: 'post',
     url: url,
     dataType: 'json',
     success: onSuccess,
     error: onError,
-    data: JSON.stringify(data)
+    data: JSON.stringify(data),
   });
 };
 
-const sendKeepAlive = function (session, onSuccess, onError) {
+const sendKeepAlive = (session, onSuccess, onError): void => {
   sendJson('/tests/alive', {
-    session: session
+    session: session,
   }, onSuccess, onError);
 };
 
-const sendTestStart = function (session, file, name, onSuccess, onError) {
+const sendTestStart = (session, file, name, onSuccess, onError): void => {
   sendJson('/tests/start', {
     totalTests: globalTests.length,
     session: session,
@@ -92,46 +92,108 @@ const sendTestStart = function (session, file, name, onSuccess, onError) {
   }, onSuccess, onError);
 };
 
-const sendTestResult = function (session, file, name, passed, time, error, onSuccess, onError) {
+const sendTestResult = (session, file, name, passed, time, error, onSuccess, onError): void => {
   sendJson('/tests/result', {
     session: session,
     file: file,
     name: name,
     passed: passed,
     time: time,
-    error: error
+    error: error,
   }, onSuccess, onError);
 };
 
-const sendDone = function (session, onSuccess, onError) {
-  const getCoverage = function () {
-    return typeof Global.__coverage__ === 'undefined' ? {} : Global.__coverage__;
-  };
+const sendDone = (session, onSuccess, onError): void => {
+  const getCoverage = (): any => typeof Global.__coverage__ === 'undefined' ? {} : Global.__coverage__;
 
   sendJson('/tests/done', {
     session: session,
-    coverage: getCoverage()
+    coverage: getCoverage(),
   }, onSuccess, onError);
 };
 
-const reporter = (function () {
+const htmlentities = (str): string =>
+  String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+/* Required to make <del> and <ins> stay as tags.*/
+const processQUnit = (html): string =>
+  (html
+    .replace(/&lt;del&gt;/g, '<del>')
+    .replace(/&lt;\/del&gt;/g, '</del>')
+    .replace(/&lt;ins&gt;/g, '<ins>')
+    .replace(/&lt;\/ins&gt;/g, '</ins>'));
+
+const formatExtra = (e): string => {
+  if (!e.logs) {
+    if (!e.stack) {
+      return '';
+    } else {
+      const lines = e.stack.split('\n').filter((line) =>
+        line.indexOf('at') !== -1);
+      return '\n\nStack:\n' + lines.join('\n');
+    }
+  } else {
+    const lines = e.logs.map((log) =>
+      log.replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
+    return '\n\nLogs:\n' + lines.join('\n');
+  }
+};
+
+const clean = (err): string => {
+  const e = err === undefined ? new Error('no error given') : err;
+
+  if (typeof e === 'string') {
+    return e;
+  }
+  const extra = formatExtra(e);
+  if (e.diff !== undefined) {
+    // Provide detailed HTML comparison information
+    return 'Test failure: ' + e.message +
+      '\nExpected: ' + htmlentities(e.diff.expected) +
+      '\nActual: ' + htmlentities(e.diff.actual) +
+      '\n\nHTML Diff: ' + processQUnit(htmlentities(e.diff.comparison)) +
+      extra;
+  }
+  if (e.name === 'AssertionError') {
+    return 'Assertion error' + (e.message ? ' [' + e.message + ']' : '') +
+      ': [' + htmlentities(JSON.stringify(e.expected)) + '] ' + e.operator +
+      ' [' + htmlentities(JSON.stringify(e.actual)) + ']' + extra;
+  }
+  if (e.name && e.message) {
+    return htmlentities(e.name + ': ' + e.message + extra);
+  }
+  if (e.toString) {
+    return htmlentities(String(e) + extra);
+  }
+  return htmlentities(JSON.stringify(e) + extra);
+};
+
+let passCount = 0;
+let failCount = 0;
+
+const summary = (): {passed: number; failed: number} => ({
+  passed: passCount + (params.offset - params.failed),
+  failed: failCount + params.failed,
+});
+
+const reporter = (() => {
   const current = $('<span />').addClass('progress').text(params.offset);
-  const restartBtn = $('<button />').text('Restart').click(function () {
+  const restartBtn = $('<button />').text('Restart').on('click', () => {
     const url = makeUrl(null, 0, 0, 0);
     window.location.assign(url);
   });
-  const retryBtn = $('<button />').text('Retry').click(function () {
+  const retryBtn = $('<button />').text('Retry').on('click', () => {
     const sum = summary();
     const url = makeUrl(params.session, sum.passed + sum.failed - 1, sum.failed - 1, 0);
     window.location.assign(url);
   }).hide();
-  const skipBtn = $('<button />').text('Skip').click(function () {
+  const skipBtn = $('<button />').text('Skip').on('click', () => {
     const sum = summary();
     const url = makeUrl(params.session, sum.passed + sum.failed, sum.failed, 0);
     window.location.assign(url);
   }).hide();
 
-  $('document').ready(function () {
+  $(() => {
     $('body')
       .append($('<div />')
         .append($('<span />').text('Suite progress: '))
@@ -148,26 +210,16 @@ const reporter = (function () {
   });
 
   const initial = new Date();
-  const passCount = 0;
-  const failCount = 0;
+  let stopOnFailure = false;
 
-  const stopOnFailure = false;
-
-  const keepAliveTimer = setInterval(function () {
-    sendKeepAlive(params.session, undefined, function () {
+  const keepAliveTimer = setInterval(() => {
+    sendKeepAlive(params.session, undefined, () => {
       // if the server shutsdown stop trying to send messages
       clearInterval(keepAliveTimer);
     });
   }, 5000);
 
-  var summary = function () {
-    return {
-      passed: passCount + (params.offset - params.failed),
-      failed: failCount + params.failed,
-    };
-  };
-
-  const elapsed = function (since: Date) {
+  const elapsed = (since: Date): string => {
     const end = new Date();
     const millis = end.getDate() - since.getDate();
     const seconds = Math.floor(millis / 1000);
@@ -179,10 +231,19 @@ const reporter = (function () {
     return seconds + '.' + printable + 's';
   };
 
-  const test = function (file, name) {
-    let starttime, el, output, marker, testfile, nameSpan, error, time, scratch, reported;
+  const test = (file, name) => {
+    let starttime;
+    let el;
+    let output;
+    let marker;
+    let testfile;
+    let nameSpan;
+    let error;
+    let time;
+    let scratch;
+    let reported;
 
-    const start = function (onDone) {
+    const start = (onDone): void => {
       starttime = new Date();
       el = $('<div />').addClass('test running');
 
@@ -198,11 +259,11 @@ const reporter = (function () {
       $('body').append(el);
 
       reported = false;
-      testscratch = scratch.get(0);  // intentional, see top of file for var decl.
+      testscratch = scratch.get(0); // intentional, see top of file for var decl.
       sendTestStart(params.session, file, name, onDone, onDone);
     };
 
-    const pass = function (onDone) {
+    const pass = (onDone): void => {
       if (reported) return;
       reported = true;
       passCount++;
@@ -214,7 +275,7 @@ const reporter = (function () {
       sendTestResult(params.session, file, name, true, testTime, null, onDone, onDone);
     };
 
-    const fail = function (e, onDone) {
+    const fail = (e, onDone): void => {
       if (reported) return;
       reported = true;
       failCount++;
@@ -241,12 +302,12 @@ const reporter = (function () {
     return {
       start: start,
       pass: pass,
-      fail: fail
+      fail: fail,
     };
   };
 
-  const done = function () {
-    const setAsDone = function () {
+  const done = (): void => {
+    const setAsDone = (): void => {
       const totalTime = elapsed(initial);
       $('body').append('<div class="done">Test run completed in <span class="time">' + totalTime + '</span></div>');
       $('.passed.hidden').removeClass('hidden');
@@ -255,87 +316,27 @@ const reporter = (function () {
     sendDone(params.session, setAsDone, setAsDone);
   };
 
-  const setStopOnFailure = function (flag) {
+  const setStopOnFailure = (flag): void => {
     stopOnFailure = flag;
   };
 
-  const shouldStopOnFailure = function () {
-    return stopOnFailure;
-  };
+  const shouldStopOnFailure = (): boolean => stopOnFailure;
 
   return {
     summary: summary,
     test: test,
     done: done,
     setStopOnFailure: setStopOnFailure,
-    shouldStopOnFailure: shouldStopOnFailure
+    shouldStopOnFailure: shouldStopOnFailure,
   };
 })();
 
-const htmlentities = function (str) {
-  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-};
-
-const processQUnit = function (html) {
-  // Required to make <del> and <ins> stay as tags.
-  return html.replace(/&lt;del&gt;/g, '<del>').replace(/&lt;\/del&gt;/g, '</del>').replace(/&lt;ins&gt;/g, '<ins>').replace(/&lt;\/ins&gt;/g, '</ins>');
-};
-
-const formatExtra = function (e) {
-  if (!e.logs) {
-    if (!e.stack) {
-      return '';
-    } else {
-      var lines = e.stack.split('\n').filter(function (line) {
-        return line.indexOf('at') !== -1;
-      });
-      return '\n\nStack:\n' + lines.join('\n');
-    }
-  } else {
-    var lines = e.logs.map(function (log) {
-      const noNewLines = log.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
-      return noNewLines;
-    });
-    return '\n\nLogs:\n' + lines.join('\n');
-  }
-};
-
-var clean = function (err) {
-  const e = err === undefined ? new Error('no error given') : err;
-
-  if (typeof e === 'string') {
-    return e;
-  }
-  const extra = formatExtra(e);
-  if (e.diff !== undefined) {
-    // Provide detailed HTML comparison information
-    return 'Test failure: ' + e.message +
-      '\nExpected: ' + htmlentities(e.diff.expected) +
-      '\nActual: ' + htmlentities(e.diff.actual) +
-      '\n\nHTML Diff: ' + processQUnit(htmlentities(e.diff.comparison)) +
-      extra;
-  }
-  if (e.name === 'AssertionError') {
-    return 'Assertion error' + (e.message ? ' [' + e.message + ']' : '') +
-    ': [' + htmlentities(JSON.stringify(e.expected)) + '] ' + e.operator +
-    ' [' + htmlentities(JSON.stringify(e.actual)) + ']' + extra;
-  }
-  if (e.name && e.message) {
-    return htmlentities(e.name + ': ' + e.message + extra);
-  }
-  if (e.toString) {
-    return htmlentities(String(e) + extra);
-  }
-  return htmlentities(JSON.stringify(e) + extra);
-};
-
-const initError = function (e) {
+const initError = (e): void => {
   $('body').append('<div class="failed done">ajax error: ' + JSON.stringify(e) + '</div>');
 };
 
-const runGlobalTests = function () {
-
-  const loadNextChunk = function () {
+const runGlobalTests = (): void => {
+  const loadNextChunk = (): void => {
     if (globalTests.length > (params.offset + chunk)) {
       const url = makeUrl(params.session, params.offset + chunk, reporter.summary().failed, 0);
       window.location.assign(url);
@@ -346,7 +347,7 @@ const runGlobalTests = function () {
     }
   };
 
-  const retryTest = function () {
+  const retryTest = (): void => {
     const sum = reporter.summary();
     window.location.assign(
       makeUrl(
@@ -358,7 +359,7 @@ const runGlobalTests = function () {
     );
   };
 
-  const loadNextTest = function () {
+  const loadNextTest = (): void => {
     const sum = reporter.summary();
     window.location.assign(
       makeUrl(
@@ -370,7 +371,7 @@ const runGlobalTests = function () {
     );
   };
 
-  const afterFail = function () {
+  const afterFail = (): void => {
     if (reporter.shouldStopOnFailure()) {
       reporter.done();
       // make it easy to restart at this test
@@ -384,18 +385,18 @@ const runGlobalTests = function () {
     }
   };
 
-  const loop = function (tests) {
+  const loop = (tests): void => {
     if (tests.length > 0) {
       const test = tests.shift();
       const report = reporter.test(test.filePath, test.name);
-      const timer = setTimeout(function () {
+      const timer = setTimeout(() => {
         report.fail('Test ran too long', afterFail);
       }, timeout);
       try {
-        report.start(function () {
-          test.test(function () {
+        report.start(() => {
+          test.test(() => {
             clearTimeout(timer);
-            report.pass(function () {
+            report.pass(() => {
               if (params.retry > 0) {
                 params.retry = 0;
                 const url = makeUrl(params.session, params.offset, params.failed, params.retry);
@@ -403,7 +404,7 @@ const runGlobalTests = function () {
               }
               loop(tests);
             });
-          }, function (e) {
+          }, (e) => {
             clearTimeout(timer);
             console.error(e);
             report.fail(e, afterFail);
@@ -413,7 +414,6 @@ const runGlobalTests = function () {
         clearTimeout(timer);
         console.error(e);
         report.fail(e, afterFail);
-
       }
     } else {
       loadNextChunk();
@@ -423,7 +423,7 @@ const runGlobalTests = function () {
   loop(globalTests.slice(params.offset, params.offset + chunk));
 };
 
-const loadtests = function (data) {
+const loadtests = (data): void => {
   chunk = data.chunk;
   retries = data.retries;
   timeout = data.timeout;
@@ -431,20 +431,19 @@ const loadtests = function (data) {
   runGlobalTests();
 };
 
-const testrunner = function () {
+const testrunner = (): void => {
   // delay this ajax call until after the reporter status elements are in the page
-  $('document').ready(function () {
+  $((): void => {
     $.ajax({
       url: 'harness',
       dataType: 'json',
       success: loadtests,
-      error: initError
+      error: initError,
     });
   });
 };
 
-const getscratch = function () {
-  return testscratch;
-};
+// TODO: do we need the scratch area? TinyMCE seems to just ignore it
+const getscratch = () => testscratch;
 
 testrunner();
