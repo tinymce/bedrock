@@ -1,4 +1,5 @@
 import resolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
 
 export default {
   input: 'dist/lib/runner/ts/Runner.js',
@@ -12,6 +13,7 @@ export default {
   },
   context: 'window',
   plugins: [
-    resolve()
+    resolve(),
+    commonjs()
   ]
 };

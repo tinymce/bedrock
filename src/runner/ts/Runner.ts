@@ -1,19 +1,9 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import * as QS from 'querystringify';
+
+declare const $: JQueryStatic;
 
 // webpack makes this available
 const Global: any = window;
-
-const urlParams = () => {
-  const params = {};
-  let qs = window.location.search;
-  qs = qs.split('+').join(' ');
-  const re = /[?&]?([^=]+)=([^&]*)/g;
-  let m;
-  while (m = re.exec(qs)) {
-    params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
-  }
-  return params;
-};
 
 const posInt = (str): number => {
   if (typeof str === 'string') {
@@ -36,7 +26,7 @@ interface Params {
 }
 
 const getParams = (): Params => {
-  const params = urlParams();
+  const params = QS.parse(window.location.search);
   return {
     session: params['session'] || makeSessionId(),
     offset: posInt(params['offset']),
@@ -434,6 +424,7 @@ const loadtests = (data): void => {
 const testrunner = (): void => {
   // delay this ajax call until after the reporter status elements are in the page
   $((): void => {
+    // noinspection JSIgnoredPromiseFromCall
     $.ajax({
       url: 'harness',
       dataType: 'json',
