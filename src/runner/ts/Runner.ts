@@ -38,7 +38,6 @@ const getParams = (): Params => {
 let chunk; // set during loadtests
 let retries; // set during loadtests
 let timeout; // set during loadtests
-let testscratch = null; // set per test, private dom scratch area for the current test to use.
 const globalTests = Global.__tests ? Global.__tests : [];
 
 const params = getParams();
@@ -230,7 +229,6 @@ const reporter = (() => {
     let nameSpan;
     let error;
     let time;
-    let scratch;
     let reported;
 
     const start = (onDone): void => {
@@ -244,12 +242,9 @@ const reporter = (() => {
       error = $('<span />').addClass('error-container');
       time = $('<span />').addClass('time');
       output.append(marker, ' ', nameSpan, ' [', time, '] ', error, ' ', testfile);
-      scratch = $('<div />').addClass('scratch');
-      el.append(output, scratch);
       $('body').append(el);
 
       reported = false;
-      testscratch = scratch.get(0); // intentional, see top of file for var decl.
       sendTestStart(params.session, file, name, onDone, onDone);
     };
 
@@ -433,8 +428,5 @@ const testrunner = (): void => {
     });
   });
 };
-
-// TODO: do we need the scratch area? TinyMCE seems to just ignore it
-const getscratch = () => testscratch;
 
 testrunner();
