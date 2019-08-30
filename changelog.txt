@@ -1,7 +1,12 @@
+Version 6.0.0
+
+* Major version bump, due to removal of UnitTest.domtest
+
 Version 5.1.0
 
 * Added types to client package.
 * Allow tests to fail with a TestLabel type.
+* Removed UnitTest.domtest - this should have been a major version bump.
 
 Version 5.0.2
 
