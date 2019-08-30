@@ -1,46 +1,19 @@
-import * as QS from 'querystringify';
+import { UrlParams } from './core/UrlParams';
 
 declare const $: JQueryStatic;
 
 // webpack makes this available
 const Global: any = window;
 
-const posInt = (str): number => {
-  if (typeof str === 'string') {
-    const num = parseInt(str, 10);
-    if (!isNaN(num) && num > 0) {
-      return num;
-    }
-  }
-  return 0;
-};
-
 const makeSessionId = (): string =>
   '' + Math.ceil((Math.random() * 100000000));
-
-interface Params {
-  readonly session: number;
-  readonly offset: number;
-  readonly failed: number;
-  retry: number;
-}
-
-const getParams = (): Params => {
-  const params = QS.parse(window.location.search);
-  return {
-    session: params['session'] || makeSessionId(),
-    offset: posInt(params['offset']),
-    failed: posInt(params['failed']),
-    retry: posInt(params['retry']),
-  };
-};
 
 let chunk; // set during loadtests
 let retries; // set during loadtests
 let timeout; // set during loadtests
 const globalTests = Global.__tests ? Global.__tests : [];
 
-const params = getParams();
+const params = UrlParams.parse(window.location.search, makeSessionId);
 
 const makeUrl = (session, offset, failed, retry): string => {
   const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
