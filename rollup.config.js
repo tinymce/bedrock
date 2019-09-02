@@ -6,7 +6,6 @@ export default {
   output: {
     file: 'dist/bedrock/www/runner/runner.js',
     format: 'iife',
-    name: 'runner',
     globals: {
       'jQuery': 'jQuery'
     },
