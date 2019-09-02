@@ -237,6 +237,7 @@ const stopOnFailure = {
   validate: extraction.any
 };
 
+// eslint-disable-next-line camelcase
 const stopOnFailure__hidden = {
   name: 'stopOnFailure',
   type: Boolean,

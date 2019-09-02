@@ -22,7 +22,7 @@ const outputTime = function (runnerTime) {
   return time.charAt(time.length - 1) === 's' ? time.substr(0, time.length - 2) : time;
 };
 
-var write = function (settings) {
+const write = function (settings) {
   return function (data) {
     return new Promise(function (resolve, reject) {
       const results = data.results;

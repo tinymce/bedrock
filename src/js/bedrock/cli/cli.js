@@ -1,4 +1,3 @@
-const cloptions = require('./cloptions');
 const commandLineArgs = require('command-line-args');
 const attempt = require('../core/attempt');
 const version = require('../core/version');

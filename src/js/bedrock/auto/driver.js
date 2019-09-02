@@ -1,5 +1,5 @@
 const path = require('path');
-const child_process = require('child_process');
+const childProcess = require('child_process');
 const os = require('os');
 const webdriver = require('selenium-webdriver');
 
@@ -18,7 +18,7 @@ const browserDrivers = {
 const cscriptFocus = function (basedir, script) {
   return new Promise(function (resolve) {
     const focusScript = path.join(basedir, 'bin/focus/' + script);
-    child_process.exec('cscript ' + focusScript, function () {
+    childProcess.exec('cscript ' + focusScript, function () {
       resolve();
     });
   });
@@ -33,7 +33,7 @@ const focusEdge = function (basedir) {
 const focusMac = function (basedir, browser) {
   return new Promise(function (resolve) {
     const macFocusScript = path.join(basedir, 'bin/focus/mac.applescript');
-    child_process.exec(`osascript ${macFocusScript} ${browser}`, function () {
+    childProcess.exec(`osascript ${macFocusScript} ${browser}`, function () {
       resolve();
     });
   });

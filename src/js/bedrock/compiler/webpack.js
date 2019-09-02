@@ -13,8 +13,9 @@ function moduleAvailable (name) {
   try {
     require.resolve(name);
     return true;
-  } catch (e) {}
-  return false;
+  } catch (e) {
+    return false;
+  }
 }
 
 const webpackRemap = moduleAvailable('@ephox/swag') ? [

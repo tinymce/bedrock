@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 var go = function (settings) {
   var serve = require('./bedrock/server/serve');
 

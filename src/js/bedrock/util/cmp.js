@@ -1,5 +1,5 @@
 // Doesn't handle all corner with undefined and null
-var deepEq = function (obj1, obj2) {
+const deepEq = function (obj1, obj2) {
   const type = typeof obj1;
   if (type === 'string' || type === 'number' || type === 'boolean') {
     return obj1 === obj2;

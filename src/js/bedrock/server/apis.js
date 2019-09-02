@@ -19,7 +19,7 @@ const create = function (master, maybeDriver, projectdir, basedir, stickyFirstSe
   // effects before driver.get has returned properly, it throws "UnsupportedOperationErrors"
   // This code is designed to allow the driver.get promise launched in bedrock-auto to
   // let the server known when it is able to use driver when responding to effect ajax calls.
-  var waitForDriverReady = function (attempts, f) {
+  const waitForDriverReady = function (attempts, f) {
     if (pageHasLoaded && master !== null) return master.waitForIdle(f, 'effect');
     else if (attempts === 0) return Promise.reject('Driver never appeared to be ready');
     else {
@@ -63,7 +63,7 @@ const create = function (master, maybeDriver, projectdir, basedir, stickyFirstSe
   };
 
 
-  var pageHasLoaded = false;
+  let pageHasLoaded = false;
 
   const markLoaded = function () {
     pageHasLoaded = true;

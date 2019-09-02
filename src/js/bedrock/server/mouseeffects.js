@@ -1,6 +1,3 @@
-const webdriver = require('selenium-webdriver');
-const By = webdriver.By;
-
 const effectutils = require('./effectutils');
 
 /*
@@ -15,7 +12,7 @@ const getAction = function (driver, target, type) {
   else if (type === 'up') return driver.actions().mouseMove(target).mouseUp().perform();
   // MicrosoftEdge does support this, but does not seem to support click in an ActionSequence
   else if (type === 'click') return target.click();
-  else return new Promise.reject('Unknown mouse effect type: ' + type);
+  else return Promise.reject('Unknown mouse effect type: ' + type);
 };
 
 const execute = function (driver, data) {

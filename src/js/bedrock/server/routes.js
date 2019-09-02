@@ -26,7 +26,7 @@ const json = function (method, prefix, data) {
   };
 };
 
-var concludeJson = function (response, status, info) {
+const concludeJson = function (response, status, info) {
   response.writeHeader(status, {'Content-Type': 'application/json'});
   response.end(JSON.stringify(info));
 };

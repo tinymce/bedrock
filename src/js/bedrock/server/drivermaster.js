@@ -40,7 +40,7 @@ const create = function () {
    * fall out.
    */
 
-  var doWaitForIdle = function (identifier, f, label, attempts) {
+  const doWaitForIdle = function (identifier, f, label, attempts) {
     // Locking has failed many times ... so just assume the lock should have been released.
     if (attempts === 0) return use(f, label);
     // Nothing has a lock, and there is no queue
@@ -73,7 +73,7 @@ const create = function () {
   };
 
 
-  var use = function (f, label) {
+  const use = function (f, label) {
     inUse = true;
 
     return f().then(function (v) {
