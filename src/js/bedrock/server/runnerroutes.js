@@ -4,10 +4,18 @@ const compiler = require('../compiler/compiler');
 const fs = require('fs');
 const glob = require('glob');
 
-const flatMap = function (xs, f) {
+if (!Array.prototype.flatMap) {
+  // simple polyfill for node versions < 11
+  // not at all to ES2019 spec, but if you're relying on that you should use node 11 /shrug
   const concat = (x, y) => x.concat(y);
-  return xs.map(f).reduce(concat, []);
-};
+
+  const flatMap = (f, xs) => xs.map(f).reduce(concat, []);
+
+  // eslint-disable-next-line no-extend-native
+  Array.prototype.flatMap = function (f) {
+    return flatMap(f, this);
+  };
+}
 
 const generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, chunk, retries, singleTimeout, stopOnFailure, basePage, coverage) {
   const files = testfiles.map(function (filePath) {
@@ -28,7 +36,7 @@ const generate = function (mode, projectdir, basedir, configFile, bundler, testf
   const pkjson = JSON.parse(fs.readFileSync(`${projectdir}/package.json`));
 
   // Search for yarn workspace projects to use as resource folders
-  const workspaceRoots = !pkjson.workspaces ? [] : flatMap(flatMap(pkjson.workspaces, (w) => glob.sync(w)), (moduleFolder) => {
+  const workspaceRoots = !pkjson.workspaces ? [] : pkjson.workspaces.flatMap((w) => glob.sync(w)).flatMap((moduleFolder) => {
     const moduleJson = `${moduleFolder}/package.json`;
     if (fs.statSync(moduleJson)) {
       const workspaceJson = JSON.parse(fs.readFileSync(moduleJson));
