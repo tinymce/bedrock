@@ -2,9 +2,9 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 
 export default {
-  input: 'dist/lib/runner/ts/Runner.js',
+  input: 'lib/runner/ts/Runner.js',
   output: {
-    file: 'dist/www/runner/runner.js',
+    file: 'dist/bedrock/www/runner/runner.js',
     format: 'iife',
     name: 'runner',
     globals: {
