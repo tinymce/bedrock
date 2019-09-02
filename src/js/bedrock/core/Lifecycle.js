@@ -1,5 +1,5 @@
-const exitcodes = require('../util/exitcodes');
-const attempt = require('./attempt');
+const exitcodes = require('../util/ExitCodes');
+const attempt = require('./Attempt');
 
 const shutdown = function (promise, driver, done, gruntDone, delayExiting) {
   const exitDelay = function () {

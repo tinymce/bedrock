@@ -1,7 +1,7 @@
-const attempt = require('./bedrock/core/attempt');
-const version = require('./bedrock/core/version');
-const runnerroutes = require('./bedrock/server/runnerroutes');
-const webpack = require('./bedrock/compiler/webpack');
+const attempt = require('./bedrock/core/Attempt');
+const version = require('./bedrock/core/Version');
+const runnerroutes = require('./bedrock/server/RunnerRoutes');
+const webpack = require('./bedrock/compiler/Wkebpack');
 
 const go = function (settings) {
   settings.stopOnFailure = true;

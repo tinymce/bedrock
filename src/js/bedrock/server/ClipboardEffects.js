@@ -1,6 +1,6 @@
 const childProcess = require('child_process');
 const path = require('path');
-const exitcodes = require('../util/exitcodes');
+const exitcodes = require('../util/ExitCodes');
 
 const execSync = childProcess.execSync;
 

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const readdirSyncRec = require('recursive-readdir-sync');
-const attempt = require('../core/attempt');
-const qstring = require('../util/qstring');
+const attempt = require('../core/Attempt');
+const qstring = require('../util/Qstring');
 
 const file = function (name, rawValue) {
   // Ignore any query strings when checking if a file exists

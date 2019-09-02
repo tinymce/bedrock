@@ -1,6 +1,6 @@
 const XMLWriter = require('xml-writer');
 const fs = require('fs');
-const attempt = require('./attempt');
+const attempt = require('./Attempt');
 
 const writePollExit = function (settings, results) {
   return write({

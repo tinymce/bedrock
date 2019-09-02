@@ -1,5 +1,5 @@
-const attempt = require('./bedrock/core/attempt');
-const clis = require('./bedrock/cli/clis');
+const attempt = require('./bedrock/core/Attempt');
+const clis = require('./bedrock/cli/Clis');
 
 const run = function (program, directories) {
   if (clis[program.mode] === undefined) throw 'Bedrock mode not known: ' + program.mode;

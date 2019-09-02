@@ -1,4 +1,4 @@
-const effectutils = require('./effectutils');
+const effectutils = require('./EffectUtils');
 
 /*
  JSON API for data: {

@@ -1,11 +1,11 @@
-const serve = require('./bedrock/server/serve');
-const attempt = require('./bedrock/core/attempt');
-const version = require('./bedrock/core/version');
-const runnerroutes = require('./bedrock/server/runnerroutes');
-const reporter = require('./bedrock/core/reporter');
-const drivermaster = require('./bedrock/server/drivermaster');
-const driver = require('./bedrock/auto/driver');
-const lifecycle = require('./bedrock/core/lifecycle');
+const serve = require('./bedrock/server/Serve');
+const attempt = require('./bedrock/core/Attempt');
+const version = require('./bedrock/core/Version');
+const runnerroutes = require('./bedrock/server/RunnerRoutes');
+const reporter = require('./bedrock/core/Reporter');
+const drivermaster = require('./bedrock/server/DriverMaster');
+const driver = require('./bedrock/auto/Driver');
+const lifecycle = require('./bedrock/core/Lifecycle');
 
 const skipTests = function (reporter, settings, message) {
   // Write results

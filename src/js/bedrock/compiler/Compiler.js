@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const webpack = require('../compiler/webpack');
+const webpack = require('../compiler/Webpack');
 
 module.exports = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, files, coverage) {
   const getCompileFunc = function () {

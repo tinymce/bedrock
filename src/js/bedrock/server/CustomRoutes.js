@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const matchers = require('./matchers');
-const obj = require('../util/obj');
-const type = require('../util/type');
-const routes = require('./routes');
+const matchers = require('./Matchers');
+const obj = require('../util/Obj');
+const type = require('../util/Type');
+const routes = require('./Routes');
 
 const readRequestBody = function (request, done) {
   let body = '';

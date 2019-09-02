@@ -1,4 +1,4 @@
-const attempt = require('../core/attempt');
+const attempt = require('../core/Attempt');
 
 const validateOne = function (defn, settings) {
   return defn.validate(defn.name, settings[defn.name]);

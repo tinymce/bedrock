@@ -1,5 +1,5 @@
 const path = require('path');
-const extraction = require('./extraction');
+const extraction = require('./Extraction');
 
 // Note, this is a blend of the previous hand-rolled cloption approach and
 // the existing npm package: command-line-arguments

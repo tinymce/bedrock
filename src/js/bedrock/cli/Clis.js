@@ -1,6 +1,6 @@
-const cli = require('./cli');
-const cloptions = require('./cloptions');
-const exitcodes = require('../util/exitcodes');
+const cli = require('./Cli');
+const cloptions = require('./ClOptions');
+const exitcodes = require('../util/ExitCodes');
 
 const commonOptions = function (directories) {
   return [

@@ -1,4 +1,4 @@
-const mHud = require('../cli/hud');
+const mHud = require('../cli/Hud');
 
 // allow a little extra time for a test timeout so the runner can handle it gracefully
 const timeoutGrace = 2000;

@@ -5,8 +5,8 @@ const sourcemaps = require('rollup-plugin-sourcemaps');
 const path = require('path');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
-const imports = require('./imports');
-const exitcodes = require('../util/exitcodes');
+const imports = require('./Imports');
+const exitcodes = require('../util/ExitCodes');
 
 const parseTsConfig = function (tsconfig) {
   return JSON.parse(fs.readFileSync(tsconfig));

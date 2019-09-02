@@ -1,4 +1,4 @@
-const routes = require('./routes');
+const routes = require('./Routes');
 
 const generate = function (projectdir, basedir, page) {
   const routers = [

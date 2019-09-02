@@ -1,5 +1,5 @@
 const webdriver = require('selenium-webdriver');
-const effectutils = require('./effectutils');
+const effectutils = require('./EffectUtils');
 
 const Key = webdriver.Key;
 

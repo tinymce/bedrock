@@ -1,9 +1,9 @@
 const commandLineArgs = require('command-line-args');
-const attempt = require('../core/attempt');
-const version = require('../core/version');
-const validation = require('./validation');
-const cliusage = require('./cliusage');
-const exitcodes = require('../util/exitcodes');
+const attempt = require('../core/Attempt');
+const version = require('../core/Version');
+const validation = require('./Validation');
+const cliusage = require('./CliUsage');
+const exitcodes = require('../util/ExitCodes');
 
 const parseCommandLine = function (definitions) {
   try {

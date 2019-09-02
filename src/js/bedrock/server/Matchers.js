@@ -1,6 +1,6 @@
-const cmp = require('../util/cmp');
-const obj = require('../util/obj');
 const url = require('url');
+const cmp = require('../util/Cmp');
+const obj = require('../util/Obj');
 
 const prefixMatch = function (prefix) {
   return function (request) {

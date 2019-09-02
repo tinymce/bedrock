@@ -1,9 +1,9 @@
-const accessor = require('../core/accessor');
 const finalhandler = require('finalhandler');
 const portfinder = require('portfinder');
-const routes = require('./routes');
-const apis = require('./apis');
-const cr = require('./customroutes');
+const accessor = require('../core/Accessor');
+const routes = require('./Routes');
+const apis = require('./Apis');
+const cr = require('./CustomRoutes');
 
 /*
  * Settings:

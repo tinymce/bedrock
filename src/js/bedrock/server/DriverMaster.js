@@ -1,4 +1,4 @@
-const waiter = require('../util/waiter');
+const waiter = require('../util/Waiter');
 
 const create = function () {
   let inUse = false;
