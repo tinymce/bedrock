@@ -1,5 +1,5 @@
-const Attempt = require('./bedrock/core/Attempt');
-const Clis = require('./bedrock/cli/Clis');
+import * as Attempt from './bedrock/core/Attempt';
+import * as Clis from './bedrock/cli/Clis';
 
 const run = function (program, directories) {
   if (Clis[program.mode] === undefined) {

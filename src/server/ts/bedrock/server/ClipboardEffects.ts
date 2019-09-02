@@ -1,6 +1,6 @@
-const childProcess = require('child_process');
-const path = require('path');
-const ExitCodes = require('../util/ExitCodes');
+import * as childProcess from 'child_process';
+import * as path from 'path';
+import * as ExitCodes from '../util/ExitCodes';
 
 const execSync = childProcess.execSync;
 

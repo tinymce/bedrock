@@ -1,13 +1,13 @@
-const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const webpack = require('webpack');
-const path = require('path');
-const fs = require('fs');
-const mkdirp = require('mkdirp');
-const WebpackDevServer = require('webpack-dev-server');
-const Serve = require('../server/Serve');
-const ExitCodes = require('../util/ExitCodes');
-const Imports = require('./Imports');
+import * as TsConfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
+import * as ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
+import * as webpack from 'webpack';
+import * as path from 'path';
+import * as fs from 'fs';
+import * as mkdirp from 'mkdirp';
+import * as WebpackDevServer from 'webpack-dev-server';
+import * as Serve from '../server/Serve';
+import * as ExitCodes from '../util/ExitCodes';
+import * as Imports from './Imports';
 
 function moduleAvailable (name) {
   try {

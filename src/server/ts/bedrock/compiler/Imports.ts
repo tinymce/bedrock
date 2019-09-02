@@ -1,4 +1,4 @@
-const path = require('path');
+import * as path from 'path';
 
 const filePathToImport = function (useRequire, scratchFile) {
   return function (filePath) {

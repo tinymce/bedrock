@@ -1,4 +1,4 @@
-const Routes = require('./Routes');
+import * as Routes from './Routes';
 
 const generate = function (projectdir, basedir, page) {
   const routers = [

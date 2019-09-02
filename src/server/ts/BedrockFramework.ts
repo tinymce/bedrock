@@ -1,12 +1,12 @@
-const path = require('path');
-const Serve = require('./bedrock/server/Serve');
-const Reporter = require('./bedrock/core/Reporter');
-const Attempt = require('./bedrock/core/Attempt');
-const Version = require('./bedrock/core/Version');
-const DriverMaster = require('./bedrock/server/DriverMaster');
-const Driver = require('./bedrock/auto/Diver');
-const PageRoutes = require('./bedrock/server/PageRoutes');
-const Lifecycle = require('./bedrock/core/Lifecycle');
+import * as path from 'path';
+import * as Serve from './bedrock/server/Serve';
+import * as Reporter from './bedrock/core/Reporter';
+import * as Attempt from './bedrock/core/Attempt';
+import * as Version from './bedrock/core/Version';
+import * as DriverMaster from './bedrock/server/DriverMaster';
+import * as Driver from './bedrock/auto/Diver';
+import * as PageRoutes from './bedrock/server/PageRoutes';
+import * as Lifecycle from './bedrock/core/Lifecycle';
 
 /* eslint-disable no-undef */
 const go = function (settings) {

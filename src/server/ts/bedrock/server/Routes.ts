@@ -1,5 +1,5 @@
-const server = require('serve-static');
-const Matchers = require('./Matchers');
+import * as server from 'serve-static';
+import * as Matchers from './Matchers';
 
 const routing = function (method, prefix, source) {
   const router = server(source);

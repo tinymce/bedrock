@@ -1,4 +1,4 @@
-const EffectUtils = require('./EffectUtils');
+import * as EffectUtils from './EffectUtils';
 
 /*
  JSON API for data: {

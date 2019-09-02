@@ -1,5 +1,5 @@
-const webdriver = require('selenium-webdriver');
-const until = require('selenium-webdriver/lib/until');
+import * as webdriver from 'selenium-webdriver';
+import * as until from 'selenium-webdriver/lib/until';
 
 const By = webdriver.By;
 

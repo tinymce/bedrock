@@ -1,9 +1,10 @@
-const finalhandler = require('finalhandler');
-const portfinder = require('portfinder');
-const Accessor = require('../core/Accessor');
-const Routes = require('./Routes');
-const Apis = require('./Apis');
-const CustomRoutes = require('./CustomRoutes');
+import * as finalhandler from 'finalhandler';
+import * as portfinder from 'portfinder';
+import * as Accessor from '../core/Accessor';
+import * as Routes from './Routes';
+import * as Apis from './Apis';
+import * as CustomRoutes from './CustomRoutes';
+import * as http from 'http';
 
 /*
  * Settings:
@@ -77,7 +78,6 @@ const startCustom = function (settings, createServer, f) {
 };
 
 const start = function (settings, f) {
-  const http = require('http');
   startCustom(settings, http.createServer, f);
 };
 

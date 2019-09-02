@@ -1,6 +1,6 @@
-const url = require('url');
-const Cmp = require('../util/Cmp');
-const Obj = require('../util/Obj');
+import * as url from 'url';
+import * as Cmp from '../util/Cmp';
+import * as Obj from '../util/Obj';
 
 const prefixMatch = function (prefix) {
   return function (request) {

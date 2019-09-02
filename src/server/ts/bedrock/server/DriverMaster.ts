@@ -1,4 +1,4 @@
-const Waiter = require('../util/Waiter');
+import * as Waiter from '../util/Waiter';
 
 const create = function () {
   let inUse = false;

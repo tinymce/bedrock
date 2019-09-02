@@ -1,5 +1,5 @@
-const webdriver = require('selenium-webdriver');
-const EffectUtils = require('./EffectUtils');
+import * as webdriver from 'selenium-webdriver';
+import * as EffectUtils from './EffectUtils';
 
 const Key = webdriver.Key;
 

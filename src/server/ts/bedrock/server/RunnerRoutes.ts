@@ -1,8 +1,8 @@
-const path = require('path');
-const fs = require('fs');
-const glob = require('glob');
-const Routes = require('./routes');
-const Compiler = require('../compiler/Compiler');
+import * as path from 'path';
+import * as fs from 'fs';
+import * as glob from 'glob';
+import * as Routes from './routes';
+import * as Compiler from '../compiler/Compiler';
 
 const flatMap = function (xs, f) {
   const concat = (x, y) => x.concat(y);

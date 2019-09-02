@@ -1,9 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-const Matchers = require('./Matchers');
-const Obj = require('../util/Obj');
-const Type = require('../util/Type');
-const Routes = require('./Routes');
+import * as fs from 'fs';
+import * as path from 'path';
+import * as Matchers from './Matchers';
+import * as Obj from '../util/Obj';
+import * as Type from '../util/Type';
+import * as Routes from './Routes';
 
 const readRequestBody = function (request, done) {
   let body = '';

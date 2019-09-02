@@ -1,4 +1,4 @@
-const Hud = require('../cli/Hud');
+import * as Hud from '../cli/Hud';
 
 // allow a little extra time for a test timeout so the runner can handle it gracefully
 const timeoutGrace = 2000;

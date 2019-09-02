@@ -1,4 +1,4 @@
-const Attempt = require('../core/Attempt');
+import * as Attempt from '../core/Attempt';
 
 const validateOne = function (defn, settings) {
   return defn.validate(defn.name, settings[defn.name]);

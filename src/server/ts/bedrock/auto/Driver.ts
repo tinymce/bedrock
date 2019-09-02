@@ -1,7 +1,7 @@
-const path = require('path');
-const childProcess = require('child_process');
-const os = require('os');
-const webdriver = require('selenium-webdriver');
+import * as path from 'path';
+import * as childProcess from 'child_process';
+import * as os from 'os';
+import * as webdriver from 'selenium-webdriver';
 
 const browserVariants = {
   'chrome-headless': 'chrome',
@@ -126,6 +126,7 @@ const create = function (settings) {
    */
 
   // Support for disabling the Automation Chrome Extension
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const chrome = require('selenium-webdriver/chrome');
   const chromeOptions = new chrome.Options();
   chromeOptions.addArguments('chrome.switches', '--disable-extensions');
@@ -139,6 +140,7 @@ const create = function (settings) {
     const winVersion = getWinVersion();
     // The "--jwp" argument doesn't exist in older versions of `MicrosoftWebDriver` so we need to detect the windows version
     if (winVersion.major > 10 || winVersion.major === 10 && winVersion.build >= 17763) {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const edge = require('selenium-webdriver/edge');
       const edgeService = new edge.ServiceBuilder().addArguments('--jwp').build();
       edge.setDefaultService(edgeService);

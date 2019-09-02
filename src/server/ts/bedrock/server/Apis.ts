@@ -1,11 +1,11 @@
-const keys = require('./keyeffects');
-const mouse = require('./mouseeffects');
-const ClipboardEffects = require('./ClipboardEffects');
-const Routes = require('./Routes');
-const Controller = require('./Controller');
-const Attempt = require('../core/Attempt');
-const Waiter = require('../util/Waiter');
-const Coverage = require('../core/Coverage');
+import * as keys from './keyeffects';
+import * as mouse from './mouseeffects';
+import * as ClipboardEffects from './ClipboardEffects';
+import * as Routes from './Routes';
+import * as Controller from './Controller';
+import * as Attempt from '../core/Attempt';
+import * as Waiter from '../util/Waiter';
+import * as Coverage from '../core/Coverage';
 
 // This is how long to wait before checking if the driver is ready again
 const pollRate = 2000;

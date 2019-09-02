@@ -1,4 +1,4 @@
-const usage = require('command-line-usage');
+import * as usage from 'command-line-usage';
 
 const generateUsage = function (command, desc, definitions) {
   const visibleDefinitions = definitions.filter(function (defn) {

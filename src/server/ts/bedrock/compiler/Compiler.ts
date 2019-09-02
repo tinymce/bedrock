@@ -1,6 +1,6 @@
-const path = require('path');
-const fs = require('fs');
-const Webpack = require('../compiler/Webpack');
+import * as path from 'path';
+import * as fs from 'fs';
+import * as Webpack from '../compiler/Webpack';
 
 const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, files, coverage) {
   const getCompileFunc = function () {

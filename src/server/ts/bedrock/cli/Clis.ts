@@ -1,6 +1,6 @@
-const cli = require('./Cli');
-const ClOptions = require('./ClOptions');
-const ExitCodes = require('../util/ExitCodes');
+import * as cli from './Cli';
+import * as ClOptions from './ClOptions';
+import * as ExitCodes from '../util/ExitCodes';
 
 const commonOptions = function (directories) {
   return [

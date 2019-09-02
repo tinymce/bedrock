@@ -1,12 +1,12 @@
-const rollup = require('rollup');
-const typescript = require('rollup-plugin-typescript2');
-const resolve = require('rollup-plugin-node-resolve');
-const sourcemaps = require('rollup-plugin-sourcemaps');
-const path = require('path');
-const fs = require('fs');
-const mkdirp = require('mkdirp');
-const Imports = require('./Imports');
-const ExitCodes = require('../util/ExitCodes');
+import * as rollup from 'rollup';
+import * as typescript from 'rollup-plugin-typescript2';
+import * as resolve from 'rollup-plugin-node-resolve';
+import * as sourcemaps from 'rollup-plugin-sourcemaps';
+import * as path from 'path';
+import * as fs from 'fs';
+import * as mkdirp from 'mkdirp';
+import * as Imports from './Imports';
+import * as ExitCodes from '../util/ExitCodes';
 
 const parseTsConfig = function (tsconfig) {
   return JSON.parse(fs.readFileSync(tsconfig));
