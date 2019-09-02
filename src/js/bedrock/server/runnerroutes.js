@@ -1,14 +1,7 @@
-if (!Array.prototype.flatMap) {
-  // simple polyfill for node versions < 11
-  // not at all to ES2019 spec, but if you're relying on that you should use node 11 /shrug
+const flatMap = function (xs, f) {
   const concat = (x, y) => x.concat(y);
-
-  const flatMap = (f, xs) => xs.map(f).reduce(concat, []);
-
-  Array.prototype.flatMap = function (f) {
-    return flatMap(f, this);
-  };
-}
+  return xs.map(f).reduce(concat, []);
+};
 
 const generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, chunk, retries, singleTimeout, stopOnFailure, basePage, coverage) {
   const path = require('path');
@@ -35,7 +28,7 @@ const generate = function (mode, projectdir, basedir, configFile, bundler, testf
   const pkjson = JSON.parse(fs.readFileSync(`${projectdir}/package.json`));
 
   // Search for yarn workspace projects to use as resource folders
-  const workspaceRoots = !pkjson.workspaces ? [] : pkjson.workspaces.flatMap((w) => glob.sync(w)).flatMap((moduleFolder) => {
+  const workspaceRoots = !pkjson.workspaces ? [] : flatMap(flatMap(pkjson.workspaces, (w) => glob.sync(w)), (moduleFolder) => {
     const moduleJson = `${moduleFolder}/package.json`;
     if (fs.statSync(moduleJson)) {
       const workspaceJson = JSON.parse(fs.readFileSync(moduleJson));
