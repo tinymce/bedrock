@@ -1,1 +1,2 @@
-module.exports = 'v' + require('../../../../package.json').version;
+let packagejson = require('../../../../package.json');
+module.exports = 'v' + packagejson.version;

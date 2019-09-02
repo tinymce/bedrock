@@ -5,7 +5,8 @@ var go = function (settings) {
   var attempt = require('./bedrock/core/attempt');
   var version = require('./bedrock/core/version');
 
-  var master = require('./bedrock/server/drivermaster').create();
+  let drivermaster = require('./bedrock/server/drivermaster');
+  var master = drivermaster.create();
 
   var path = require('path');
 

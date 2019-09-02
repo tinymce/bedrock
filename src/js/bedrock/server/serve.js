@@ -28,7 +28,8 @@ var startCustom = function (settings, createServer, f) {
 
   var routes = require('./routes');
   var apis = require('./apis');
-  var customroutes = require('./customroutes').create(settings.customRoutes);
+  let cr = require('./customroutes');
+  var customroutes = cr.create(settings.customRoutes);
 
   var basedir = Prefs.basedir(settings);
   var projectdir = Prefs.projectdir(settings);

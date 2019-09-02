@@ -22,7 +22,8 @@ module.exports = function(grunt) {
     }
   });
 
-  require("load-grunt-tasks")(grunt);
+  let gruntTasks = require("load-grunt-tasks");
+  gruntTasks(grunt);
   grunt.loadTasks("../bin/grunt-tasks");
   grunt.loadTasks("../tasks");
 

@@ -1,4 +1,5 @@
-var execSync = require('child_process').execSync;
+let childProcess = require('child_process');
+var execSync = childProcess.execSync;
 var path = require('path');
 
 var exitcodes = require('../util/exitcodes');

@@ -42,7 +42,8 @@ var go = function (settings) {
     return;
   }
 
-  var master = require('./bedrock/server/drivermaster').create();
+  let drivermaster = require('./bedrock/server/drivermaster');
+  var master = drivermaster.create();
   var driver = require('./bedrock/auto/driver');
 
   var isPhantom = settings.browser === 'phantomjs';
