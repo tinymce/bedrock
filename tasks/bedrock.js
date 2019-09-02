@@ -1,6 +1,7 @@
-var cloptions = require('../src/js/bedrock/cli/cloptions');
-var path = require('path');
-var bedrockManual = require('../src/js/bedrock-manual');
+const path = require('path');
+const cloptions = require('../src/js/bedrock/cli/ClOptions');
+const bedrockManual = require('../src/js/BedrockManual');
+const bedrockAuto = require('../src/js/BedrockAuto');
 
 module.exports = function(grunt) {
 
@@ -87,8 +88,6 @@ module.exports = function(grunt) {
       done(passed);
     };
     autoSettings.stopOnFailure = options.stopOnFailure;
-
-    var bedrockAuto = require('../src/js/bedrock-auto');
 
     try {
       bedrockAuto.go(autoSettings);
