@@ -75,7 +75,7 @@ export const go = function (settings) {
       };
 
       Serve.start(serveSettings, function (service, done) {
-        if (!isPhantom) console.log('bedrock-auto ' + Version + ' available at: http://localhost:' + service.port);
+        if (!isPhantom) console.log('bedrock-auto ' + Version.get() + ' available at: http://localhost:' + service.port);
         const result = driver.get('http://localhost:' + service.port)
           .then(() => driver.executeScript('window.focus();'))
           .then(() => {

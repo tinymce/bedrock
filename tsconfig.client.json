@@ -6,11 +6,9 @@
     "lib": ["es2015", "dom"],
     "declaration": true,
     "sourceMap": true,
-    "outDir": "lib"
+    "outDir": "lib/client/ts"
   },
   "include": [
-    "src/client/ts",
-    "src/runner/ts",
-    "src/server/ts"
+    "src/client/ts"
   ]
 }

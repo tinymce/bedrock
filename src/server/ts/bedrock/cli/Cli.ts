@@ -17,8 +17,8 @@ const parseCommandLine = function (definitions) {
 export const extract = function (command, desc, definitions) {
   const parsed = parseCommandLine(definitions);
 
-
   Attempt.cata(parsed, function () {
+    // TODO: this should report an error
   }, function (s) {
     if (s.help === true) {
       // Print usage information if used with --help or -h.

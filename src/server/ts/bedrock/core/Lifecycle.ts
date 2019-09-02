@@ -13,7 +13,9 @@ export const shutdown = function (promise, driver, done, gruntDone, delayExiting
     // Only check the delay exit option if tests failed.
     Attempt.cata(res, function (_errs) {
       exitDelay();
-    }, function () { });
+    }, function () {
+      // TODO: maybe an Attempt.isFailure would work better here
+    });
 
     // we always need at least 1s delay here
     driver.sleep(1000);

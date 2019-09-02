@@ -33,7 +33,7 @@ export const go = function (settings) {
 
     Webpack.devserver(serveSettings, function (service/* , done */) {
       service.enableHud();
-      console.log('bedrock-manual ' + Version + ' available at: http://localhost:' + service.port);
+      console.log('bedrock-manual ' + Version.get() + ' available at: http://localhost:' + service.port);
     });
   });
 };

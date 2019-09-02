@@ -43,7 +43,7 @@ export const go = function (settings) {
     const isPhantom = settings.browser === 'phantomjs';
 
     Serve.start(serveSettings, function (service, done) {
-      if (!isPhantom) console.log('bedrock-framework ' + Version + ' available at: http://localhost:' + service.port);
+      if (!isPhantom) console.log('bedrock-framework ' + Version.get() + ' available at: http://localhost:' + service.port);
       const result = driver.get('http://localhost:' + service.port + '/' + settings.page).then(function () {
         const message = isPhantom ? '\nPhantom tests loading ...\n' : '\n ... Initial page has loaded ...';
         console.log(message);
