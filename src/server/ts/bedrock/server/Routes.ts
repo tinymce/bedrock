@@ -15,6 +15,11 @@ export const routing = function (method, prefix, source) {
   };
 };
 
+const concludeJson = function (response, status, info) {
+  response.writeHeader(status, {'Content-Type': 'application/json'});
+  response.end(JSON.stringify(info));
+};
+
 export const json = function (method, prefix, data) {
   const go = function (request, response/* , done */) {
     concludeJson(response, 200, data);
@@ -24,11 +29,6 @@ export const json = function (method, prefix, data) {
     matches: [Matchers.methodMatch(method), Matchers.prefixMatch(prefix)],
     go: go
   };
-};
-
-const concludeJson = function (response, status, info) {
-  response.writeHeader(status, {'Content-Type': 'application/json'});
-  response.end(JSON.stringify(info));
 };
 
 export const asyncJs = function (method, url, fn) {
