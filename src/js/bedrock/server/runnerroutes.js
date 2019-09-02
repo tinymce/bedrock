@@ -10,7 +10,6 @@ const flatMap = function (xs, f) {
 };
 
 const generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, chunk, retries, singleTimeout, stopOnFailure, basePage, coverage) {
-
   const files = testfiles.map(function (filePath) {
     return path.relative(projectdir, filePath);
   });
