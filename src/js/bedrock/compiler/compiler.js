@@ -1,11 +1,9 @@
 const path = require('path');
 const fs = require('fs');
-// var rollup = require('../compiler/rollup');
 const webpack = require('../compiler/webpack');
 
 module.exports = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, files, coverage) {
   const getCompileFunc = function () {
-    // return bundler === 'webpack' ? webpack.compile : rollup.compile;
     return webpack.compile;
   };
 
