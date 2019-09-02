@@ -1,4 +1,3 @@
-import * as TsConfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import * as ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import * as webpack from 'webpack';
 import * as path from 'path';
@@ -18,7 +17,7 @@ function moduleAvailable (name) {
   }
 }
 
-const webpackRemap = moduleAvailable('@ephox/swag') ? [
+const webpackRemap: any[] = moduleAvailable('@ephox/swag') ? [
   {
     test: /\.js|\.tsx?$/,
     use: ['@ephox/swag/webpack/remapper']
@@ -26,6 +25,8 @@ const webpackRemap = moduleAvailable('@ephox/swag') ? [
 ] : [];
 
 const getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manualMode, basedir) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
   return {
     stats: 'none',
     entry: scratchFile,

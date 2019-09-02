@@ -1,19 +1,18 @@
+/* eslint-disable */
 import * as rollup from 'rollup';
-import * as typescript from 'rollup-plugin-typescript2';
-import * as resolve from 'rollup-plugin-node-resolve';
-import * as sourcemaps from 'rollup-plugin-sourcemaps';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as Imports from './Imports';
 import {ExitCodes} from '../util/ExitCodes';
 import * as FileUtils from '../util/FileUtils';
+import { OutputOptions } from 'rollup';
 
 export const compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, success) {
   const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   const dest = path.join(scratchDir, 'compiled/tests.js');
 
-  const outputOptions = {
+  const outputOptions: OutputOptions = {
     name: 'ephoxTests',
     file: dest,
     format: 'iife',
@@ -25,6 +24,10 @@ export const compile = function (tsConfigFile, scratchDir, exitOnCompileError, s
 
   mkdirp.sync(path.dirname(scratchFile));
   fs.writeFileSync(scratchFile, Imports.generateImports(false, scratchFile, srcFiles));
+
+  const typescript = require('rollup-plugin-typescript2');
+  const resolve = require('rollup-plugin-node-resolve');
+  const sourcemaps = require('rollup-plugin-sourcemaps');
 
   rollup.rollup({
     input: scratchFile,
