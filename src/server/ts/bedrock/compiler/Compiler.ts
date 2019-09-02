@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as Webpack from '../compiler/Webpack';
 
-const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, files, coverage) {
+export const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, files, coverage) {
   const getCompileFunc = function () {
     return Webpack.compile;
   };
@@ -41,8 +41,4 @@ const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError,
     }),
     generate: generate
   };
-};
-
-module.exports = {
-  compile
 };

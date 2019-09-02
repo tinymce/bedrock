@@ -1,6 +1,6 @@
 import * as usage from 'command-line-usage';
 
-const generateUsage = function (command, desc, definitions) {
+export const generateUsage = function (command, desc, definitions) {
   const visibleDefinitions = definitions.filter(function (defn) {
     return defn.hidden !== true;
   });
@@ -22,15 +22,11 @@ const generateUsage = function (command, desc, definitions) {
     optionList: uncommonDefs
   };
 
-  const options = [commonOptions].concat(uncommonDefs.length > 0 ? [uncommonOptions] : []);
+  const options: any[] = [commonOptions].concat(uncommonDefs.length > 0 ? [uncommonOptions] : []);
 
   return usage(
     [
       {header: command, content: desc}
     ].concat(options)
   );
-};
-
-module.exports = {
-  generateUsage: generateUsage
 };

@@ -10,6 +10,7 @@
   },
   "include": [
     "src/client/ts",
-    "src/runner/ts"
+    "src/runner/ts",
+    "src/server/ts"
   ]
 }

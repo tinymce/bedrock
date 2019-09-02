@@ -2,27 +2,13 @@ import * as XMLWriter from 'xml-writer';
 import * as fs from 'fs';
 import * as Attempt from './Attempt';
 
-const writePollExit = function (settings, results) {
-  return write({
-    name: settings.name,
-    output: settings.output
-  })(results).then(function () {
-    return Promise.reject(results.message);
-  }, function (err) {
-    console.error('Error writing report for polling exit condition');
-    console.error(err);
-    console.error(err.stack);
-    return Promise.reject(results.message);
-  });
-};
-
 const outputTime = function (runnerTime) {
   // runner adds 's' to the time for human readability, but junit needs just a float value in seconds
   const time = runnerTime;
   return time.charAt(time.length - 1) === 's' ? time.substr(0, time.length - 2) : time;
 };
 
-const write = function (settings) {
+export const write = function (settings) {
   return function (data) {
     return new Promise(function (resolve, reject) {
       const results = data.results;
@@ -92,7 +78,16 @@ const write = function (settings) {
   };
 };
 
-module.exports = {
-  writePollExit: writePollExit,
-  write: write
+export const writePollExit = function (settings, results) {
+  return write({
+    name: settings.name,
+    output: settings.output
+  })(results).then(function () {
+    return Promise.reject(results.message);
+  }, function (err) {
+    console.error('Error writing report for polling exit condition');
+    console.error(err);
+    console.error(err.stack);
+    return Promise.reject(results.message);
+  });
 };

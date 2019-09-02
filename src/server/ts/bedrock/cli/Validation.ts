@@ -18,7 +18,7 @@ const validateRequired = function (defn, settings) {
   ]) : Attempt.passed(defn);
 };
 
-const scanRequired = function (definitions, settings) {
+export const scanRequired = function (definitions, settings) {
   const requiredInfo = definitions.map(function (defn) {
     return validateRequired(defn, settings);
   });
@@ -35,7 +35,7 @@ const flatten = function (arrays) {
 };
 
 // Returns either a Failure of an array of error messages, or a Success of the settings object
-const scan = function (definitions, settings) {
+export const scan = function (definitions, settings) {
   return definitions.reduce(function (rest, defn) {
     if (settings[defn.name] === undefined) return rest;
     const newValue = defn.multiple === true ? validateMany(defn, settings) : validateOne(defn, settings);
@@ -50,9 +50,4 @@ const scan = function (definitions, settings) {
       return Attempt.passed(result);
     });
   }, Attempt.passed({}));
-};
-
-module.exports = {
-  scanRequired: scanRequired,
-  scan: scan
 };

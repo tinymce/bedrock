@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as WebpackDevServer from 'webpack-dev-server';
 import * as Serve from '../server/Serve';
-import * as ExitCodes from '../util/ExitCodes';
+import { ExitCodes } from '../util/ExitCodes';
 import * as Imports from './Imports';
 
 function moduleAvailable (name) {
@@ -123,7 +123,7 @@ const getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, ma
   };
 };
 
-const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, srcFiles, coverage, success) {
+export const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, srcFiles, coverage, success) {
   const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   const dest = path.join(scratchDir, 'compiled/tests.js');
   console.log(`Compiling ${srcFiles.length} tests...`);
@@ -154,7 +154,7 @@ const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError,
 
 const isCompiledRequest = (request) => request.url.startsWith('/compiled/');
 
-const devserver = function (settings, done) {
+export const devserver = function (settings, done) {
   return Serve.startCustom(settings, function (handler) {
     const scratchDir = path.resolve('scratch');
     const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
@@ -193,9 +193,4 @@ const devserver = function (settings, done) {
       }
     });
   }, done);
-};
-
-module.exports = {
-  compile: compile,
-  devserver: devserver
 };

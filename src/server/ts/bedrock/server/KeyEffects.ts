@@ -53,12 +53,8 @@ const execute = function (driver, data) {
   });
 };
 
-const executor = function (driver) {
+export const executor = function (driver) {
   return function (data) {
     return execute(driver, data);
   };
-};
-
-module.exports = {
-  executor: executor
 };

@@ -6,13 +6,13 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as Imports from './Imports';
-import * as ExitCodes from '../util/ExitCodes';
+import {ExitCodes} from '../util/ExitCodes';
 
 const parseTsConfig = function (tsconfig) {
   return JSON.parse(fs.readFileSync(tsconfig));
 };
 
-const compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, success) {
+export const compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, success) {
   const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   const dest = path.join(scratchDir, 'compiled/tests.js');
 
@@ -70,8 +70,4 @@ const compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles
 
     success(dest);
   });
-};
-
-module.exports = {
-  compile: compile
 };

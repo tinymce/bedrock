@@ -1,7 +1,7 @@
 import * as server from 'serve-static';
 import * as Matchers from './Matchers';
 
-const routing = function (method, prefix, source) {
+export const routing = function (method, prefix, source) {
   const router = server(source);
 
   const go = function (request, response, done) {
@@ -15,7 +15,7 @@ const routing = function (method, prefix, source) {
   };
 };
 
-const json = function (method, prefix, data) {
+export const json = function (method, prefix, data) {
   const go = function (request, response/* , done */) {
     concludeJson(response, 200, data);
   };
@@ -31,7 +31,7 @@ const concludeJson = function (response, status, info) {
   response.end(JSON.stringify(info));
 };
 
-const asyncJs = function (method, url, fn) {
+export const asyncJs = function (method, url, fn) {
   const go = function (request, response/* , done */) {
     fn(function (data) {
       response.writeHeader(200, {'Content-Type': 'text/javascript'});
@@ -45,7 +45,7 @@ const asyncJs = function (method, url, fn) {
   };
 };
 
-const effect = function (method, prefix, action) {
+export const effect = function (method, prefix, action) {
   const go = function (request, response/* , done */) {
     let body = '';
     request.on('data', function (data) {
@@ -70,7 +70,7 @@ const effect = function (method, prefix, action) {
   };
 };
 
-const rewrite = function (method, root, input, output) {
+export const rewrite = function (method, root, input, output) {
   const base = server(root);
 
   const go = function (request, response, done) {
@@ -84,7 +84,7 @@ const rewrite = function (method, root, input, output) {
   };
 };
 
-const constant = function (method, root, url) {
+export const constant = function (method, root, url) {
   const base = server(root);
 
   const go = function (request, response, done) {
@@ -98,7 +98,7 @@ const constant = function (method, root, url) {
   };
 };
 
-const host = function (method, root) {
+export const host = function (method, root) {
   const base = server(root);
 
   const go = function (request, response, done) {
@@ -111,7 +111,7 @@ const host = function (method, root) {
   };
 };
 
-const hostOn = function (method, prefix, root) {
+export const hostOn = function (method, prefix, root) {
   const base = server(root);
 
   const go = function (request, response, done) {
@@ -126,7 +126,7 @@ const hostOn = function (method, prefix, root) {
   };
 };
 
-const unsupported = function (method, root, label) {
+export const unsupported = function (method, root, label) {
   const go = function (request, response/* , done */) {
     concludeJson(response, 404, {error: label});
   };
@@ -137,7 +137,7 @@ const unsupported = function (method, root, label) {
   };
 };
 
-const route = function (routes, fallback, request, response, done) {
+export const route = function (routes, fallback, request, response, done) {
   request.originalUrl = request.url;
 
   const match = routes.find(function (candidate) {
@@ -148,17 +148,4 @@ const route = function (routes, fallback, request, response, done) {
 
   const matching = match === undefined ? fallback : match;
   matching.go(request, response, done);
-};
-
-module.exports = {
-  routing: routing,
-  effect: effect,
-  constant: constant,
-  rewrite: rewrite,
-  unsupported: unsupported,
-  json: json,
-  asyncJs: asyncJs,
-  route: route,
-  host: host,
-  hostOn: hostOn
 };

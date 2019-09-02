@@ -1,4 +1,4 @@
-module.exports = {
+export const ExitCodes = {
   failures: {
     error: 1,
     cli: 2,

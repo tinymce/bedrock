@@ -1,7 +1,7 @@
 import * as Attempt from './bedrock/core/Attempt';
 import * as Clis from './bedrock/cli/Clis';
 
-const run = function (program, directories) {
+export const run = function (program, directories) {
   if (Clis[program.mode] === undefined) {
     throw new Error('Bedrock mode not known: ' + program.mode);
   }
@@ -10,8 +10,4 @@ const run = function (program, directories) {
   Attempt.cata(maybeSettings, Clis.logAndExit, function (settings) {
     program.go(settings, directories);
   });
-};
-
-module.exports = {
-  run: run
 };

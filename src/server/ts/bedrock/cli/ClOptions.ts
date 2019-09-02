@@ -1,9 +1,24 @@
 import * as path from 'path';
 import * as Extraction from './Extraction';
 
+export interface ClOption {
+  name: string;
+  alias?: string;
+  required?: boolean;
+  type: (s: string) => any; // TODO: stronger type?
+  defaultValue?: any; // TODO: stronger type?
+  output?: string;
+  multiple?: boolean;
+  uncommon?: boolean;
+  flatten?: boolean;
+  description: string;
+  validate: (n: string, v: string) => any; // TODO: stronger type
+  hidden?: boolean;
+}
+
 // Note, this is a blend of the previous hand-rolled cloption approach and
 // the existing npm package: command-line-arguments
-const name = {
+export const name: ClOption = {
   name: 'name',
   alias: 'n',
   type: String,
@@ -12,7 +27,7 @@ const name = {
   validate: Extraction.any
 };
 
-const output = {
+export const output: ClOption = {
   name: 'output',
   alias: 'o',
   type: String,
@@ -21,7 +36,7 @@ const output = {
   validate: Extraction.any
 };
 
-const browser = {
+export const browser: ClOption = {
   name: 'browser',
   alias: 'b',
   type: String,
@@ -39,7 +54,7 @@ const browser = {
   ])
 };
 
-const bundler = {
+export const bundler: ClOption = {
   name: 'bundler',
   type: String,
   required: false,
@@ -51,7 +66,7 @@ const bundler = {
   ])
 };
 
-const configTo = function (defaultValue) {
+export const configTo = function (defaultValue): ClOption {
   return {
     name: 'config',
     alias: 'c',
@@ -62,9 +77,9 @@ const configTo = function (defaultValue) {
   };
 };
 
-const config = configTo('tsconfig.json');
+export const config: ClOption = configTo('tsconfig.json');
 
-const files = {
+export const files: ClOption = {
   name: 'files',
   output: 'testfiles',
   alias: 'f',
@@ -76,7 +91,7 @@ const files = {
   validate: Extraction.file
 };
 
-const testdir = {
+export const testdir: ClOption = {
   name: 'testdir',
   output: 'testfiles',
   // Confusing
@@ -88,7 +103,7 @@ const testdir = {
   validate: Extraction.files(['Test.js', 'Test.ts', 'Test.tsx'])
 };
 
-const testdirs = {
+export const testdirs: ClOption = {
   name: 'testdirs',
   output: 'testfiles',
   required: true,
@@ -99,7 +114,7 @@ const testdirs = {
   validate: Extraction.files(['Test.js', 'Test.ts', 'Test.tsx'])
 };
 
-const page = {
+export const page: ClOption = {
   name: 'page',
   output: 'page',
   required: true,
@@ -108,7 +123,7 @@ const page = {
   validate: Extraction.file
 };
 
-const projectdir = function (directories) {
+export const projectdir = function (directories): ClOption {
   return {
     name: 'projectdir',
     alias: 'p',
@@ -120,7 +135,7 @@ const projectdir = function (directories) {
   };
 };
 
-const basedir = function (directories) {
+export const basedir = function (directories): ClOption {
   return {
     name: 'basedir',
     type: String,
@@ -131,7 +146,7 @@ const basedir = function (directories) {
   };
 };
 
-const debuggingPort = {
+export const debuggingPort: ClOption = {
   name: 'debuggingPort',
   type: Number,
   description: 'The port for remote debugging (used for phantom and chrome-headless)',
@@ -140,7 +155,7 @@ const debuggingPort = {
   uncommon: true
 };
 
-const bucket = {
+export const bucket: ClOption = {
   name: 'bucket',
   type: Number,
   description: 'Which "bucket" of tests to run, if you split the test runs with "buckets" setting. 1-based.',
@@ -149,7 +164,7 @@ const bucket = {
   uncommon: true
 };
 
-const buckets = {
+export const buckets: ClOption = {
   name: 'buckets',
   type: Number,
   description: 'Number of "buckets" to split tests into. You can specify which bucket number to run, using the "bucket" setting. Useful for parallelizing tests over multiple build nodes.',
@@ -158,7 +173,7 @@ const buckets = {
   uncommon: true
 };
 
-const overallTimeout = {
+export const overallTimeout: ClOption = {
   name: 'totalTimeout',
   type: Number,
   output: 'overallTimeout',
@@ -168,7 +183,7 @@ const overallTimeout = {
   uncommon: true
 };
 
-const singleTimeout = {
+export const singleTimeout: ClOption = {
   name: 'singleTimeout',
   type: Number,
   description: 'The total amount of time in milliseconds a single test can take before bedrock times out.',
@@ -177,7 +192,7 @@ const singleTimeout = {
   uncommon: true
 };
 
-const framework = {
+export const framework: ClOption = {
   name: 'framework',
   type: String,
   defaultValue: 'qunit',
@@ -186,7 +201,7 @@ const framework = {
   required: true
 };
 
-const help = {
+export const help: ClOption = {
   name: 'help',
   alias: 'h',
   type: Boolean,
@@ -195,7 +210,7 @@ const help = {
   validate: Extraction.any
 };
 
-const logging = {
+export const logging: ClOption = {
   name: 'loglevel',
   type: String,
   defaultValue: 'advanced',
@@ -204,7 +219,7 @@ const logging = {
   required: true
 };
 
-const version = {
+export const version: ClOption = {
   name: 'version',
   type: Boolean,
   defaultValue: false,
@@ -212,7 +227,7 @@ const version = {
   validate: Extraction.any
 };
 
-const chunk = {
+export const chunk: ClOption = {
   name: 'chunk',
   type: Number,
   description: 'Run tests in groups of this size, reload page between.',
@@ -221,7 +236,7 @@ const chunk = {
   uncommon: true
 };
 
-const retries = {
+export const retries: ClOption = {
   name: 'retries',
   type: Number,
   description: 'Retry failing tests this many times. Ignored with stopOnFailure.',
@@ -229,7 +244,7 @@ const retries = {
   defaultValue: 0
 };
 
-const stopOnFailure = {
+export const stopOnFailure: ClOption = {
   name: 'stopOnFailure',
   type: Boolean,
   defaultValue: false,
@@ -237,16 +252,18 @@ const stopOnFailure = {
   validate: Extraction.any
 };
 
-// eslint-disable-next-line camelcase
-const stopOnFailure__hidden = {
+// TODO: what is this setting?
+// eslint-disable-next-line camelcase,@typescript-eslint/camelcase
+export const stopOnFailure__hidden: ClOption = {
   name: 'stopOnFailure',
+  description: 'Stop on failure',
   type: Boolean,
   defaultValue: false,
   validate: Extraction.any,
   hidden: true
 };
 
-const customRoutes = {
+export const customRoutes: ClOption = {
   name: 'customRoutes',
   type: String,
   description: 'File with custom static routes',
@@ -254,7 +271,7 @@ const customRoutes = {
   uncommon: true
 };
 
-const delayExiting = {
+export const delayExiting: ClOption = {
   name: 'delayExit',
   type: Boolean,
   defaultValue: false,
@@ -262,7 +279,7 @@ const delayExiting = {
   validate: Extraction.any
 };
 
-const useSandboxForHeadless = {
+export const useSandboxForHeadless: ClOption = {
   name: 'useSandboxForHeadless',
   type: Boolean,
   defaultValue: false,
@@ -271,7 +288,7 @@ const useSandboxForHeadless = {
   uncommon: true
 };
 
-const coverage = {
+export const coverage: ClOption = {
   name: 'coverage',
   output: 'coverage',
   type: String,
@@ -282,52 +299,11 @@ const coverage = {
   validate: Extraction.directory
 };
 
-const skipResetMousePosition = {
+export const skipResetMousePosition: ClOption = {
   name: 'skipResetMousePosition',
   type: Boolean,
   defaultValue: false,
   description: 'Prevent bedrock from resetting the mouse position to the top left corner of the screen between each test',
   validate: Extraction.any,
   uncommon: true
-};
-
-module.exports = {
-  // All modes testing
-  config: config,
-  configTo: configTo,
-  files: files,
-  testdir: testdir,
-  testdirs: testdirs,
-  bucket,
-  buckets,
-  customRoutes: customRoutes,
-  bundler: bundler,
-  coverage,
-
-  // Webdriver testing
-  name: name,
-  output: output,
-  browser: browser,
-
-  // Test driver settings
-  projectdir: projectdir,
-  basedir: basedir,
-  overallTimeout: overallTimeout,
-  singleTimeout: singleTimeout,
-
-  // Phantom settings
-  debuggingPort: debuggingPort,
-
-  framework: framework,
-  help: help,
-  version: version,
-  chunk: chunk,
-  retries: retries,
-  stopOnFailure: stopOnFailure,
-  stopOnFailure__hidden: stopOnFailure__hidden,
-  delayExiting: delayExiting,
-  useSandboxForHeadless: useSandboxForHeadless,
-  page: page,
-  logging: logging,
-  skipResetMousePosition: skipResetMousePosition
 };

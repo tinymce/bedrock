@@ -4,15 +4,15 @@ import * as Reporter from './bedrock/core/Reporter';
 import * as Attempt from './bedrock/core/Attempt';
 import * as Version from './bedrock/core/Version';
 import * as DriverMaster from './bedrock/server/DriverMaster';
-import * as Driver from './bedrock/auto/Diver';
+import * as Driver from './bedrock/auto/Driver';
 import * as PageRoutes from './bedrock/server/PageRoutes';
 import * as Lifecycle from './bedrock/core/Lifecycle';
 
 /* eslint-disable no-undef */
-const go = function (settings) {
+export const go = function (settings) {
   const master = DriverMaster.create();
 
-  const runner = PageRoutes.generate(settings.projectdir, settings.basedir, settings.page);
+  const runner = PageRoutes.generate(settings.projectdir, settings.basedir);
 
   Driver.create({
     browser: settings.browser
@@ -63,12 +63,11 @@ const go = function (settings) {
           });
         });
       });
-      Lifecycle.shutdown(result, driver, done, settings.gruntDone !== undefined ? settings.gruntDone : null);
+      // TODO: where should this setting come from? Is it used?
+      const delayExiting = false;
+      Lifecycle.shutdown(result, driver, done, settings.gruntDone !== undefined ? settings.gruntDone : null, delayExiting);
     });
   });
 };
 
-module.exports = {
-  go: go,
-  mode: 'forFramework'
-};
+export const mode = 'forFramework';

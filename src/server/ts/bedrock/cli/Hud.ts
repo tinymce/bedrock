@@ -1,4 +1,6 @@
-const create = function (testfiles, loglevel) {
+import * as readline from 'readline';
+
+export const create = function (testfiles, loglevel) {
   let started = false;
 
   const stream = process.stdout;
@@ -12,19 +14,19 @@ const create = function (testfiles, loglevel) {
       'Session: ' + id + ', Status: ' + status + ', Progress: ' + numRun + '/' + total +
       ', Failed: ' + numFailed + ' ... ' + '\n'
     );
-    stream.clearLine(2);
+    readline.clearLine(stream, 2);
     return Promise.resolve({});
   };
 
   const advUpdate = function (data) {
     if (started) {
       // Note, this writes over the above line, which is why we only do this after the first update.
-      stream.moveCursor(0, -2);
+      readline.moveCursor(stream, 0, -2);
     } else {
       started = true;
     }
-    stream.clearLine(0);
-    stream.cursorTo(0);
+    readline.clearLine(stream, 0);
+    readline.cursorTo(stream, 0);
     stream.write('Current test: ' + (data.test !== undefined ? data.test.substring(0, 60) : 'Unknown') + '\n');
     const totalFiles = data.totalFiles !== undefined ? data.totalFiles : numFiles;
     const totalTests = data.totalTests !== undefined ? data.totalTests : totalFiles;
@@ -41,18 +43,13 @@ const create = function (testfiles, loglevel) {
   };
 
   const supportsAdvanced = (function () {
-    return stream.clearLine !== undefined &&
-      stream.moveCursor !== undefined &&
-      stream.cursorTo !== undefined;
+    return readline.clearLine !== undefined &&
+      readline.moveCursor !== undefined &&
+      readline.cursorTo !== undefined;
   })();
 
   return {
     update: loglevel === 'advanced' && supportsAdvanced ? advUpdate : basicUpdate,
     complete: complete
   };
-};
-
-
-module.exports = {
-  create: create
 };

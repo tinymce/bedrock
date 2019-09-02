@@ -1,6 +1,6 @@
 import * as childProcess from 'child_process';
 import * as path from 'path';
-import * as ExitCodes from '../util/ExitCodes';
+import { ExitCodes } from '../util/ExitCodes';
 
 const execSync = childProcess.execSync;
 
@@ -26,12 +26,8 @@ const importClipboard = function (basedir, clipboarddir, data) {
   return Promise.resolve({});
 };
 
-const route = function (basedir, clipboarddir) {
+export const route = function (basedir, clipboarddir) {
   return function (data) {
     return importClipboard(basedir, clipboarddir, data);
   };
-};
-
-module.exports = {
-  route: route
 };

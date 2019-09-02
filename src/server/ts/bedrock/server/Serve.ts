@@ -16,7 +16,7 @@ import * as http from 'http';
  * master (can be null) The driver master (locking and unlocking)
  * runner: runner (e.g. runnerroutes, pageroutes etc). Has fallback and routers.
  */
-const startCustom = function (settings, createServer, f) {
+export const startCustom = function (settings, createServer, f) {
   const Prefs = Accessor.create([
     'projectdir',
     'basedir',
@@ -77,11 +77,6 @@ const startCustom = function (settings, createServer, f) {
   });
 };
 
-const start = function (settings, f) {
+export const start = function (settings, f) {
   startCustom(settings, http.createServer, f);
-};
-
-module.exports = {
-  startCustom: startCustom,
-  start: start
 };

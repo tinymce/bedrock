@@ -3,10 +3,12 @@ import * as Version from './bedrock/core/Version';
 import * as RunnerRoutes from './bedrock/server/RunnerRoutes';
 import * as Webpack from './bedrock/compiler/Webpack';
 
-const go = function (settings) {
+export const go = function (settings) {
   settings.stopOnFailure = true;
 
-  const routes = RunnerRoutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, 'src/resources/bedrock.html');
+  // TODO: where should this setting come from? Is it used?
+  const delayExiting = false;
+  const routes = RunnerRoutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, 'src/resources/bedrock.html', delayExiting);
 
   console.log('bedrock-manual ' + Version + ' starting...');
 
@@ -36,8 +38,5 @@ const go = function (settings) {
   });
 };
 
-module.exports = {
-  go: go,
-  mode: 'forManual'
-};
+export const mode = 'forManual';
 

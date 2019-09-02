@@ -106,7 +106,7 @@ const logBrowserDetails = function (driver) {
  * browser: the name of the browser
  * basedir: base directory for bedrock
  */
-const create = function (settings) {
+export const create = function (settings) {
   const browser = settings.browser;
   const browserFamily = browserVariants.hasOwnProperty(browser) ? browserVariants[browser] : browser;
   const driverDep = browserDrivers[browserFamily];
@@ -181,7 +181,7 @@ const create = function (settings) {
             Promise.resolve();
 
         systemFocus
-          .then(browserFocus)
+          .then(() => browserFocus)
           .then(logBrowserDetails(driver))
           .then(function () {
             resolve(driver);
@@ -190,8 +190,3 @@ const create = function (settings) {
     }, 1500);
   });
 };
-
-module.exports = {
-  create: create
-};
-

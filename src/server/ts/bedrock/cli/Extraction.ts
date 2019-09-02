@@ -3,20 +3,22 @@ import * as readdirSyncRec from 'recursive-readdir-sync';
 import * as Attempt from '../core/Attempt';
 import * as Qstring from '../util/Qstring';
 
-const file = function (name, rawValue) {
+export const file = function (name, rawValue) {
   // Ignore any query strings when checking if a file exists
   const parsed = Qstring.parse(rawValue);
   const value = parsed.base;
   try {
     fs.accessSync(value);
-    if (!fs.statSync(value).isFile()) throw new Error('Property: ' + name + ' => Value: ' + value + ' was not a file');
+    if (!fs.statSync(value).isFile()) {
+      return Attempt.failed('Property: ' + name + ' => Value: ' + value + ' was not a file');
+    }
     return Attempt.passed(parsed.original);
   } catch (err) {
     return Attempt.failed(['Property [' + name + '] has value: [' + value + ']. This file does not exist']);
   }
 };
 
-const inSet = function (candidates) {
+export const inSet = function (candidates) {
   return function (name, value) {
     if (candidates.indexOf(value) === -1) {
       return Attempt.failed([
@@ -28,11 +30,11 @@ const inSet = function (candidates) {
   };
 };
 
-const any = function (name, value) {
+export const any = function (name, value) {
   return Attempt.passed(value);
 };
 
-const directory = function (name, value) {
+export const directory = function (name, value) {
   try {
     if (! fs.lstatSync(value).isDirectory()) return Attempt.failed(['[' + value + '] is not a directory']);
     return Attempt.passed(value);
@@ -41,7 +43,7 @@ const directory = function (name, value) {
   }
 };
 
-const files = function (patterns) {
+export const files = function (patterns) {
   return function (name, value) {
     const dir = directory(name, value);
     return Attempt.bind(dir, function (d) {
@@ -61,12 +63,4 @@ const files = function (patterns) {
       }
     });
   };
-};
-
-module.exports = {
-  file: file,
-  inSet: inSet,
-  any: any,
-  files: files,
-  directory: directory
 };

@@ -1,9 +1,22 @@
 import * as Waiter from '../util/Waiter';
 
-const create = function () {
+export const create = function () {
   let inUse = false;
 
   let queue = [];
+
+  const use = function (f, label) {
+    inUse = true;
+
+    return f().then(function (v) {
+      inUse = false;
+      return Promise.resolve(v);
+    }, function (err) {
+      inUse = false;
+      return Promise.reject(err);
+    });
+  };
+
 
   /*
    * DriverMaster is a very naive locking / unlocking system for access
@@ -72,24 +85,7 @@ const create = function () {
     }
   };
 
-
-  const use = function (f, label) {
-    inUse = true;
-
-    return f().then(function (v) {
-      inUse = false;
-      return Promise.resolve(v);
-    }, function (err) {
-      inUse = false;
-      return Promise.reject(err);
-    });
-  };
-
   return {
     waitForIdle: waitForIdle
   };
-};
-
-module.exports = {
-  create: create
 };

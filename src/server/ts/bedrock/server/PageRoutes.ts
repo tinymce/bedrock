@@ -1,11 +1,11 @@
 import * as Routes from './Routes';
 
-const generate = function (projectdir, basedir, page) {
+export const generate = function (projectdir, basedir) {
   const routers = [
     Routes.hostOn('GET', '/page', basedir)
   ];
 
-  const fallback = Routes.host('GET', projectdir, page);
+  const fallback = Routes.host('GET', projectdir);
 
   return {
     routers: routers,
@@ -13,6 +13,3 @@ const generate = function (projectdir, basedir, page) {
   };
 };
 
-module.exports = {
-  generate: generate
-};

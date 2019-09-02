@@ -33,7 +33,7 @@ const skipTests = function (reporter, settings, message) {
   }
 };
 
-const go = function (settings) {
+export const go = function (settings) {
   // If the browser is Safari, then we need to skip the tests because in v12.1 they removed
   // the --legacy flag in safaridriver which was required to run webdriver.
   // see https://github.com/SeleniumHQ/selenium/issues/6431#issuecomment-477408650
@@ -50,7 +50,7 @@ const go = function (settings) {
   const basePage = isPhantom ? 'src/resources/bedrock-phantom.html' : 'src/resources/bedrock.html';
   const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage);
 
-  console.log('bedrock-auto ' + Version + ' starting...');
+  console.log('bedrock-auto ' + Version.get() + ' starting...');
 
   routes.then((runner) => {
     Driver.create({
@@ -104,7 +104,4 @@ const go = function (settings) {
   });
 };
 
-module.exports = {
-  go: go,
-  mode: 'forAuto'
-};
+export const mode = 'forAuto';

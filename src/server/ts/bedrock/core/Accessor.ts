@@ -1,4 +1,4 @@
-const create = function (fields) {
+export const create = function (fields) {
   const r = {};
 
   fields.forEach(function (f) {
@@ -11,8 +11,4 @@ const create = function (fields) {
   });
 
   return r;
-};
-
-module.exports = {
-  create: create
 };

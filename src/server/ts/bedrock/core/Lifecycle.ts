@@ -1,7 +1,7 @@
-import * as ExitCodes from '../util/ExitCodes';
+import { ExitCodes } from '../util/ExitCodes';
 import * as Attempt from './Attempt';
 
-const shutdown = function (promise, driver, done, gruntDone, delayExiting) {
+export const shutdown = function (promise, driver, done, gruntDone, delayExiting) {
   const exitDelay = function () {
     if (delayExiting) {
       // 17 minutes should be enough, if it's not we can make this configurable later.
@@ -43,8 +43,4 @@ const shutdown = function (promise, driver, done, gruntDone, delayExiting) {
       else process.exit(ExitCodes.failures.tests);
     });
   });
-};
-
-module.exports = {
-  shutdown: shutdown
 };

@@ -21,7 +21,7 @@ const filePathToImport = function (useRequire, scratchFile) {
   };
 };
 
-const generateImports = function (useRequire, scratchFile, srcFiles) {
+export const generateImports = function (useRequire, scratchFile, srcFiles) {
   const imports = srcFiles.map(filePathToImport(useRequire, scratchFile)).join('\n');
   // header code for tests.ts
   return [
@@ -55,8 +55,4 @@ const addTest = (testFilePath) => {
     imports,
     'export {};'
   ].join('\n');
-};
-
-module.exports = {
-  generateImports: generateImports
 };

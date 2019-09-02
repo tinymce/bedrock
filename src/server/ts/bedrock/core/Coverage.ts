@@ -3,7 +3,7 @@ import * as path from 'path';
 
 const coverageDataDir = 'scratch';
 
-const writeCoverageData = function (data) {
+export const writeCoverageData = function (data) {
   if (Object.keys(data).length > 0) {
     const coverageDataFilePath = path.join(coverageDataDir, 'coverage.json');
 
@@ -15,8 +15,4 @@ const writeCoverageData = function (data) {
 
     fs.writeFileSync(coverageDataFilePath, JSON.stringify(data));
   }
-};
-
-module.exports = {
-  writeCoverageData: writeCoverageData
 };

@@ -2,7 +2,7 @@ import * as Hud from '../cli/Hud';
 
 // allow a little extra time for a test timeout so the runner can handle it gracefully
 const timeoutGrace = 2000;
-const create = function (stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel) {
+export const create = function (stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel) {
   const hud = Hud.create(testfiles, loglevel);
   const sessions = {};
   let stickyId = null;
@@ -189,9 +189,4 @@ const create = function (stickyFirstSession, singleTimeout, overallTimeout, test
     recordDone,
     awaitDone
   };
-};
-
-
-module.exports = {
-  create: create
 };

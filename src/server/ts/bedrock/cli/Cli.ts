@@ -3,7 +3,7 @@ import * as Attempt from '../core/Attempt';
 import * as Version from '../core/Version';
 import * as Validation from './Validation';
 import * as CliUsage from './CliUsage';
-import * as ExitCodes from '../util/ExitCodes';
+import { ExitCodes } from '../util/ExitCodes';
 
 const parseCommandLine = function (definitions) {
   try {
@@ -14,7 +14,7 @@ const parseCommandLine = function (definitions) {
   }
 };
 
-const extract = function (command, desc, definitions) {
+export const extract = function (command, desc, definitions) {
   const parsed = parseCommandLine(definitions);
 
 
@@ -46,8 +46,4 @@ const extract = function (command, desc, definitions) {
       usage: CliUsage.generateUsage(command, desc, definitions)
     });
   }, Attempt.passed);
-};
-
-module.exports = {
-  extract: extract
 };

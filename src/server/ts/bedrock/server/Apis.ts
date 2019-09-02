@@ -12,8 +12,14 @@ const pollRate = 2000;
 // This is how many times to fail the driver check before the process fails
 const maxInvalidAttempts = 300;
 
+let pageHasLoaded = false;
+
+const markLoaded = function () {
+  pageHasLoaded = true;
+};
+
 // TODO: Do not use files here.
-const create = function (master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel, resetMousePosition) {
+export const create = function (master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel, resetMousePosition) {
   // On IE, the webdriver seems to load the page before it's ready to start
   // responding to commands. If the testing page itself tries to interact with
   // effects before driver.get has returned properly, it throws "UnsupportedOperationErrors"
@@ -62,13 +68,6 @@ const create = function (master, maybeDriver, projectdir, basedir, stickyFirstSe
     });
   };
 
-
-  let pageHasLoaded = false;
-
-  const markLoaded = function () {
-    pageHasLoaded = true;
-  };
-
   const c = Controller.create(stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel);
 
   const routers = [
@@ -110,8 +109,4 @@ const create = function (master, maybeDriver, projectdir, basedir, stickyFirstSe
     enableHud: c.enableHud,
     awaitDone: c.awaitDone
   };
-};
-
-module.exports = {
-  create: create
 };

@@ -1,4 +1,4 @@
-const toLowerCaseKeys = function (items) {
+export const toLowerCaseKeys = function (items) {
   const clone = {};
 
   Object.keys(items).forEach(function (key) {
@@ -6,8 +6,4 @@ const toLowerCaseKeys = function (items) {
   });
 
   return clone;
-};
-
-module.exports = {
-  toLowerCaseKeys: toLowerCaseKeys
 };

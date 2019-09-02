@@ -9,7 +9,7 @@ const flatMap = function (xs, f) {
   return xs.map(f).reduce(concat, []);
 };
 
-const generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, chunk, retries, singleTimeout, stopOnFailure, basePage, coverage) {
+export const generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, chunk, retries, singleTimeout, stopOnFailure, basePage, coverage) {
   const files = testfiles.map(function (filePath) {
     return path.relative(projectdir, filePath);
   });
@@ -85,8 +85,4 @@ const generate = function (mode, projectdir, basedir, configFile, bundler, testf
       };
     }
   );
-};
-
-module.exports = {
-  generate: generate
 };

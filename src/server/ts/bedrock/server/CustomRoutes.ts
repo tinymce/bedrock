@@ -120,12 +120,8 @@ const routers = function (filePath) {
   ];
 };
 
-const create = function (filePath) {
+export const create = function (filePath) {
   return {
     routers: routers(filePath)
   };
-};
-
-module.exports = {
-  create: create
 };

@@ -20,12 +20,8 @@ const getTargetFromMain = function (driver, selector) {
   return driver.findElement(By.css(selector));
 };
 
-const getTarget = function (driver, data) {
+export const getTarget = function (driver, data) {
   const selector = data.selector;
   const getter = selector.indexOf('=>') > -1 ? getTargetFromFrame : getTargetFromMain;
   return getter(driver, selector);
-};
-
-module.exports = {
-  getTarget: getTarget
 };
