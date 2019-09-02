@@ -1,6 +1,5 @@
 import * as finalhandler from 'finalhandler';
 import * as portfinder from 'portfinder';
-import * as Accessor from '../core/Accessor';
 import * as Routes from './Routes';
 import * as Apis from './Apis';
 import * as CustomRoutes from './CustomRoutes';
@@ -17,31 +16,28 @@ import * as http from 'http';
  * runner: runner (e.g. runnerroutes, pageroutes etc). Has fallback and routers.
  */
 export const startCustom = function (settings, createServer, f) {
-  const Prefs = Accessor.create([
-    'projectdir',
-    'basedir',
-    'testfiles',
-    'driver',
-    'master',
-    'runner',
-    'singleTimeout',
-    'overallTimeout',
-    'skipResetMousePosition'
-  ]);
+  
+  const pref = (f: string): any => {
+    const v = settings[f];
+    if (v === undefined) {
+      throw new Error('Object: does not have field: ' + f);
+    }
+    return v;
+  };
 
   const cr = CustomRoutes.create(settings.customRoutes);
 
-  const basedir = Prefs.basedir(settings);
-  const projectdir = Prefs.projectdir(settings);
-  const testfiles = Prefs.testfiles(settings);
-  const maybeDriver = Prefs.driver(settings);
-  const master = Prefs.master(settings);
+  const basedir = pref('basedir');
+  const projectdir = pref('projectdir');
+  const testfiles = pref('testfiles');
+  const maybeDriver = pref('driver');
+  const master = pref('master');
   const stickyFirstSession = settings.stickyFirstSession;
-  const singleTimeout = Prefs.singleTimeout(settings);
-  const overallTimeout = Prefs.overallTimeout(settings);
-  const resetMousePosition = !Prefs.skipResetMousePosition(settings);
+  const singleTimeout = pref('singleTimeout');
+  const overallTimeout = pref('overallTimeout');
+  const resetMousePosition = !pref('skipResetMousePosition');
 
-  const runner = Prefs.runner(settings);
+  const runner = pref('runner');
   const api = Apis.create(master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, settings.loglevel, resetMousePosition);
 
   const routers = runner.routers.concat(
