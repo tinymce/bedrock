@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock",
-  "version": "6.0.1",
+  "version": "7.0.0",
   "description": "NodeJS test runner",
   "repository": {
     "type": "git",
@@ -13,12 +13,12 @@
   },
   "scripts": {
     "prepublishOnly": "tsc",
-    "build": "tsc",
+    "build": "yarn eslint 'src/runner/**' && tsc && rollup --config",
     "test-atomic": "tape test/atomic/*.js",
     "test-props": "tape test/props/*.js",
     "test-samples-pass": "bin/bedrock-auto.js -b phantomjs --config sample/tsconfig.json --files sample/ts/**/*PassTest.ts sample/ts/**/*PassTest.tsx",
     "test-samples-fail": "bin/bedrock-auto.js -b phantomjs --config sample/tsconfig.json --files sample/ts/**/*FailTest.ts",
-    "test": "npm run test-atomic && npm run test-props && npm run test-samples-pass"
+    "test": "yarn build && yarn run test-atomic && yarn run test-props && yarn run test-samples-pass"
   },
   "private": false,
   "dependencies": {
@@ -29,7 +29,7 @@
     "finalhandler": "^1.1.2",
     "fork-ts-checker-webpack-plugin": "~1.0.4",
     "istanbul-instrumenter-loader": "^3.0.1",
-    "jquery": "^3.0.0",
+    "jquery": "^3.4.1",
     "mkdirp": "^0.5.1",
     "node-glob": "^1.2.0",
     "portfinder": "1.0.21",
@@ -46,24 +46,27 @@
     "xml-writer": "^1.6.0"
   },
   "devDependencies": {
-    "eslint": "^5.15.1",
+    "@types/jquery": "^3.3.31",
+    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/parser": "^2.0.0",
+    "eslint": "^6.2.2",
     "eslint-config-google": "^0.12.0",
     "grunt": "^1.0.1",
     "jscheck": "^0.2.0",
     "jsverify": "^0.7.1",
     "load-grunt-tasks": "^3.5.0",
     "nlf": "^1.4.2",
-    "rollup": "^0.52.3",
-    "rollup-plugin-node-resolve": "^3.0.2",
+    "rollup": "^1.20.2",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-sourcemaps": "^0.4.2",
-    "rollup-plugin-typescript2": "^0.15.0",
     "tape": "^4.5.1"
   },
   "author": "Ephox Corporation",
   "license": "Apache-2.0",
-  "main": "./lib/api/Main.js",
-  "module": "./lib/api/Main.js",
-  "types": "./lib/api/Main.d.ts",
+  "main": "./lib/client/ts/api/Main.js",
+  "module": "./lib/client/ts/api/Main.js",
+  "types": "./lib/client/ts/api/Main.d.ts",
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   }

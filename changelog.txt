@@ -1,3 +1,8 @@
+Version 7.0.0
+
+* Removed scratch area in runner.
+* Ported runner to TypeScript.
+
 Version 6.0.0
 
 * Major version bump, due to removal of UnitTest.domtest

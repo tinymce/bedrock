@@ -1,12 +1,22 @@
 module.exports = {
-    "extends": "google",
-    "rules": {
-      "curly": ["error", "multi-line"],
-      "object-curly-spacing": "off",
-      "array-bracket-spacing": "off",
-      "space-before-function-paren": "off",
-      "no-trailing-spaces": "off",
-      "indent": ["error", 2],
-      "max-len": "off"
+  extends: "eslint:recommended",
+  parserOptions: {
+    ecmaVersion: 11,
+    sourceType: "module",
+    ecmaFeatures: {
+      impliedStrict: true
     }
+  },
+  rules: {
+    "curly": ["error", "multi-line"],
+    "object-curly-spacing": "off",
+    "array-bracket-spacing": "off",
+    "space-before-function-paren": "off",
+    "no-trailing-spaces": "off",
+    "indent": ["error", 2],
+    "max-len": "off"
+  },
+  "env": {
+    "node": true
+  }
 };
