@@ -1,5 +1,5 @@
 const server = require('serve-static');
-const matchers = require('./Matchers');
+const Matchers = require('./Matchers');
 
 const routing = function (method, prefix, source) {
   const router = server(source);
@@ -10,7 +10,7 @@ const routing = function (method, prefix, source) {
   };
 
   return {
-    matches: [matchers.methodMatch(method), matchers.prefixMatch(prefix)],
+    matches: [Matchers.methodMatch(method), Matchers.prefixMatch(prefix)],
     go: go
   };
 };
@@ -21,7 +21,7 @@ const json = function (method, prefix, data) {
   };
 
   return {
-    matches: [matchers.methodMatch(method), matchers.prefixMatch(prefix)],
+    matches: [Matchers.methodMatch(method), Matchers.prefixMatch(prefix)],
     go: go
   };
 };
@@ -40,7 +40,7 @@ const asyncJs = function (method, url, fn) {
   };
 
   return {
-    matches: [matchers.methodMatch(method), matchers.urlMatch(url)],
+    matches: [Matchers.methodMatch(method), Matchers.urlMatch(url)],
     go: go
   };
 };
@@ -65,7 +65,7 @@ const effect = function (method, prefix, action) {
   };
 
   return {
-    matches: [matchers.methodMatch(method), matchers.prefixMatch(prefix)],
+    matches: [Matchers.methodMatch(method), Matchers.prefixMatch(prefix)],
     go: go
   };
 };
@@ -79,7 +79,7 @@ const rewrite = function (method, root, input, output) {
   };
 
   return {
-    matches: [matchers.methodMatch(method), matchers.prefixMatch(input)],
+    matches: [Matchers.methodMatch(method), Matchers.prefixMatch(input)],
     go: go
   };
 };
@@ -93,7 +93,7 @@ const constant = function (method, root, url) {
   };
 
   return {
-    matches: [matchers.methodMatch(method), matchers.prefixMatch(root)],
+    matches: [Matchers.methodMatch(method), Matchers.prefixMatch(root)],
     go: go
   };
 };
@@ -106,7 +106,7 @@ const host = function (method, root) {
   };
 
   return {
-    matches: [matchers.methodMatch(method), matchers.prefixMatch(root)],
+    matches: [Matchers.methodMatch(method), Matchers.prefixMatch(root)],
     go: go
   };
 };
@@ -121,7 +121,7 @@ const hostOn = function (method, prefix, root) {
   };
 
   return {
-    matches: [matchers.methodMatch(method), matchers.prefixMatch(prefix)],
+    matches: [Matchers.methodMatch(method), Matchers.prefixMatch(prefix)],
     go: go
   };
 };
@@ -132,7 +132,7 @@ const unsupported = function (method, root, label) {
   };
 
   return {
-    matches: [matchers.methodMatch(method), matchers.prefixMatch(root)],
+    matches: [Matchers.methodMatch(method), Matchers.prefixMatch(root)],
     go: go
   };
 };

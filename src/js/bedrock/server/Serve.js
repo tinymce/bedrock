@@ -1,9 +1,9 @@
 const finalhandler = require('finalhandler');
 const portfinder = require('portfinder');
-const accessor = require('../core/Accessor');
-const routes = require('./Routes');
-const apis = require('./Apis');
-const cr = require('./CustomRoutes');
+const Accessor = require('../core/Accessor');
+const Routes = require('./Routes');
+const Apis = require('./Apis');
+const CustomRoutes = require('./CustomRoutes');
 
 /*
  * Settings:
@@ -16,7 +16,7 @@ const cr = require('./CustomRoutes');
  * runner: runner (e.g. runnerroutes, pageroutes etc). Has fallback and routers.
  */
 const startCustom = function (settings, createServer, f) {
-  const Prefs = accessor.create([
+  const Prefs = Accessor.create([
     'projectdir',
     'basedir',
     'testfiles',
@@ -28,7 +28,7 @@ const startCustom = function (settings, createServer, f) {
     'skipResetMousePosition'
   ]);
 
-  const customroutes = cr.create(settings.customRoutes);
+  const cr = CustomRoutes.create(settings.customRoutes);
 
   const basedir = Prefs.basedir(settings);
   const projectdir = Prefs.projectdir(settings);
@@ -41,11 +41,11 @@ const startCustom = function (settings, createServer, f) {
   const resetMousePosition = !Prefs.skipResetMousePosition(settings);
 
   const runner = Prefs.runner(settings);
-  const api = apis.create(master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, settings.loglevel, resetMousePosition);
+  const api = Apis.create(master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, settings.loglevel, resetMousePosition);
 
   const routers = runner.routers.concat(
     api.routers,
-    customroutes.routers
+    cr.routers
   );
 
   const fallback = runner.fallback;
@@ -61,7 +61,7 @@ const startCustom = function (settings, createServer, f) {
 
     const server = createServer(function (request, response) {
       const done = finalhandler(request, response);
-      routes.route(routers, fallback, request, response, done);
+      Routes.route(routers, fallback, request, response, done);
     }).listen(port);
 
     f({

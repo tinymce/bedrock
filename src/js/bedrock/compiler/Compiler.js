@@ -1,10 +1,10 @@
 const path = require('path');
 const fs = require('fs');
-const webpack = require('../compiler/Webpack');
+const Webpack = require('../compiler/Webpack');
 
-module.exports = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, files, coverage) {
+const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, files, coverage) {
   const getCompileFunc = function () {
-    return webpack.compile;
+    return Webpack.compile;
   };
 
   const isTs = function (filePath) {
@@ -41,4 +41,8 @@ module.exports = function (tsConfigFile, scratchDir, basedir, exitOnCompileError
     }),
     generate: generate
   };
+};
+
+module.exports = {
+  compile
 };

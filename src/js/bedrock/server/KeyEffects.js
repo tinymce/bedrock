@@ -1,5 +1,5 @@
 const webdriver = require('selenium-webdriver');
-const effectutils = require('./EffectUtils');
+const EffectUtils = require('./EffectUtils');
 
 const Key = webdriver.Key;
 
@@ -40,7 +40,7 @@ const scan = function (keys) {
 
 const execute = function (driver, data) {
   const actions = scan(data.keys);
-  return effectutils.getTarget(driver, data).then(function (target) {
+  return EffectUtils.getTarget(driver, data).then(function (target) {
     return target.sendKeys.apply(target, actions).then(function (x) {
       return driver.switchTo().defaultContent().then(function () {
         return x;

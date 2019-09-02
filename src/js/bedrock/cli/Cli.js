@@ -1,16 +1,16 @@
 const commandLineArgs = require('command-line-args');
-const attempt = require('../core/Attempt');
-const version = require('../core/Version');
-const validation = require('./Validation');
-const cliusage = require('./CliUsage');
-const exitcodes = require('../util/ExitCodes');
+const Attempt = require('../core/Attempt');
+const Version = require('../core/Version');
+const Validation = require('./Validation');
+const CliUsage = require('./CliUsage');
+const ExitCodes = require('../util/ExitCodes');
 
 const parseCommandLine = function (definitions) {
   try {
     const settings = commandLineArgs(definitions);
-    return attempt.passed(settings);
+    return Attempt.passed(settings);
   } catch (err) {
-    return attempt.failed([err.message !== undefined ? err.message : err]);
+    return Attempt.failed([err.message !== undefined ? err.message : err]);
   }
 };
 
@@ -18,34 +18,34 @@ const extract = function (command, desc, definitions) {
   const parsed = parseCommandLine(definitions);
 
 
-  attempt.cata(parsed, function () {
+  Attempt.cata(parsed, function () {
   }, function (s) {
     if (s.help === true) {
       // Print usage information if used with --help or -h.
-      console.log(cliusage.generateUsage(command, desc, definitions));
-      process.exit(exitcodes.success);
+      console.log(CliUsage.generateUsage(command, desc, definitions));
+      process.exit(ExitCodes.success);
     } else if (s.version === true) {
-      console.log(command + ' version: ' + version);
-      process.exit(exitcodes.success);
+      console.log(command + ' version: ' + Version);
+      process.exit(ExitCodes.success);
     }
   });
 
-  const extracted = attempt.list(parsed, [
+  const extracted = Attempt.list(parsed, [
     function (settings) {
-      return validation.scan(definitions, settings);
+      return Validation.scan(definitions, settings);
     },
     function (results) {
-      return validation.scanRequired(definitions, results);
+      return Validation.scanRequired(definitions, results);
     }
   ]);
 
-  return attempt.cata(extracted, function (errs) {
-    return attempt.failed({
+  return Attempt.cata(extracted, function (errs) {
+    return Attempt.failed({
       command: command,
       errors: errs,
-      usage: cliusage.generateUsage(command, desc, definitions)
+      usage: CliUsage.generateUsage(command, desc, definitions)
     });
-  }, attempt.passed);
+  }, Attempt.passed);
 };
 
 module.exports = {

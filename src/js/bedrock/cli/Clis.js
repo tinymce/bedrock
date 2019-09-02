@@ -1,18 +1,18 @@
 const cli = require('./Cli');
-const cloptions = require('./ClOptions');
-const exitcodes = require('../util/ExitCodes');
+const ClOptions = require('./ClOptions');
+const ExitCodes = require('../util/ExitCodes');
 
 const commonOptions = function (directories) {
   return [
-    cloptions.projectdir(directories),
-    cloptions.basedir(directories),
-    cloptions.overallTimeout,
-    cloptions.singleTimeout,
-    cloptions.chunk,
-    cloptions.help,
-    cloptions.logging,
-    cloptions.version,
-    cloptions.bundler
+    ClOptions.projectdir(directories),
+    ClOptions.basedir(directories),
+    ClOptions.overallTimeout,
+    ClOptions.singleTimeout,
+    ClOptions.chunk,
+    ClOptions.help,
+    ClOptions.logging,
+    ClOptions.version,
+    ClOptions.bundler
   ];
 };
 
@@ -21,21 +21,21 @@ const forAuto = function (directories) {
     'bedrock-auto',
     'Use a Webdriver to launch a browser and run tests against it',
     commonOptions(directories).concat([
-      cloptions.browser,
-      cloptions.config,
-      cloptions.files,
-      cloptions.testdir,
-      cloptions.testdirs,
-      cloptions.name,
-      cloptions.output,
-      cloptions.debuggingPort,
-      cloptions.customRoutes,
-      cloptions.stopOnFailure,
-      cloptions.retries,
-      cloptions.delayExiting,
-      cloptions.useSandboxForHeadless,
-      cloptions.skipResetMousePosition,
-      cloptions.coverage
+      ClOptions.browser,
+      ClOptions.config,
+      ClOptions.files,
+      ClOptions.testdir,
+      ClOptions.testdirs,
+      ClOptions.name,
+      ClOptions.output,
+      ClOptions.debuggingPort,
+      ClOptions.customRoutes,
+      ClOptions.stopOnFailure,
+      ClOptions.retries,
+      ClOptions.delayExiting,
+      ClOptions.useSandboxForHeadless,
+      ClOptions.skipResetMousePosition,
+      ClOptions.coverage
     ])
   );
 };
@@ -45,13 +45,13 @@ const forManual = function (directories) {
     'bedrock',
     'Launch a testing process on a localhost port and allow the user to navigate to it in any browser',
     commonOptions(directories).concat([
-      cloptions.stopOnFailure__hidden,
-      cloptions.config,
-      cloptions.files,
-      cloptions.testdir,
-      cloptions.testdirs,
-      cloptions.customRoutes,
-      cloptions.coverage
+      ClOptions.stopOnFailure__hidden,
+      ClOptions.config,
+      ClOptions.files,
+      ClOptions.testdir,
+      ClOptions.testdirs,
+      ClOptions.customRoutes,
+      ClOptions.coverage
     ])
   );
 };
@@ -61,13 +61,13 @@ const forFramework = function (directories) {
     'bedrock-framework',
     'Load bedrock against a specific page using a framework',
     commonOptions(directories).concat([
-      cloptions.stopOnFailure,
-      cloptions.name,
-      cloptions.page,
-      cloptions.browser,
-      cloptions.output,
-      cloptions.framework,
-      cloptions.debuggingPort
+      ClOptions.stopOnFailure,
+      ClOptions.name,
+      ClOptions.page,
+      ClOptions.browser,
+      ClOptions.output,
+      ClOptions.framework,
+      ClOptions.debuggingPort
     ])
   );
 };
@@ -77,7 +77,7 @@ const logAndExit = function (errs) {
   const messages = errs.errors.join('\n');
   console.error(messages);
   console.error('Use ' + errs.command + ' --help to print usage\n****\n');
-  process.exit(exitcodes.failures.cli);
+  process.exit(ExitCodes.failures.cli);
 };
 
 module.exports = {

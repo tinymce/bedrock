@@ -1,5 +1,5 @@
-const exitcodes = require('../util/ExitCodes');
-const attempt = require('./Attempt');
+const ExitCodes = require('../util/ExitCodes');
+const Attempt = require('./Attempt');
 
 const shutdown = function (promise, driver, done, gruntDone, delayExiting) {
   const exitDelay = function () {
@@ -11,7 +11,7 @@ const shutdown = function (promise, driver, done, gruntDone, delayExiting) {
 
   promise.then(function (res) {
     // Only check the delay exit option if tests failed.
-    attempt.cata(res, function (_errs) {
+    Attempt.cata(res, function (_errs) {
       exitDelay();
     }, function () { });
 
@@ -20,10 +20,10 @@ const shutdown = function (promise, driver, done, gruntDone, delayExiting) {
 
     driver.quit().then(function () {
       done();
-      attempt.cata(res, function (errs) {
+      Attempt.cata(res, function (errs) {
         console.log(errs.join('\n'));
         if (gruntDone !== null) gruntDone(false);
-        else process.exit(exitcodes.failures.tests);
+        else process.exit(ExitCodes.failures.tests);
       }, function () {
         console.log('All tests passed.');
         if (gruntDone !== null) gruntDone(true);
@@ -40,7 +40,7 @@ const shutdown = function (promise, driver, done, gruntDone, delayExiting) {
       console.error(err);
       done();
       if (gruntDone !== null) gruntDone(false);
-      else process.exit(exitcodes.failures.tests);
+      else process.exit(ExitCodes.failures.tests);
     });
   });
 };

@@ -1,26 +1,26 @@
 const path = require('path');
-const serve = require('./bedrock/server/Serve');
-const reporter = require('./bedrock/core/Reporter');
-const attempt = require('./bedrock/core/Attempt');
-const version = require('./bedrock/core/Version');
-const drivermaster = require('./bedrock/server/DriverMaster');
-const driver = require('./bedrock/auto/Diver');
-const pageroutes = require('./bedrock/server/PageRoutes');
-const lifecycle = require('./bedrock/core/Lifecycle');
+const Serve = require('./bedrock/server/Serve');
+const Reporter = require('./bedrock/core/Reporter');
+const Attempt = require('./bedrock/core/Attempt');
+const Version = require('./bedrock/core/Version');
+const DriverMaster = require('./bedrock/server/DriverMaster');
+const Driver = require('./bedrock/auto/Diver');
+const PageRoutes = require('./bedrock/server/PageRoutes');
+const Lifecycle = require('./bedrock/core/Lifecycle');
 
 /* eslint-disable no-undef */
 const go = function (settings) {
-  const master = drivermaster.create();
+  const master = DriverMaster.create();
 
-  const runner = pageroutes.generate(settings.projectdir, settings.basedir, settings.page);
+  const runner = PageRoutes.generate(settings.projectdir, settings.basedir, settings.page);
 
-  driver.create({
+  Driver.create({
     browser: settings.browser
   }).then(function (driver) {
     const serveSettings = {
       projectdir: settings.projectdir,
       basedir: settings.basedir,
-      driver: attempt.passed(driver),
+      driver: Attempt.passed(driver),
       testfiles: [ ],
       master: master,
       runner: runner,
@@ -42,8 +42,8 @@ const go = function (settings) {
 
     const isPhantom = settings.browser === 'phantomjs';
 
-    serve.start(serveSettings, function (service, done) {
-      if (!isPhantom) console.log('bedrock-framework ' + version + ' available at: http://localhost:' + service.port);
+    Serve.start(serveSettings, function (service, done) {
+      if (!isPhantom) console.log('bedrock-framework ' + Version + ' available at: http://localhost:' + service.port);
       const result = driver.get('http://localhost:' + service.port + '/' + settings.page).then(function () {
         const message = isPhantom ? '\nPhantom tests loading ...\n' : '\n ... Initial page has loaded ...';
         console.log(message);
@@ -51,19 +51,19 @@ const go = function (settings) {
 
         return addFramework(settings.framework).then(function () {
           return service.awaitDone().then(function (data) {
-            return reporter.write({
+            return Reporter.write({
               name: settings.name,
               output: settings.output
             })(data);
           }, function (pollExit) {
-            return reporter.writePollExit({
+            return Reporter.writePollExit({
               name: settings.name,
               output: settings.output
             }, pollExit);
           });
         });
       });
-      lifecycle.shutdown(result, driver, done, settings.gruntDone !== undefined ? settings.gruntDone : null);
+      Lifecycle.shutdown(result, driver, done, settings.gruntDone !== undefined ? settings.gruntDone : null);
     });
   });
 };

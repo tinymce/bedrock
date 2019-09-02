@@ -1,4 +1,4 @@
-const effectutils = require('./EffectUtils');
+const EffectUtils = require('./EffectUtils');
 
 /*
  JSON API for data: {
@@ -16,7 +16,7 @@ const getAction = function (driver, target, type) {
 };
 
 const execute = function (driver, data) {
-  return effectutils.getTarget(driver, data).then(function (tgt) {
+  return EffectUtils.getTarget(driver, data).then(function (tgt) {
     return getAction(driver, tgt, data.type).then(function (res) {
       return driver.switchTo().defaultContent().then(function () {
         return res;

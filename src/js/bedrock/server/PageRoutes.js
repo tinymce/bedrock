@@ -1,11 +1,11 @@
-const routes = require('./Routes');
+const Routes = require('./Routes');
 
 const generate = function (projectdir, basedir, page) {
   const routers = [
-    routes.hostOn('GET', '/page', basedir)
+    Routes.hostOn('GET', '/page', basedir)
   ];
 
-  const fallback = routes.host('GET', projectdir, page);
+  const fallback = Routes.host('GET', projectdir, page);
 
   return {
     routers: routers,

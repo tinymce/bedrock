@@ -1,4 +1,4 @@
-const waiter = require('../util/Waiter');
+const Waiter = require('../util/Waiter');
 
 const create = function () {
   let inUse = false;
@@ -53,7 +53,7 @@ const create = function () {
     // Either something has a lock, or this process is not at the head of the queue,
     // so it needs to wait its turn
     } else {
-      return waiter.delay({}, 100).then(function () {
+      return Waiter.delay({}, 100).then(function () {
         return doWaitForIdle(identifier, f, label, attempts - 1);
       });
     }

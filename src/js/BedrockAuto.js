@@ -1,11 +1,11 @@
-const serve = require('./bedrock/server/Serve');
-const attempt = require('./bedrock/core/Attempt');
-const version = require('./bedrock/core/Version');
-const runnerroutes = require('./bedrock/server/RunnerRoutes');
-const reporter = require('./bedrock/core/Reporter');
-const drivermaster = require('./bedrock/server/DriverMaster');
-const driver = require('./bedrock/auto/Driver');
-const lifecycle = require('./bedrock/core/Lifecycle');
+const Serve = require('./bedrock/server/Serve');
+const Attempt = require('./bedrock/core/Attempt');
+const Version = require('./bedrock/core/Version');
+const RunnerRoutes = require('./bedrock/server/RunnerRoutes');
+const Reporter = require('./bedrock/core/Reporter');
+const DriverMaster = require('./bedrock/server/DriverMaster');
+const Driver = require('./bedrock/auto/Driver');
+const Lifecycle = require('./bedrock/core/Lifecycle');
 
 const skipTests = function (reporter, settings, message) {
   // Write results
@@ -40,21 +40,21 @@ const go = function (settings) {
   // see https://github.com/SeleniumHQ/selenium/issues/6431#issuecomment-477408650
   if (settings.browser === 'safari') {
     console.warn('Skipping tests as webdriver is currently broken on Safari');
-    skipTests(reporter, settings, 'Selenium webdriver is currently broken on Safari, see: https://github.com/SeleniumHQ/selenium/issues/6431#issuecomment-477408650');
+    skipTests(Reporter, settings, 'Selenium webdriver is currently broken on Safari, see: https://github.com/SeleniumHQ/selenium/issues/6431#issuecomment-477408650');
     return;
   }
 
-  const master = drivermaster.create();
+  const master = DriverMaster.create();
 
   const isPhantom = settings.browser === 'phantomjs';
 
   const basePage = isPhantom ? 'src/resources/bedrock-phantom.html' : 'src/resources/bedrock.html';
-  const routes = runnerroutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage);
+  const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage);
 
-  console.log('bedrock-auto ' + version + ' starting...');
+  console.log('bedrock-auto ' + Version + ' starting...');
 
   routes.then((runner) => {
-    driver.create({
+    Driver.create({
       browser: settings.browser,
       basedir: settings.basedir,
       debuggingPort: settings.debuggingPort,
@@ -64,7 +64,7 @@ const go = function (settings) {
         projectdir: settings.projectdir,
         basedir: settings.basedir,
         testfiles: settings.testfiles,
-        driver: attempt.passed(driver),
+        driver: Attempt.passed(driver),
         master: master,
         runner: runner,
         loglevel: settings.loglevel,
@@ -75,8 +75,8 @@ const go = function (settings) {
         skipResetMousePosition: settings.skipResetMousePosition
       };
 
-      serve.start(serveSettings, function (service, done) {
-        if (!isPhantom) console.log('bedrock-auto ' + version + ' available at: http://localhost:' + service.port);
+      Serve.start(serveSettings, function (service, done) {
+        if (!isPhantom) console.log('bedrock-auto ' + Version + ' available at: http://localhost:' + service.port);
         const result = driver.get('http://localhost:' + service.port)
           .then(driver.executeScript('window.focus();'))
           .then(function () {
@@ -85,19 +85,19 @@ const go = function (settings) {
             service.markLoaded();
             service.enableHud();
             return service.awaitDone().then(function (data) {
-              return reporter.write({
+              return Reporter.write({
                 name: settings.name,
                 output: settings.output
               })(data);
             }, function (pollExit) {
-              return reporter.writePollExit({
+              return Reporter.writePollExit({
                 name: settings.name,
                 output: settings.output
               }, pollExit);
             });
           });
 
-        lifecycle.shutdown(result, driver, done, settings.gruntDone !== undefined ? settings.gruntDone : null, settings.delayExit !== undefined ? settings.delayExit : false);
+        Lifecycle.shutdown(result, driver, done, settings.gruntDone !== undefined ? settings.gruntDone : null, settings.delayExit !== undefined ? settings.delayExit : false);
       });
     }, function (err) {
       console.error('Unable to create driver', err);

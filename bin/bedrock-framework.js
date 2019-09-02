@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-const cli = require('../src/js/BedrockCli');
-const bedrock = require('../src/js/BedrockFramework');
+const BedrockCli = require('../src/js/BedrockCli');
+const BedrockFramework = require('../src/js/BedrockFramework');
 
-cli.run(bedrock, {
+BedrockCli.run(BedrockFramework, {
   current: process.cwd(),
   bin: __dirname
 });

@@ -1,6 +1,6 @@
 const XMLWriter = require('xml-writer');
 const fs = require('fs');
-const attempt = require('./Attempt');
+const Attempt = require('./Attempt');
 
 const writePollExit = function (settings, results) {
   return write({
@@ -86,8 +86,8 @@ const write = function (settings) {
       const reportFile = settings.output + '/TEST-' + settings.name + '.xml';
       fs.writeFileSync(reportFile, w.toString());
 
-      if (failed.length > 0) resolve(attempt.failed(['Some tests failed. See {' + reportFile + '} for details.']));
-      else resolve(attempt.passed(results));
+      if (failed.length > 0) resolve(Attempt.failed(['Some tests failed. See {' + reportFile + '} for details.']));
+      else resolve(Attempt.passed(results));
     });
   };
 };

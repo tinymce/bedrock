@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const matchers = require('./Matchers');
-const obj = require('../util/Obj');
-const type = require('../util/Type');
-const routes = require('./Routes');
+const Matchers = require('./Matchers');
+const Obj = require('../util/Obj');
+const Type = require('../util/Type');
+const Routes = require('./Routes');
 
 const readRequestBody = function (request, done) {
   let body = '';
@@ -18,8 +18,7 @@ const readRequestBody = function (request, done) {
 
 const parseJson = function (filePath) {
   const contents = fs.readFileSync(filePath);
-  const data = JSON.parse(contents);
-  return data;
+  return JSON.parse(contents);
 };
 
 const serializeJson = function (json) {
@@ -29,28 +28,28 @@ const serializeJson = function (json) {
 const matchesFromRequest = function (matchRequest) {
   const matches = [];
 
-  if (type.isString(matchRequest.method)) {
-    matches.push(matchers.methodMatch(matchRequest.method));
+  if (Type.isString(matchRequest.method)) {
+    matches.push(Matchers.methodMatch(matchRequest.method));
   }
 
-  if (type.isString(matchRequest.url)) {
-    matches.push(matchers.urlMatch(matchRequest.url));
+  if (Type.isString(matchRequest.url)) {
+    matches.push(Matchers.urlMatch(matchRequest.url));
   }
 
-  if (type.isString(matchRequest.path)) {
-    matches.push(matchers.pathMatch(matchRequest.path));
+  if (Type.isString(matchRequest.path)) {
+    matches.push(Matchers.pathMatch(matchRequest.path));
   }
 
-  if (type.isObject(matchRequest.headers)) {
-    matches.push(matchers.headersMatch(matchRequest.headers));
+  if (Type.isObject(matchRequest.headers)) {
+    matches.push(Matchers.headersMatch(matchRequest.headers));
   }
 
-  if (type.isObject(matchRequest.query)) {
-    matches.push(matchers.queryMatch(matchRequest.query));
+  if (Type.isObject(matchRequest.query)) {
+    matches.push(Matchers.queryMatch(matchRequest.query));
   }
 
-  if (type.isObject(matchRequest.json)) {
-    matches.push(matchers.jsonBodyMatch(matchRequest.json));
+  if (Type.isObject(matchRequest.json)) {
+    matches.push(Matchers.jsonBodyMatch(matchRequest.json));
   }
 
   return matches;
@@ -67,12 +66,12 @@ const assignContentType = function (headers, contentType) {
 
 const goFromResponse = function (matchResponse, configPath) {
   return function (request, response/* , done */) {
-    const headers = matchResponse.headers ? obj.toLowerCaseKeys(matchResponse.headers) : { };
+    const headers = matchResponse.headers ? Obj.toLowerCaseKeys(matchResponse.headers) : { };
     const status = matchResponse.status ? matchResponse.status : 200;
 
-    if (type.isString(matchResponse.json_file) || type.isObject(matchResponse.json)) {
+    if (Type.isString(matchResponse.json_file) || Type.isObject(matchResponse.json)) {
       response.writeHead(status, assignContentType(headers, 'application/json'));
-      const json = type.isObject(matchResponse.json) ? matchResponse.json : parseJsonFromFile(matchResponse.json_file, configPath);
+      const json = Type.isObject(matchResponse.json) ? matchResponse.json : parseJsonFromFile(matchResponse.json_file, configPath);
       response.end(serializeJson(json));
     }
   };
@@ -107,7 +106,7 @@ const go = function (filePath) {
     const routers = filePath ? jsonToRouters(parseJson(filePath), filePath) : [];
     readRequestBody(request, function (body) {
       request.body = body;
-      routes.route(routers, fallback, request, response, done);
+      Routes.route(routers, fallback, request, response, done);
     });
   };
 };
@@ -115,7 +114,7 @@ const go = function (filePath) {
 const routers = function (filePath) {
   return [
     {
-      matches: [matchers.prefixMatch('/custom')],
+      matches: [Matchers.prefixMatch('/custom')],
       go: go(filePath)
     }
   ];

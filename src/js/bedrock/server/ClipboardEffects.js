@@ -1,6 +1,6 @@
 const childProcess = require('child_process');
 const path = require('path');
-const exitcodes = require('../util/ExitCodes');
+const ExitCodes = require('../util/ExitCodes');
 
 const execSync = childProcess.execSync;
 
@@ -20,7 +20,7 @@ const importClipboard = function (basedir, clipboarddir, data) {
   const result = execSync(args.join(' '));
   if (result.length > 0) {
     console.error(result);
-    process.exit(exitcodes.failures.wink);
+    process.exit(ExitCodes.failures.wink);
   }
 
   return Promise.resolve({});
