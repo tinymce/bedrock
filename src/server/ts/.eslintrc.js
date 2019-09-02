@@ -1,18 +1,18 @@
 module.exports = {
+  parser:  '@typescript-eslint/parser',
+  plugins: ["@typescript-eslint"],
+  extends:  [
+    'plugin:@typescript-eslint/recommended',
+  ],
   'env': {
-    'browser': true,
     'commonjs': true,
     'es6': true,
+    "node": true
   },
-  'extends': [
-    'google',
-  ],
   'globals': {
-    'Atomics': 'readonly',
-    'SharedArrayBuffer': 'readonly',
   },
   'parserOptions': {
-    'ecmaVersion': 2018,
+    'sourceType': 'module',
   },
   'rules': {
     "max-len": "off",
@@ -22,6 +22,9 @@ module.exports = {
     "require-jsdoc": "off",
     "prefer-promise-reject-errors": "off",
     "prefer-spread": "off",
-    "no-prototype-builtins": "off"
+    "no-prototype-builtins": "off",
+
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/explicit-function-return-type": "off"
   },
 };
