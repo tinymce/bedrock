@@ -77,8 +77,8 @@ export const go = function (settings) {
       Serve.start(serveSettings, function (service, done) {
         if (!isPhantom) console.log('bedrock-auto ' + Version + ' available at: http://localhost:' + service.port);
         const result = driver.get('http://localhost:' + service.port)
-          .then(driver.executeScript('window.focus();'))
-          .then(function () {
+          .then(() => driver.executeScript('window.focus();'))
+          .then(() => {
             const message = isPhantom ? '\nPhantom tests loading ...\n' : '\nInitial page has loaded ...\n';
             console.log(message);
             service.markLoaded();

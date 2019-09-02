@@ -23,6 +23,7 @@
   },
   "private": false,
   "dependencies": {
+    "@types/selenium-webdriver": "^4.0.2",
     "async": "^1.5.2",
     "babel-polyfill": "^6.23.0",
     "command-line-args": "^3.0.0",
