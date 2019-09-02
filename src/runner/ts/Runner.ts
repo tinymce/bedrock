@@ -215,6 +215,7 @@ const reporter = (() => {
       error = $('<span />').addClass('error-container');
       time = $('<span />').addClass('time');
       output.append(marker, ' ', nameSpan, ' [', time, '] ', error, ' ', testfile);
+      el.append(output);
       $('body').append(el);
 
       reported = false;
