@@ -1,5 +1,5 @@
-var failed = function (err) {
-  var foldAttempt = function (onFailed, onPassed) {
+const failed = function (err) {
+  const foldAttempt = function (onFailed, onPassed) {
     return onFailed(err);
   };
 
@@ -8,8 +8,8 @@ var failed = function (err) {
   };
 };
 
-var passed = function (value) {
-  var foldAttempt = function (onFailed, onPassed) {
+const passed = function (value) {
+  const foldAttempt = function (onFailed, onPassed) {
     return onPassed(value);
   };
 
@@ -18,29 +18,29 @@ var passed = function (value) {
   };
 };
 
-var cata = function (attempt, onFailed, onPassed) {
+const cata = function (attempt, onFailed, onPassed) {
   return attempt.foldAttempt(onFailed, onPassed);
 };
 
-var bind = function (firstAttempt, f) {
+const bind = function (firstAttempt, f) {
   return firstAttempt.foldAttempt(function (err) {
     return failed(err);
   }, f);
 };
 
-var map = function (firstAttempt, f) {
+const map = function (firstAttempt, f) {
   return firstAttempt.foldAttempt(failed, function (v) {
     return passed(f(v));
   });
 };
 
-var list = function (firstAttempt, fs) {
+const list = function (firstAttempt, fs) {
   return fs.reduce(function (rest, x) {
     return bind(rest, x);
   }, firstAttempt);
 };
 
-var carry = function (firstAttempt, secondAttempt, f) {
+const carry = function (firstAttempt, secondAttempt, f) {
   return cata(firstAttempt, function (errs) {
     return cata(secondAttempt, function (sErrs) {
       return failed(errs.concat(sErrs));
@@ -56,16 +56,16 @@ var carry = function (firstAttempt, secondAttempt, f) {
   });
 };
 
-var concat = function (attempts) {
+const concat = function (attempts) {
   // take a list of attempts, and turn them info an attempt of a list.
   return attempts.reduce(function (rest, b) {
     return carry(rest, b, function (x, y) {
-      return passed(x.concat([ y ]));
+      return passed(x.concat([y]));
     });
   }, passed([]));
 };
 
-var toString = function (attempt) {
+const toString = function (attempt) {
   return cata(attempt, function (errs) {
     return 'attempt.failed(' + JSON.stringify(errs) + ')';
   }, function (value) {
@@ -73,7 +73,7 @@ var toString = function (attempt) {
   });
 };
 
-var hasPassed = function (attempt) {
+const hasPassed = function (attempt) {
   return cata(attempt, function () {
     return false;
   }, function () {

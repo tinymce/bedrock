@@ -1,11 +1,11 @@
-var webdriver = require('selenium-webdriver');
-var By = webdriver.By;
-var until = require('selenium-webdriver/lib/until');
+const webdriver = require('selenium-webdriver');
+const By = webdriver.By;
+const until = require('selenium-webdriver/lib/until');
 
-var getTargetFromFrame = function (driver, selector) {
-  var sections = selector.split('=>');
-  var frameSelector = sections[0];
-  var targetSelector = sections[1];
+const getTargetFromFrame = function (driver, selector) {
+  const sections = selector.split('=>');
+  const frameSelector = sections[0];
+  const targetSelector = sections[1];
   return driver.findElement(By.css(frameSelector)).then(function (frame) {
     return driver.wait(until.ableToSwitchToFrame(frame), 100).then(function (f) {
       return driver.findElement(By.css(targetSelector)).then(function (target) {
@@ -15,13 +15,13 @@ var getTargetFromFrame = function (driver, selector) {
   });
 };
 
-var getTargetFromMain = function (driver, selector) {
+const getTargetFromMain = function (driver, selector) {
   return driver.findElement(By.css(selector));
 };
 
-var getTarget = function (driver, data) {
-  var selector = data.selector;
-  var getter = selector.indexOf('=>') > -1 ? getTargetFromFrame : getTargetFromMain;
+const getTarget = function (driver, data) {
+  const selector = data.selector;
+  const getter = selector.indexOf('=>') > -1 ? getTargetFromFrame : getTargetFromMain;
   return getter(driver, selector);
 };
 

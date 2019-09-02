@@ -1,2 +1,2 @@
-let packagejson = require('../../../../package.json');
+const packagejson = require('../../../../package.json');
 module.exports = 'v' + packagejson.version;

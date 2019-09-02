@@ -10,18 +10,18 @@ if (!Array.prototype.flatMap) {
   };
 }
 
-var generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, chunk, retries, singleTimeout, stopOnFailure, basePage, coverage) {
-  var path = require('path');
-  var routes = require('./routes');
-  var compiler = require('../compiler/compiler');
-  var fs = require('fs');
-  var glob = require('glob');
+const generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, chunk, retries, singleTimeout, stopOnFailure, basePage, coverage) {
+  const path = require('path');
+  const routes = require('./routes');
+  const compiler = require('../compiler/compiler');
+  const fs = require('fs');
+  const glob = require('glob');
 
-  var files = testfiles.map(function (filePath) {
+  const files = testfiles.map(function (filePath) {
     return path.relative(projectdir, filePath);
   });
 
-  var testGenerator = compiler(
+  const testGenerator = compiler(
     path.join(projectdir, configFile),
     path.join(projectdir, 'scratch'),
     basedir,
@@ -35,27 +35,27 @@ var generate = function (mode, projectdir, basedir, configFile, bundler, testfil
   const pkjson = JSON.parse(fs.readFileSync(`${projectdir}/package.json`));
 
   // Search for yarn workspace projects to use as resource folders
-  const workspaceRoots = !pkjson.workspaces ? [] : pkjson.workspaces.flatMap(w => glob.sync(w)).flatMap((moduleFolder) => {
+  const workspaceRoots = !pkjson.workspaces ? [] : pkjson.workspaces.flatMap((w) => glob.sync(w)).flatMap((moduleFolder) => {
     const moduleJson = `${moduleFolder}/package.json`;
     if (fs.statSync(moduleJson)) {
       const workspaceJson = JSON.parse(fs.readFileSync(moduleJson));
-      return [{ name: workspaceJson.name, folder: moduleFolder }];
+      return [{name: workspaceJson.name, folder: moduleFolder}];
     } else {
       return [];
     }
   });
 
-  const resourceRoots = [{ name: pkjson.name, folder: '.' }].concat(workspaceRoots);
+  const resourceRoots = [{name: pkjson.name, folder: '.'}].concat(workspaceRoots);
 
   // console.log(`Resource maps from ${projectdir}: \n`, resourceRoots.map(({ name, folder }) => `/project/${name}/ => ${folder}`));
 
-  const resourceRoutes = resourceRoots.map(({ name, folder }) => routes.routing('GET', `/project/${name}`, path.join(projectdir, folder)));
+  const resourceRoutes = resourceRoots.map(({name, folder}) => routes.routing('GET', `/project/${name}`, path.join(projectdir, folder)));
 
   const precompiledTests = (mode === 'auto' ? testGenerator.generate() : Promise.resolve(null));
 
   return precompiledTests.then(
     (precompTests) => {
-      var routers = resourceRoutes.concat([
+      const routers = resourceRoutes.concat([
         // fallback resource route to project root
         routes.routing('GET', '/project', projectdir),
 
@@ -84,7 +84,7 @@ var generate = function (mode, projectdir, basedir, configFile, bundler, testfil
         })
       ]);
 
-      var fallback = routes.constant('GET', basedir, basePage);
+      const fallback = routes.constant('GET', basedir, basePage);
 
       return {
         routers: routers,

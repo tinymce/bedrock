@@ -1,11 +1,11 @@
-var fs = require('fs');
-var path = require('path');
+const fs = require('fs');
+const path = require('path');
 
-var coverageDataDir = 'scratch';
+const coverageDataDir = 'scratch';
 
-var writeCoverageData = function (data) {
+const writeCoverageData = function (data) {
   if (Object.keys(data).length > 0) {
-    var coverageDataFilePath = path.join(coverageDataDir, 'coverage.json');
+    const coverageDataFilePath = path.join(coverageDataDir, 'coverage.json');
 
     console.log('Writing coverage data to: ' + coverageDataFilePath);
 

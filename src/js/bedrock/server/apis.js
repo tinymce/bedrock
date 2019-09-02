@@ -1,20 +1,19 @@
-var keys = require('./keyeffects');
-var mouse = require('./mouseeffects');
-var clipboard = require('./clipboardeffects');
-var routes = require('./routes');
-var mController = require('./controller');
-var attempt = require('../core/attempt');
-var waiter = require('../util/waiter');
-var coverage = require('../core/coverage');
+const keys = require('./keyeffects');
+const mouse = require('./mouseeffects');
+const clipboard = require('./clipboardeffects');
+const routes = require('./routes');
+const mController = require('./controller');
+const attempt = require('../core/attempt');
+const waiter = require('../util/waiter');
+const coverage = require('../core/coverage');
 
 // This is how long to wait before checking if the driver is ready again
-var pollRate = 2000;
+const pollRate = 2000;
 // This is how many times to fail the driver check before the process fails
-var maxInvalidAttempts = 300;
+const maxInvalidAttempts = 300;
 
 // TODO: Do not use files here.
-var create = function (master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel, resetMousePosition) {
-
+const create = function (master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel, resetMousePosition) {
   // On IE, the webdriver seems to load the page before it's ready to start
   // responding to commands. If the testing page itself tries to interact with
   // effects before driver.get has returned properly, it throws "UnsupportedOperationErrors"
@@ -23,25 +22,27 @@ var create = function (master, maybeDriver, projectdir, basedir, stickyFirstSess
   var waitForDriverReady = function (attempts, f) {
     if (pageHasLoaded && master !== null) return master.waitForIdle(f, 'effect');
     else if (attempts === 0) return Promise.reject('Driver never appeared to be ready');
-    else return waiter.delay({}, pollRate).then(function () {
-      return waitForDriverReady(attempts - 1, f);
-    });
-  };
-
-  var effect = function (executor, driver) {
-    return function (data) {
-      return waitForDriverReady(maxInvalidAttempts, function () {
-        return executor(driver)(data);
+    else {
+      return waiter.delay({}, pollRate).then(function () {
+        return waitForDriverReady(attempts - 1, f);
       });
     }
   };
 
-  var setInitialMousePosition = function (driver) {
+  const effect = function (executor, driver) {
+    return function (data) {
+      return waitForDriverReady(maxInvalidAttempts, function () {
+        return executor(driver)(data);
+      });
+    };
+  };
+
+  const setInitialMousePosition = function (driver) {
     return function () {
       return driver.getCapabilities().then(function (caps) {
         // TODO re-enable resetting the mouse on other browsers when mouseMove gets fixed on Firefox/IE
-        if (caps.get("browserName") === "chrome") {
-          return driver.actions().mouseMove({ x: 0, y: 0 }).perform();
+        if (caps.get('browserName') === 'chrome') {
+          return driver.actions().mouseMove({x: 0, y: 0}).perform();
         } else {
           return Promise.resolve({});
         }
@@ -49,7 +50,7 @@ var create = function (master, maybeDriver, projectdir, basedir, stickyFirstSess
     };
   };
 
-  var driverRouter = function (url, apiLabel, executor) {
+  const driverRouter = function (url, apiLabel, executor) {
     return attempt.cata(maybeDriver, function () {
       return routes.unsupported(
         'POST',
@@ -64,13 +65,13 @@ var create = function (master, maybeDriver, projectdir, basedir, stickyFirstSess
 
   var pageHasLoaded = false;
 
-  var markLoaded = function () {
+  const markLoaded = function () {
     pageHasLoaded = true;
   };
 
   const controller = mController.create(stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel);
 
-  var routers = [
+  const routers = [
 
     driverRouter('/keys', 'Keys', keys.executor),
     driverRouter('/mouse', 'Mouse', mouse.executor),

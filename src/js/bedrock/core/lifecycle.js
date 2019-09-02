@@ -1,9 +1,9 @@
-var exitcodes = require('../util/exitcodes');
+const exitcodes = require('../util/exitcodes');
 
-var shutdown = function (promise, driver, done, gruntDone, delayExiting) {
-  var attempt = require('./attempt');
+const shutdown = function (promise, driver, done, gruntDone, delayExiting) {
+  const attempt = require('./attempt');
 
-  var exitDelay = function () {
+  const exitDelay = function () {
     if (delayExiting) {
       // 17 minutes should be enough, if it's not we can make this configurable later.
       driver.sleep(17 * 60 * 1000);

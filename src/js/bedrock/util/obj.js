@@ -1,5 +1,5 @@
-var toLowerCaseKeys = function (items) {
-  var clone = {};
+const toLowerCaseKeys = function (items) {
+  const clone = {};
 
   Object.keys(items).forEach(function (key) {
     clone[key.toLowerCase()] = items[key];

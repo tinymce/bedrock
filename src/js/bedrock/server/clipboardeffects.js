@@ -1,23 +1,23 @@
-let childProcess = require('child_process');
-var execSync = childProcess.execSync;
-var path = require('path');
+const childProcess = require('child_process');
+const execSync = childProcess.execSync;
+const path = require('path');
 
-var exitcodes = require('../util/exitcodes');
+const exitcodes = require('../util/exitcodes');
 
 /*
  JSON API for data: {
    import: "<file name>"
  }
  */
-var importClipboard = function (basedir, clipboarddir, data) {
-  var fileName = data.import;
-  var fullPath = path.join(clipboarddir, fileName);
-  var args = [
+const importClipboard = function (basedir, clipboarddir, data) {
+  const fileName = data.import;
+  const fullPath = path.join(clipboarddir, fileName);
+  const args = [
     path.join(basedir, 'bin/wink.exe'),
     '-i ' + fullPath
   ];
 
-  var result = execSync(args.join(' '));
+  const result = execSync(args.join(' '));
   if (result.length > 0) {
     console.error(result);
     process.exit(exitcodes.failures.wink);
@@ -26,7 +26,7 @@ var importClipboard = function (basedir, clipboarddir, data) {
   return Promise.resolve({});
 };
 
-var route = function (basedir, clipboarddir) {
+const route = function (basedir, clipboarddir) {
   return function (data) {
     return importClipboard(basedir, clipboarddir, data);
   };

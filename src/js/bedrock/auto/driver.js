@@ -1,23 +1,23 @@
-var path = require('path');
-var child_process = require('child_process');
-var os = require('os');
-var webdriver = require('selenium-webdriver');
+const path = require('path');
+const child_process = require('child_process');
+const os = require('os');
+const webdriver = require('selenium-webdriver');
 
-var browserVariants = {
+const browserVariants = {
   'chrome-headless': 'chrome',
   'firefox-headless': 'firefox'
 };
 
-var browserDrivers = {
+const browserDrivers = {
   'chrome': 'chromedriver',
   'firefox': 'geckodriver',
   'internet explorer': 'iedriver',
   'MicrosoftEdge': 'edgedriver'
 };
 
-var cscriptFocus = function (basedir, script) {
+const cscriptFocus = function (basedir, script) {
   return new Promise(function (resolve) {
-    var focusScript = path.join(basedir, 'bin/focus/' + script);
+    const focusScript = path.join(basedir, 'bin/focus/' + script);
     child_process.exec('cscript ' + focusScript, function () {
       resolve();
     });
@@ -25,14 +25,14 @@ var cscriptFocus = function (basedir, script) {
 };
 
 // Makes sure that Edge has proper focus and is the top most window
-var focusEdge = function (basedir) {
+const focusEdge = function (basedir) {
   return cscriptFocus(basedir, 'edge.js');
 };
 
 // Mac doesn't focus windows opened through automation, so use AppleScript to do it for us
-var focusMac = function (basedir, browser) {
+const focusMac = function (basedir, browser) {
   return new Promise(function (resolve) {
-    var macFocusScript = path.join(basedir, 'bin/focus/mac.applescript');
+    const macFocusScript = path.join(basedir, 'bin/focus/mac.applescript');
     child_process.exec(`osascript ${macFocusScript} ${browser}`, function () {
       resolve();
     });
@@ -41,37 +41,37 @@ var focusMac = function (basedir, browser) {
 
 // Firefox insists on having focus in the address bar, and while F6 will focus the body
 // mozilla haven't implemented browser-wide sendkeys in their webdriver
-var focusFirefox = function (basedir) {
+const focusFirefox = function (basedir) {
   // mac F6 is handled in the applescript, we haven't looked at linux FF yet so it's just windows for now
   if (os.platform() === 'win32') return cscriptFocus(basedir, 'winff.js');
   else return Promise.resolve();
 };
 
-var getWinVersion = function () {
+const getWinVersion = function () {
   if (os.platform() === 'win32') {
-    var release = os.release().split('.');
+    const release = os.release().split('.');
     return {
       major: parseInt(release[0]),
       minor: parseInt(release[1]),
-      build: parseInt(release[2]),
-    }
+      build: parseInt(release[2])
+    };
   } else {
     throw new Error('Unable to determine windows version');
   }
 };
 
 // Sets logging level to WARNING instead of the verbose default for phantomjs.
-var addPhantomCapabilities = function (blueprints, settings) {
-  var prefs = new webdriver.logging.Preferences();
+const addPhantomCapabilities = function (blueprints, settings) {
+  const prefs = new webdriver.logging.Preferences();
   prefs.setLevel(webdriver.logging.Type.DRIVER, webdriver.logging.Level.WARNING);
 
-  var caps = webdriver.Capabilities.phantomjs();
+  const caps = webdriver.Capabilities.phantomjs();
   caps.setLoggingPrefs(prefs);
   caps.set('phantomjs.cli.args', '--remote-debugger-port=' + settings.debuggingPort);
   return blueprints.withCapabilities(caps);
 };
 
-var setupHeadlessModes = function (settings, browser, chromeOptions) {
+const setupHeadlessModes = function (settings, browser, chromeOptions) {
   if (browser === 'firefox-headless') {
     process.env.MOZ_HEADLESS = '1';
   } else if (browser === 'chrome-headless') {
@@ -83,10 +83,10 @@ var setupHeadlessModes = function (settings, browser, chromeOptions) {
   }
 };
 
-var logBrowserDetails = function (driver) {
+const logBrowserDetails = function (driver) {
   return function () {
-    return driver.getCapabilities().then(caps => {
-      var browser = caps.get('browserName');
+    return driver.getCapabilities().then((caps) => {
+      const browser = caps.get('browserName');
 
       if (browser === 'chrome') {
         console.log('browser:', caps.get('version'), 'driver:', caps.get('chrome').chromedriverVersion);
@@ -106,10 +106,10 @@ var logBrowserDetails = function (driver) {
  * browser: the name of the browser
  * basedir: base directory for bedrock
  */
-var create = function (settings) {
-  var browser = settings.browser;
-  var browserFamily = browserVariants.hasOwnProperty(browser) ? browserVariants[browser] : browser;
-  var driverDep = browserDrivers[browserFamily];
+const create = function (settings) {
+  const browser = settings.browser;
+  const browserFamily = browserVariants.hasOwnProperty(browser) ? browserVariants[browser] : browser;
+  const driverDep = browserDrivers[browserFamily];
   if (driverDep === undefined) console.log('Not loading a driver for browser ' + browser);
   else {
     try {
@@ -126,8 +126,8 @@ var create = function (settings) {
    */
 
   // Support for disabling the Automation Chrome Extension
-  var chrome = require('selenium-webdriver/chrome');
-  var chromeOptions = new chrome.Options();
+  const chrome = require('selenium-webdriver/chrome');
+  const chromeOptions = new chrome.Options();
   chromeOptions.addArguments('chrome.switches', '--disable-extensions');
 
   // https://stackoverflow.com/questions/43261516/selenium-chrome-i-just-cant-use-driver-maximize-window-to-maximize-window
@@ -136,31 +136,31 @@ var create = function (settings) {
   // As of Windows build 1809 the edge driver starts in W3C mode instead of JSON Wire Protocol, so we need to start the driver with the '--jwp' flag
   // https://github.com/SeleniumHQ/selenium/issues/6464
   if (os.platform() === 'win32' && browser === 'MicrosoftEdge') {
-    var winVersion = getWinVersion();
+    const winVersion = getWinVersion();
     // The "--jwp" argument doesn't exist in older versions of `MicrosoftWebDriver` so we need to detect the windows version
     if (winVersion.major > 10 || winVersion.major === 10 && winVersion.build >= 17763) {
-      var edge = require('selenium-webdriver/edge');
-      var edgeService = new edge.ServiceBuilder().addArguments('--jwp').build();
+      const edge = require('selenium-webdriver/edge');
+      const edgeService = new edge.ServiceBuilder().addArguments('--jwp').build();
       edge.setDefaultService(edgeService);
     }
   }
 
-  var rawBlueprints = new webdriver.Builder()
+  const rawBlueprints = new webdriver.Builder()
     .forBrowser(browserFamily).setChromeOptions(chromeOptions);
 
-  var blueprint = browser === 'phantomjs' ? addPhantomCapabilities(rawBlueprints, settings) : rawBlueprints;
+  const blueprint = browser === 'phantomjs' ? addPhantomCapabilities(rawBlueprints, settings) : rawBlueprints;
 
-  var driver = blueprint.build();
+  const driver = blueprint.build();
 
   setupHeadlessModes(settings, browser, chromeOptions);
 
-  var setSize = function () {
+  const setSize = function () {
     /* If maximize does not work on your system (esp. firefox hangs), hard-code the size (like so) */
     // return driver.manage().window().setSize(800, 600);
     return driver.manage().window().maximize();
   };
 
-  var resume = function () {
+  const resume = function () {
     return Promise.resolve(driver);
   };
 
@@ -172,11 +172,11 @@ var create = function (settings) {
     setTimeout(function () {
       // Some tests require large windows, so make it as large as it can be.
       return setSize().then(resume, resume).then(function () {
-        var systemFocus = os.platform() === 'darwin' && browser !== 'phantomjs' ? focusMac(settings.basedir, browser) : Promise.resolve();
+        const systemFocus = os.platform() === 'darwin' && browser !== 'phantomjs' ? focusMac(settings.basedir, browser) : Promise.resolve();
 
-        var browserFocus = browser === 'MicrosoftEdge' ? focusEdge(settings.basedir) :
-                          browser === 'firefox' ? focusFirefox(settings.basedir) :
-                          Promise.resolve();
+        const browserFocus = browser === 'MicrosoftEdge' ? focusEdge(settings.basedir) :
+          browser === 'firefox' ? focusFirefox(settings.basedir) :
+            Promise.resolve();
 
         systemFocus
           .then(browserFocus)

@@ -80,24 +80,24 @@ var go = function (settings) {
       serve.start(serveSettings, function (service, done) {
         if (!isPhantom) console.log('bedrock-auto ' + version + ' available at: http://localhost:' + service.port);
         var result = driver.get('http://localhost:' + service.port)
-                           .then(driver.executeScript('window.focus();'))
-                           .then(function () {
-          var message = isPhantom ? '\nPhantom tests loading ...\n' : '\nInitial page has loaded ...\n';
-          console.log(message);
-          service.markLoaded();
-          service.enableHud();
-          return service.awaitDone().then(function (data) {
-            return reporter.write({
-              name: settings.name,
-              output: settings.output
-            })(data);
-          }, function (pollExit) {
-            return reporter.writePollExit({
-              name: settings.name,
-              output: settings.output
-            }, pollExit);
+          .then(driver.executeScript('window.focus();'))
+          .then(function () {
+            var message = isPhantom ? '\nPhantom tests loading ...\n' : '\nInitial page has loaded ...\n';
+            console.log(message);
+            service.markLoaded();
+            service.enableHud();
+            return service.awaitDone().then(function (data) {
+              return reporter.write({
+                name: settings.name,
+                output: settings.output
+              })(data);
+            }, function (pollExit) {
+              return reporter.writePollExit({
+                name: settings.name,
+                output: settings.output
+              }, pollExit);
+            });
           });
-        });
 
         lifecycle.shutdown(result, driver, done, settings.gruntDone !== undefined ? settings.gruntDone : null, settings.delayExit !== undefined ? settings.delayExit : false);
       });

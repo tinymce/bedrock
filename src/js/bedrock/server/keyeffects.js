@@ -1,11 +1,11 @@
-var webdriver = require('selenium-webdriver');
-var Key = webdriver.Key;
+const webdriver = require('selenium-webdriver');
+const Key = webdriver.Key;
 
-var effectutils = require('./effectutils');
+const effectutils = require('./effectutils');
 
-var NO_ACTION = null;
+const NO_ACTION = null;
 
-var scanCombo = function (combo) {
+const scanCombo = function (combo) {
   // Does not currently support complex key combinations.
   if (combo.ctrlKey) return Key.chord(Key.CONTROL, combo.key);
   else if (combo.metaKey) return Key.chord(Key.COMMAND, combo.key);
@@ -13,17 +13,17 @@ var scanCombo = function (combo) {
   return NO_ACTION;
 };
 
-var scanItem = function (item) {
+const scanItem = function (item) {
   if (item.text) return item.text;
   else if (item.combo) return scanCombo(item.combo);
   return NO_ACTION;
 };
 
-var scan = function (keys) {
+const scan = function (keys) {
   // Use map.
-  var actions = [ ];
-  for (var i = 0; i < keys.length; i++) {
-    var action = scanItem(keys[i]);
+  const actions = [];
+  for (let i = 0; i < keys.length; i++) {
+    const action = scanItem(keys[i]);
     if (action !== NO_ACTION) actions.push(action);
   }
   return actions;
@@ -38,8 +38,8 @@ var scan = function (keys) {
  }
  */
 
-var execute = function (driver, data) {
-  var actions = scan(data.keys);
+const execute = function (driver, data) {
+  const actions = scan(data.keys);
   return effectutils.getTarget(driver, data).then(function (target) {
     return target.sendKeys.apply(target, actions).then(function (x) {
       return driver.switchTo().defaultContent().then(function () {
@@ -53,7 +53,7 @@ var execute = function (driver, data) {
   });
 };
 
-var executor = function (driver) {
+const executor = function (driver) {
   return function (data) {
     return execute(driver, data);
   };

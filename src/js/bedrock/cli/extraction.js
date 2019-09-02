@@ -1,23 +1,23 @@
-var fs = require('fs');
-var readdirSyncRec = require('recursive-readdir-sync');
-var attempt = require('../core/attempt');
+const fs = require('fs');
+const readdirSyncRec = require('recursive-readdir-sync');
+const attempt = require('../core/attempt');
 
-var qstring = require('../util/qstring');
+const qstring = require('../util/qstring');
 
-var file = function (name, rawValue) {
+const file = function (name, rawValue) {
   // Ignore any query strings when checking if a file exists
-  var parsed = qstring.parse(rawValue);
-  var value = parsed.base;
+  const parsed = qstring.parse(rawValue);
+  const value = parsed.base;
   try {
     fs.accessSync(value);
     if (!fs.statSync(value).isFile()) throw new Error('Property: ' + name + ' => Value: ' + value + ' was not a file');
     return attempt.passed(parsed.original);
   } catch (err) {
-    return attempt.failed([ 'Property [' + name + '] has value: [' + value + ']. This file does not exist' ]);
+    return attempt.failed(['Property [' + name + '] has value: [' + value + ']. This file does not exist']);
   }
 };
 
-var inSet = function (candidates) {
+const inSet = function (candidates) {
   return function (name, value) {
     if (candidates.indexOf(value) === -1) {
       return attempt.failed([
@@ -29,26 +29,26 @@ var inSet = function (candidates) {
   };
 };
 
-var any = function (name, value) {
+const any = function (name, value) {
   return attempt.passed(value);
 };
 
-var directory = function (name, value) {
+const directory = function (name, value) {
   try {
-    if (! fs.lstatSync(value).isDirectory()) return attempt.failed([ '[' + value + '] is not a directory' ]);
+    if (! fs.lstatSync(value).isDirectory()) return attempt.failed(['[' + value + '] is not a directory']);
     return attempt.passed(value);
   } catch (err) {
-    return attempt.failed([ '[' + value + '] is not a directory' ]);
+    return attempt.failed(['[' + value + '] is not a directory']);
   }
 };
 
-var files = function (patterns) {
+const files = function (patterns) {
   return function (name, value) {
-    var dir = directory(name, value);
+    const dir = directory(name, value);
     return attempt.bind(dir, function (d) {
       try {
-        var scanned = readdirSyncRec(d).filter(function (f) {
-          var matches = patterns.filter(function (p) {
+        const scanned = readdirSyncRec(d).filter(function (f) {
+          const matches = patterns.filter(function (p) {
             return f.indexOf(p) > -1;
           });
 

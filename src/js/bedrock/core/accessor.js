@@ -1,5 +1,5 @@
-var create = function (fields) {
-  var r = {};
+const create = function (fields) {
+  const r = {};
 
   fields.forEach(function (f) {
     r[f] = function (obj) {
