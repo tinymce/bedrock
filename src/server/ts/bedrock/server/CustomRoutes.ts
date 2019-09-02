@@ -1,9 +1,9 @@
-import * as fs from 'fs';
 import * as path from 'path';
 import * as Matchers from './Matchers';
 import * as Obj from '../util/Obj';
 import * as Type from '../util/Type';
 import * as Routes from './Routes';
+import * as FileUtils from '../util/FileUtils';
 
 const readRequestBody = function (request, done) {
   let body = '';
@@ -16,10 +16,6 @@ const readRequestBody = function (request, done) {
   });
 };
 
-const parseJson = function (filePath) {
-  const contents = fs.readFileSync(filePath);
-  return JSON.parse(contents);
-};
 
 const serializeJson = function (json) {
   return JSON.stringify(json, null, 2);
@@ -57,7 +53,7 @@ const matchesFromRequest = function (matchRequest) {
 
 const parseJsonFromFile = function (filePath, configPath) {
   const resolvedFilePath = path.join(path.dirname(configPath), filePath);
-  return parseJson(resolvedFilePath);
+  return FileUtils.readFileAsJson(resolvedFilePath);
 };
 
 const assignContentType = function (headers, contentType) {
@@ -103,7 +99,7 @@ const fallbackGo = function (filePath) {
 const go = function (filePath) {
   const fallback = {matching: [], go: fallbackGo(filePath)};
   return function (request, response, done) {
-    const routers = filePath ? jsonToRouters(parseJson(filePath), filePath) : [];
+    const routers = filePath ? jsonToRouters(FileUtils.readFileAsJson(filePath), filePath) : [];
     readRequestBody(request, function (body) {
       request.body = body;
       Routes.route(routers, fallback, request, response, done);

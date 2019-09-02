@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as glob from 'glob';
 import * as Routes from './routes';
 import * as Compiler from '../compiler/Compiler';
+import * as FileUtils from '../util/FileUtils'
 
 export const generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, chunk, retries, singleTimeout, stopOnFailure, basePage, coverage) {
   const files = testfiles.map(function (filePath) {
@@ -20,13 +21,13 @@ export const generate = function (mode, projectdir, basedir, configFile, bundler
 
 
   // read the project json file to determine the project name to expose resources as `/project/${name}`
-  const pkjson = JSON.parse(fs.readFileSync(`${projectdir}/package.json`));
+  const pkjson = FileUtils.readFileAsJson(`${projectdir}/package.json`);
 
   // Search for yarn workspace projects to use as resource folders
   const workspaceRoots = !pkjson.workspaces ? [] : pkjson.workspaces.flatMap((w) => glob.sync(w)).flatMap((moduleFolder) => {
     const moduleJson = `${moduleFolder}/package.json`;
     if (fs.statSync(moduleJson)) {
-      const workspaceJson = JSON.parse(fs.readFileSync(moduleJson));
+      const workspaceJson = FileUtils.readFileAsJson(moduleJson);
       return [{name: workspaceJson.name, folder: moduleFolder}];
     } else {
       return [];

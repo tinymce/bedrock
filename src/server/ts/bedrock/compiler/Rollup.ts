@@ -7,10 +7,7 @@ import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as Imports from './Imports';
 import {ExitCodes} from '../util/ExitCodes';
-
-const parseTsConfig = function (tsconfig) {
-  return JSON.parse(fs.readFileSync(tsconfig));
-};
+import * as FileUtils from '../util/FileUtils';
 
 export const compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, success) {
   const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
@@ -23,7 +20,7 @@ export const compile = function (tsConfigFile, scratchDir, exitOnCompileError, s
     sourcemap: true
   };
 
-  const tsConfig = parseTsConfig(tsConfigFile);
+  const tsConfig = FileUtils.readFileAsJson(tsConfigFile);
   const include = tsConfig.include ? tsConfig.include : [];
 
   mkdirp.sync(path.dirname(scratchFile));
