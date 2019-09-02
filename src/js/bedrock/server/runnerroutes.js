@@ -1,14 +1,15 @@
+const path = require('path');
+const routes = require('./routes');
+const compiler = require('../compiler/compiler');
+const fs = require('fs');
+const glob = require('glob');
+
 const flatMap = function (xs, f) {
   const concat = (x, y) => x.concat(y);
   return xs.map(f).reduce(concat, []);
 };
 
 const generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, chunk, retries, singleTimeout, stopOnFailure, basePage, coverage) {
-  const path = require('path');
-  const routes = require('./routes');
-  const compiler = require('../compiler/compiler');
-  const fs = require('fs');
-  const glob = require('glob');
 
   const files = testfiles.map(function (filePath) {
     return path.relative(projectdir, filePath);

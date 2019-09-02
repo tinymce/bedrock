@@ -1,6 +1,5 @@
 var tape = require('tape');
 var attempt = require('../../src/js/bedrock/core/attempt.js');
-
 var validation = require('../../src/js/bedrock/cli/validation.js');
 var extraction = require('../../src/js/bedrock/cli/extraction.js');
 

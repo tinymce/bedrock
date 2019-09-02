@@ -120,7 +120,7 @@ const create = function (settings) {
   }
 
   /* Add additional logging
-   * var logging = webdriver.logging;
+   * const logging = webdriver.logging;
    * logging.installConsoleHandler();
    * logging.getLogger('promise.ControlFlow').setLevel(logging.Level.ALL);
    */

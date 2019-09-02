@@ -1,7 +1,6 @@
 const fs = require('fs');
 const readdirSyncRec = require('recursive-readdir-sync');
 const attempt = require('../core/attempt');
-
 const qstring = require('../util/qstring');
 
 const file = function (name, rawValue) {

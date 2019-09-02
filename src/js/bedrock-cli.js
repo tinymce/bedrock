@@ -1,10 +1,10 @@
-var run = function (program, directories) {
-  var attempt = require('./bedrock/core/attempt');
-  var clis = require('./bedrock/cli/clis');
+const attempt = require('./bedrock/core/attempt');
+const clis = require('./bedrock/cli/clis');
 
-  if (clis[program.mode] === undefined)  throw 'Bedrock mode not known: ' + program.mode;
+const run = function (program, directories) {
+  if (clis[program.mode] === undefined) throw 'Bedrock mode not known: ' + program.mode;
 
-  var maybeSettings = clis[program.mode](directories);
+  const maybeSettings = clis[program.mode](directories);
   attempt.cata(maybeSettings, clis.logAndExit, function (settings) {
     program.go(settings, directories);
   });

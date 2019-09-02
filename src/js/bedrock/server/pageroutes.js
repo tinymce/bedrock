@@ -1,6 +1,6 @@
-const generate = function (projectdir, basedir, page) {
-  const routes = require('./routes');
+const routes = require('./routes');
 
+const generate = function (projectdir, basedir, page) {
   const routers = [
     routes.hostOn('GET', '/page', basedir)
   ];

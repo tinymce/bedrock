@@ -1,7 +1,7 @@
 const webdriver = require('selenium-webdriver');
-const Key = webdriver.Key;
-
 const effectutils = require('./effectutils');
+
+const Key = webdriver.Key;
 
 const NO_ACTION = null;
 

@@ -1,6 +1,7 @@
 const webdriver = require('selenium-webdriver');
-const By = webdriver.By;
 const until = require('selenium-webdriver/lib/until');
+
+const By = webdriver.By;
 
 const getTargetFromFrame = function (driver, selector) {
   const sections = selector.split('=>');

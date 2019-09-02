@@ -1,4 +1,10 @@
 const accessor = require('../core/accessor');
+const finalhandler = require('finalhandler');
+const portfinder = require('portfinder');
+const routes = require('./routes');
+const apis = require('./apis');
+const cr = require('./customroutes');
+
 /*
  * Settings:
  *
@@ -22,13 +28,6 @@ const startCustom = function (settings, createServer, f) {
     'skipResetMousePosition'
   ]);
 
-  const finalhandler = require('finalhandler');
-
-  const portfinder = require('portfinder');
-
-  const routes = require('./routes');
-  const apis = require('./apis');
-  const cr = require('./customroutes');
   const customroutes = cr.create(settings.customRoutes);
 
   const basedir = Prefs.basedir(settings);

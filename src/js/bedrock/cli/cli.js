@@ -3,7 +3,6 @@ const attempt = require('../core/attempt');
 const version = require('../core/version');
 const validation = require('./validation');
 const cliusage = require('./cliusage');
-
 const exitcodes = require('../util/exitcodes');
 
 const parseCommandLine = function (definitions) {

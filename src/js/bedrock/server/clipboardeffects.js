@@ -1,8 +1,8 @@
 const childProcess = require('child_process');
-const execSync = childProcess.execSync;
 const path = require('path');
-
 const exitcodes = require('../util/exitcodes');
+
+const execSync = childProcess.execSync;
 
 /*
  JSON API for data: {
