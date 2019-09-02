@@ -21,7 +21,7 @@ const go = function (settings) {
       projectdir: settings.projectdir,
       basedir: settings.basedir,
       driver: Attempt.passed(driver),
-      testfiles: [ ],
+      testfiles: [],
       master: master,
       runner: runner,
       loglevel: settings.loglevel,
