@@ -1,4 +1,5 @@
 import * as EffectUtils from './EffectUtils';
+import { WebDriver, WebElement } from 'selenium-webdriver';
 
 /*
  JSON API for data: {
@@ -6,7 +7,7 @@ import * as EffectUtils from './EffectUtils';
    selector :: String
  }
  */
-const getAction = function (driver, target, type) {
+const getAction = function (driver: WebDriver, target: WebElement, type: string): Promise<void> {
   if (type === 'move') return driver.actions().mouseMove(target).perform();
   else if (type === 'down') return driver.actions().mouseMove(target).mouseDown().perform();
   else if (type === 'up') return driver.actions().mouseMove(target).mouseUp().perform();
