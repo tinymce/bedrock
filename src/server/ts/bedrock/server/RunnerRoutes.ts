@@ -4,11 +4,6 @@ import * as glob from 'glob';
 import * as Routes from './routes';
 import * as Compiler from '../compiler/Compiler';
 
-const flatMap = function (xs, f) {
-  const concat = (x, y) => x.concat(y);
-  return xs.map(f).reduce(concat, []);
-};
-
 export const generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, chunk, retries, singleTimeout, stopOnFailure, basePage, coverage) {
   const files = testfiles.map(function (filePath) {
     return path.relative(projectdir, filePath);
@@ -28,7 +23,7 @@ export const generate = function (mode, projectdir, basedir, configFile, bundler
   const pkjson = JSON.parse(fs.readFileSync(`${projectdir}/package.json`));
 
   // Search for yarn workspace projects to use as resource folders
-  const workspaceRoots = !pkjson.workspaces ? [] : flatMap(flatMap(pkjson.workspaces, (w) => glob.sync(w)), (moduleFolder) => {
+  const workspaceRoots = !pkjson.workspaces ? [] : pkjson.workspaces.flatMap((w) => glob.sync(w)).flatMap((moduleFolder) => {
     const moduleJson = `${moduleFolder}/package.json`;
     if (fs.statSync(moduleJson)) {
       const workspaceJson = JSON.parse(fs.readFileSync(moduleJson));
