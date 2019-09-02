@@ -22,7 +22,6 @@
   },
   "private": false,
   "dependencies": {
-    "@types/jquery": "^3.3.31",
     "async": "^1.5.2",
     "babel-polyfill": "^6.23.0",
     "command-line-args": "^3.0.0",
@@ -47,6 +46,7 @@
     "xml-writer": "^1.6.0"
   },
   "devDependencies": {
+    "@types/jquery": "^3.3.31",
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
     "eslint": "^6.2.2",
