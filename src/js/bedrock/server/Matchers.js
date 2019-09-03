@@ -1,6 +1,6 @@
-const cmp = require('../util/cmp');
-const obj = require('../util/obj');
 const url = require('url');
+const Cmp = require('../util/Cmp');
+const Obj = require('../util/Obj');
 
 const prefixMatch = function (prefix) {
   return function (request) {
@@ -27,23 +27,23 @@ const pathMatch = function (path) {
 };
 
 const headersMatch = function (headers) {
-  const lcHeaders = obj.toLowerCaseKeys(headers);
+  const lcHeaders = Obj.toLowerCaseKeys(headers);
   return function (request) {
-    return cmp.hasAllOf(obj.toLowerCaseKeys(request.headers), lcHeaders);
+    return Cmp.hasAllOf(Obj.toLowerCaseKeys(request.headers), lcHeaders);
   };
 };
 
 const queryMatch = function (query) {
   return function (request) {
     const reqQuery = url.parse(request.originalUrl, true).query;
-    return cmp.hasAllOf(reqQuery, query);
+    return Cmp.hasAllOf(reqQuery, query);
   };
 };
 
 const jsonBodyMatch = function (json) {
   return function (request) {
     const data = request.body ? JSON.parse(request.body) : { };
-    return cmp.deepEq(json, data);
+    return Cmp.deepEq(json, data);
   };
 };
 

@@ -1,13 +1,13 @@
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const webpack = require('webpack');
 const path = require('path');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
-const serve = require('../server/serve');
-const exitcodes = require('../util/exitcodes');
-const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
-const imports = require('./imports');
+const Serve = require('../server/Serve');
+const ExitCodes = require('../util/ExitCodes');
+const Imports = require('./Imports');
 
 function moduleAvailable (name) {
   try {
@@ -129,7 +129,7 @@ const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError,
   console.log(`Compiling ${srcFiles.length} tests...`);
 
   mkdirp.sync(path.dirname(scratchFile));
-  fs.writeFileSync(scratchFile, imports.generateImports(true, scratchFile, srcFiles));
+  fs.writeFileSync(scratchFile, Imports.generateImports(true, scratchFile, srcFiles));
 
   webpack(getWebPackConfig(tsConfigFile, scratchFile, dest, coverage, false, basedir), (err, stats) => {
     if (err || stats.hasErrors()) {
@@ -144,7 +144,7 @@ const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError,
       console.log(msg);
 
       if (exitOnCompileError) {
-        process.exit(exitcodes.failures.error);
+        process.exit(ExitCodes.failures.error);
       }
     }
 
@@ -155,7 +155,7 @@ const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError,
 const isCompiledRequest = (request) => request.url.startsWith('/compiled/');
 
 const devserver = function (settings, done) {
-  return serve.startCustom(settings, function (handler) {
+  return Serve.startCustom(settings, function (handler) {
     const scratchDir = path.resolve('scratch');
     const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
     const dest = path.join(scratchDir, 'compiled/tests.js');
@@ -163,7 +163,7 @@ const devserver = function (settings, done) {
     console.log(`Loading ${settings.testfiles.length} tests...`);
 
     mkdirp.sync(path.dirname(scratchFile));
-    fs.writeFileSync(scratchFile, imports.generateImports(true, scratchFile, settings.testfiles));
+    fs.writeFileSync(scratchFile, Imports.generateImports(true, scratchFile, settings.testfiles));
 
     const compiler = webpack(getWebPackConfig(tsConfigFile, scratchFile, dest, settings.coverage, true, settings.basedir));
 

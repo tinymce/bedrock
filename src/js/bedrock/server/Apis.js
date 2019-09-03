@@ -1,11 +1,11 @@
 const keys = require('./keyeffects');
 const mouse = require('./mouseeffects');
-const clipboard = require('./clipboardeffects');
-const routes = require('./routes');
-const mController = require('./controller');
-const attempt = require('../core/attempt');
-const waiter = require('../util/waiter');
-const coverage = require('../core/coverage');
+const ClipboardEffects = require('./ClipboardEffects');
+const Routes = require('./Routes');
+const Controller = require('./Controller');
+const Attempt = require('../core/Attempt');
+const Waiter = require('../util/Waiter');
+const Coverage = require('../core/Coverage');
 
 // This is how long to wait before checking if the driver is ready again
 const pollRate = 2000;
@@ -23,7 +23,7 @@ const create = function (master, maybeDriver, projectdir, basedir, stickyFirstSe
     if (pageHasLoaded && master !== null) return master.waitForIdle(f, 'effect');
     else if (attempts === 0) return Promise.reject('Driver never appeared to be ready');
     else {
-      return waiter.delay({}, pollRate).then(function () {
+      return Waiter.delay({}, pollRate).then(function () {
         return waitForDriverReady(attempts - 1, f);
       });
     }
@@ -51,14 +51,14 @@ const create = function (master, maybeDriver, projectdir, basedir, stickyFirstSe
   };
 
   const driverRouter = function (url, apiLabel, executor) {
-    return attempt.cata(maybeDriver, function () {
-      return routes.unsupported(
+    return Attempt.cata(maybeDriver, function () {
+      return Routes.unsupported(
         'POST',
         url,
         apiLabel + ' API not supported without webdriver running. Use bedrock-auto to get this feature.'
       );
     }, function (driver) {
-      return routes.effect('POST', url, effect(executor, driver));
+      return Routes.effect('POST', url, effect(executor, driver));
     });
   };
 
@@ -69,20 +69,20 @@ const create = function (master, maybeDriver, projectdir, basedir, stickyFirstSe
     pageHasLoaded = true;
   };
 
-  const controller = mController.create(stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel);
+  const c = Controller.create(stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel);
 
   const routers = [
 
     driverRouter('/keys', 'Keys', keys.executor),
     driverRouter('/mouse', 'Mouse', mouse.executor),
-    routes.effect('POST', '/tests/alive', function (data) {
-      controller.recordAlive(data.session);
+    Routes.effect('POST', '/tests/alive', function (data) {
+      c.recordAlive(data.session);
       return Promise.resolve({});
     }),
-    routes.effect('POST', '/tests/start', function (data) {
-      controller.recordTestStart(data.session, data.name, data.file, data.totalTests);
+    Routes.effect('POST', '/tests/start', function (data) {
+      c.recordTestStart(data.session, data.name, data.file, data.totalTests);
       if (resetMousePosition) {
-        return attempt.cata(maybeDriver, function () {
+        return Attempt.cata(maybeDriver, function () {
           return Promise.reject('Resetting mouse position not supported without webdriver running. Use bedrock-auto to get this feature.');
         }, function (driver) {
           return effect(setInitialMousePosition, driver)({});
@@ -91,24 +91,24 @@ const create = function (master, maybeDriver, projectdir, basedir, stickyFirstSe
         return Promise.resolve({});
       }
     }),
-    routes.effect('POST', '/tests/result', function (data) {
-      controller.recordTestResult(data.session, data.name, data.file, data.passed, data.time, data.error);
+    Routes.effect('POST', '/tests/result', function (data) {
+      c.recordTestResult(data.session, data.name, data.file, data.passed, data.time, data.error);
       return Promise.resolve({});
     }),
-    routes.effect('POST', '/tests/done', function (data) {
-      coverage.writeCoverageData(data.coverage);
-      controller.recordDone(data.session);
+    Routes.effect('POST', '/tests/done', function (data) {
+      Coverage.writeCoverageData(data.coverage);
+      c.recordDone(data.session);
       return Promise.resolve({});
     }),
     // This does not need the webdriver.
-    routes.effect('POST', '/clipboard', clipboard.route(basedir, projectdir))
+    Routes.effect('POST', '/clipboard', ClipboardEffects.route(basedir, projectdir))
   ];
 
   return {
     routers: routers,
     markLoaded: markLoaded,
-    enableHud: controller.enableHud,
-    awaitDone: controller.awaitDone
+    enableHud: c.enableHud,
+    awaitDone: c.awaitDone
   };
 };
 

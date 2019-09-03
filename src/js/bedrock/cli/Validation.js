@@ -1,4 +1,4 @@
-const attempt = require('../core/attempt');
+const Attempt = require('../core/Attempt');
 
 const validateOne = function (defn, settings) {
   return defn.validate(defn.name, settings[defn.name]);
@@ -8,23 +8,23 @@ const validateMany = function (defn, settings) {
   const validations = settings[defn.name].map(function (f) {
     return defn.validate(defn.name, f);
   });
-  return attempt.concat(validations);
+  return Attempt.concat(validations);
 };
 
 const validateRequired = function (defn, settings) {
   const output = defn.output !== undefined ? defn.output : defn.name;
-  return defn.required === true && settings[output] === undefined ? attempt.failed([
+  return defn.required === true && settings[output] === undefined ? Attempt.failed([
     'The *required* output property [' + output + '] from [' + defn.name + '] must be specified'
-  ]) : attempt.passed(defn);
+  ]) : Attempt.passed(defn);
 };
 
 const scanRequired = function (definitions, settings) {
   const requiredInfo = definitions.map(function (defn) {
     return validateRequired(defn, settings);
   });
-  const outcome = attempt.concat(requiredInfo);
-  return attempt.cata(outcome, attempt.failed, function () {
-    return attempt.passed(settings);
+  const outcome = Attempt.concat(requiredInfo);
+  return Attempt.cata(outcome, Attempt.failed, function () {
+    return Attempt.passed(settings);
   });
 };
 
@@ -39,17 +39,17 @@ const scan = function (definitions, settings) {
   return definitions.reduce(function (rest, defn) {
     if (settings[defn.name] === undefined) return rest;
     const newValue = defn.multiple === true ? validateMany(defn, settings) : validateOne(defn, settings);
-    return attempt.carry(rest, newValue, function (result, v) {
+    return Attempt.carry(rest, newValue, function (result, v) {
       const output = defn.output !== undefined ? defn.output : defn.name;
       // REMOVE MUTATION when I know how to do extend in node.
       if (rest[output] !== undefined) {
-        return attempt.failed(['Incompatible']);
+        return Attempt.failed(['Incompatible']);
       }
       result[output] = defn.flatten === true ? flatten(v): v;
 
-      return attempt.passed(result);
+      return Attempt.passed(result);
     });
-  }, attempt.passed({}));
+  }, Attempt.passed({}));
 };
 
 module.exports = {

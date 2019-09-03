@@ -1,5 +1,5 @@
 const path = require('path');
-const extraction = require('./extraction');
+const Extraction = require('./Extraction');
 
 // Note, this is a blend of the previous hand-rolled cloption approach and
 // the existing npm package: command-line-arguments
@@ -9,7 +9,7 @@ const name = {
   type: String,
   defaultValue: 'bedrock-run',
   description: 'The name of the test run. It is used in reporting data',
-  validate: extraction.any
+  validate: Extraction.any
 };
 
 const output = {
@@ -18,7 +18,7 @@ const output = {
   type: String,
   defaultValue: 'scratch',
   description: 'The destination directory of the test reports',
-  validate: extraction.any
+  validate: Extraction.any
 };
 
 const browser = {
@@ -27,7 +27,7 @@ const browser = {
   type: String,
   required: true,
   description: 'The name of the browser to launch',
-  validate: extraction.inSet([
+  validate: Extraction.inSet([
     'ie',
     'firefox',
     'firefox-headless',
@@ -45,7 +45,7 @@ const bundler = {
   required: false,
   defaultValue: 'webpack',
   description: 'DISABLED: The name bundler to use webpack/rollup (forced webpack in this build)',
-  validate: extraction.inSet([
+  validate: Extraction.inSet([
     'webpack',
     'rollup'
   ])
@@ -58,7 +58,7 @@ const configTo = function (defaultValue) {
     type: String,
     defaultValue: defaultValue,
     description: 'The location of the typescript config file',
-    validate: extraction.file
+    validate: Extraction.file
   };
 };
 
@@ -73,7 +73,7 @@ const files = {
   type: String,
   multiple: true,
   description: 'The list of files to test',
-  validate: extraction.file
+  validate: Extraction.file
 };
 
 const testdir = {
@@ -85,7 +85,7 @@ const testdir = {
   alias: 'd',
   type: String,
   description: 'The directory containing all the files to test',
-  validate: extraction.files(['Test.js', 'Test.ts', 'Test.tsx'])
+  validate: Extraction.files(['Test.js', 'Test.ts', 'Test.tsx'])
 };
 
 const testdirs = {
@@ -96,7 +96,7 @@ const testdirs = {
   multiple: true,
   flatten: true,
   description: 'The directories (plural) containing all the files to test',
-  validate: extraction.files(['Test.js', 'Test.ts', 'Test.tsx'])
+  validate: Extraction.files(['Test.js', 'Test.ts', 'Test.tsx'])
 };
 
 const page = {
@@ -105,7 +105,7 @@ const page = {
   required: true,
   type: String,
   description: 'The page to load into the browser',
-  validate: extraction.file
+  validate: Extraction.file
 };
 
 const projectdir = function (directories) {
@@ -114,7 +114,7 @@ const projectdir = function (directories) {
     alias: 'p',
     type: String,
     description: 'The base directory to host',
-    validate: extraction.any,
+    validate: Extraction.any,
     defaultValue: directories.current,
     uncommon: true
   };
@@ -125,7 +125,7 @@ const basedir = function (directories) {
     name: 'basedir',
     type: String,
     description: 'The base directory of the bedrock program',
-    validate: extraction.any,
+    validate: Extraction.any,
     defaultValue: path.join(directories.bin, '/..'),
     uncommon: true
   };
@@ -135,7 +135,7 @@ const debuggingPort = {
   name: 'debuggingPort',
   type: Number,
   description: 'The port for remote debugging (used for phantom and chrome-headless)',
-  validate: extraction.any,
+  validate: Extraction.any,
   defaultValue: 9000,
   uncommon: true
 };
@@ -144,7 +144,7 @@ const bucket = {
   name: 'bucket',
   type: Number,
   description: 'Which "bucket" of tests to run, if you split the test runs with "buckets" setting. 1-based.',
-  validate: extraction.any,
+  validate: Extraction.any,
   defaultValue: 1,
   uncommon: true
 };
@@ -153,7 +153,7 @@ const buckets = {
   name: 'buckets',
   type: Number,
   description: 'Number of "buckets" to split tests into. You can specify which bucket number to run, using the "bucket" setting. Useful for parallelizing tests over multiple build nodes.',
-  validate: extraction.any,
+  validate: Extraction.any,
   defaultValue: 1,
   uncommon: true
 };
@@ -163,7 +163,7 @@ const overallTimeout = {
   type: Number,
   output: 'overallTimeout',
   description: 'The total amount of time in milliseconds the test can take before bedrock times out.',
-  validate: extraction.any,
+  validate: Extraction.any,
   defaultValue: 10 * 60 * 1000,
   uncommon: true
 };
@@ -172,7 +172,7 @@ const singleTimeout = {
   name: 'singleTimeout',
   type: Number,
   description: 'The total amount of time in milliseconds a single test can take before bedrock times out.',
-  validate: extraction.any,
+  validate: Extraction.any,
   defaultValue: 30 * 1000,
   uncommon: true
 };
@@ -182,7 +182,7 @@ const framework = {
   type: String,
   defaultValue: 'qunit',
   description: 'The testing framework being used',
-  validate: extraction.inSet(['qunit']),
+  validate: Extraction.inSet(['qunit']),
   required: true
 };
 
@@ -192,7 +192,7 @@ const help = {
   type: Boolean,
   defaultValue: false,
   description: 'Print out the help information for command',
-  validate: extraction.any
+  validate: Extraction.any
 };
 
 const logging = {
@@ -200,7 +200,7 @@ const logging = {
   type: String,
   defaultValue: 'advanced',
   description: 'The level of logging for test progress',
-  validate: extraction.inSet(['simple', 'advanced']),
+  validate: Extraction.inSet(['simple', 'advanced']),
   required: true
 };
 
@@ -209,14 +209,14 @@ const version = {
   type: Boolean,
   defaultValue: false,
   description: 'Output the version number of the command',
-  validate: extraction.any
+  validate: Extraction.any
 };
 
 const chunk = {
   name: 'chunk',
   type: Number,
   description: 'Run tests in groups of this size, reload page between.',
-  validate: extraction.any,
+  validate: Extraction.any,
   defaultValue: 100,
   uncommon: true
 };
@@ -225,7 +225,7 @@ const retries = {
   name: 'retries',
   type: Number,
   description: 'Retry failing tests this many times. Ignored with stopOnFailure.',
-  validate: extraction.any,
+  validate: Extraction.any,
   defaultValue: 0
 };
 
@@ -234,7 +234,7 @@ const stopOnFailure = {
   type: Boolean,
   defaultValue: false,
   description: 'Stop after the first failure',
-  validate: extraction.any
+  validate: Extraction.any
 };
 
 // eslint-disable-next-line camelcase
@@ -242,7 +242,7 @@ const stopOnFailure__hidden = {
   name: 'stopOnFailure',
   type: Boolean,
   defaultValue: false,
-  validate: extraction.any,
+  validate: Extraction.any,
   hidden: true
 };
 
@@ -250,7 +250,7 @@ const customRoutes = {
   name: 'customRoutes',
   type: String,
   description: 'File with custom static routes',
-  validate: extraction.file,
+  validate: Extraction.file,
   uncommon: true
 };
 
@@ -259,7 +259,7 @@ const delayExiting = {
   type: Boolean,
   defaultValue: false,
   description: 'After the tests have completed, delay quitting the server',
-  validate: extraction.any
+  validate: Extraction.any
 };
 
 const useSandboxForHeadless = {
@@ -267,7 +267,7 @@ const useSandboxForHeadless = {
   type: Boolean,
   defaultValue: false,
   description: 'Pass --no-sandbox through to chrome headless options',
-  validate: extraction.any,
+  validate: Extraction.any,
   uncommon: true
 };
 
@@ -279,7 +279,7 @@ const coverage = {
   uncommon: true,
   multiple: true,
   flatten: true,
-  validate: extraction.directory
+  validate: Extraction.directory
 };
 
 const skipResetMousePosition = {
@@ -287,7 +287,7 @@ const skipResetMousePosition = {
   type: Boolean,
   defaultValue: false,
   description: 'Prevent bedrock from resetting the mouse position to the top left corner of the screen between each test',
-  validate: extraction.any,
+  validate: Extraction.any,
   uncommon: true
 };
 

@@ -5,8 +5,8 @@ const sourcemaps = require('rollup-plugin-sourcemaps');
 const path = require('path');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
-const imports = require('./imports');
-const exitcodes = require('../util/exitcodes');
+const Imports = require('./Imports');
+const ExitCodes = require('../util/ExitCodes');
 
 const parseTsConfig = function (tsconfig) {
   return JSON.parse(fs.readFileSync(tsconfig));
@@ -27,7 +27,7 @@ const compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles
   const include = tsConfig.include ? tsConfig.include : [];
 
   mkdirp.sync(path.dirname(scratchFile));
-  fs.writeFileSync(scratchFile, imports.generateImports(false, scratchFile, srcFiles));
+  fs.writeFileSync(scratchFile, Imports.generateImports(false, scratchFile, srcFiles));
 
   rollup.rollup({
     input: scratchFile,
@@ -65,7 +65,7 @@ const compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles
     console.log(err);
 
     if (exitOnCompileError) {
-      process.exit(exitcodes.failures.error);
+      process.exit(ExitCodes.failures.error);
     }
 
     success(dest);

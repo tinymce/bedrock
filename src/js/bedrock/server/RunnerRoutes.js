@@ -1,8 +1,8 @@
 const path = require('path');
-const routes = require('./routes');
-const compiler = require('../compiler/compiler');
 const fs = require('fs');
 const glob = require('glob');
+const Routes = require('./routes');
+const Compiler = require('../compiler/Compiler');
 
 if (!Array.prototype.flatMap) {
   // simple polyfill for node versions < 11
@@ -22,7 +22,7 @@ const generate = function (mode, projectdir, basedir, configFile, bundler, testf
     return path.relative(projectdir, filePath);
   });
 
-  const testGenerator = compiler(
+  const testGenerator = Compiler.compile(
     path.join(projectdir, configFile),
     path.join(projectdir, 'scratch'),
     basedir,
@@ -50,7 +50,7 @@ const generate = function (mode, projectdir, basedir, configFile, bundler, testf
 
   // console.log(`Resource maps from ${projectdir}: \n`, resourceRoots.map(({ name, folder }) => `/project/${name}/ => ${folder}`));
 
-  const resourceRoutes = resourceRoots.map(({name, folder}) => routes.routing('GET', `/project/${name}`, path.join(projectdir, folder)));
+  const resourceRoutes = resourceRoots.map(({name, folder}) => Routes.routing('GET', `/project/${name}`, path.join(projectdir, folder)));
 
   const precompiledTests = (mode === 'auto' ? testGenerator.generate() : Promise.resolve(null));
 
@@ -58,26 +58,26 @@ const generate = function (mode, projectdir, basedir, configFile, bundler, testf
     (precompTests) => {
       const routers = resourceRoutes.concat([
         // fallback resource route to project root
-        routes.routing('GET', '/project', projectdir),
+        Routes.routing('GET', '/project', projectdir),
 
         // bedrock resources
-        routes.routing('GET', '/runner', path.join(basedir, 'dist/bedrock/www/runner')),
-        routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery'))),
-        routes.routing('GET', '/lib/babel-polyfill', path.join(path.dirname(require.resolve('babel-polyfill')), '../dist')),
-        routes.routing('GET', '/css', path.join(basedir, 'src/css')),
+        Routes.routing('GET', '/runner', path.join(basedir, 'dist/bedrock/www/runner')),
+        Routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery'))),
+        Routes.routing('GET', '/lib/babel-polyfill', path.join(path.dirname(require.resolve('babel-polyfill')), '../dist')),
+        Routes.routing('GET', '/css', path.join(basedir, 'src/css')),
 
         // test code
-        routes.asyncJs('GET', '/compiled/tests.js', function (done) {
+        Routes.asyncJs('GET', '/compiled/tests.js', function (done) {
           if (precompTests !== null) {
             done(precompTests);
           } else {
             testGenerator.generate().then(done);
           }
         }),
-        routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
+        Routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
 
         // harness API
-        routes.json('GET', '/harness', {
+        Routes.json('GET', '/harness', {
           stopOnFailure: stopOnFailure,
           chunk: chunk,
           retries: retries,
@@ -85,7 +85,7 @@ const generate = function (mode, projectdir, basedir, configFile, bundler, testf
         })
       ]);
 
-      const fallback = routes.constant('GET', basedir, basePage);
+      const fallback = Routes.constant('GET', basedir, basePage);
 
       return {
         routers: routers,
