@@ -1,4 +1,4 @@
-var attempt = require('../../src/js/bedrock/core/attempt');
+var attempt = require('../../lib/server/ts/bedrock/core/Attempt');
 var tape = require('tape');
 var jsc = require('jsverify');
 

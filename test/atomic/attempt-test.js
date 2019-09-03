@@ -1,5 +1,5 @@
 var tape = require('tape');
-var attempt = require('../../src/js/bedrock/core/attempt.js');
+var attempt = require('../../lib/server/ts/bedrock/core/attempt.js');
 var attemptutils = require('../util/attempt-utils.js');
 
 // TODO: Investigate invariant testing in tape/node.

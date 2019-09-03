@@ -14,7 +14,8 @@ module.exports = {
     "space-before-function-paren": "off",
     "no-trailing-spaces": "off",
     "indent": ["error", 2],
-    "max-len": "off"
+    "max-len": "off",
+    "no-prototype-builtins": "off"
   },
   "env": {
     "node": true
