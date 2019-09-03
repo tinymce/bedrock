@@ -1,8 +1,8 @@
-var isString = function (val) {
+const isString = function (val) {
   return typeof val === 'string';
 };
 
-var isObject = function (val) {
+const isObject = function (val) {
   return typeof val === 'object';
 };
 

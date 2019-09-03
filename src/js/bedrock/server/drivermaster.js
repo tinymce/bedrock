@@ -1,10 +1,9 @@
-var waiter = require('../util/waiter');
+const waiter = require('../util/waiter');
 
-var create = function () {
+const create = function () {
+  let inUse = false;
 
-  var inUse = false;
-
-  var queue = [ ];
+  let queue = [];
 
   /*
    * DriverMaster is a very naive locking / unlocking system for access
@@ -41,14 +40,14 @@ var create = function () {
    * fall out.
    */
 
-  var doWaitForIdle = function (identifier, f, label, attempts) {
+  const doWaitForIdle = function (identifier, f, label, attempts) {
     // Locking has failed many times ... so just assume the lock should have been released.
     if (attempts === 0) return use(f, label);
     // Nothing has a lock, and there is no queue
     if (inUse === false && queue.length === 0) return use(f, label);
     // Nothing has a lock and this process is at the head of the queue
     else if (inUse === false && queue[0].identifier === identifier) {
-      var first = queue[0];
+      const first = queue[0];
       queue = queue.slice(1);
       return use(first.f, first.label);
     // Either something has a lock, or this process is not at the head of the queue,
@@ -60,10 +59,10 @@ var create = function () {
     }
   };
 
-  var waitForIdle = function (f, label) {
+  const waitForIdle = function (f, label) {
     if (inUse === false && queue.length === 0) return use(f, label);
     else {
-      var identifier = label + '_' + new Date().getTime() + Math.floor(Math.random() * 10000);
+      const identifier = label + '_' + new Date().getTime() + Math.floor(Math.random() * 10000);
       queue = queue.concat({
         f: f,
         label: label,
@@ -74,7 +73,7 @@ var create = function () {
   };
 
 
-  var use = function (f, label) {
+  const use = function (f, label) {
     inUse = true;
 
     return f().then(function (v) {

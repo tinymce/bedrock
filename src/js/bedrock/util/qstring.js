@@ -1,7 +1,7 @@
 // NOTE: Replace this with a sensible npm module if you can find one.
 
-var parse = function (url) {
-  var questionIndex = url.indexOf('?');
+const parse = function (url) {
+  const questionIndex = url.indexOf('?');
   return questionIndex === -1 ? {
     base: url,
     original: url

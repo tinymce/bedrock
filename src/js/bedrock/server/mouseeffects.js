@@ -1,7 +1,4 @@
-var webdriver = require('selenium-webdriver');
-var By = webdriver.By;
-
-var effectutils = require('./effectutils');
+const effectutils = require('./effectutils');
 
 /*
  JSON API for data: {
@@ -9,16 +6,16 @@ var effectutils = require('./effectutils');
    selector :: String
  }
  */
-var getAction = function (driver, target, type) {
+const getAction = function (driver, target, type) {
   if (type === 'move') return driver.actions().mouseMove(target).perform();
   else if (type === 'down') return driver.actions().mouseMove(target).mouseDown().perform();
   else if (type === 'up') return driver.actions().mouseMove(target).mouseUp().perform();
   // MicrosoftEdge does support this, but does not seem to support click in an ActionSequence
   else if (type === 'click') return target.click();
-  else return new Promise.reject('Unknown mouse effect type: ' + type);
+  else return Promise.reject('Unknown mouse effect type: ' + type);
 };
 
-var execute = function (driver, data) {
+const execute = function (driver, data) {
   return effectutils.getTarget(driver, data).then(function (tgt) {
     return getAction(driver, tgt, data.type).then(function (res) {
       return driver.switchTo().defaultContent().then(function () {
@@ -27,12 +24,12 @@ var execute = function (driver, data) {
     }, function (err) {
       return driver.switchTo().defaultContent().then(function () {
         return Promise.reject(err);
-      })
+      });
     });
   });
 };
 
-var executor = function (driver) {
+const executor = function (driver) {
   return function (data) {
     return execute(driver, data);
   };

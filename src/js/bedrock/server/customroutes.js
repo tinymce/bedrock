@@ -1,12 +1,12 @@
-var fs = require('fs');
-var path = require('path');
-var matchers = require('./matchers');
-var obj = require('../util/obj');
-var type = require('../util/type');
-var routes = require('./routes');
+const fs = require('fs');
+const path = require('path');
+const matchers = require('./matchers');
+const obj = require('../util/obj');
+const type = require('../util/type');
+const routes = require('./routes');
 
-var readRequestBody = function (request, done) {
-  var body = '';
+const readRequestBody = function (request, done) {
+  let body = '';
   request.on('data', function (data) {
     body += data;
   });
@@ -16,18 +16,18 @@ var readRequestBody = function (request, done) {
   });
 };
 
-var parseJson = function (filePath) {
-  var contents = fs.readFileSync(filePath);
-  var data = JSON.parse(contents);
+const parseJson = function (filePath) {
+  const contents = fs.readFileSync(filePath);
+  const data = JSON.parse(contents);
   return data;
 };
 
-var serializeJson = function (json) {
+const serializeJson = function (json) {
   return JSON.stringify(json, null, 2);
 };
 
-var matchesFromRequest = function (matchRequest) {
-  var matches = [];
+const matchesFromRequest = function (matchRequest) {
+  const matches = [];
 
   if (type.isString(matchRequest.method)) {
     matches.push(matchers.methodMatch(matchRequest.method));
@@ -56,29 +56,29 @@ var matchesFromRequest = function (matchRequest) {
   return matches;
 };
 
-var parseJsonFromFile = function (filePath, configPath) {
-  var resolvedFilePath = path.join(path.dirname(configPath), filePath);
+const parseJsonFromFile = function (filePath, configPath) {
+  const resolvedFilePath = path.join(path.dirname(configPath), filePath);
   return parseJson(resolvedFilePath);
 };
 
-var assignContentType = function (headers, contentType) {
+const assignContentType = function (headers, contentType) {
   return Object.assign({}, {'content-type': contentType}, headers);
 };
 
-var goFromResponse = function (matchResponse, configPath) {
+const goFromResponse = function (matchResponse, configPath) {
   return function (request, response/* , done */) {
-    var headers = matchResponse.headers ? obj.toLowerCaseKeys(matchResponse.headers) : { };
-    var status = matchResponse.status ? matchResponse.status : 200;
+    const headers = matchResponse.headers ? obj.toLowerCaseKeys(matchResponse.headers) : { };
+    const status = matchResponse.status ? matchResponse.status : 200;
 
     if (type.isString(matchResponse.json_file) || type.isObject(matchResponse.json)) {
       response.writeHead(status, assignContentType(headers, 'application/json'));
-      var json = type.isObject(matchResponse.json) ? matchResponse.json : parseJsonFromFile(matchResponse.json_file, configPath);
+      const json = type.isObject(matchResponse.json) ? matchResponse.json : parseJsonFromFile(matchResponse.json_file, configPath);
       response.end(serializeJson(json));
     }
   };
 };
 
-var jsonToRouters = function (data, configPath) {
+const jsonToRouters = function (data, configPath) {
   return data.map(function (staticRouter) {
     return {
       matches: matchesFromRequest(staticRouter.request),
@@ -87,7 +87,7 @@ var jsonToRouters = function (data, configPath) {
   });
 };
 
-var fallbackGo = function (filePath) {
+const fallbackGo = function (filePath) {
   return function (request, response, done) {
     response.writeHead(404, {'content-type': 'application/json'});
     response.end([
@@ -101,10 +101,10 @@ var fallbackGo = function (filePath) {
   };
 };
 
-var go = function (filePath) {
-  var fallback = { matching: [], go: fallbackGo(filePath) };
+const go = function (filePath) {
+  const fallback = {matching: [], go: fallbackGo(filePath)};
   return function (request, response, done) {
-    var routers = filePath ? jsonToRouters(parseJson(filePath), filePath) : [ ];
+    const routers = filePath ? jsonToRouters(parseJson(filePath), filePath) : [];
     readRequestBody(request, function (body) {
       request.body = body;
       routes.route(routers, fallback, request, response, done);
@@ -112,16 +112,16 @@ var go = function (filePath) {
   };
 };
 
-var routers = function (filePath) {
+const routers = function (filePath) {
   return [
     {
-      matches: [ matchers.prefixMatch('/custom') ],
+      matches: [matchers.prefixMatch('/custom')],
       go: go(filePath)
     }
   ];
 };
 
-var create = function (filePath) {
+const create = function (filePath) {
   return {
     routers: routers(filePath)
   };

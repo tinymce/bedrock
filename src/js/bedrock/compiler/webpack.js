@@ -1,20 +1,21 @@
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-var path = require('path');
-var fs = require('fs');
-var mkdirp = require('mkdirp');
-var serve = require("../server/serve");
-var exitcodes = require('../util/exitcodes');
-var webpack = require("webpack");
+const path = require('path');
+const fs = require('fs');
+const mkdirp = require('mkdirp');
+const serve = require('../server/serve');
+const exitcodes = require('../util/exitcodes');
+const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const imports = require('./imports');
 
-function moduleAvailable(name) {
+function moduleAvailable (name) {
   try {
     require.resolve(name);
     return true;
-  } catch (e) {}
-  return false;
+  } catch (e) {
+    return false;
+  }
 }
 
 const webpackRemap = moduleAvailable('@ephox/swag') ? [
@@ -24,7 +25,7 @@ const webpackRemap = moduleAvailable('@ephox/swag') ? [
   }
 ] : [];
 
-let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manualMode, basedir) {
+const getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manualMode, basedir) {
   return {
     stats: 'none',
     entry: scratchFile,
@@ -42,7 +43,7 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
           configFile: tsConfigFile,
           // awesome-typescript-loader could read this from above, but the new plugin can't?
           // lol whatever
-          extensions: ['.ts', '.tsx', '.js'],
+          extensions: ['.ts', '.tsx', '.js']
         })
       ]
     },
@@ -87,7 +88,7 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
 
         {
           test: /\.(html|htm|css|bower|hex|rtf|xml|yml)$/,
-          use: [ 'raw-loader' ]
+          use: ['raw-loader']
         }
       ]).concat(
         coverage ? [
@@ -99,7 +100,7 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
             options: {
               esModules: true
             }
-          },
+          }
         ] : []
       )
     },
@@ -122,9 +123,9 @@ let getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manu
   };
 };
 
-let compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, srcFiles, coverage, success) {
-  var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
-  var dest = path.join(scratchDir, 'compiled/tests.js');
+const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, srcFiles, coverage, success) {
+  const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
+  const dest = path.join(scratchDir, 'compiled/tests.js');
   console.log(`Compiling ${srcFiles.length} tests...`);
 
   mkdirp.sync(path.dirname(scratchFile));
@@ -132,7 +133,7 @@ let compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, s
 
   webpack(getWebPackConfig(tsConfigFile, scratchFile, dest, coverage, false, basedir), (err, stats) => {
     if (err || stats.hasErrors()) {
-      let msg = stats.toString({
+      const msg = stats.toString({
         all: false,
         errors: true,
         moduleTrace: true,
@@ -151,14 +152,14 @@ let compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, s
   });
 };
 
-let isCompiledRequest = request => request.url.startsWith('/compiled/');
+const isCompiledRequest = (request) => request.url.startsWith('/compiled/');
 
-let devserver = function (settings, done) {
+const devserver = function (settings, done) {
   return serve.startCustom(settings, function (handler) {
-    var scratchDir = path.resolve('scratch');
-    var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
-    var dest = path.join(scratchDir, 'compiled/tests.js');
-    var tsConfigFile = settings.config;
+    const scratchDir = path.resolve('scratch');
+    const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
+    const dest = path.join(scratchDir, 'compiled/tests.js');
+    const tsConfigFile = settings.config;
     console.log(`Loading ${settings.testfiles.length} tests...`);
 
     mkdirp.sync(path.dirname(scratchFile));

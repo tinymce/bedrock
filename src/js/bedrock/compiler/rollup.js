@@ -8,13 +8,13 @@ const mkdirp = require('mkdirp');
 const imports = require('./imports');
 const exitcodes = require('../util/exitcodes');
 
-let parseTsConfig = function (tsconfig) {
+const parseTsConfig = function (tsconfig) {
   return JSON.parse(fs.readFileSync(tsconfig));
 };
 
-let compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, success) {
-  var scratchFile = path.join(scratchDir, 'compiled/tests.ts');
-  var dest = path.join(scratchDir, 'compiled/tests.js');
+const compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, success) {
+  const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
+  const dest = path.join(scratchDir, 'compiled/tests.js');
 
   const outputOptions = {
     name: 'ephoxTests',

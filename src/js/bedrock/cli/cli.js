@@ -1,23 +1,21 @@
-var cloptions = require('./cloptions');
-var commandLineArgs = require('command-line-args');
-var attempt = require('../core/attempt');
-var version = require('../core/version');
-var validation = require('./validation');
-var cliusage = require('./cliusage');
+const commandLineArgs = require('command-line-args');
+const attempt = require('../core/attempt');
+const version = require('../core/version');
+const validation = require('./validation');
+const cliusage = require('./cliusage');
+const exitcodes = require('../util/exitcodes');
 
-var exitcodes = require('../util/exitcodes');
-
-var parseCommandLine = function (definitions) {
+const parseCommandLine = function (definitions) {
   try {
-    var settings = commandLineArgs(definitions);
+    const settings = commandLineArgs(definitions);
     return attempt.passed(settings);
   } catch (err) {
-    return attempt.failed([ err.message !== undefined ? err.message : err ]);
+    return attempt.failed([err.message !== undefined ? err.message : err]);
   }
 };
 
-var extract = function (command, desc, definitions) {
-  var parsed = parseCommandLine(definitions);
+const extract = function (command, desc, definitions) {
+  const parsed = parseCommandLine(definitions);
 
 
   attempt.cata(parsed, function () {
@@ -32,7 +30,7 @@ var extract = function (command, desc, definitions) {
     }
   });
 
-  var extracted = attempt.list(parsed, [
+  const extracted = attempt.list(parsed, [
     function (settings) {
       return validation.scan(definitions, settings);
     },

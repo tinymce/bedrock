@@ -1,59 +1,59 @@
-var server = require('serve-static');
-var matchers = require('./matchers');
+const server = require('serve-static');
+const matchers = require('./matchers');
 
-var routing = function (method, prefix, source) {
-  var router = server(source);
+const routing = function (method, prefix, source) {
+  const router = server(source);
 
-  var go = function (request, response, done) {
+  const go = function (request, response, done) {
     request.url = request.url.substring(prefix.length);
     router(request, response, done);
   };
 
   return {
-    matches: [ matchers.methodMatch(method), matchers.prefixMatch(prefix) ],
+    matches: [matchers.methodMatch(method), matchers.prefixMatch(prefix)],
     go: go
   };
 };
 
-var json = function (method, prefix, data) {
-  var go = function (request, response/* , done */) {
+const json = function (method, prefix, data) {
+  const go = function (request, response/* , done */) {
     concludeJson(response, 200, data);
   };
 
   return {
-    matches: [ matchers.methodMatch(method), matchers.prefixMatch(prefix) ],
+    matches: [matchers.methodMatch(method), matchers.prefixMatch(prefix)],
     go: go
   };
 };
 
-var concludeJson = function (response, status, info) {
-  response.writeHeader(status, { "Content-Type": "application/json" });
+const concludeJson = function (response, status, info) {
+  response.writeHeader(status, {'Content-Type': 'application/json'});
   response.end(JSON.stringify(info));
 };
 
-var asyncJs = function (method, url, fn) {
-  var go = function (request, response/* , done */) {
+const asyncJs = function (method, url, fn) {
+  const go = function (request, response/* , done */) {
     fn(function (data) {
-      response.writeHeader(200, { "Content-Type": "text/javascript" });
+      response.writeHeader(200, {'Content-Type': 'text/javascript'});
       response.end(data);
     });
   };
 
   return {
-    matches: [ matchers.methodMatch(method), matchers.urlMatch(url) ],
+    matches: [matchers.methodMatch(method), matchers.urlMatch(url)],
     go: go
   };
 };
 
-var effect = function (method, prefix, action) {
-  var go = function (request, response/* , done */) {
-    var body = '';
+const effect = function (method, prefix, action) {
+  const go = function (request, response/* , done */) {
+    let body = '';
     request.on('data', function (data) {
       body += data;
     });
 
     request.on('end', function () {
-      var parsed = JSON.parse(body);
+      const parsed = JSON.parse(body);
       action(parsed).then(function () {
         concludeJson(response, 200, {});
       }, function (err) {
@@ -65,88 +65,88 @@ var effect = function (method, prefix, action) {
   };
 
   return {
-    matches: [ matchers.methodMatch(method), matchers.prefixMatch(prefix) ],
+    matches: [matchers.methodMatch(method), matchers.prefixMatch(prefix)],
     go: go
   };
 };
 
-var rewrite = function (method, root, input, output) {
-  var base = server(root);
+const rewrite = function (method, root, input, output) {
+  const base = server(root);
 
-  var go = function (request, response, done) {
+  const go = function (request, response, done) {
     request.url = output;
     base(request, response, done);
   };
 
   return {
-    matches: [ matchers.methodMatch(method), matchers.prefixMatch(input) ],
+    matches: [matchers.methodMatch(method), matchers.prefixMatch(input)],
     go: go
   };
 };
 
-var constant = function (method, root, url) {
-  var base = server(root);
+const constant = function (method, root, url) {
+  const base = server(root);
 
-  var go = function (request, response, done) {
+  const go = function (request, response, done) {
     request.url = url;
     base(request, response, done);
   };
 
   return {
-    matches: [ matchers.methodMatch(method), matchers.prefixMatch(root) ],
+    matches: [matchers.methodMatch(method), matchers.prefixMatch(root)],
     go: go
   };
 };
 
-var host = function (method, root) {
-  var base = server(root);
+const host = function (method, root) {
+  const base = server(root);
 
-  var go = function (request, response, done) {
+  const go = function (request, response, done) {
     base(request, response, done);
   };
 
   return {
-    matches: [ matchers.methodMatch(method), matchers.prefixMatch(root) ],
+    matches: [matchers.methodMatch(method), matchers.prefixMatch(root)],
     go: go
   };
 };
 
-var hostOn = function (method, prefix, root) {
-  var base = server(root);
+const hostOn = function (method, prefix, root) {
+  const base = server(root);
 
-  var go = function (request, response, done) {
-    var original = request.url;
+  const go = function (request, response, done) {
+    const original = request.url;
     request.url = original.substring((prefix + '/').length);
     base(request, response, done);
   };
 
   return {
-    matches: [ matchers.methodMatch(method), matchers.prefixMatch(prefix) ],
+    matches: [matchers.methodMatch(method), matchers.prefixMatch(prefix)],
     go: go
   };
 };
 
-var unsupported = function (method, root, label) {
-  var go = function (request, response/* , done */) {
-    concludeJson(response, 404, { error: label });
+const unsupported = function (method, root, label) {
+  const go = function (request, response/* , done */) {
+    concludeJson(response, 404, {error: label});
   };
 
   return {
-    matches: [ matchers.methodMatch(method), matchers.prefixMatch(root) ],
+    matches: [matchers.methodMatch(method), matchers.prefixMatch(root)],
     go: go
   };
 };
 
-var route = function (routes, fallback, request, response, done) {
+const route = function (routes, fallback, request, response, done) {
   request.originalUrl = request.url;
 
-  var match = routes.find(function (candidate) {
+  const match = routes.find(function (candidate) {
     return candidate.matches.every(function (match) {
       return match(request);
     });
   });
 
-  var matching = match === undefined ? fallback : match;
+  const matching = match === undefined ? fallback : match;
   matching.go(request, response, done);
 };
 

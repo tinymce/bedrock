@@ -1,4 +1,10 @@
-var accessor = require('../core/accessor');
+const accessor = require('../core/accessor');
+const finalhandler = require('finalhandler');
+const portfinder = require('portfinder');
+const routes = require('./routes');
+const apis = require('./apis');
+const cr = require('./customroutes');
+
 /*
  * Settings:
  *
@@ -9,8 +15,8 @@ var accessor = require('../core/accessor');
  * master (can be null) The driver master (locking and unlocking)
  * runner: runner (e.g. runnerroutes, pageroutes etc). Has fallback and routers.
  */
-var startCustom = function (settings, createServer, f) {
-  var Prefs = accessor.create([
+const startCustom = function (settings, createServer, f) {
+  const Prefs = accessor.create([
     'projectdir',
     'basedir',
     'testfiles',
@@ -22,33 +28,27 @@ var startCustom = function (settings, createServer, f) {
     'skipResetMousePosition'
   ]);
 
-  var finalhandler = require('finalhandler');
+  const customroutes = cr.create(settings.customRoutes);
 
-  var portfinder = require('portfinder');
+  const basedir = Prefs.basedir(settings);
+  const projectdir = Prefs.projectdir(settings);
+  const testfiles = Prefs.testfiles(settings);
+  const maybeDriver = Prefs.driver(settings);
+  const master = Prefs.master(settings);
+  const stickyFirstSession = settings.stickyFirstSession;
+  const singleTimeout = Prefs.singleTimeout(settings);
+  const overallTimeout = Prefs.overallTimeout(settings);
+  const resetMousePosition = !Prefs.skipResetMousePosition(settings);
 
-  var routes = require('./routes');
-  var apis = require('./apis');
-  var customroutes = require('./customroutes').create(settings.customRoutes);
+  const runner = Prefs.runner(settings);
+  const api = apis.create(master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, settings.loglevel, resetMousePosition);
 
-  var basedir = Prefs.basedir(settings);
-  var projectdir = Prefs.projectdir(settings);
-  var testfiles = Prefs.testfiles(settings);
-  var maybeDriver = Prefs.driver(settings);
-  var master = Prefs.master(settings);
-  var stickyFirstSession = settings.stickyFirstSession;
-  var singleTimeout = Prefs.singleTimeout(settings);
-  var overallTimeout = Prefs.overallTimeout(settings);
-  var resetMousePosition = !Prefs.skipResetMousePosition(settings);
-
-  var runner = Prefs.runner(settings);
-  var api = apis.create(master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, settings.loglevel, resetMousePosition);
-
-  var routers = runner.routers.concat(
+  const routers = runner.routers.concat(
     api.routers,
     customroutes.routers
   );
 
-  var fallback = runner.fallback;
+  const fallback = runner.fallback;
 
   portfinder.getPort({
     port: 8000,
@@ -59,8 +59,8 @@ var startCustom = function (settings, createServer, f) {
       return;
     }
 
-    var server = createServer(function (request, response) {
-      var done = finalhandler(request, response);
+    const server = createServer(function (request, response) {
+      const done = finalhandler(request, response);
       routes.route(routers, fallback, request, response, done);
     }).listen(port);
 
@@ -76,8 +76,8 @@ var startCustom = function (settings, createServer, f) {
   });
 };
 
-var start = function (settings, f) {
-  var http = require('http');
+const start = function (settings, f) {
+  const http = require('http');
   startCustom(settings, http.createServer, f);
 };
 

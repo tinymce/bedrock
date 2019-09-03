@@ -12,8 +12,9 @@
     "bedrock": "./bin/bedrock.js"
   },
   "scripts": {
+    "lint": "yarn eslint 'src/js/**' 'src/runner/**'",
     "prepublishOnly": "tsc",
-    "build": "yarn eslint 'src/runner/**' && tsc && rollup --config",
+    "build": "yarn lint && tsc && rollup --config",
     "test-atomic": "tape test/atomic/*.js",
     "test-props": "tape test/props/*.js",
     "test-samples-pass": "bin/bedrock-auto.js -b phantomjs --config sample/tsconfig.json --files sample/ts/**/*PassTest.ts sample/ts/**/*PassTest.tsx",
@@ -49,8 +50,8 @@
     "@types/jquery": "^3.3.31",
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
-    "eslint": "^6.2.2",
-    "eslint-config-google": "^0.12.0",
+    "eslint": "^6.3.0",
+    "eslint-config-google": "^0.13.0",
     "grunt": "^1.0.1",
     "jscheck": "^0.2.0",
     "jsverify": "^0.7.1",

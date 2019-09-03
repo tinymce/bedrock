@@ -1,9 +1,9 @@
 const path = require('path');
 
-let filePathToImport = function (useRequire, scratchFile) {
+const filePathToImport = function (useRequire, scratchFile) {
   return function (filePath) {
-    var importFilePath = path.join(path.dirname(filePath), path.basename(filePath, path.extname(filePath)));
-    var relativePath = path.relative(path.dirname(scratchFile), importFilePath);
+    const importFilePath = path.join(path.dirname(filePath), path.basename(filePath, path.extname(filePath)));
+    let relativePath = path.relative(path.dirname(scratchFile), importFilePath);
 
     // make sure slashes are escaped for windows
     relativePath = relativePath.replace(/\\/g, '\\\\');
@@ -21,11 +21,10 @@ let filePathToImport = function (useRequire, scratchFile) {
   };
 };
 
-let generateImports = function (useRequire, scratchFile, srcFiles) {
-  var imports = srcFiles.map(filePathToImport(useRequire, scratchFile)).join('\n');
-
+const generateImports = function (useRequire, scratchFile, srcFiles) {
+  const imports = srcFiles.map(filePathToImport(useRequire, scratchFile)).join('\n');
+  // header code for tests.ts
   return [
-// header code for tests.ts
     `
 declare let require: any;
 declare let __tests: any;

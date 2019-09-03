@@ -1,26 +1,23 @@
-var go = function (settings) {
-  var serve = require('./bedrock/server/serve');
+const serve = require('./bedrock/server/serve');
+const reporter = require('./bedrock/core/reporter');
+const attempt = require('./bedrock/core/attempt');
+const version = require('./bedrock/core/version');
+const drivermaster = require('./bedrock/server/drivermaster');
+const path = require('path');
+const driver = require('./bedrock/auto/driver');
+const pageroutes = require('./bedrock/server/pageroutes');
+const lifecycle = require('./bedrock/core/lifecycle');
 
-  var reporter = require('./bedrock/core/reporter');
-  var attempt = require('./bedrock/core/attempt');
-  var version = require('./bedrock/core/version');
+/* eslint-disable no-undef */
+const go = function (settings) {
+  const master = drivermaster.create();
 
-  var master = require('./bedrock/server/drivermaster').create();
-
-  var path = require('path');
-
-  var driver = require('./bedrock/auto/driver');
-
-  var pageroutes = require('./bedrock/server/pageroutes');
-
-  var lifecycle = require('./bedrock/core/lifecycle');
-
-  var runner = pageroutes.generate(settings.projectdir, settings.basedir, settings.page);
+  const runner = pageroutes.generate(settings.projectdir, settings.basedir, settings.page);
 
   driver.create({
     browser: settings.browser
   }).then(function (driver) {
-    var serveSettings = {
+    const serveSettings = {
       projectdir: settings.projectdir,
       basedir: settings.basedir,
       driver: attempt.passed(driver),
@@ -34,21 +31,21 @@ var go = function (settings) {
       skipResetMousePosition: settings.skipResetMousePosition
     };
 
-    var addFramework = function (framework) {
-      var source = path.join('/page', 'src', 'resources', framework + '-wrapper.js');
+    const addFramework = function (framework) {
+      const source = path.join('/page', 'src', 'resources', framework + '-wrapper.js');
       return driver.executeScript(function (src) {
-        var script = document.createElement('script');
+        const script = document.createElement('script');
         script.setAttribute('src', src);
         document.head.appendChild(script);
       }, source);
     };
 
-    var isPhantom = settings.browser === 'phantomjs';
+    const isPhantom = settings.browser === 'phantomjs';
 
     serve.start(serveSettings, function (service, done) {
       if (!isPhantom) console.log('bedrock-framework ' + version + ' available at: http://localhost:' + service.port);
-      var result = driver.get('http://localhost:' + service.port + '/' + settings.page).then(function () {
-        var message = isPhantom ? '\nPhantom tests loading ...\n' : '\n ... Initial page has loaded ...';
+      const result = driver.get('http://localhost:' + service.port + '/' + settings.page).then(function () {
+        const message = isPhantom ? '\nPhantom tests loading ...\n' : '\n ... Initial page has loaded ...';
         console.log(message);
         service.markLoaded();
 

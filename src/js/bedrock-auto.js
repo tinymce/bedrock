@@ -1,4 +1,13 @@
-var skipTests = function (reporter, settings, message) {
+const serve = require('./bedrock/server/serve');
+const attempt = require('./bedrock/core/attempt');
+const version = require('./bedrock/core/version');
+const runnerroutes = require('./bedrock/server/runnerroutes');
+const reporter = require('./bedrock/core/reporter');
+const drivermaster = require('./bedrock/server/drivermaster');
+const driver = require('./bedrock/auto/driver');
+const lifecycle = require('./bedrock/core/lifecycle');
+
+const skipTests = function (reporter, settings, message) {
   // Write results
   reporter.write({
     name: settings.name,
@@ -24,14 +33,7 @@ var skipTests = function (reporter, settings, message) {
   }
 };
 
-var go = function (settings) {
-  var serve = require('./bedrock/server/serve');
-  var attempt = require('./bedrock/core/attempt');
-  var version = require('./bedrock/core/version');
-
-  var runnerroutes = require('./bedrock/server/runnerroutes');
-
-  var reporter = require('./bedrock/core/reporter');
+const go = function (settings) {
 
   // If the browser is Safari, then we need to skip the tests because in v12.1 they removed
   // the --legacy flag in safaridriver which was required to run webdriver.
@@ -42,15 +44,12 @@ var go = function (settings) {
     return;
   }
 
-  var master = require('./bedrock/server/drivermaster').create();
-  var driver = require('./bedrock/auto/driver');
+  const master = drivermaster.create();
 
-  var isPhantom = settings.browser === 'phantomjs';
+  const isPhantom = settings.browser === 'phantomjs';
 
-  var basePage = isPhantom ? 'src/resources/bedrock-phantom.html' : 'src/resources/bedrock.html';
-
-  var lifecycle = require('./bedrock/core/lifecycle');
-  var routes = runnerroutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage);
+  const basePage = isPhantom ? 'src/resources/bedrock-phantom.html' : 'src/resources/bedrock.html';
+  const routes = runnerroutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage);
 
   console.log('bedrock-auto ' + version + ' starting...');
 
@@ -61,7 +60,7 @@ var go = function (settings) {
       debuggingPort: settings.debuggingPort,
       useSandboxForHeadless: settings.useSandboxForHeadless
     }).then(function (driver) {
-      var serveSettings = {
+      const serveSettings = {
         projectdir: settings.projectdir,
         basedir: settings.basedir,
         testfiles: settings.testfiles,
@@ -78,25 +77,25 @@ var go = function (settings) {
 
       serve.start(serveSettings, function (service, done) {
         if (!isPhantom) console.log('bedrock-auto ' + version + ' available at: http://localhost:' + service.port);
-        var result = driver.get('http://localhost:' + service.port)
-                           .then(driver.executeScript('window.focus();'))
-                           .then(function () {
-          var message = isPhantom ? '\nPhantom tests loading ...\n' : '\nInitial page has loaded ...\n';
-          console.log(message);
-          service.markLoaded();
-          service.enableHud();
-          return service.awaitDone().then(function (data) {
-            return reporter.write({
-              name: settings.name,
-              output: settings.output
-            })(data);
-          }, function (pollExit) {
-            return reporter.writePollExit({
-              name: settings.name,
-              output: settings.output
-            }, pollExit);
+        const result = driver.get('http://localhost:' + service.port)
+          .then(driver.executeScript('window.focus();'))
+          .then(function () {
+            const message = isPhantom ? '\nPhantom tests loading ...\n' : '\nInitial page has loaded ...\n';
+            console.log(message);
+            service.markLoaded();
+            service.enableHud();
+            return service.awaitDone().then(function (data) {
+              return reporter.write({
+                name: settings.name,
+                output: settings.output
+              })(data);
+            }, function (pollExit) {
+              return reporter.writePollExit({
+                name: settings.name,
+                output: settings.output
+              }, pollExit);
+            });
           });
-        });
 
         lifecycle.shutdown(result, driver, done, settings.gruntDone !== undefined ? settings.gruntDone : null, settings.delayExit !== undefined ? settings.delayExit : false);
       });

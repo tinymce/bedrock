@@ -1,11 +1,8 @@
-module.exports = function(grunt) {
-  var serve = require('../src/js/bedrock/server/serve');
-  var cloptions = require('../src/js/bedrock/cli/cloptions');
-  var extraction = require('../src/js/bedrock/cli/extraction');
-  var attempt = require('../src/js/bedrock/core/attempt');
+var cloptions = require('../src/js/bedrock/cli/cloptions');
+var path = require('path');
+var bedrockManual = require('../src/js/bedrock-manual');
 
-  var path = require('path');
-  var fs = require('fs');
+module.exports = function(grunt) {
 
   var bucketize = function(array, bucket, buckets) {
     return array.filter(function(x, i) {
@@ -63,7 +60,6 @@ module.exports = function(grunt) {
     this.requiresConfig([this.name, this.target, 'config']);
     this.requiresConfig([this.name, this.target, 'testfiles']);
 
-    var bedrockManual = require('../src/js/bedrock-manual');
     var manualSettings = enrichSettings(settings);
 
     try {

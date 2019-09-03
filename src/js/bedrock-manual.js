@@ -1,16 +1,17 @@
-var go = function (settings) {
-  settings.stopOnFailure = true;
-  var attempt = require('./bedrock/core/attempt');
-  var version = require('./bedrock/core/version');
-  var runnerroutes = require('./bedrock/server/runnerroutes');
-  var webpack = require('./bedrock/compiler/webpack');
+const attempt = require('./bedrock/core/attempt');
+const version = require('./bedrock/core/version');
+const runnerroutes = require('./bedrock/server/runnerroutes');
+const webpack = require('./bedrock/compiler/webpack');
 
-  var routes = runnerroutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, 'src/resources/bedrock.html');
+const go = function (settings) {
+  settings.stopOnFailure = true;
+
+  const routes = runnerroutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, 'src/resources/bedrock.html');
 
   console.log('bedrock-manual ' + version + ' starting...');
 
   routes.then((runner) => {
-    var serveSettings = {
+    const serveSettings = {
       projectdir: settings.projectdir,
       basedir: settings.basedir,
       testfiles: settings.testfiles,

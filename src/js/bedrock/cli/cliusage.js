@@ -1,32 +1,32 @@
-var usage = require('command-line-usage');
+const usage = require('command-line-usage');
 
-var generateUsage = function (command, desc, definitions) {
-  var visibleDefinitions = definitions.filter(function (defn) {
+const generateUsage = function (command, desc, definitions) {
+  const visibleDefinitions = definitions.filter(function (defn) {
     return defn.hidden !== true;
   });
-  var commonDefs = visibleDefinitions.filter(function (defn) {
+  const commonDefs = visibleDefinitions.filter(function (defn) {
     return defn.uncommon !== true;
   });
 
-  var uncommonDefs = visibleDefinitions.filter(function (defn) {
+  const uncommonDefs = visibleDefinitions.filter(function (defn) {
     return defn.uncommon === true;
   });
 
-  var commonOptions = {
+  const commonOptions = {
     header: 'Common Options',
     optionList: commonDefs
   };
 
-  var uncommonOptions = {
+  const uncommonOptions = {
     header: 'Uncommon Options',
     optionList: uncommonDefs
   };
 
-  var options = [ commonOptions ].concat(uncommonDefs.length > 0 ? [ uncommonOptions ] : []);
+  const options = [commonOptions].concat(uncommonDefs.length > 0 ? [uncommonOptions] : []);
 
   return usage(
     [
-      { header: command, content: desc }
+      {header: command, content: desc}
     ].concat(options)
   );
 };

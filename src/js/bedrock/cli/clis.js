@@ -1,8 +1,8 @@
-var cli = require('./cli');
-var cloptions = require('./cloptions');
-var exitcodes = require('../util/exitcodes');
+const cli = require('./cli');
+const cloptions = require('./cloptions');
+const exitcodes = require('../util/exitcodes');
 
-var commonOptions = function (directories) {
+const commonOptions = function (directories) {
   return [
     cloptions.projectdir(directories),
     cloptions.basedir(directories),
@@ -16,7 +16,7 @@ var commonOptions = function (directories) {
   ];
 };
 
-var forAuto = function (directories) {
+const forAuto = function (directories) {
   return cli.extract(
     'bedrock-auto',
     'Use a Webdriver to launch a browser and run tests against it',
@@ -40,7 +40,7 @@ var forAuto = function (directories) {
   );
 };
 
-var forManual = function (directories) {
+const forManual = function (directories) {
   return cli.extract(
     'bedrock',
     'Launch a testing process on a localhost port and allow the user to navigate to it in any browser',
@@ -56,7 +56,7 @@ var forManual = function (directories) {
   );
 };
 
-var forFramework = function (directories) {
+const forFramework = function (directories) {
   return cli.extract(
     'bedrock-framework',
     'Load bedrock against a specific page using a framework',
@@ -72,9 +72,9 @@ var forFramework = function (directories) {
   );
 };
 
-var logAndExit = function (errs) {
+const logAndExit = function (errs) {
   console.error('\n****\nError while processing command line for ' + errs.command);
-  var messages = errs.errors.join('\n');
+  const messages = errs.errors.join('\n');
   console.error(messages);
   console.error('Use ' + errs.command + ' --help to print usage\n****\n');
   process.exit(exitcodes.failures.cli);
