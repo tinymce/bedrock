@@ -19,7 +19,7 @@
     "test-props": "tape test/props/*.js",
     "test-samples-pass": "bin/bedrock-auto.js -b phantomjs --config sample/tsconfig.json --files sample/ts/**/*PassTest.ts sample/ts/**/*PassTest.tsx",
     "test-samples-fail": "bin/bedrock-auto.js -b phantomjs --config sample/tsconfig.json --files sample/ts/**/*FailTest.ts",
-    "test": "yarn build && yarn run test-atomic && yarn run test-props && yarn run test-samples-pass"
+    "test": "yarn build && yarn test-atomic && yarn test-props && yarn test-samples-pass"
   },
   "private": false,
   "dependencies": {
