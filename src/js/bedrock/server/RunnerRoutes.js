@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const glob = require('glob');
-const Routes = require('./routes');
+const Routes = require('./Routes');
 const Compiler = require('../compiler/Compiler');
 
 if (!Array.prototype.flatMap) {
