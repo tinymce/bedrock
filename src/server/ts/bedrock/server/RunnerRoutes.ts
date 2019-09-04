@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as glob from 'glob';
-import * as Routes from './routes';
+import * as Routes from './Routes';
 import * as Compiler from '../compiler/Compiler';
 import * as FileUtils from '../util/FileUtils'
 

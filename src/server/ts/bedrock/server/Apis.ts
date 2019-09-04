@@ -1,5 +1,5 @@
-import * as keys from './keyeffects';
-import * as mouse from './mouseeffects';
+import * as KeyEffects from './keyeffects';
+import * as MouseEffects from './mouseeffects';
 import * as ClipboardEffects from './ClipboardEffects';
 import * as Routes from './Routes';
 import * as Controller from './Controller';
@@ -72,8 +72,8 @@ export const create = function (master, maybeDriver, projectdir, basedir, sticky
 
   const routers = [
 
-    driverRouter('/keys', 'Keys', keys.executor),
-    driverRouter('/mouse', 'Mouse', mouse.executor),
+    driverRouter('/keys', 'Keys', KeyEffects.executor),
+    driverRouter('/mouse', 'Mouse', MouseEffects.executor),
     Routes.effect('POST', '/tests/alive', function (data) {
       c.recordAlive(data.session);
       return Promise.resolve({});
