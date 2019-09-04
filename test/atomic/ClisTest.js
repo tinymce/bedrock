@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-var clis = require('../../src/js/bedrock/cli/clis.js');
-var attemptutils = require('../util/attempt-utils.js');
-var attempt = require('../../src/js/bedrock/core/attempt.js');
+var Clis = require('../../src/js/bedrock/cli/Clis.js');
+var AttemptUtils = require('../util/AttemptUtils.js');
+var Attempt = require('../../src/js/bedrock/core/Attempt.js');
 var tape = require('tape');
 
 var directories = {
@@ -27,14 +27,14 @@ var mutateArgs = function (newArgs) {
 };
 
 var cleanError = function (result) {
-  return attempt.cata(result, function (err) {
-    return attempt.failed(err.errors);
-  }, attempt.passed);
+  return Attempt.cata(result, function (err) {
+    return Attempt.failed(err.errors);
+  }, Attempt.passed);
 };
 
 var cleanResult = function (result) {
-  return attempt.cata(result, attempt.failed, function (v) {
-    return attempt.passed(exclude([ 'projectdir', 'basedir' ])(v));
+  return Attempt.cata(result, Attempt.failed, function (v) {
+    return Attempt.passed(exclude([ 'projectdir', 'basedir' ])(v));
   });
 };
 
@@ -44,8 +44,8 @@ tape('Minimal specification of bedrock-auto', function (t) {
     "--files", "test/resources/test.file1",
     "--config", "sample/tsconfig.json"
   ]);
-  var actual = clis.forAuto(directories);
-  attemptutils.assertResult(t, {
+  var actual = Clis.forAuto(directories);
+  AttemptUtils.assertResult(t, {
     browser: 'MicrosoftEdge',
     bundler: 'webpack',
     config: 'sample/tsconfig.json',
@@ -74,8 +74,8 @@ tape('Specification of bedrock-auto missing required field: browser', function (
     "--files", "test/resources/test.file1",
     "--config", "sample/tsconfig.json"
   ]);
-  var actual = clis.forAuto(directories);
-  attemptutils.assertErrors(t, [
+  var actual = Clis.forAuto(directories);
+  AttemptUtils.assertErrors(t, [
     'The *required* output property [browser] from [browser] must be specified'
   ], cleanError(actual));
 });
@@ -85,8 +85,8 @@ tape('Minimal specification of bedrock-manual', function (t) {
     "--files", "test/resources/test.file1",
     "--config", "sample/tsconfig.json"
   ]);
-  var actual = clis.forManual(directories);
-  attemptutils.assertResult(t, {
+  var actual = Clis.forManual(directories);
+  AttemptUtils.assertResult(t, {
     config: 'sample/tsconfig.json',
     testfiles: [
       'test/resources/test.file1'
@@ -99,5 +99,5 @@ tape('Minimal specification of bedrock-manual', function (t) {
     loglevel: 'advanced',
     version: false,
     chunk: 100
-  }, attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
+  }, Attempt.map(actual, exclude([ 'projectdir', 'basedir' ])));
 });
