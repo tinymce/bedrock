@@ -12,11 +12,17 @@ node("primary") {
     }
   }
 
+  def ex = load("jenkins-plumbing/execHandle.groovy")
+
   def runBuild = load("jenkins-plumbing/standard-build.groovy")
 
   notifyBitbucket()
   try {
-    runBuild()
+    runBuild({
+      ex "yarn build"
+      ex "yarn test"
+      junit allowEmptyResults: true, testResults: 'scratch/*.xml'
+    })
 
     // bitbucket plugin requires the result to explicitly be success
     if (currentBuild.resultIsBetterOrEqualTo("SUCCESS")) {
