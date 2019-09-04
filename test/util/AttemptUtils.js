@@ -1,7 +1,7 @@
-var attempt = require('../../lib/server/ts/bedrock/core/Attempt.js');
+var Attempt = require('../../lib/server/ts/bedrock/core/Attempt.js');
 
 var assertErrors = function (t, expected, actual) {
-  attempt.cata(actual, function (errs) {
+  Attempt.cata(actual, function (errs) {
     t.deepEquals(errs, expected);
     t.end();
   }, function (result) {
@@ -11,7 +11,7 @@ var assertErrors = function (t, expected, actual) {
 };
 
 var assertResult = function (t, expected, actual) {
-  attempt.cata(actual, function (errs) {
+  Attempt.cata(actual, function (errs) {
     t.fail('Unexpected errors: ' + JSON.stringify(errs));
     t.end();
   }, function (result) {

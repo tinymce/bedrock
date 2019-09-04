@@ -1,10 +1,10 @@
 var tape = require('tape');
-var attempt = require('../../lib/server/ts/bedrock/core/Attempt.js');
-var validation = require('../../lib/server/ts/bedrock/cli/Validation.js');
-var extraction = require('../../lib/server/ts/bedrock/cli/Extraction.js');
+var Attempt = require('../../lib/server/ts/bedrock/core/Attempt.js');
+var Validation = require('../../lib/server/ts/bedrock/cli/Validation.js');
+var Extraction = require('../../lib/server/ts/bedrock/cli/Extraction.js');
 
 var assertErrors = function (t, expected, actual) {
-  attempt.cata(actual, function (errs) {
+  Attempt.cata(actual, function (errs) {
     t.deepEquals(errs, expected);
     t.end();
   }, function (result) {
@@ -14,7 +14,7 @@ var assertErrors = function (t, expected, actual) {
 };
 
 var assertResult = function (t, expected, actual) {
-  attempt.cata(actual, function (errs) {
+  Attempt.cata(actual, function (errs) {
     t.fail('Unexpected errors: ' + JSON.stringify(errs));
     t.end();
   }, function (result) {
@@ -25,14 +25,14 @@ var assertResult = function (t, expected, actual) {
 
 var checkErrors = function (label, expected, definitions, settings) {
   tape(label, function (t) {
-    var actual = validation.scan(definitions, settings);
+    var actual = Validation.scan(definitions, settings);
     assertErrors(t, expected, actual);
   });
 };
 
 var checkResult = function (label, expected, definitions, settings) {
   tape(label, function (t) {
-    var actual = validation.scan(definitions, settings);
+    var actual = Validation.scan(definitions, settings);
     assertResult(t, expected, actual);
   });
 };
@@ -43,7 +43,7 @@ checkErrors(
     'Property [file] has value: [test/resources/test.file1.not.existing]. This file does not exist'
   ],
   [
-    { name: 'file', validate: extraction.file }
+    { name: 'file', validate: Extraction.file }
   ],
   {
     file: 'test/resources/test.file1.not.existing'
@@ -56,7 +56,7 @@ checkErrors(
     '[test/resources.not.existing] is not a directory',
   ],
   [
-    { name: 'testdir', validate: extraction.files([ 'Test.js' ]) }
+    { name: 'testdir', validate: Extraction.files([ 'Test.js' ]) }
   ],
   {
     testdir: 'test/resources.not.existing'
@@ -70,7 +70,7 @@ checkResult(
     other: [ ]
   },
   [
-    { name: 'testdir', validate: extraction.files([ 'Test.js' ]), output: 'other' }
+    { name: 'testdir', validate: Extraction.files([ 'Test.js' ]), output: 'other' }
   ],
   {
     testdir: 'test/resources'
@@ -86,7 +86,7 @@ checkResult(
     ]
   },
   [
-    { name: 'testdir', validate: extraction.files([ '' ]), output: 'other' }
+    { name: 'testdir', validate: Extraction.files([ '' ]), output: 'other' }
   ],
   {
     testdir: 'test/resources'
@@ -99,8 +99,8 @@ checkResult(
     alpha: 'Alpha'
   },
   [
-    { name: 'alpha', validate: extraction.any },
-    { name: 'beta', validate: attempt.failed }
+    { name: 'alpha', validate: Extraction.any },
+    { name: 'beta', validate: Attempt.failed }
   ],
   {
     alpha: 'Alpha'
@@ -113,8 +113,8 @@ checkErrors(
     'Invalid value for property: beta. Actual value: Beta. Required value: one of ["gamma"]'
   ],
   [
-    { name: 'alpha', validate: extraction.any },
-    { name: 'beta', validate: extraction.inSet([ 'gamma' ]) }
+    { name: 'alpha', validate: Extraction.any },
+    { name: 'beta', validate: Extraction.inSet([ 'gamma' ]) }
   ],
   {
     alpha: 'Alpha',
@@ -133,10 +133,10 @@ checkResult(
     delta: 'test/resources'
   },
   [
-    { name: 'alpha', validate: extraction.any },
-    { name: 'beta', validate: extraction.any, output: 'new.beta' },
-    { name: 'gamma', validate: extraction.files([ '' ]) },
-    { name: 'delta', validate: extraction.directory }
+    { name: 'alpha', validate: Extraction.any },
+    { name: 'beta', validate: Extraction.any, output: 'new.beta' },
+    { name: 'gamma', validate: Extraction.files([ '' ]) },
+    { name: 'delta', validate: Extraction.directory }
   ],
   {
     alpha: 'Alpha',
@@ -153,12 +153,12 @@ checkErrors(
     '[test/resources.fake] is not a directory'
   ],
   [
-    { name: 'alpha', validate: extraction.inSet([ 'a' ]) },
-    { name: 'beta', validate: extraction.any, output: 'new.beta' },
-    { name: 'gamma', validate: extraction.files([ '' ]) },
-    { name: 'delta', validate: extraction.inSet([ 'Delta' ]) },
-    { name: 'epsilon', validate: extraction.directory },
-    { name: 'rho', validate: extraction.any }
+    { name: 'alpha', validate: Extraction.inSet([ 'a' ]) },
+    { name: 'beta', validate: Extraction.any, output: 'new.beta' },
+    { name: 'gamma', validate: Extraction.files([ '' ]) },
+    { name: 'delta', validate: Extraction.inSet([ 'Delta' ]) },
+    { name: 'epsilon', validate: Extraction.directory },
+    { name: 'rho', validate: Extraction.any }
   ],
   {
     alpha: 'Alpha',
