@@ -1,5 +1,5 @@
-const keys = require('./keyeffects');
-const mouse = require('./mouseeffects');
+const KeyEffects = require('./KeyEffects');
+const MouseEffects = require('./MouseEffects');
 const ClipboardEffects = require('./ClipboardEffects');
 const Routes = require('./Routes');
 const Controller = require('./Controller');
@@ -73,8 +73,8 @@ const create = function (master, maybeDriver, projectdir, basedir, stickyFirstSe
 
   const routers = [
 
-    driverRouter('/keys', 'Keys', keys.executor),
-    driverRouter('/mouse', 'Mouse', mouse.executor),
+    driverRouter('/keys', 'Keys', KeyEffects.executor),
+    driverRouter('/mouse', 'Mouse', MouseEffects.executor),
     Routes.effect('POST', '/tests/alive', function (data) {
       c.recordAlive(data.session);
       return Promise.resolve({});
