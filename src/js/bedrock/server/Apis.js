@@ -43,7 +43,7 @@ const create = function (master, maybeDriver, projectdir, basedir, stickyFirstSe
       return driver.getCapabilities().then(function (caps) {
         // TODO re-enable resetting the mouse on other browsers when mouseMove gets fixed on Firefox/IE
         if (caps.get('browserName') === 'chrome') {
-          return EffectUtils.getTarget(driver, {selector: '#bedrock-mouse-reset'}).then(function (tgt) {
+          return EffectUtils.getTarget(driver, {selector: '.bedrock-mouse-reset'}).then(function (tgt) {
             return driver.actions().mouseMove(tgt).perform();
           });
         } else {

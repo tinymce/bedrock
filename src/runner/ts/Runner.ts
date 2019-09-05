@@ -369,11 +369,7 @@ const runGlobalTests = (): void => {
             });
           }, (e) => {
             clearTimeout(timer);
-            if (e.error) {
-              console.error(e.error);
-            } else {
-              console.error(e);
-            }
+            console.error(e.error || e);
             report.fail(e, afterFail);
           });
         });
