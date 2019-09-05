@@ -1,12 +1,12 @@
 var tape = require('tape');
 
-var accessor = require('../../src/js/bedrock/core/accessor.js');
+var Accessor = require('../../src/js/bedrock/core/Accessor.js');
 
 tape('Testing basic accessor', function (t) {
   var obj = {
     alpha: 'Alpha'
   };
-  var access = accessor.create([ 'alpha' ]);
+  var access = Accessor.create([ 'alpha' ]);
   t.equal(access.alpha(obj), 'Alpha');
   t.end();
 });
