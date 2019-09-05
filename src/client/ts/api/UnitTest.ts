@@ -1,30 +1,12 @@
 import { TestLabel } from "./TestLabel";
 import { TestLogEntry, TestLogs } from "./TestLogs";
+import { HtmlDiffAssertionError, LoggedError, NormalizedTestError } from '../core/ErrorTypes';
 
-interface JsError extends Error {
-  toString?: () => string;
-}
-
-export interface HtmlDiffError extends JsError {
-  name: string;
-  message: string;
-  diff: {
-    expected: string,
-    actual: string,
-    comparison: string
-  };
-  label: string;
-  stack: string;
-}
+export type HtmlDiffError = HtmlDiffAssertionError;
 
 export type SuccessCallback = () => void;
-export type TestError = TestLabel | HtmlDiffError | Error;
+export type TestError = TestLabel | NormalizedTestError;
 export type FailureCallback = (error: TestError, logs?: TestLogs) => void;
-
-interface LoggedError {
-  error: JsError | HtmlDiffError;
-  logs: string[];
-}
 
 const Global = (function () {
   if (typeof window !== 'undefined') {
@@ -53,7 +35,7 @@ const cleanStack = (error: Error, linesToRemove = 1) => {
   return message + '\n' + stack.join('\n');
 };
 
-const normalizeError = (err: TestError): JsError | HtmlDiffError => {
+const normalizeError = (err: TestError): NormalizedTestError => {
   if (typeof err === 'string') {
     // Create an error object, but strip the stack of the 2 latest calls as it'll
     // just be this function and the previous function that called this (ie asyncTest)

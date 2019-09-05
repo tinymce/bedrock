@@ -11,6 +11,15 @@ body {
     margin: 0px;
 }
 
+.bedrock-mouse-reset {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 0;
+    width: 0;
+    visibility: hidden;
+}
+
 .name {
     margin: 10px;
 }
