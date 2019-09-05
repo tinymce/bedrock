@@ -1,6 +1,7 @@
 Version 7.0.2
 
-* Fixed log messages from tests not being printed in the reports
+* Fixed log messages from tests not being printed in the reports.
+* Fixed the mouse reset position added in 4.5.1 not actually positioning to (0, 0).
 
 Version 7.0.0
 
