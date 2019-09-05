@@ -1,5 +1,5 @@
-import * as KeyEffects from './keyeffects';
-import * as MouseEffects from './mouseeffects';
+import * as KeyEffects from './KeyEffects';
+import * as MouseEffects from './MouseEffects';
 import * as ClipboardEffects from './ClipboardEffects';
 import * as Routes from './Routes';
 import * as Controller from './Controller';
