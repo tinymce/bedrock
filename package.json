@@ -13,7 +13,7 @@
   },
   "scripts": {
     "lint": "yarn eslint 'src/server/**/*.ts' 'src/runner/**/*.ts'",
-    "prepublishOnly": "tsc",
+    "prepublishOnly": "yarn build",
     "build": "yarn lint && tsc -p tsconfig.client.json && tsc -p tsconfig.runner.json && tsc -p tsconfig.server.json && rollup --config",
     "test-atomic": "tape test/atomic/*.js",
     "test-props": "tape test/props/*.js",
