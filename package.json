@@ -23,7 +23,6 @@
   },
   "private": false,
   "dependencies": {
-    "@types/selenium-webdriver": "^4.0.2",
     "async": "^1.5.2",
     "babel-polyfill": "^6.23.0",
     "command-line-args": "^3.0.0",
@@ -49,6 +48,7 @@
     "xml-writer": "^1.6.0"
   },
   "devDependencies": {
+    "@types/selenium-webdriver": "^4.0.2",
     "@types/jquery": "^3.3.31",
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
