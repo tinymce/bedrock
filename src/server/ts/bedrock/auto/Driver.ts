@@ -2,7 +2,6 @@ import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
 import * as webdriver from 'selenium-webdriver';
-import { Builder, WebDriver } from 'selenium-webdriver';
 
 const browserVariants = {
   'chrome-headless': 'chrome',
@@ -107,7 +106,7 @@ const logBrowserDetails = function (driver) {
  * browser: the name of the browser
  * basedir: base directory for bedrock
  */
-export const create = function (settings): Promise<WebDriver> {
+export const create = function (settings): Promise<webdriver.WebDriver> {
   const browser = settings.browser;
   const browserFamily = browserVariants.hasOwnProperty(browser) ? browserVariants[browser] : browser;
   const driverDep = browserDrivers[browserFamily];
@@ -148,7 +147,7 @@ export const create = function (settings): Promise<WebDriver> {
     }
   }
 
-  const rawBlueprints: Builder = new Builder()
+  const rawBlueprints: webdriver.Builder = new webdriver.Builder()
     .forBrowser(browserFamily).setChromeOptions(chromeOptions);
 
   const blueprint = browser === 'phantomjs' ? addPhantomCapabilities(rawBlueprints, settings) : rawBlueprints;

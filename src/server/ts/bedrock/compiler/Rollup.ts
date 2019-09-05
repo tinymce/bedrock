@@ -6,13 +6,12 @@ import * as mkdirp from 'mkdirp';
 import * as Imports from './Imports';
 import {ExitCodes} from '../util/ExitCodes';
 import * as FileUtils from '../util/FileUtils';
-import { OutputOptions } from 'rollup';
 
 export const compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, success) {
   const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   const dest = path.join(scratchDir, 'compiled/tests.js');
 
-  const outputOptions: OutputOptions = {
+  const outputOptions: rollup.OutputOptions = {
     name: 'ephoxTests',
     file: dest,
     format: 'iife',
