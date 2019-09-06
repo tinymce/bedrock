@@ -1,4 +1,4 @@
-import * as Attempt from '../core/Attempt';
+import { Attempt } from '../core/Attempt';
 
 const validateOne = function (defn, settings) {
   return defn.validate(defn.name, settings[defn.name]);

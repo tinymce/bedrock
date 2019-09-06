@@ -1,6 +1,6 @@
 import * as XMLWriter from 'xml-writer';
 import * as fs from 'fs';
-import * as Attempt from './Attempt';
+import { Attempt } from './Attempt';
 
 const outputTime = function (runnerTime) {
   // runner adds 's' to the time for human readability, but junit needs just a float value in seconds

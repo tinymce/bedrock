@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as readdirSyncRec from 'recursive-readdir-sync';
-import * as Attempt from '../core/Attempt';
+import { Attempt } from '../core/Attempt';
 import * as Qstring from '../util/Qstring';
 
 export const file = function (name, rawValue) {

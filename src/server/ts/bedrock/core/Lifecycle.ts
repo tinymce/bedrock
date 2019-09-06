@@ -1,5 +1,5 @@
 import { ExitCodes } from '../util/ExitCodes';
-import * as Attempt from './Attempt';
+import { Attempt } from './Attempt';
 
 export const shutdown = function (promise, driver, done, gruntDone, delayExiting) {
   const exitDelay = function () {

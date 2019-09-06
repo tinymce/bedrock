@@ -1,4 +1,4 @@
-import * as Attempt from './bedrock/core/Attempt';
+import { Attempt } from './bedrock/core/Attempt';
 import * as Clis from './bedrock/cli/Clis';
 
 export const run = function (program, directories) {

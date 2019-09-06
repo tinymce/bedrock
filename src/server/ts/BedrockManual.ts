@@ -1,4 +1,4 @@
-import * as Attempt from './bedrock/core/Attempt';
+import { Attempt } from './bedrock/core/Attempt';
 import * as Version from './bedrock/core/Version';
 import * as RunnerRoutes from './bedrock/server/RunnerRoutes';
 import * as Webpack from './bedrock/compiler/Webpack';

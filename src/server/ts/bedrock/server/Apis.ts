@@ -3,7 +3,7 @@ import * as MouseEffects from './MouseEffects';
 import * as ClipboardEffects from './ClipboardEffects';
 import * as Routes from './Routes';
 import * as Controller from './Controller';
-import * as Attempt from '../core/Attempt';
+import { Attempt } from '../core/Attempt';
 import * as Waiter from '../util/Waiter';
 import * as Coverage from '../core/Coverage';
 

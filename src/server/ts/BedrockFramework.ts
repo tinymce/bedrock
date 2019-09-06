@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as Serve from './bedrock/server/Serve';
 import * as Reporter from './bedrock/core/Reporter';
-import * as Attempt from './bedrock/core/Attempt';
+import { Attempt } from './bedrock/core/Attempt';
 import * as Version from './bedrock/core/Version';
 import * as DriverMaster from './bedrock/server/DriverMaster';
 import * as Driver from './bedrock/auto/Driver';

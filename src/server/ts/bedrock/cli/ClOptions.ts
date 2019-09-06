@@ -1,14 +1,10 @@
 import * as path from 'path';
 import * as Extraction from './Extraction';
+import { OptionDefinition } from 'command-line-args';
 
-export interface ClOption {
-  name: string;
-  alias?: string;
+export interface ClOption extends OptionDefinition {
   required?: boolean;
-  type: (s: string) => any; // TODO: stronger type?
-  defaultValue?: any; // TODO: stronger type?
   output?: string;
-  multiple?: boolean;
   uncommon?: boolean;
   flatten?: boolean;
   description: string;

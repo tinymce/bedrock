@@ -1,13 +1,14 @@
 import * as commandLineArgs from 'command-line-args';
-import * as Attempt from '../core/Attempt';
+import { Attempt } from '../core/Attempt';
 import * as Version from '../core/Version';
 import * as Validation from './Validation';
 import * as CliUsage from './CliUsage';
 import { ExitCodes } from '../util/ExitCodes';
+import { CommandLineOptions } from 'command-line-args';
 
-const parseCommandLine = function (definitions) {
+const parseCommandLine = function (definitions: commandLineArgs.OptionDefinition[]): Attempt<string[], CommandLineOptions> {
   try {
-    const settings = commandLineArgs(definitions);
+    const settings: commandLineArgs.CommandLineOptions = commandLineArgs(definitions);
     return Attempt.passed(settings);
   } catch (err) {
     return Attempt.failed([err.message !== undefined ? err.message : err]);

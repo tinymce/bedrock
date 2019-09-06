@@ -48,8 +48,9 @@
     "xml-writer": "^1.6.0"
   },
   "devDependencies": {
-    "@types/selenium-webdriver": "^4.0.2",
+    "@types/command-line-args": "^5.0.0",
     "@types/jquery": "^3.3.31",
+    "@types/selenium-webdriver": "^4.0.2",
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
     "eslint": "^6.3.0",

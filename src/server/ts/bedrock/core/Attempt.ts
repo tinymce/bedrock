@@ -1,4 +1,8 @@
-export const failed = function (err) {
+export interface Attempt<E, A> {
+  foldAttempt: <B> (onFailed: (e: E) => B, onPassed: (a: A) => B) => B;
+}
+
+const failed = function <E, A> (err): Attempt<E, A> {
   const foldAttempt = function (onFailed, onPassed) {
     return onFailed(err);
   };
@@ -8,7 +12,7 @@ export const failed = function (err) {
   };
 };
 
-export const passed = function (value) {
+const passed = function <E, A> (value): Attempt<E, A> {
   const foldAttempt = function (onFailed, onPassed) {
     return onPassed(value);
   };
@@ -18,29 +22,29 @@ export const passed = function (value) {
   };
 };
 
-export const cata = function (attempt, onFailed, onPassed) {
+const cata = function <E, A, B> (attempt: Attempt<E, A>, onFailed, onPassed) {
   return attempt.foldAttempt(onFailed, onPassed);
 };
 
-export const bind = function (firstAttempt, f) {
+const bind = function (firstAttempt, f) {
   return firstAttempt.foldAttempt(function (err) {
     return failed(err);
   }, f);
 };
 
-export const map = function (firstAttempt, f) {
+const map = function (firstAttempt, f) {
   return firstAttempt.foldAttempt(failed, function (v) {
     return passed(f(v));
   });
 };
 
-export const list = function (firstAttempt, fs) {
+const list = function (firstAttempt, fs) {
   return fs.reduce(function (rest, x) {
     return bind(rest, x);
   }, firstAttempt);
 };
 
-export const carry = function (firstAttempt, secondAttempt, f) {
+const carry = function (firstAttempt, secondAttempt, f) {
   return cata(firstAttempt, function (errs) {
     return cata(secondAttempt, function (sErrs) {
       return failed(errs.concat(sErrs));
@@ -56,7 +60,7 @@ export const carry = function (firstAttempt, secondAttempt, f) {
   });
 };
 
-export const concat = function (attempts) {
+const concat = function (attempts) {
   // take a list of attempts, and turn them info an attempt of a list.
   return attempts.reduce(function (rest, b) {
     return carry(rest, b, function (x, y) {
@@ -65,7 +69,7 @@ export const concat = function (attempts) {
   }, passed([]));
 };
 
-export const toString = function (attempt) {
+const toString = function (attempt) {
   return cata(attempt, function (errs) {
     return 'attempt.failed(' + JSON.stringify(errs) + ')';
   }, function (value) {
@@ -73,10 +77,23 @@ export const toString = function (attempt) {
   });
 };
 
-export const hasPassed = function (attempt) {
+const hasPassed = function (attempt) {
   return cata(attempt, function () {
     return false;
   }, function () {
     return true;
   });
+};
+
+export const Attempt = {
+  failed,
+  passed,
+  cata,
+  bind,
+  map,
+  list,
+  carry,
+  concat,
+  toString,
+  hasPassed
 };
