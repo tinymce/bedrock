@@ -4,6 +4,9 @@ properties([
 ])
 
 node("primary") {
+  echo "Clean workspace"
+  cleanWs()
+
   stage ("Checkout SCM") {
     checkout scm
     sh "mkdir -p jenkins-plumbing"

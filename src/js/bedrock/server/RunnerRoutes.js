@@ -4,20 +4,25 @@ const glob = require('glob');
 const Routes = require('./Routes');
 const Compiler = require('../compiler/Compiler');
 
-if (!Array.prototype.flatMap) {
-  // simple polyfill for node versions < 11
-  // not at all to ES2019 spec, but if you're relying on that you should use node 11 /shrug
-  const concat = (x, y) => x.concat(y);
-
-  const flatMap = (f, xs) => xs.map(f).reduce(concat, []);
-
-  // eslint-disable-next-line no-extend-native
-  Array.prototype.flatMap = function (f) {
-    return flatMap(f, this);
-  };
-}
-
 const generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, chunk, retries, singleTimeout, stopOnFailure, basePage, coverage) {
+  if (!Array.prototype.flatMap) {
+    // simple polyfill for node versions < 11
+    // not at all to ES2019 spec, but if you're relying on that you should use node 11 /shrug
+    const concat = (x, y) => x.concat(y);
+
+    const flatMap = (f, xs) => xs.map(f).reduce(concat, []);
+
+    // eslint-disable-next-line no-extend-native
+    Object.defineProperty(Array.prototype, 'flatMap', {
+      configurable: true,
+      enumerable: false,
+      value: function (f) {
+        return flatMap(f, this);
+      },
+      writable: true
+    });
+  }
+
   const files = testfiles.map(function (filePath) {
     return path.relative(projectdir, filePath);
   });
