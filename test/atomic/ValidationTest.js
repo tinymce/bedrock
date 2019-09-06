@@ -1,7 +1,7 @@
 var tape = require('tape');
-var Attempt = require('../../src/js/bedrock/core/Attempt.js');
-var Validation = require('../../src/js/bedrock/cli/Validation.js');
-var Extraction = require('../../src/js/bedrock/cli/Extraction.js');
+var Attempt = require('../../lib/server/ts/bedrock/core/Attempt.js').Attempt;
+var Validation = require('../../lib/server/ts/bedrock/cli/Validation.js');
+var Extraction = require('../../lib/server/ts/bedrock/cli/Extraction.js');
 
 var assertErrors = function (t, expected, actual) {
   Attempt.cata(actual, function (errs) {

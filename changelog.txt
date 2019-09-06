@@ -1,4 +1,4 @@
-Version 7.0.3
+`Version 7.0.3
 
 * Fixed adding the Array.flatMap polyfill during module import and using a polyfill that was enumerable.
 * Fixed duplicate files being packaged.

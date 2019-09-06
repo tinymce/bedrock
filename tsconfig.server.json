@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "target": "es2018",
+    "module": "commonjs",
+    "lib": ["es2018", "dom"],
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "lib/server/ts"
+  },
+  "include": [
+    "src/server/ts"
+  ]
+}
