@@ -4,6 +4,7 @@ import * as glob from 'glob';
 import * as Routes from './Routes';
 import * as Compiler from '../compiler/Compiler';
 import * as FileUtils from '../util/FileUtils'
+import * as Arr from '../util/Arr';
 
 export const generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, chunk, retries, singleTimeout, stopOnFailure, basePage, coverage) {
   const files = testfiles.map(function (filePath) {
@@ -19,12 +20,16 @@ export const generate = function (mode, projectdir, basedir, configFile, bundler
     coverage
   );
 
+  interface PackageJson {
+    name: string;
+    workspaces: string[];
+  }
 
   // read the project json file to determine the project name to expose resources as `/project/${name}`
-  const pkjson = FileUtils.readFileAsJson(`${projectdir}/package.json`);
+  const pkjson: PackageJson = FileUtils.readFileAsJson(`${projectdir}/package.json`);
 
   // Search for yarn workspace projects to use as resource folders
-  const workspaceRoots = !pkjson.workspaces ? [] : pkjson.workspaces.flatMap((w) => glob.sync(w)).flatMap((moduleFolder) => {
+  const findWorkspaceResources = (moduleFolder: string): Array<{name: string; folder: string}> => {
     const moduleJson = `${moduleFolder}/package.json`;
     if (fs.statSync(moduleJson)) {
       const workspaceJson = FileUtils.readFileAsJson(moduleJson);
@@ -32,7 +37,12 @@ export const generate = function (mode, projectdir, basedir, configFile, bundler
     } else {
       return [];
     }
-  });
+  };
+  const workspaceRoots = (
+    pkjson.workspaces
+      ? Arr.bind2(pkjson.workspaces, (w) => glob.sync(w), findWorkspaceResources)
+      : []
+  );
 
   const resourceRoots = [{name: pkjson.name, folder: '.'}].concat(workspaceRoots);
 
