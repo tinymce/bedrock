@@ -14,10 +14,12 @@ const generate = function (mode, projectdir, basedir, configFile, bundler, testf
 
     // eslint-disable-next-line no-extend-native
     Object.defineProperty(Array.prototype, 'flatMap', {
+      configurable: true,
       enumerable: false,
-      get: function (f) {
+      value: function (f) {
         return flatMap(f, this);
-      }
+      },
+      writable: true
     });
   }
 
