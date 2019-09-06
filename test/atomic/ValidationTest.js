@@ -1,5 +1,5 @@
 var tape = require('tape');
-var Attempt = require('../../lib/server/ts/bedrock/core/Attempt.js');
+var Attempt = require('../../lib/server/ts/bedrock/core/Attempt.js').Attempt;
 var Validation = require('../../lib/server/ts/bedrock/cli/Validation.js');
 var Extraction = require('../../lib/server/ts/bedrock/cli/Extraction.js');
 
