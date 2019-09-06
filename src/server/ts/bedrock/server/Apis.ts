@@ -1,4 +1,5 @@
 import * as KeyEffects from './KeyEffects';
+import * as EffectUtils from './EffectUtils';
 import * as MouseEffects from './MouseEffects';
 import * as ClipboardEffects from './ClipboardEffects';
 import * as Routes from './Routes';
@@ -48,7 +49,9 @@ export const create = function (master, maybeDriver, projectdir, basedir, sticky
       return driver.getCapabilities().then(function (caps) {
         // TODO re-enable resetting the mouse on other browsers when mouseMove gets fixed on Firefox/IE
         if (caps.get('browserName') === 'chrome') {
-          return driver.actions().mouseMove({x: 0, y: 0}).perform();
+          return EffectUtils.getTarget(driver, {selector: '.bedrock-mouse-reset'}).then(function (tgt) {
+            return driver.actions().mouseMove(tgt).perform();
+          });
         } else {
           return Promise.resolve({});
         }

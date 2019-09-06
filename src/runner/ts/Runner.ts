@@ -1,4 +1,5 @@
 import { UrlParams } from './core/UrlParams';
+import { AssertionError, HtmlDiffAssertionError, LoggedError, NormalizedTestError } from './alien/ErrorTypes';
 
 declare const $: JQueryStatic;
 
@@ -85,12 +86,20 @@ const processQUnit = (html): string =>
     .replace(/&lt;ins&gt;/g, '<ins>')
     .replace(/&lt;\/ins&gt;/g, '</ins>'));
 
-const formatExtra = (e): string => {
+const isHTMLDiffError = (err: NormalizedTestError): err is HtmlDiffAssertionError => {
+  return err.name === 'HtmlAssertion';
+};
+
+const isAssertionError = (err: NormalizedTestError): err is AssertionError => {
+  return err.name === 'AssertionError';
+};
+
+const formatExtra = (e: LoggedError): string => {
   if (!e.logs) {
-    if (!e.stack) {
+    if (!e.error.stack) {
       return '';
     } else {
-      const lines = e.stack.split('\n').filter((line) =>
+      const lines = e.error.stack.split('\n').filter((line) =>
         line.indexOf('at') !== -1);
       return '\n\nStack:\n' + lines.join('\n');
     }
@@ -101,33 +110,28 @@ const formatExtra = (e): string => {
   }
 };
 
-const clean = (err): string => {
-  const e = err === undefined ? new Error('no error given') : err;
+const clean = (err: LoggedError): string => {
+  const e = err === undefined ? new Error('no error given') : err.error;
 
-  if (typeof e === 'string') {
-    return e;
-  }
-  const extra = formatExtra(e);
-  if (e.diff !== undefined) {
+  const extra = formatExtra(err);
+  if (isHTMLDiffError(e)) {
     // Provide detailed HTML comparison information
     return 'Test failure: ' + e.message +
       '\nExpected: ' + htmlentities(e.diff.expected) +
       '\nActual: ' + htmlentities(e.diff.actual) +
       '\n\nHTML Diff: ' + processQUnit(htmlentities(e.diff.comparison)) +
       extra;
-  }
-  if (e.name === 'AssertionError') {
+  } else if (isAssertionError(e)) {
     return 'Assertion error' + (e.message ? ' [' + e.message + ']' : '') +
       ': [' + htmlentities(JSON.stringify(e.expected)) + '] ' + e.operator +
       ' [' + htmlentities(JSON.stringify(e.actual)) + ']' + extra;
-  }
-  if (e.name && e.message) {
+  } else if (e.name && e.message) {
     return htmlentities(e.name + ': ' + e.message + extra);
-  }
-  if (e.toString) {
+  } else if (e.toString !== undefined) {
     return htmlentities(String(e) + extra);
+  } else {
+    return htmlentities(JSON.stringify(e) + extra);
   }
-  return htmlentities(JSON.stringify(e) + extra);
 };
 
 let passCount = 0;
@@ -365,7 +369,7 @@ const runGlobalTests = (): void => {
             });
           }, (e) => {
             clearTimeout(timer);
-            console.error(e);
+            console.error(e.error || e);
             report.fail(e, afterFail);
           });
         });
