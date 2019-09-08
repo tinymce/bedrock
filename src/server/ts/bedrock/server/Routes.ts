@@ -56,9 +56,9 @@ export const effect = function (method, prefix, action) {
       const parsed = JSON.parse(body);
       action(parsed).then(function () {
         concludeJson(response, 200, {});
-      }, function (err) {
+      }).catch(function (err) {
         console.error('Executing effect failed: \n** ' + body);
-        console.error('Error: ', err);
+        console.error('Error: ', err, '\n');
         concludeJson(response, 500, {});
       });
     });

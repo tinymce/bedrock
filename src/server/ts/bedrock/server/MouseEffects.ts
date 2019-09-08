@@ -22,7 +22,7 @@ const performAction = function (target, type) {
    selector :: String
  }
  */
-const getAction = function (driver, target, type) {
+const doAction = function (driver, target, type) {
   if (type === 'move') {
     return target.moveTo();
   } else if (type === 'down' || type === 'up') {
@@ -38,16 +38,8 @@ const getAction = function (driver, target, type) {
 };
 
 const execute = function (driver, data) {
-  return EffectUtils.getTarget(driver, data).then(function (tgt) {
-    return getAction(driver, tgt, data.type).then(function (res) {
-      return driver.switchToFrame(null).then(function () {
-        return res;
-      });
-    }).catch(function (err) {
-      return driver.switchToFrame(null).then(function () {
-        return Promise.reject(err);
-      });
-    });
+  return EffectUtils.performActionOnTarget(driver, data, function (target) {
+    return doAction(driver, target, data.type);
   });
 };
 

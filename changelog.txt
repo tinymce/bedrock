@@ -2,6 +2,7 @@ Version 8.0.0
 
 * Changed to using webdriver.io instead of selenium's webdriver implementation under the hood.
 * Fixed chrome-headless not maximizing screen size in auto mode.
+* Fixed the frame context not being restored if an error occurred while looking up the frame.
 * Improved --debuggingPort to work with firefox in headless mode.
 
 Version 7.0.4

@@ -98,16 +98,8 @@ const performAction = function (driver, target, actions, isW3C) {
 
 const execute = function (driver, data) {
   const actions = scan(data.keys);
-  return EffectUtils.getTarget(driver, data).then(function (target) {
-    return performAction(driver, target, actions, driver.isW3C).then(function (x) {
-      return driver.switchToFrame(null).then(function () {
-        return x;
-      });
-    }).catch(function (err) {
-      return driver.switchToFrame(null).then(function () {
-        return Promise.reject(err);
-      });
-    });
+  return EffectUtils.performActionOnTarget(driver, data, function (target) {
+    return performAction(driver, target, actions, driver.isW3C);
   });
 };
 

@@ -36,3 +36,17 @@ export const getTarget = function (driver, data) {
   const getter = selector.indexOf('=>') > -1 ? getTargetFromFrame : getTargetFromMain;
   return getter(driver, selector);
 };
+
+export const performActionOnTarget = function (driver, data, action) {
+  return getTarget(driver, data).then(function (target) {
+    return action(target).then(function (result) {
+      return driver.switchToFrame(null).then(function () {
+        return result;
+      });
+    });
+  }).catch(function (err) {
+    return driver.switchToFrame(null).then(function () {
+      return Promise.reject(err);
+    });
+  });
+};
