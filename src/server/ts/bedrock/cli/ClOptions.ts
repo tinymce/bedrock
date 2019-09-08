@@ -145,7 +145,7 @@ export const basedir = function (directories): ClOption {
 export const debuggingPort: ClOption = {
   name: 'debuggingPort',
   type: Number,
-  description: 'The port for remote debugging (used for phantom and chrome-headless)',
+  description: 'The port for remote debugging (used for phantom and headless browsers)',
   validate: Extraction.any,
   defaultValue: 9000,
   uncommon: true

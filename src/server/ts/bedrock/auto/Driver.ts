@@ -77,7 +77,13 @@ const getOptions = function (port, browserName, browserFamily, settings): Webdri
   if (browserName === 'phantomjs') {
     caps['phantomjs.cli.args'] = '--remote-debugger-port=' + settings.debuggingPort;
   } else if (browserName === 'firefox-headless') {
-    addArguments(caps, 'moz:firefoxOptions', ['-headless']);
+    // https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode#Debugging_headless_Firefox
+    addArguments(caps, 'moz:firefoxOptions', ['-headless', '-start-debugger-server=' + settings.debuggingPort]);
+    caps['moz:firefoxOptions'].prefs = {
+      'devtools.debugger.remote-enabled': true,
+      'devtools.debugger.prompt-connection': false,
+      'devtools.chrome.enabled': true
+    }
   } else if (browserName === 'chrome-headless') {
     addArguments(caps, 'goog:chromeOptions', ['--headless', '--remote-debugging-port=' + settings.debuggingPort]);
   }
