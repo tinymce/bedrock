@@ -353,7 +353,7 @@ const runGlobalTests = (): void => {
       const test = tests.shift();
       const report = reporter.test(test.filePath, test.name);
       const timer = setTimeout(() => {
-        report.fail('Test ran too long', afterFail);
+        report.fail({ error: 'Test ran too long' }, afterFail);
       }, timeout);
       try {
         report.start(() => {
