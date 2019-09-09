@@ -71,6 +71,14 @@
   "main": "./lib/client/ts/api/Main.js",
   "module": "./lib/client/ts/api/Main.js",
   "types": "./lib/client/ts/api/Main.d.ts",
+  "files": [
+    "bin/**",
+    "lib/**",
+    "dist/**",
+    "src/css/**",
+    "src/resources/**",
+    "tasks/**"
+  ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   }
