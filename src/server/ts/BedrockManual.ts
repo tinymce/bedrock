@@ -10,7 +10,7 @@ export const go = function (settings) {
   const delayExiting = false;
   const routes = RunnerRoutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, 'src/resources/bedrock.html', delayExiting);
 
-  console.log('bedrock-manual ' + Version + ' starting...');
+  console.log('bedrock-manual ' + Version.get() + ' starting...');
 
   routes.then((runner) => {
     const serveSettings = {
