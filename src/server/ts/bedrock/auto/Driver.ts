@@ -86,6 +86,9 @@ const getOptions = function (port, browserName, browserFamily, settings): Webdri
     }
   } else if (browserName === 'chrome-headless') {
     addArguments(caps, 'goog:chromeOptions', ['--headless', '--remote-debugging-port=' + settings.debuggingPort]);
+    if (settings.useSandboxForHeadless) {
+      addArguments(caps, 'goog:chromeOptions', [ '--no-sandbox' ]);
+    }
   }
 
   return options;
