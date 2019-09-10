@@ -1,7 +1,7 @@
 import * as path from 'path';
 
-const filePathToImport = function (useRequire, scratchFile) {
-  return function (filePath) {
+const filePathToImport = (useRequire: boolean, scratchFile: string) => {
+  return (filePath: string) => {
     const importFilePath = path.join(path.dirname(filePath), path.basename(filePath, path.extname(filePath)));
     let relativePath = path.relative(path.dirname(scratchFile), importFilePath);
 
@@ -21,7 +21,7 @@ const filePathToImport = function (useRequire, scratchFile) {
   };
 };
 
-export const generateImports = function (useRequire, scratchFile, srcFiles) {
+export const generateImports = (useRequire: boolean, scratchFile: string, srcFiles: string[]) => {
   const imports = srcFiles.map(filePathToImport(useRequire, scratchFile)).join('\n');
   // header code for tests.ts
   return [
@@ -30,7 +30,7 @@ declare let require: any;
 declare let __tests: any;
 declare let console: any;
 let __lastTestIndex: number = -1;
-const addTest = (testFilePath) => {
+const addTest = (testFilePath: string) => {
   if (__tests && __tests[__tests.length - 1]) {
     const lastTest = __tests[__tests.length - 1];
     if (!lastTest.filePath) {

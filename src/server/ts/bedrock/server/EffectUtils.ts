@@ -1,8 +1,10 @@
-const frameSelected = function (driver, frame) {
-  return function () {
-    return driver.switchToFrame(frame).then(function () {
+import { BrowserObject, Element } from 'webdriverio';
+
+const frameSelected = (driver: BrowserObject, frame: string): () => Promise<boolean> => {
+  return () => {
+    return driver.switchToFrame(frame).then(() => {
       return true;
-    }).catch(function (e) {
+    }).catch((e) => {
       if (!(e.name && e.name === 'no such frame')) {
         throw e;
       }
@@ -11,15 +13,15 @@ const frameSelected = function (driver, frame) {
   }
 };
 
-const getTargetFromFrame = function (driver, selector) {
+const getTargetFromFrame = (driver: BrowserObject, selector: string) => {
   const sections = selector.split('=>');
   const frameSelector = sections[0];
   const targetSelector = sections[1];
   // Note: Don't use driver.$() here as it doesn't work on Edge
-  return driver.findElement('css selector', frameSelector).then(function (frame) {
-    return driver.waitUntil(frameSelected(driver, frame), 100).then(function () {
-      return driver.$(targetSelector).then(function (target) {
-        return target.waitForDisplayed(100).then(function () {
+  return driver.findElement('css selector', frameSelector).then((frame) => {
+    return driver.waitUntil(frameSelected(driver, frame), 100).then(() => {
+      return driver.$(targetSelector).then((target) => {
+        return target.waitForDisplayed(100).then(() => {
           return target;
         });
       });
@@ -27,25 +29,25 @@ const getTargetFromFrame = function (driver, selector) {
   });
 };
 
-const getTargetFromMain = function (driver, selector) {
+const getTargetFromMain = (driver: BrowserObject, selector: string) => {
   return driver.$(selector);
 };
 
-export const getTarget = function (driver, data) {
+export const getTarget = (driver: BrowserObject, data: { selector: string }) => {
   const selector = data.selector;
   const getter = selector.indexOf('=>') > -1 ? getTargetFromFrame : getTargetFromMain;
   return getter(driver, selector);
 };
 
-export const performActionOnTarget = function (driver, data, action) {
-  return getTarget(driver, data).then(function (target) {
-    return action(target).then(function (result) {
-      return driver.switchToFrame(null).then(function () {
+export const performActionOnTarget = <T>(driver: BrowserObject, data: { selector: string }, action: (target: Element) => Promise<T>): Promise<T> => {
+  return getTarget(driver, data).then((target) => {
+    return action(target).then((result) => {
+      return driver.switchToFrame(null).then(() => {
         return result;
       });
     });
-  }).catch(function (err) {
-    return driver.switchToFrame(null).then(function () {
+  }).catch((err: any) => {
+    return driver.switchToFrame(null).then(() => {
       return Promise.reject(err);
     });
   });

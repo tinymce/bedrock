@@ -6,9 +6,10 @@ import * as Reporter from './bedrock/core/Reporter';
 import * as DriverMaster from './bedrock/server/DriverMaster';
 import * as Driver from './bedrock/auto/Driver';
 import * as Lifecycle from './bedrock/core/Lifecycle';
+import { BedrockAutoSettings } from './bedrock/core/Settings';
 import { ExitCodes } from './bedrock/util/ExitCodes';
 
-export const go = function (settings) {
+export const go = (settings: BedrockAutoSettings) => {
   const master = DriverMaster.create();
 
   const isPhantom = settings.browser === 'phantomjs';
@@ -18,15 +19,15 @@ export const go = function (settings) {
 
   console.log('bedrock-auto ' + Version.get() + ' starting...');
 
-  routes.then(function (runner) {
+  routes.then((runner) => {
     Driver.create({
       browser: settings.browser,
       basedir: settings.basedir,
       debuggingPort: settings.debuggingPort,
       useSandboxForHeadless: settings.useSandboxForHeadless
-    }).then(function (driver) {
+    }).then((driver) => {
       const webdriver = driver.webdriver;
-      const serveSettings = {
+      const serveSettings: Serve.ServeSettings = {
         projectdir: settings.projectdir,
         basedir: settings.basedir,
         testfiles: settings.testfiles,
@@ -41,18 +42,18 @@ export const go = function (settings) {
         skipResetMousePosition: settings.skipResetMousePosition
       };
 
-      return Serve.start(serveSettings).then(function (service) {
+      return Serve.start(serveSettings).then((service) => {
         if (!isPhantom) console.log('bedrock-auto ' + Version.get() + ' available at: http://localhost:' + service.port);
-        const result = webdriver.url('http://localhost:' + service.port).then(function () {
+        const result = webdriver.url('http://localhost:' + service.port).then(() => {
           console.log(isPhantom ? '\nPhantom tests loading ...\n' : '\nInitial page has loaded ...\n');
           service.markLoaded();
           service.enableHud();
-          return service.awaitDone().then(function (data) {
+          return service.awaitDone().then((data) => {
             return Reporter.write({
               name: settings.name,
               output: settings.output
             })(data);
-          }).catch(function (pollExit) {
+          }).catch((pollExit) => {
             return Reporter.writePollExit({
               name: settings.name,
               output: settings.output
@@ -66,7 +67,7 @@ export const go = function (settings) {
 
         return Lifecycle.shutdown(result, webdriver, done, gruntDone, delayExit);
       });
-    }).catch(function (err) {
+    }).catch((err) => {
       console.error(err);
       if (settings.gruntDone !== undefined) settings.gruntDone(false);
       else process.exit(ExitCodes.failures.unexpected);

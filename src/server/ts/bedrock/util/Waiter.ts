@@ -1,6 +1,6 @@
-export const delay = function (value, amount) {
-  return new Promise(function (resolve, reject) {
-    setTimeout(function () {
+export const delay = <T>(value: T, amount: number): Promise<T> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
       resolve(value);
     }, amount);
   });

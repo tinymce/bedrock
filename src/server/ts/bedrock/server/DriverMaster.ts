@@ -1,17 +1,29 @@
 import * as Waiter from '../util/Waiter';
 
-export const create = function () {
+type Executor<T> = () => Promise<T>;
+
+interface QueueItem<T> {
+  f: Executor<T>;
+  label: string;
+  identifier: string;
+}
+
+export interface DriverMaster {
+  waitForIdle: <T>(f: Executor<T>, label: string) => Promise<T>;
+}
+
+export const create = () => {
   let inUse = false;
 
-  let queue = [];
+  let queue: QueueItem<any>[] = [];
 
-  const use = function (f, label) {
+  const use = <T>(f: Executor<T>, label: string) => {
     inUse = true;
 
-    return f().then(function (v) {
+    return f().then((v) => {
       inUse = false;
       return Promise.resolve(v);
-    }, function (err) {
+    }).catch((err) => {
       inUse = false;
       return Promise.reject(err);
     });
@@ -53,7 +65,7 @@ export const create = function () {
    * fall out.
    */
 
-  const doWaitForIdle = function (identifier, f, label, attempts) {
+  const doWaitForIdle = <T>(identifier: string, f: Executor<T>, label: string, attempts: number): Promise<T> => {
     // Locking has failed many times ... so just assume the lock should have been released.
     if (attempts === 0) return use(f, label);
     // Nothing has a lock, and there is no queue
@@ -66,15 +78,16 @@ export const create = function () {
     // Either something has a lock, or this process is not at the head of the queue,
     // so it needs to wait its turn
     } else {
-      return Waiter.delay({}, 100).then(function () {
+      return Waiter.delay({}, 100).then(() => {
         return doWaitForIdle(identifier, f, label, attempts - 1);
       });
     }
   };
 
-  const waitForIdle = function (f, label) {
-    if (inUse === false && queue.length === 0) return use(f, label);
-    else {
+  const waitForIdle = <T>(f: Executor<T>, label: string): Promise<T> => {
+    if (inUse === false && queue.length === 0) {
+      return use(f, label);
+    } else {
       const identifier = label + '_' + new Date().getTime() + Math.floor(Math.random() * 10000);
       queue = queue.concat({
         f: f,
@@ -86,6 +99,6 @@ export const create = function () {
   };
 
   return {
-    waitForIdle: waitForIdle
+    waitForIdle
   };
 };

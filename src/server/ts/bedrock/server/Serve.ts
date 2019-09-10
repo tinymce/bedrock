@@ -1,9 +1,42 @@
 import * as finalhandler from 'finalhandler';
+import * as http from 'http';
 import * as portfinder from 'portfinder';
+import { BrowserObject } from 'webdriverio';
+import { Attempt } from '../core/Attempt';
 import * as Routes from './Routes';
 import * as Apis from './Apis';
 import * as CustomRoutes from './CustomRoutes';
-import * as http from 'http';
+import { DriverMaster } from './DriverMaster';
+import { Result } from './Controller';
+
+interface Server {
+  listen: (port: number) => http.Server;
+  close: (callback?: () => void) => void;
+}
+
+export interface ServeSettings {
+  basedir: string;
+  customRoutes: string;
+  driver: Attempt<string, BrowserObject>;
+  loglevel: 'simple' | 'advanced';
+  master: DriverMaster | null;
+  overallTimeout: number;
+  projectdir: string;
+  runner: any;
+  singleTimeout: number;
+  skipResetMousePosition: boolean;
+  stickyFirstSession: boolean;
+  testfiles: string[];
+}
+
+export interface ServeService {
+  port: number;
+  server: Server;
+  markLoaded: () => void;
+  enableHud: () => void;
+  awaitDone: () => Promise<Result>;
+  shutdown: () => Promise<void>;
+}
 
 /*
  * Settings:
@@ -15,7 +48,7 @@ import * as http from 'http';
  * master (can be null) The driver master (locking and unlocking)
  * runner: runner (e.g. runnerroutes, pageroutes etc). Has fallback and routers.
  */
-export const startCustom = function (settings, createServer) {
+export const startCustom = (settings: ServeSettings, createServer: (listener: http.RequestListener) => Server): Promise<ServeService> => {
 
   const pref = (f: string): any => {
     const v = settings[f];
@@ -50,8 +83,8 @@ export const startCustom = function (settings, createServer) {
   return portfinder.getPortPromise({
     port: 8000,
     stopPort: 20000
-  }).then(function (port) {
-    const server = createServer(function (request, response) {
+  }).then((port) => {
+    const server = createServer((request, response) => {
       const done = finalhandler(request, response);
       Routes.route(routers, fallback, request, response, done);
     }).listen(port);
@@ -62,8 +95,8 @@ export const startCustom = function (settings, createServer) {
       markLoaded: api.markLoaded,
       enableHud: api.enableHud,
       awaitDone: api.awaitDone,
-      shutdown: function () {
-        return new Promise(function (resolve) {
+      shutdown: () => {
+        return new Promise<void>((resolve) => {
           server.close();
           // TODO: Find out why this doesn't shutdown quickly as we may not be closing connections properly
           // For now though give the server 1 sec to shutdown gracefully
@@ -71,11 +104,11 @@ export const startCustom = function (settings, createServer) {
         });
       }
     };
-  }).catch(function (err) {
+  }).catch((err) => {
     return Promise.reject('Error looking for open port between 8000 and 20000: ' + err);
   });
 };
 
-export const start = function (settings) {
+export const start = (settings: ServeSettings) => {
   return startCustom(settings, http.createServer);
 };

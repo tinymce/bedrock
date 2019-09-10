@@ -7,18 +7,22 @@ import * as DriverMaster from './bedrock/server/DriverMaster';
 import * as Driver from './bedrock/auto/Driver';
 import * as PageRoutes from './bedrock/server/PageRoutes';
 import * as Lifecycle from './bedrock/core/Lifecycle';
+import { BedrockFrameworkSettings } from './bedrock/core/Settings';
 
 /* eslint-disable no-undef */
-export const go = function (settings) {
+export const go = (settings: BedrockFrameworkSettings) => {
   const master = DriverMaster.create();
 
   const runner = PageRoutes.generate(settings.projectdir, settings.basedir);
 
   Driver.create({
-    browser: settings.browser
-  }).then(function (driver) {
+    browser: settings.browser,
+    basedir: settings.basedir,
+    debuggingPort: settings.debuggingPort,
+    useSandboxForHeadless: false
+  }).then((driver) => {
     const webdriver = driver.webdriver;
-    const serveSettings = {
+    const serveSettings: Serve.ServeSettings = {
       projectdir: settings.projectdir,
       basedir: settings.basedir,
       driver: Attempt.passed(webdriver),
@@ -27,14 +31,15 @@ export const go = function (settings) {
       runner: runner,
       loglevel: settings.loglevel,
       customRoutes: settings.customRoutes,
+      stickyFirstSession: true,
       overallTimeout: settings.overallTimeout,
       singleTimeout: settings.singleTimeout,
-      skipResetMousePosition: settings.skipResetMousePosition
+      skipResetMousePosition: false
     };
 
-    const addFramework = function (framework) {
+    const addFramework = (framework: string) => {
       const source = path.join('/page', 'src', 'resources', framework + '-wrapper.js');
-      return webdriver.execute(function (src) {
+      return webdriver.execute((src) => {
         const script = document.createElement('script');
         script.setAttribute('src', src);
         document.head.appendChild(script);
@@ -43,19 +48,19 @@ export const go = function (settings) {
 
     const isPhantom = settings.browser === 'phantomjs';
 
-    return Serve.start(serveSettings).then(function (service) {
+    return Serve.start(serveSettings).then((service) => {
       if (!isPhantom) console.log('bedrock-framework ' + Version.get() + ' available at: http://localhost:' + service.port);
-      const result = webdriver.url('http://localhost:' + service.port + '/' + settings.page).then(function () {
+      const result = webdriver.url('http://localhost:' + service.port + '/' + settings.page).then(() => {
         console.log(isPhantom ? '\nPhantom tests loading ...\n' : '\n ... Initial page has loaded ...');
         service.markLoaded();
 
-        return addFramework(settings.framework).then(function () {
-          return service.awaitDone().then(function (data) {
+        return addFramework(settings.framework).then(() => {
+          return service.awaitDone().then((data) => {
             return Reporter.write({
               name: settings.name,
               output: settings.output
             })(data);
-          }, function (pollExit) {
+          }).catch((pollExit) => {
             return Reporter.writePollExit({
               name: settings.name,
               output: settings.output
@@ -69,7 +74,7 @@ export const go = function (settings) {
       const gruntDone = settings.gruntDone !== undefined ? settings.gruntDone : null;
       const done = () => Promise.all([ service.shutdown(), driver.shutdown() ]);
 
-      return Lifecycle.shutdown(result, driver, done, gruntDone, delayExiting);
+      return Lifecycle.shutdown(result, webdriver, done, gruntDone, delayExiting);
     });
   });
 };

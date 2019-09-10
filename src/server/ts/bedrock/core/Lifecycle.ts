@@ -1,38 +1,34 @@
+import { BrowserObject } from 'webdriverio';
+import { TestResult } from '../server/Controller';
 import { ExitCodes } from '../util/ExitCodes';
 import { Attempt } from './Attempt';
 
-export const shutdown = function (promise: Promise<Attempt<string[], any>>, driver, done, gruntDone, delayExiting) {
-  const exitDelay = function () {
+export const shutdown = (promise: Promise<Attempt<string[], TestResult[]>>, driver: BrowserObject, done: () => Promise<any>, gruntDone: ((success: boolean) => void) | null, delayExiting: boolean) => {
+  const exitDelay = () => {
     // 17 minutes should be enough, if it's not we can make this configurable later.
     return delayExiting ? driver.pause(17 * 60 * 1000) : Promise.resolve();
   };
 
-  const exit = function (exitCode) {
-    return function () {
-      if (gruntDone !== null) gruntDone(exitCode === 0);
-      else process.exit(exitCode);
-    };
+  const exit = (exitCode: number) => () => {
+    if (gruntDone !== null) gruntDone(exitCode === 0);
+    else process.exit(exitCode);
   };
 
-  return promise.then(function (res) {
+  return promise.then((res) => {
     // Only check the delay exit option if tests failed.
-    const delay = Attempt.cata(res, function (_errs) {
-      return exitDelay();
-    }, function () {
-      return Promise.resolve();
-    });
+    const delay = Attempt.cata(res, (_errs) => exitDelay(), () => Promise.resolve());
 
-    return delay.then(function () {
-      return Attempt.cata(res, function (errs) {
+    return delay.then(() => {
+      return Attempt.cata(res, (errs) => {
         console.log(errs.join('\n'));
         return done().then(exit(ExitCodes.failures.tests));
-      }, function () {
+      }, () => {
         console.log('All tests passed.');
         return done().then(exit(ExitCodes.success));
       });
     });
-  }).catch(function (err) {
-    return exitDelay().then(function () {
+  }).catch((err) => {
+    return exitDelay().then(() => {
       console.error('********** Unexpected Bedrock Error -> Server Quitting **********');
       console.error(err);
       return done().then(exit(ExitCodes.failures.unexpected));

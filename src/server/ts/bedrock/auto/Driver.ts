@@ -1,10 +1,25 @@
 import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
-import * as webdriver from 'webdriverio';
+import { DesiredCapabilities, Options } from 'webdriver';
+import * as webdriverio from 'webdriverio';
 import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
 import * as DriverLoader from './DriverLoader';
+
+export interface DriverSettings {
+  basedir: string;
+  browser: string;
+  debuggingPort: number;
+  useSandboxForHeadless: boolean;
+  webdriverPort?: number;
+  webdriverTimeout?: number;
+}
+
+export interface Driver {
+  webdriver: webdriverio.BrowserObject;
+  shutdown: (immediate?: boolean) => Promise<void>;
+}
 
 const browserVariants = {
   'chrome-headless': 'chrome',
@@ -12,30 +27,26 @@ const browserVariants = {
   'ie': 'internet explorer'
 };
 
-const cscriptFocus = function (basedir, script) {
-  return new Promise(function (resolve) {
+const cscriptFocus = (basedir: string, script: string) => {
+  return new Promise<void>((resolve) => {
     const focusScript = path.join(basedir, 'bin/focus/' + script);
-    childProcess.exec('cscript ' + focusScript, function () {
-      resolve();
-    });
+    childProcess.exec('cscript ' + focusScript, () => resolve());
   });
 };
 
 // Mac doesn't focus windows opened through automation, so use AppleScript to do it for us
-const focusMac = function (basedir, browser) {
+const focusMac = (basedir: string, browser: string) => {
   if (browser === 'phantomjs') {
     return Promise.resolve();
   } else {
-    return new Promise(function (resolve) {
+    return new Promise<void>((resolve) => {
       const macFocusScript = path.join(basedir, 'bin/focus/mac.applescript');
-      childProcess.exec(`osascript ${macFocusScript} ${browser}`, function () {
-        resolve();
-      });
+      childProcess.exec(`osascript ${macFocusScript} ${browser}`, () => resolve());
     });
   }
 };
 
-const focusWindows = function (basedir, browser) {
+const focusWindows = (basedir: string, browser: string) => {
   if (browser === 'MicrosoftEdge') {
     // Makes sure that Edge has proper focus and is the top most window
     return cscriptFocus(basedir, 'edge.js');
@@ -48,7 +59,7 @@ const focusWindows = function (basedir, browser) {
   }
 };
 
-const addArguments = function (capabilities, name, args) {
+const addArguments = (capabilities: DesiredCapabilities, name: string, args: string[]) => {
   if (!capabilities.hasOwnProperty(name)) {
     capabilities[name] = { args: [] };
   }
@@ -56,8 +67,8 @@ const addArguments = function (capabilities, name, args) {
   capabilities[name].args = currentArgs.concat(args);
 };
 
-const getOptions = function (port, browserName, browserFamily, settings): WebdriverIO.RemoteOptions {
-  const options = {
+const getOptions = (port: number, browserName: string, browserFamily: string, settings: DriverSettings) => {
+  const options: Options = {
     path: '/',
     port: port,
     logLevel: 'silent' as 'silent',
@@ -94,8 +105,8 @@ const getOptions = function (port, browserName, browserFamily, settings): Webdri
   return options;
 };
 
-const logDriverDetails = function (driver) {
-  const caps = driver.capabilities;
+const logDriverDetails = (driver: webdriverio.BrowserObject) => {
+  const caps: Record<string, any> = driver.capabilities;
   const browserName = caps.browserName;
   const browserVersion = caps.browserVersion || caps.version;
 
@@ -110,7 +121,7 @@ const logDriverDetails = function (driver) {
   }
 };
 
-const focusBrowser = function (browserName, settings) {
+const focusBrowser = (browserName: string, settings: DriverSettings) => {
   if (os.platform() === 'darwin') {
     return focusMac(settings.basedir, browserName);
   } else if (os.platform() === 'win32') {
@@ -120,8 +131,8 @@ const focusBrowser = function (browserName, settings) {
   }
 };
 
-const setupShutdown = function (driver: WebdriverIOAsync.BrowserObject, driverApi: DriverLoader.DriverAPI) {
-  const driverShutdown = function (immediate?: boolean) {
+const setupShutdown = (driver: webdriverio.BrowserObject, driverApi: DriverLoader.DriverAPI): (immediate?: boolean) => Promise<void> => {
+  const driverShutdown = (immediate?: boolean) => {
     if (immediate) {
       driver.deleteSession();
       driverApi.stop();
@@ -131,10 +142,8 @@ const setupShutdown = function (driver: WebdriverIOAsync.BrowserObject, driverAp
     }
   };
 
-  Shutdown.registerShutdown(function (code, immediate) {
-    driverShutdown(immediate).then(function () {
-      process.exit(code);
-    });
+  Shutdown.registerShutdown((code, immediate) => {
+    driverShutdown(immediate).then(() => process.exit(code));
   });
 
   return driverShutdown;
@@ -147,7 +156,7 @@ const setupShutdown = function (driver: WebdriverIOAsync.BrowserObject, driverAp
  * webdriverPort: port to use for the webdriver server
  * webdriverTimeout: how long to wait for the webdriver server to start
  */
-export const create = function (settings) {
+export const create = (settings: DriverSettings): Promise<Driver> => {
   const webdriverPort = settings.webdriverPort || 4444;
   const webdriverTimeout = settings.webdriverTimeout || 30000;
 
@@ -160,19 +169,19 @@ export const create = function (settings) {
   return portfinder.getPortPromise({
     port: webdriverPort,
     stopPort: webdriverPort + 100
-  }).then(function (port) {
+  }).then((port) => {
     // Wait for the driver to start up and then start the webdriver session
-    return DriverLoader.startAndWaitForAlive(driverApi, port, webdriverTimeout).then(function () {
+    return DriverLoader.startAndWaitForAlive(driverApi, port, webdriverTimeout).then(() => {
       const webdriverOptions = getOptions(port, browserName, browserFamily, settings);
-      return webdriver.remote(webdriverOptions);
-    }).then(function (driver) {
+      return webdriverio.remote(webdriverOptions);
+    }).then((driver) => {
       // Ensure the driver gets shutdown correctly if shutdown
       // by the user instead of the application
       const driverShutdown = setupShutdown(driver, driverApi);
 
       // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
       // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
-      return driver.pause(1500).then(function () {
+      return driver.pause(1500).then(() => {
         // Log driver details
         logDriverDetails(driver);
 
@@ -183,9 +192,9 @@ export const create = function (settings) {
         } else {
           return driver.maximizeWindow();
         }
-      }).then(function () {
+      }).then(() => {
         return focusBrowser(browserFamily, settings);
-      }).then(function () {
+      }).then(() => {
         // Return the public driver api
         return {
           webdriver: driver,
@@ -193,7 +202,7 @@ export const create = function (settings) {
         };
       });
     });
-  }).catch(function (e) {
+  }).catch((e) => {
     driverApi.stop();
     return Promise.reject(e);
   });

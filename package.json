@@ -43,6 +43,7 @@
     "ts-loader": "^5.3.3",
     "tsconfig-paths-webpack-plugin": "^3.2.0",
     "typescript": "^3.3.0",
+    "webdriver": "5.11.10",
     "webdriverio": "5.11.10",
     "webpack": "^4.25.1",
     "webpack-dev-server": "^3.2.1",
@@ -50,8 +51,14 @@
   },
   "devDependencies": {
     "@types/command-line-args": "^5.0.0",
+    "@types/command-line-usage": "^5.0.1",
+    "@types/cross-spawn": "^6.0.0",
+    "@types/finalhandler": "^1.1.0",
     "@types/jquery": "^3.3.31",
-    "@types/selenium-webdriver": "^4.0.2",
+    "@types/mkdirp": "^0.5.2",
+    "@types/querystringify": "^2.0.0",
+    "@types/webpack": "^4.39.1",
+    "@types/webpack-dev-server": "^3.1.7",
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
     "eslint": "^6.3.0",
@@ -69,6 +76,9 @@
   },
   "resolutions": {
     "webdriver": "5.11.10"
+  },
+  "engines": {
+    "node": ">=8.0.0"
   },
   "author": "Ephox Corporation",
   "license": "Apache-2.0",

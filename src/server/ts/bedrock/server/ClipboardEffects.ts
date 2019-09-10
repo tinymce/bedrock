@@ -2,14 +2,16 @@ import * as childProcess from 'child_process';
 import * as path from 'path';
 import { ExitCodes } from '../util/ExitCodes';
 
-const execSync = childProcess.execSync;
-
 /*
  JSON API for data: {
    import: "<file name>"
  }
  */
-const importClipboard = function (basedir, clipboarddir, data) {
+export interface ClipboardData {
+  import: string;
+}
+
+const importClipboard = (basedir: string, clipboarddir: string, data: ClipboardData) => {
   const fileName = data.import;
   const fullPath = path.join(clipboarddir, fileName);
   const args = [
@@ -17,17 +19,17 @@ const importClipboard = function (basedir, clipboarddir, data) {
     '-i ' + fullPath
   ];
 
-  const result = execSync(args.join(' '));
+  const result = childProcess.execSync(args.join(' '));
   if (result.length > 0) {
     console.error(result);
     process.exit(ExitCodes.failures.wink);
   }
 
-  return Promise.resolve({});
+  return Promise.resolve();
 };
 
-export const route = function (basedir, clipboarddir) {
-  return function (data) {
+export const route = (basedir: string, clipboarddir: string) => {
+  return (data: ClipboardData) => {
     return importClipboard(basedir, clipboarddir, data);
   };
 };

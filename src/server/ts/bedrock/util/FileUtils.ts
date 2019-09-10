@@ -1,8 +1,7 @@
-import * as fs from "fs";
-import { PathLike } from 'fs';
+import * as fs from 'fs';
 
-export const readFileAsString = (p: PathLike): string =>
+export const readFileAsString = (p: fs.PathLike): string =>
   fs.readFileSync(p).toString();
 
-export const readFileAsJson = (p: PathLike): any =>
+export const readFileAsJson = (p: fs.PathLike): any =>
   JSON.parse(readFileAsString(p));

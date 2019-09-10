@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
+    "noUnusedLocals": true,
     "target": "es2018",
     "module": "commonjs",
     "lib": ["es2018", "dom"],
@@ -8,8 +9,7 @@
     "sourceMap": true,
     "outDir": "lib/server/ts",
     "types": [
-      "node",
-      "webdriverio"
+      "node"
     ]
   },
   "include": [

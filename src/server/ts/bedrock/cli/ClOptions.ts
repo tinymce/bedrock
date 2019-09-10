@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as Extraction from './Extraction';
 import { OptionDefinition } from 'command-line-args';
+import { Attempt } from '../core/Attempt';
 
 export interface ClOption extends OptionDefinition {
   required?: boolean;
@@ -8,7 +9,7 @@ export interface ClOption extends OptionDefinition {
   uncommon?: boolean;
   flatten?: boolean;
   description: string;
-  validate: (n: string, v: string) => any; // TODO: stronger type
+  validate: (n: string, v: string) => Attempt<string[], any>; // TODO: stronger type
   hidden?: boolean;
 }
 
@@ -62,7 +63,7 @@ export const bundler: ClOption = {
   ])
 };
 
-export const configTo = function (defaultValue): ClOption {
+export const configTo = (defaultValue: string): ClOption => {
   return {
     name: 'config',
     alias: 'c',
@@ -119,25 +120,25 @@ export const page: ClOption = {
   validate: Extraction.file
 };
 
-export const projectdir = function (directories): ClOption {
+export const projectdir = (currentDir: string): ClOption => {
   return {
     name: 'projectdir',
     alias: 'p',
     type: String,
     description: 'The base directory to host',
     validate: Extraction.any,
-    defaultValue: directories.current,
+    defaultValue: currentDir,
     uncommon: true
   };
 };
 
-export const basedir = function (directories): ClOption {
+export const basedir = (binDir: string): ClOption => {
   return {
     name: 'basedir',
     type: String,
     description: 'The base directory of the bedrock program',
     validate: Extraction.any,
-    defaultValue: path.join(directories.bin, '/..'),
+    defaultValue: path.join(binDir, '/..'),
     uncommon: true
   };
 };

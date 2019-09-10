@@ -1,14 +1,15 @@
 import * as usage from 'command-line-usage';
+import { ClOption } from './ClOptions';
 
-export const generateUsage = function (command, desc, definitions) {
-  const visibleDefinitions = definitions.filter(function (defn) {
+export const generateUsage = (command: string, desc: string, definitions: ClOption[]): string => {
+  const visibleDefinitions = definitions.filter((defn) => {
     return defn.hidden !== true;
   });
-  const commonDefs = visibleDefinitions.filter(function (defn) {
+  const commonDefs = visibleDefinitions.filter((defn) => {
     return defn.uncommon !== true;
   });
 
-  const uncommonDefs = visibleDefinitions.filter(function (defn) {
+  const uncommonDefs = visibleDefinitions.filter((defn) => {
     return defn.uncommon === true;
   });
 

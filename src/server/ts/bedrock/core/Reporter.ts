@@ -1,22 +1,28 @@
 import * as XMLWriter from 'xml-writer';
 import * as fs from 'fs';
+import { Result, TestResult } from '../server/Controller';
 import { Attempt } from './Attempt';
 
-const outputTime = function (runnerTime) {
+export interface ReporterSettings {
+  name: string;
+  output: string;
+}
+
+const outputTime = (runnerTime: string) => {
   // runner adds 's' to the time for human readability, but junit needs just a float value in seconds
   const time = runnerTime;
   return time.charAt(time.length - 1) === 's' ? time.substr(0, time.length - 2) : time;
 };
 
-export const write = function (settings) {
-  return function (data) {
-    return new Promise<Attempt<string[], any>>(function (resolve) {
+export const write = (settings: ReporterSettings) => {
+  return (data: Result) => {
+    return new Promise<Attempt<string[], TestResult[]>>((resolve) => {
       const results = data.results;
       const time = (data.now - data.start) / 1000;
-      const skipped = results.filter(function (result) {
+      const skipped = results.filter((result) => {
         return result.passed !== true && result.skipped;
       });
-      const failed = results.filter(function (result) {
+      const failed = results.filter((result) => {
         return result.passed !== true && !result.skipped;
       });
 
@@ -39,7 +45,7 @@ export const write = function (settings) {
         .writeAttribute('timestamp', data.start)
         .writeAttribute('time', time);
 
-      results.forEach(function (res) {
+      results.forEach((res) => {
         const elem = w.startElement('testcase')
           .writeAttribute('name', res.file)
           .writeAttribute('classname', settings.name + '.' + res.name)
@@ -78,13 +84,13 @@ export const write = function (settings) {
   };
 };
 
-export const writePollExit = function (settings, results) {
+export const writePollExit = (settings: ReporterSettings, results: Result) => {
   return write({
     name: settings.name,
     output: settings.output
-  })(results).then(function () {
+  })(results).then(() => {
     return Promise.reject(results.message);
-  }, function (err) {
+  }, (err) => {
     console.error('Error writing report for polling exit condition');
     console.error(err);
     console.error(err.stack);

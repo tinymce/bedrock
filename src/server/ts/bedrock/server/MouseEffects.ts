@@ -1,6 +1,23 @@
+import { BrowserObject, Element } from 'webdriverio';
 import * as EffectUtils from './EffectUtils';
 
-const performAction = function (target, type) {
+/*
+ JSON API for data: {
+   type :: String, ("move" || "click" || "down" || "up")
+   selector :: String
+ }
+ */
+export interface MouseData {
+  type: 'move' | 'click' | 'down' | 'up';
+  selector: string;
+}
+
+type ElementWithActions = Element & {
+  performActions: (actions: Array<Record<string, any>>) => Promise<void>;
+  releaseActions: () => Promise<void>;
+};
+
+const performAction = (target: ElementWithActions, type: string) => {
   const action = {
     type: 'pointer',
     id: 'pointer1',
@@ -11,22 +28,16 @@ const performAction = function (target, type) {
       { type: type, button: 0 }
     ]
   };
-  return target.performActions([action]).then(function () {
+  return target.performActions([action]).then(() => {
     return target.releaseActions();
   });
 };
 
-/*
- JSON API for data: {
-   type :: String, ("move" || "click" || "down" || "up")
-   selector :: String
- }
- */
-const doAction = function (driver, target, type) {
+const doAction = (driver: BrowserObject, target: ElementWithActions, type: MouseData['type']): Promise<void> => {
   if (type === 'move') {
     return target.moveTo();
   } else if (type === 'down' || type === 'up') {
-    return target.moveTo().then(function () {
+    return target.moveTo().then(() => {
       return performAction(target, type === 'down' ? 'pointerDown' : 'pointerUp');
     });
   // MicrosoftEdge does support this, but does not seem to support click in an ActionSequence
@@ -37,14 +48,14 @@ const doAction = function (driver, target, type) {
   }
 };
 
-const execute = function (driver, data) {
-  return EffectUtils.performActionOnTarget(driver, data, function (target) {
+const execute = (driver: BrowserObject, data: MouseData) => {
+  return EffectUtils.performActionOnTarget(driver, data, (target: ElementWithActions) => {
     return doAction(driver, target, data.type);
   });
 };
 
-export const executor = function (driver) {
-  return function (data) {
+export const executor = (driver: BrowserObject) => {
+  return (data: MouseData) => {
     return execute(driver, data);
   };
 };

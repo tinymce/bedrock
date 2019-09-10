@@ -1,12 +1,12 @@
-export const registerShutdown = function (cb: (code: number, immediate: boolean) => void) {
+export const registerShutdown = (cb: (code: number, immediate: boolean) => void) => {
   const killEvents = ['exit', 'SIGTERM', 'SIGINT'];
 
-  function register (evName) {
+  function register (evName: string) {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    process.on(evName, kill);
+    process.on(evName as any, kill);
   }
 
-  function unregister (evName) {
+  function unregister (evName: string) {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     process.removeListener(evName, kill);
   }

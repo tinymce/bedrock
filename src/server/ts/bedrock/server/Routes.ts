@@ -1,62 +1,76 @@
+import { IncomingMessage, ServerResponse } from 'http';
 import * as server from 'serve-static';
 import * as Matchers from './Matchers';
 
-export const routing = function (method, prefix, source) {
-  const router = server(source);
+type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS';
 
-  const go = function (request, response, done) {
+export type RouteGoFunc = (request: IncomingMessage, response: ServerResponse, done: () => void) => void;
+export interface Route {
+  matches: Matchers.Matcher[];
+  go: RouteGoFunc;
+}
+
+const createServer = (root: string) => {
+  // Note: The serve-static types appear to be wrong here, so just force it back to what it should be
+  return server(root) as (request: IncomingMessage, response: ServerResponse, done: (err?: any) => void) => void;
+};
+
+export const routing = (method: HTTPMethod, prefix: string, source: string): Route => {
+  const router = createServer(source);
+
+  const go: RouteGoFunc = (request, response, done) => {
     request.url = request.url.substring(prefix.length);
     router(request, response, done);
   };
 
   return {
     matches: [Matchers.methodMatch(method), Matchers.prefixMatch(prefix)],
-    go: go
+    go
   };
 };
 
-const concludeJson = function (response, status, info) {
-  response.writeHeader(status, {'Content-Type': 'application/json'});
+const concludeJson = (response: ServerResponse, status: number, info: any) => {
+  response.writeHead(status, {'Content-Type': 'application/json'});
   response.end(JSON.stringify(info));
 };
 
-export const json = function (method, prefix, data) {
-  const go = function (request, response/* , done */) {
+export const json = (method: HTTPMethod, prefix: string, data: any): Route => {
+  const go: RouteGoFunc = (request, response/* , done */) => {
     concludeJson(response, 200, data);
   };
 
   return {
     matches: [Matchers.methodMatch(method), Matchers.prefixMatch(prefix)],
-    go: go
+    go
   };
 };
 
-export const asyncJs = function (method, url, fn) {
-  const go = function (request, response/* , done */) {
-    fn(function (data) {
-      response.writeHeader(200, {'Content-Type': 'text/javascript'});
+export const asyncJs = (method: HTTPMethod, url: string, fn: ((data: any) => void)): Route => {
+  const go: RouteGoFunc = (request, response/* , done */) => {
+    fn((data: any) => {
+      response.writeHead(200, {'Content-Type': 'text/javascript'});
       response.end(data);
     });
   };
 
   return {
     matches: [Matchers.methodMatch(method), Matchers.urlMatch(url)],
-    go: go
+    go
   };
 };
 
-export const effect = function (method, prefix, action) {
-  const go = function (request, response/* , done */) {
+export const effect = <D>(method: HTTPMethod, prefix: string, action: (data: D) => Promise<void>): Route => {
+  const go: RouteGoFunc = (request, response/* , done */) => {
     let body = '';
-    request.on('data', function (data) {
+    request.on('data', (data) => {
       body += data;
     });
 
-    request.on('end', function () {
+    request.on('end', () => {
       const parsed = JSON.parse(body);
-      action(parsed).then(function () {
+      action(parsed).then(() => {
         concludeJson(response, 200, {});
-      }).catch(function (err) {
+      }).catch((err) => {
         console.error('Executing effect failed: \n** ' + body);
         console.error('Error: ', err, '\n');
         concludeJson(response, 500, {});
@@ -66,55 +80,55 @@ export const effect = function (method, prefix, action) {
 
   return {
     matches: [Matchers.methodMatch(method), Matchers.prefixMatch(prefix)],
-    go: go
+    go
   };
 };
 
-export const rewrite = function (method, root, input, output) {
-  const base = server(root);
+export const rewrite = (method: HTTPMethod, root: string, input: string, output: string): Route => {
+  const base = createServer(root);
 
-  const go = function (request, response, done) {
+  const go: RouteGoFunc = (request, response, done) => {
     request.url = output;
     base(request, response, done);
   };
 
   return {
     matches: [Matchers.methodMatch(method), Matchers.prefixMatch(input)],
-    go: go
+    go
   };
 };
 
-export const constant = function (method, root, url) {
-  const base = server(root);
+export const constant = (method: HTTPMethod, root: string, url: string): Route => {
+  const base = createServer(root);
 
-  const go = function (request, response, done) {
+  const go: RouteGoFunc = (request, response, done) => {
     request.url = url;
     base(request, response, done);
   };
 
   return {
     matches: [Matchers.methodMatch(method), Matchers.prefixMatch(root)],
-    go: go
+    go
   };
 };
 
-export const host = function (method, root) {
-  const base = server(root);
+export const host = (method: HTTPMethod, root: string): Route => {
+  const base = createServer(root);
 
-  const go = function (request, response, done) {
+  const go: RouteGoFunc = (request, response, done) => {
     base(request, response, done);
   };
 
   return {
     matches: [Matchers.methodMatch(method), Matchers.prefixMatch(root)],
-    go: go
+    go
   };
 };
 
-export const hostOn = function (method, prefix, root) {
-  const base = server(root);
+export const hostOn = (method: HTTPMethod, prefix: string, root: string): Route => {
+  const base = createServer(root);
 
-  const go = function (request, response, done) {
+  const go: RouteGoFunc = (request, response, done) => {
     const original = request.url;
     request.url = original.substring((prefix + '/').length);
     base(request, response, done);
@@ -122,26 +136,26 @@ export const hostOn = function (method, prefix, root) {
 
   return {
     matches: [Matchers.methodMatch(method), Matchers.prefixMatch(prefix)],
-    go: go
+    go
   };
 };
 
-export const unsupported = function (method, root, label) {
-  const go = function (request, response/* , done */) {
+export const unsupported = (method: HTTPMethod, root: string, label: string): Route => {
+  const go: RouteGoFunc = (request, response/* , done */) => {
     concludeJson(response, 404, {error: label});
   };
 
   return {
     matches: [Matchers.methodMatch(method), Matchers.prefixMatch(root)],
-    go: go
+    go
   };
 };
 
-export const route = function (routes, fallback, request, response, done) {
-  request.originalUrl = request.url;
+export const route = (routes: Route[], fallback: Route, request: IncomingMessage, response: ServerResponse, done: (err?: any) => void) => {
+  (request as any).originalUrl = request.url;
 
-  const match = routes.find(function (candidate) {
-    return candidate.matches.every(function (match) {
+  const match = routes.find((candidate) => {
+    return candidate.matches.every((match) => {
       return match(request);
     });
   });

@@ -3,7 +3,7 @@ import * as crossSpawn from 'cross-spawn';
 import * as http from 'http';
 
 export interface DriverAPI {
-  start: (args: any[]) => ChildProcess;
+  start: (args?: string[]) => ChildProcess;
   stop: () => void;
   defaultInstance: ChildProcess;
 }
@@ -23,15 +23,15 @@ const browserExecutables = {
   'MicrosoftEdge': 'MicrosoftWebDriver'
 };
 
-const execLoader = function (exec, driverArgs = []) {
+const execLoader = (exec: string, driverArgs: string[] = []) => {
   const api = {} as DriverAPI;
-  api.start = function (args) {
-    const finalArgs = driverArgs.concat(args || []);
+  api.start = (args = []) => {
+    const finalArgs = driverArgs.concat(args);
     api.defaultInstance = crossSpawn(exec, finalArgs);
     return api.defaultInstance;
   };
 
-  api.stop = function () {
+  api.stop = () => {
     if (api.defaultInstance) {
       api.defaultInstance.kill();
       api.defaultInstance = null;
@@ -41,13 +41,13 @@ const execLoader = function (exec, driverArgs = []) {
   return api;
 };
 
-const loadPhantomJs = function () {
+const loadPhantomJs = () => {
   const api = execLoader('phantomjs');
 
   // Patch the start function to remap the arguments
   const origStart = api.start;
-  api.start = function (args) {
-    const patchedArgs = args.map(function (arg) {
+  api.start = (args = []) => {
+    const patchedArgs = args.map((arg) => {
       return arg.indexOf('--port') !== -1 ? arg.replace('--port', '--webdriver') : arg;
     });
     return origStart(patchedArgs);
@@ -55,7 +55,7 @@ const loadPhantomJs = function () {
   return api;
 };
 
-export const loadDriver = function (browserName: string) {
+export const loadDriver = (browserName: string): DriverAPI => {
   const driverDep = browserModules[browserName];
   if (driverDep === undefined) {
     console.log('Not loading a local driver for browser ' + browserName);
@@ -77,29 +77,29 @@ export const loadDriver = function (browserName: string) {
   }
 };
 
-export const waitForAlive = function (proc: ChildProcess, port: number, timeout = 30000) {
+export const waitForAlive = (proc: ChildProcess, port: number, timeout = 30000) => {
   const url = 'http://localhost:' + port + '/status';
   const start = Date.now();
-  return new Promise(function (resolve, reject) {
-    let timeoutId = null;
+  return new Promise<void>((resolve, reject) => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-    function onStartError (error) {
+    const onStartError = (error: string) => {
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
       reject('Driver failed to start (' + error + ')');
-    }
+    };
 
-    function onServerError () {
+    const onServerError = () => {
       if (Date.now() - start > timeout) {
         reject('Timed out waiting for the webdriver server');
       } else {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         timeoutId = setTimeout(checkServerStatus, 50);
       }
-    }
+    };
 
-    function checkServerStatus () {
+    const checkServerStatus = () => {
       http.get(url, (res) => {
         if (res.statusCode === 200) {
           let rawData = '';
@@ -122,7 +122,7 @@ export const waitForAlive = function (proc: ChildProcess, port: number, timeout 
           onServerError();
         }
       }).on('error', onServerError);
-    }
+    };
 
     // Bind process listeners
     proc.on('exit', onStartError);
@@ -133,7 +133,7 @@ export const waitForAlive = function (proc: ChildProcess, port: number, timeout 
   })
 };
 
-export const startAndWaitForAlive = function (driverApi: DriverAPI, port: number, timeout = 30000) {
+export const startAndWaitForAlive = (driverApi: DriverAPI, port: number, timeout = 30000) => {
   // Start the driver
   const driverProc = driverApi.start(['--port=' + port]);
   // Wait for it to be alive

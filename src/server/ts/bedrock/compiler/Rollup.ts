@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable @typescript-eslint/no-var-requires */
 import * as rollup from 'rollup';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -7,7 +7,7 @@ import * as Imports from './Imports';
 import {ExitCodes} from '../util/ExitCodes';
 import * as FileUtils from '../util/FileUtils';
 
-export const compile = function (tsConfigFile, scratchDir, exitOnCompileError, srcFiles, success) {
+export const compile = (tsConfigFile: string, scratchDir: string, exitOnCompileError: boolean, srcFiles: string[], success: (dest: string) => void) => {
   const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   const dest = path.join(scratchDir, 'compiled/tests.js');
 
@@ -55,12 +55,11 @@ export const compile = function (tsConfigFile, scratchDir, exitOnCompileError, s
       }),
       sourcemaps()
     ]
-  }).then(function (bundle) {
-    bundle.generate(outputOptions);
+  }).then((bundle) => {
     return bundle.write(outputOptions);
-  }).then(function () {
+  }).then(() => {
     success(dest);
-  }).catch(function (err) {
+  }).catch((err) => {
     console.log(err);
 
     if (exitOnCompileError) {

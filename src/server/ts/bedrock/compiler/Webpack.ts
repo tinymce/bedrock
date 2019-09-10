@@ -8,23 +8,28 @@ import * as Serve from '../server/Serve';
 import { ExitCodes } from '../util/ExitCodes';
 import * as Imports from './Imports';
 
-function moduleAvailable (name) {
+export interface WebpackServeSettings extends Serve.ServeSettings {
+  config: string;
+  coverage: string[];
+}
+
+const moduleAvailable = (name: string) => {
   try {
     require.resolve(name);
     return true;
   } catch (e) {
     return false;
   }
-}
+};
 
-const webpackRemap: any[] = moduleAvailable('@ephox/swag') ? [
+const webpackRemap: Array<Record<string, any>> = moduleAvailable('@ephox/swag') ? [
   {
     test: /\.js|\.tsx?$/,
     use: ['@ephox/swag/webpack/remapper']
   }
 ] : [];
 
-const getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, manualMode, basedir) {
+const getWebPackConfig = (tsConfigFile: string, scratchFile: string, dest: string, coverage: string[], manualMode: boolean, basedir: string): webpack.Configuration => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
   return {
@@ -124,7 +129,7 @@ const getWebPackConfig = function (tsConfigFile, scratchFile, dest, coverage, ma
   };
 };
 
-export const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, srcFiles, coverage, success) {
+export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], coverage: string[], success: (dest: string) => void) => {
   const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   const dest = path.join(scratchDir, 'compiled/tests.js');
   console.log(`Compiling ${srcFiles.length} tests...`);
@@ -153,10 +158,10 @@ export const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompil
   });
 };
 
-const isCompiledRequest = (request) => request.url.startsWith('/compiled/');
+const isCompiledRequest = (request: { url: string }) => request.url.startsWith('/compiled/');
 
-export const devserver = function (settings) {
-  return Serve.startCustom(settings, function (handler) {
+export const devserver = (settings: WebpackServeSettings) => {
+  return Serve.startCustom(settings, (handler) => {
     const scratchDir = path.resolve('scratch');
     const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
     const dest = path.join(scratchDir, 'compiled/tests.js');
@@ -169,7 +174,7 @@ export const devserver = function (settings) {
     const compiler = webpack(getWebPackConfig(tsConfigFile, scratchFile, dest, settings.coverage, true, settings.basedir));
 
     // Prevents webpack from doing a recompilation of a change of tests.ts over and over
-    compiler.hooks.emit.tap('bedrock', function (compilation) {
+    compiler.hooks.emit.tap('bedrock', (compilation) => {
       compilation.fileDependencies.delete(scratchFile);
     });
 
@@ -187,7 +192,7 @@ export const devserver = function (settings) {
         // suppress type re-export warnings caused by `transpileOnly: true`
         warningsFilter: /export .* was not found in/
       },
-      before: function (app) {
+      before: (app) => {
         app.all('*', (request, response, next) => {
           return isCompiledRequest(request) ? next() : handler(request, response);
         });

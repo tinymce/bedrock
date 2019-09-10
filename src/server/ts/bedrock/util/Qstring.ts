@@ -1,6 +1,6 @@
 // NOTE: Replace this with a sensible npm module if you can find one.
 
-export const parse = function (url) {
+export const parse = (url: string) => {
   const questionIndex = url.indexOf('?');
   return questionIndex === -1 ? {
     base: url,

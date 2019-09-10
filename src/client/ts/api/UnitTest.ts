@@ -55,7 +55,7 @@ const normalizeError = (err: TestError): NormalizedTestError => {
 
 const processLog = (logs: TestLogs): string[] => {
   const outputToStr = function (numIndent: number, entries: TestLogEntry[]) {
-    let everything = [ ];
+    let everything: string[] = [ ];
     let indentString = '';
     for (let i = 0; i < numIndent; i++) {
       indentString += ' ';
