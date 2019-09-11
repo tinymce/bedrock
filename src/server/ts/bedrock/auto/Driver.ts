@@ -133,12 +133,19 @@ const focusBrowser = (browserName: string, settings: DriverSettings) => {
 
 const setupShutdown = (driver: webdriverio.BrowserObject, driverApi: DriverLoader.DriverAPI): (immediate?: boolean) => Promise<void> => {
   const driverShutdown = (immediate?: boolean) => {
-    if (immediate) {
-      driver.deleteSession();
+    try {
+      if (immediate) {
+        driver.deleteSession();
+        driverApi.stop();
+        return Promise.resolve();
+      } else {
+        return driver.deleteSession().then(driverApi.stop).catch(driverApi.stop);
+      }
+    } catch (e) {
+      // The above may throw an exception (eg if the connection to the browser is lost)
+      // and we want to make sure the driver process is always stopped
       driverApi.stop();
-      return Promise.resolve();
-    } else {
-      return driver.deleteSession().then(driverApi.stop).catch(driverApi.stop);
+      return Promise.reject(e);
     }
   };
 
