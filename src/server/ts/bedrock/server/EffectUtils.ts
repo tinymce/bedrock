@@ -29,18 +29,8 @@ const getTargetFromFrame = (driver: BrowserObject, selector: string) => {
   });
 };
 
-const getTargetFromMain = (driver: BrowserObject, selector: string) => {
-  return driver.$(selector);
-};
-
-export const getTarget = (driver: BrowserObject, data: { selector: string }) => {
-  const selector = data.selector;
-  const getter = selector.indexOf('=>') > -1 ? getTargetFromFrame : getTargetFromMain;
-  return getter(driver, selector);
-};
-
-export const performActionOnTarget = <T>(driver: BrowserObject, data: { selector: string }, action: (target: Element) => Promise<T>): Promise<T> => {
-  return getTarget(driver, data).then((target) => {
+const performActionOnFrame = <T>(driver: BrowserObject, selector: string, action: (target: Element) => Promise<T>) => {
+  return getTargetFromFrame(driver, selector).then((target) => {
     return action(target).then((result) => {
       return driver.switchToFrame(null).then(() => {
         return result;
@@ -51,4 +41,26 @@ export const performActionOnTarget = <T>(driver: BrowserObject, data: { selector
       return Promise.reject(err);
     });
   });
+};
+
+const getTargetFromMain = (driver: BrowserObject, selector: string) => {
+  return driver.$(selector);
+};
+
+const performActionOnMain = <T>(driver: BrowserObject, selector: string, action: (target: Element) => Promise<T>) => {
+  return getTargetFromMain(driver, selector).then((target) => {
+    return action(target);
+  });
+};
+
+export const getTarget = (driver: BrowserObject, data: { selector: string }) => {
+  const selector = data.selector;
+  const getter = selector.indexOf('=>') > -1 ? getTargetFromFrame : getTargetFromMain;
+  return getter(driver, selector);
+};
+
+export const performActionOnTarget = <T>(driver: BrowserObject, data: { selector: string }, action: (target: Element) => Promise<T>): Promise<T> => {
+  const selector = data.selector;
+  const performer = selector.indexOf('=>') > -1 ? performActionOnFrame : performActionOnMain;
+  return performer(driver, selector, action);
 };
