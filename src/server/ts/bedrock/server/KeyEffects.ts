@@ -51,7 +51,8 @@ const KEYS = {
   'insert': '\uE016',
   'delete': '\uE017',
 
-  // Tab key (Firefox doesn't remap it)
+  // Tab and backspace (Firefox doesn't remap it)
+  '\b': '\uE003',
   '\t': '\uE004',
 
   // Function keys
