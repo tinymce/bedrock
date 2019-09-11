@@ -5,17 +5,17 @@ import * as http from 'http';
 export interface DriverAPI {
   start: (args?: string[]) => ChildProcess;
   stop: () => void;
-  defaultInstance: ChildProcess;
+  defaultInstance: ChildProcess | null;
 }
 
-const browserModules = {
+const browserModules: Record<string, string> = {
   'chrome': 'chromedriver',
   'firefox': 'geckodriver',
   'internet explorer': 'iedriver',
   'MicrosoftEdge': 'edgedriver'
 };
 
-const browserExecutables = {
+const browserExecutables: Record<string, string> = {
   'safari': 'safaridriver',
   'chrome': 'chromedriver',
   'firefox': 'geckodriver',

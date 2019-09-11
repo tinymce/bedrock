@@ -60,6 +60,6 @@ export const create = (testfiles: string[], loglevel: 'simple' | 'advanced') => 
 
   return {
     update: loglevel === 'advanced' && supportsAdvanced ? advUpdate : basicUpdate,
-    complete: complete
+    complete
   };
 };

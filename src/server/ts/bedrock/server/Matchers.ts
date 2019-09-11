@@ -3,11 +3,11 @@ import * as url from 'url';
 import * as Cmp from '../util/Cmp';
 import * as Obj from '../util/Obj';
 
-export type Matcher = (request: IncomingMessage & { originalUrl?: string; body?: string }) => boolean;
+export type Matcher = (request: IncomingMessage & { originalUrl: string; body?: string }) => boolean;
 
 export const prefixMatch = (prefix: string): Matcher => {
   return (request) => {
-    return request.url.indexOf(prefix) === 0;
+    return request.url !== undefined && request.url.indexOf(prefix) === 0;
   };
 };
 

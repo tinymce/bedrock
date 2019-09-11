@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
+    "strict": true,
     "noUnusedLocals": true,
     "target": "es2018",
     "module": "commonjs",
@@ -13,6 +14,7 @@
     ]
   },
   "include": [
-    "src/server/ts"
+    "src/server/ts",
+    "typings"
   ]
 }

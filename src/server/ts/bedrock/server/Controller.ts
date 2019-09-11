@@ -9,7 +9,7 @@ export interface TestResult {
   error: string;
 }
 
-export interface Result {
+export interface TestResults {
   message?: string;
   results: TestResult[];
   start: number;
@@ -20,7 +20,10 @@ interface InflightTest {
   name: string;
   file: string;
   start: number;
-  end?: number;
+}
+
+interface PreviousTest extends InflightTest {
+  end: number;
 }
 
 interface TestSession {
@@ -30,9 +33,9 @@ interface TestSession {
   results: TestResult[];
   lookup: Record<string, Record<string, number>>;
   inflight: InflightTest | null;
-  previous: InflightTest | null;
+  previous: PreviousTest | null;
   done: boolean;
-  totalTests?: number;
+  totalTests: number;
 }
 
 // allow a little extra time for a test timeout so the runner can handle it gracefully
@@ -74,7 +77,8 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
         lookup: {},
         inflight: null,
         previous: null,
-        done: false
+        done: false,
+        totalTests: testfiles.length
       };
       sessions[sessionId] = session;
     }
@@ -126,9 +130,11 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     }
     // this check is just in case the test start arrives before the result of the previous
     if (session.inflight !== null && session.inflight.file === file && session.inflight.name === name) {
-      session.previous = session.inflight;
+      session.previous = {
+        ...session.inflight,
+        end: now
+      };
       session.inflight = null;
-      session.previous.end = now;
     }
     session.updated = now;
     session.done = false;
@@ -154,7 +160,7 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     }
   };
 
-  const awaitDone = (): Promise<Result> => {
+  const awaitDone = (): Promise<TestResults> => {
     const start = Date.now();
     if (!stickyFirstSession) {
       const message = 'Must specify sticky session mode to wait for it';

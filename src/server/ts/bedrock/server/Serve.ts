@@ -7,7 +7,7 @@ import * as Routes from './Routes';
 import * as Apis from './Apis';
 import * as CustomRoutes from './CustomRoutes';
 import { DriverMaster } from './DriverMaster';
-import { Result } from './Controller';
+import { TestResults } from './Controller';
 
 interface Server {
   listen: (port: number) => http.Server;
@@ -34,7 +34,7 @@ export interface ServeService {
   server: Server;
   markLoaded: () => void;
   enableHud: () => void;
-  awaitDone: () => Promise<Result>;
+  awaitDone: () => Promise<TestResults>;
   shutdown: () => Promise<void>;
 }
 
@@ -50,7 +50,7 @@ export interface ServeService {
  */
 export const startCustom = (settings: ServeSettings, createServer: (listener: http.RequestListener) => Server): Promise<ServeService> => {
 
-  const pref = (f: string): any => {
+  const pref = (f: keyof ServeSettings): any => {
     const v = settings[f];
     if (v === undefined) {
       throw new Error('Object: does not have field: ' + f);

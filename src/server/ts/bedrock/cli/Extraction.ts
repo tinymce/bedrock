@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import * as readdirSyncRec from 'recursive-readdir-sync';
+import readdirSyncRec = require('recursive-readdir-sync');
 import { Attempt } from '../core/Attempt';
 import * as Qstring from '../util/Qstring';
 
@@ -48,7 +48,7 @@ export const files = (patterns: string[]) => {
     const dir = directory(name, value);
     return Attempt.bind(dir, (d) => {
       try {
-        const scanned = readdirSyncRec(d).filter((f: string) => {
+        const scanned = readdirSyncRec(d).filter((f) => {
           const matches = patterns.filter((p) => {
             return f.indexOf(p) > -1;
           });

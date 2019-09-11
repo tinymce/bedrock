@@ -1,4 +1,4 @@
-import { BrowserObject, Element } from 'webdriverio';
+import { BrowserObject } from 'webdriverio';
 import * as EffectUtils from './EffectUtils';
 
 /*
@@ -12,12 +12,7 @@ export interface MouseData {
   selector: string;
 }
 
-type ElementWithActions = Element & {
-  performActions: (actions: Array<Record<string, any>>) => Promise<void>;
-  releaseActions: () => Promise<void>;
-};
-
-const performAction = (target: ElementWithActions, type: string) => {
+const performAction = (target: EffectUtils.ElementWithActions, type: string) => {
   const action = {
     type: 'pointer',
     id: 'pointer1',
@@ -33,7 +28,7 @@ const performAction = (target: ElementWithActions, type: string) => {
   });
 };
 
-const doAction = (driver: BrowserObject, target: ElementWithActions, type: MouseData['type']): Promise<void> => {
+const doAction = (driver: BrowserObject, target: EffectUtils.ElementWithActions, type: MouseData['type']): Promise<void> => {
   if (type === 'move') {
     return target.moveTo();
   } else if (type === 'down' || type === 'up') {
@@ -49,7 +44,7 @@ const doAction = (driver: BrowserObject, target: ElementWithActions, type: Mouse
 };
 
 const execute = (driver: BrowserObject, data: MouseData) => {
-  return EffectUtils.performActionOnTarget(driver, data, (target: ElementWithActions) => {
+  return EffectUtils.performActionOnTarget(driver, data, (target) => {
     return doAction(driver, target, data.type);
   });
 };

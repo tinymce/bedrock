@@ -1,6 +1,8 @@
 import * as cli from './Cli';
 import * as ClOptions from './ClOptions';
 import { ExitCodes } from '../util/ExitCodes';
+import { Attempt } from '../core/Attempt';
+import { BedrockAutoSettings, BedrockFrameworkSettings, BedrockSettings } from '../core/Settings';
 
 export interface Directories {
   current: string;
@@ -42,7 +44,7 @@ export const forAuto = (directories: Directories) => {
       ClOptions.skipResetMousePosition,
       ClOptions.coverage
     ])
-  );
+  ) as Attempt<cli.CliError, BedrockAutoSettings>;
 };
 
 export const forManual = (directories: Directories) => {
@@ -58,7 +60,7 @@ export const forManual = (directories: Directories) => {
       ClOptions.customRoutes,
       ClOptions.coverage
     ])
-  );
+  ) as Attempt<cli.CliError, BedrockSettings>;
 };
 
 export const forFramework = (directories: Directories) => {
@@ -74,7 +76,7 @@ export const forFramework = (directories: Directories) => {
       ClOptions.framework,
       ClOptions.debuggingPort
     ])
-  );
+  ) as Attempt<cli.CliError, BedrockFrameworkSettings>;
 };
 
 export const logAndExit = (errs: cli.CliError) => {

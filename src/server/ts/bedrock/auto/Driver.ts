@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
-import { DesiredCapabilities, Options } from 'webdriver';
+import { Options } from 'webdriver';
 import * as webdriverio from 'webdriverio';
 import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
@@ -21,7 +21,7 @@ export interface Driver {
   shutdown: (immediate?: boolean) => Promise<void>;
 }
 
-const browserVariants = {
+const browserVariants: Record<string, string> = {
   'chrome-headless': 'chrome',
   'firefox-headless': 'firefox',
   'ie': 'internet explorer'
@@ -59,7 +59,7 @@ const focusWindows = (basedir: string, browser: string) => {
   }
 };
 
-const addArguments = (capabilities: DesiredCapabilities, name: string, args: string[]) => {
+const addArguments = (capabilities: Record<string, any>, name: string, args: string[]) => {
   if (!capabilities.hasOwnProperty(name)) {
     capabilities[name] = { args: [] };
   }
@@ -67,8 +67,8 @@ const addArguments = (capabilities: DesiredCapabilities, name: string, args: str
   capabilities[name].args = currentArgs.concat(args);
 };
 
-const getOptions = (port: number, browserName: string, browserFamily: string, settings: DriverSettings) => {
-  const options: Options = {
+const getOptions = (port: number, browserName: string, browserFamily: string, settings: DriverSettings): Options => {
+  const options = {
     path: '/',
     port: port,
     logLevel: 'silent' as 'silent',
@@ -79,7 +79,7 @@ const getOptions = (port: number, browserName: string, browserFamily: string, se
 
   // Support for disabling the Automation Chrome Extension
   // https://stackoverflow.com/questions/43261516/selenium-chrome-i-just-cant-use-driver-maximize-window-to-maximize-window
-  const caps = options.capabilities;
+  const caps: Record<string, any> = options.capabilities;
   if (browserFamily === 'chrome') {
     addArguments(caps, 'goog:chromeOptions', ['--start-maximized', '--disable-extensions']);
   }

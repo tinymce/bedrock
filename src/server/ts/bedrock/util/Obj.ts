@@ -1,5 +1,5 @@
 export const toLowerCaseKeys = (items: Record<string, any>) => {
-  const clone = {};
+  const clone: Record<string, any> = {};
 
   Object.keys(items).forEach((key) => {
     clone[key.toLowerCase()] = items[key];

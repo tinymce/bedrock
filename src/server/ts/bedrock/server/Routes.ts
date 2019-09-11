@@ -19,7 +19,9 @@ export const routing = (method: HTTPMethod, prefix: string, source: string): Rou
   const router = createServer(source);
 
   const go: RouteGoFunc = (request, response, done) => {
-    request.url = request.url.substring(prefix.length);
+    if (request.url) {
+      request.url = request.url.substring(prefix.length);
+    }
     router(request, response, done);
   };
 
@@ -129,8 +131,9 @@ export const hostOn = (method: HTTPMethod, prefix: string, root: string): Route 
   const base = createServer(root);
 
   const go: RouteGoFunc = (request, response, done) => {
-    const original = request.url;
-    request.url = original.substring((prefix + '/').length);
+    if (request.url) {
+      request.url = request.url.substring((prefix + '/').length);
+    }
     base(request, response, done);
   };
 
@@ -156,7 +159,7 @@ export const route = (routes: Route[], fallback: Route, request: IncomingMessage
 
   const match = routes.find((candidate) => {
     return candidate.matches.every((match) => {
-      return match(request);
+      return match(request as IncomingMessage & { originalUrl: string });
     });
   });
 

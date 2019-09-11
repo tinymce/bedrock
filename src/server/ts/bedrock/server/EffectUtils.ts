@@ -1,5 +1,10 @@
 import { BrowserObject, Element } from 'webdriverio';
 
+export type ElementWithActions = Element & {
+  performActions: (actions: Array<Record<string, any>>) => Promise<void>;
+  releaseActions: () => Promise<void>;
+};
+
 const frameSelected = (driver: BrowserObject, frame: string): () => Promise<boolean> => {
   return () => {
     return driver.switchToFrame(frame).then(() => {
@@ -22,14 +27,14 @@ const getTargetFromFrame = (driver: BrowserObject, selector: string) => {
     return driver.waitUntil(frameSelected(driver, frame), 100).then(() => {
       return driver.$(targetSelector).then((target) => {
         return target.waitForDisplayed(100).then(() => {
-          return target;
+          return target as ElementWithActions;
         });
       });
     });
   });
 };
 
-const performActionOnFrame = <T>(driver: BrowserObject, selector: string, action: (target: Element) => Promise<T>) => {
+const performActionOnFrame = <T>(driver: BrowserObject, selector: string, action: (target: ElementWithActions) => Promise<T>) => {
   return getTargetFromFrame(driver, selector).then((target) => {
     return action(target).then((result) => {
       return driver.switchToFrame(null).then(() => {
@@ -44,10 +49,10 @@ const performActionOnFrame = <T>(driver: BrowserObject, selector: string, action
 };
 
 const getTargetFromMain = (driver: BrowserObject, selector: string) => {
-  return driver.$(selector);
+  return driver.$(selector) as Promise<ElementWithActions>;
 };
 
-const performActionOnMain = <T>(driver: BrowserObject, selector: string, action: (target: Element) => Promise<T>) => {
+const performActionOnMain = <T>(driver: BrowserObject, selector: string, action: (target: ElementWithActions) => Promise<T>) => {
   return getTargetFromMain(driver, selector).then((target) => {
     return action(target);
   });
@@ -59,7 +64,7 @@ export const getTarget = (driver: BrowserObject, data: { selector: string }) => 
   return getter(driver, selector);
 };
 
-export const performActionOnTarget = <T>(driver: BrowserObject, data: { selector: string }, action: (target: Element) => Promise<T>): Promise<T> => {
+export const performActionOnTarget = <T>(driver: BrowserObject, data: { selector: string }, action: (target: ElementWithActions) => Promise<T>): Promise<T> => {
   const selector = data.selector;
   const performer = selector.indexOf('=>') > -1 ? performActionOnFrame : performActionOnMain;
   return performer(driver, selector, action);

@@ -27,8 +27,6 @@ export interface CustomRouteSpec {
   response: CustomResponse;
 }
 
-export type CustomRouteGoFunc = (request: IncomingMessage & { body: string }, response: ServerResponse, done: () => void) => void;
-
 const readRequestBody = (request: IncomingMessage, done: (body: string) => void) => {
   let body = '';
   request.on('data', (data) => {
@@ -84,15 +82,21 @@ const assignContentType = (headers: Record<string, string>, contentType: string)
   return Object.assign({}, {'content-type': contentType}, headers);
 };
 
-const goFromResponse = (matchResponse: CustomResponse, configPath: string): CustomRouteGoFunc => {
+const concludeJson = (response: ServerResponse, status: number, headers: Record<string, string>, json: any) => {
+  response.writeHead(status, assignContentType(headers, 'application/json'));
+  response.end(serializeJson(json));
+};
+
+const goFromResponse = (matchResponse: CustomResponse, configPath: string): Routes.RouteGoFunc => {
   return (request, response/* , done */) => {
     const headers = matchResponse.headers ? Obj.toLowerCaseKeys(matchResponse.headers) : { };
     const status = matchResponse.status ? matchResponse.status : 200;
 
-    if (Type.isString(matchResponse.json_file) || Type.isObject(matchResponse.json)) {
-      response.writeHead(status, assignContentType(headers, 'application/json'));
-      const json = Type.isObject(matchResponse.json) ? matchResponse.json : parseJsonFromFile(matchResponse.json_file, configPath);
-      response.end(serializeJson(json));
+    if (Type.isObject(matchResponse.json)) {
+      concludeJson(response, status, headers, matchResponse.json);
+    } else if (Type.isString(matchResponse.json_file)) {
+      const json = parseJsonFromFile(matchResponse.json_file, configPath);
+      concludeJson(response, status, headers, json);
     }
   };
 };
@@ -106,26 +110,26 @@ const jsonToRouters = (data: CustomRouteSpec[], configPath: string) => {
   });
 };
 
-const fallbackGo = (filePath: string): CustomRouteGoFunc => {
+const fallbackGo = (filePath: string): Routes.RouteGoFunc => {
   return (request, response, done) => {
     response.writeHead(404, {'content-type': 'text/plain'});
     response.end([
       'Could not find a matching custom route for: ',
       'Method: ' + request.method,
       'Url: ' + request.url,
-      'Body:' + request.body,
+      'Body: ' + (request as any).body, // Patched in below
       'Config: ' + (filePath ? filePath : 'No config file provided')
     ].join('\n'));
     done();
   };
 };
 
-const go = (filePath: string): CustomRouteGoFunc => {
+const go = (filePath: string): Routes.RouteGoFunc => {
   const fallback: Routes.Route = { matches: [], go: fallbackGo(filePath) };
   return (request, response, done) => {
     const routers = filePath ? jsonToRouters(FileUtils.readFileAsJson(filePath), filePath) : [];
     readRequestBody(request, (body) => {
-      request.body = body;
+      (request as any).body = body;
       Routes.route(routers, fallback, request, response, done);
     });
   };

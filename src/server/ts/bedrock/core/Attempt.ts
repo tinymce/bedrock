@@ -3,22 +3,18 @@ export interface Attempt<E, A> {
 }
 
 const failed = <E>(err: E): Attempt<E, never> => {
-  const foldAttempt = (onFailed, onPassed) => {
-    return onFailed(err);
-  };
-
   return {
-    foldAttempt
+    foldAttempt: (onFailed, onPassed) => {
+      return onFailed(err);
+    }
   };
 };
 
 const passed = <A>(value: A): Attempt<never, A> =>  {
-  const foldAttempt = (onFailed, onPassed) => {
-    return onPassed(value);
-  };
-
   return {
-    foldAttempt
+    foldAttempt: (onFailed, onPassed) => {
+      return onPassed(value);
+    }
   };
 };
 

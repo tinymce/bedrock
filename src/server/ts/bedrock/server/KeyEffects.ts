@@ -29,7 +29,7 @@ export interface KeyData {
 const NO_ACTION = null;
 
 // See https://w3c.github.io/webdriver/#keyboard-actions for key codes
-const KEYS = {
+const KEYS: Record<string, string> = {
   'null': '\u0000', // Reset keys
   'backspace': '\uE003',
   'tab': '\uE004',

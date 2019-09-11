@@ -43,13 +43,14 @@ export const scan = (definitions: ClOption[], settings: CommandLineOptions): Att
     const newValue = defn.multiple === true ? validateMany(defn, settings) : validateOne(defn, settings);
     return Attempt.carry(rest, newValue, (result, v) => {
       const output = defn.output !== undefined ? defn.output : defn.name;
-      // REMOVE MUTATION when I know how to do extend in node.
-      if (rest[output] !== undefined) {
+      if (Object.prototype.hasOwnProperty.call(rest, output)) {
         return Attempt.failed(['Incompatible']);
       }
-      result[output] = defn.flatten === true ? flatten(v): v;
 
-      return Attempt.passed(result);
+      return Attempt.passed({
+        ...result,
+        [output]: defn.flatten === true ? flatten(v): v
+      });
     });
   }, Attempt.passed({}) as Attempt<string[], CommandLineOptions>);
 };

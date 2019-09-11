@@ -1,6 +1,6 @@
-import * as XMLWriter from 'xml-writer';
+import XMLWriter = require('xml-writer');
 import * as fs from 'fs';
-import { Result, TestResult } from '../server/Controller';
+import { TestResults, TestResult } from '../server/Controller';
 import { Attempt } from './Attempt';
 
 export interface ReporterSettings {
@@ -15,7 +15,7 @@ const outputTime = (runnerTime: string) => {
 };
 
 export const write = (settings: ReporterSettings) => {
-  return (data: Result) => {
+  return (data: TestResults) => {
     return new Promise<Attempt<string[], TestResult[]>>((resolve) => {
       const results = data.results;
       const time = (data.now - data.start) / 1000;
@@ -84,7 +84,7 @@ export const write = (settings: ReporterSettings) => {
   };
 };
 
-export const writePollExit = (settings: ReporterSettings, results: Result) => {
+export const writePollExit = (settings: ReporterSettings, results: TestResults) => {
   return write({
     name: settings.name,
     output: settings.output
