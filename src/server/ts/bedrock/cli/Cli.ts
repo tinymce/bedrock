@@ -33,7 +33,7 @@ export const extract = (command: string, desc: string, definitions: ClOption[]) 
       console.log(CliUsage.generateUsage(command, desc, definitions));
       process.exit(ExitCodes.success);
     } else if (s.version === true) {
-      console.log(command + ' version: ' + Version);
+      console.log(command + ' version: ' + Version.get());
       process.exit(ExitCodes.success);
     }
   });
