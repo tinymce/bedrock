@@ -24,7 +24,7 @@ export const create = (testfiles: string[], loglevel: 'simple' | 'advanced') => 
       'Session: ' + id + ', Status: ' + status + ', Progress: ' + numRun + '/' + total +
       ', Failed: ' + numFailed + ' ... ' + '\n'
     );
-    readline.clearLine(stream, 2);
+    readline.clearLine(stream, 1);
     return Promise.resolve({});
   };
 
