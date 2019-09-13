@@ -1,6 +1,7 @@
 import { CommandLineOptions } from 'command-line-args';
 import { Attempt } from '../core/Attempt';
 import { ClOption } from './ClOptions';
+import * as Arr from '../util/Arr';
 
 const validateOne = (defn: ClOption, settings: CommandLineOptions): Attempt<string[], any[]> => {
   return defn.validate(defn.name, settings[defn.name]);
@@ -30,12 +31,6 @@ export const scanRequired = (definitions: ClOption[], settings: CommandLineOptio
   });
 };
 
-const flatten = <T>(arrays: T[][]) => {
-  return arrays.reduce((b: T[], a) => {
-    return b.concat(a);
-  }, []);
-};
-
 // Returns either a Failure of an array of error messages, or a Success of the settings object
 export const scan = (definitions: ClOption[], settings: CommandLineOptions): Attempt<string[], CommandLineOptions> => {
   return definitions.reduce((rest: Attempt<string[], CommandLineOptions>, defn): Attempt<string[], CommandLineOptions> => {
@@ -49,7 +44,7 @@ export const scan = (definitions: ClOption[], settings: CommandLineOptions): Att
 
       return Attempt.passed({
         ...result,
-        [output]: defn.flatten === true ? flatten(v): v
+        [output]: defn.flatten === true ? Arr.flatten(v): v
       });
     });
   }, Attempt.passed({}) as Attempt<string[], CommandLineOptions>);

@@ -90,9 +90,9 @@ export const waitForAlive = (proc: ChildProcess, port: number, timeout = 30000) 
       reject('Driver failed to start (' + error + ')');
     };
 
-    const onServerError = () => {
+    const onServerError = (err: string) => {
       if (Date.now() - start > timeout) {
-        reject('Timed out waiting for the webdriver server');
+        reject('Timed out waiting for the webdriver server. Error: ' + err);
       } else {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         timeoutId = setTimeout(checkServerStatus, 50);
@@ -112,14 +112,14 @@ export const waitForAlive = (proc: ChildProcess, port: number, timeout = 30000) 
                 proc.removeListener('error', onStartError);
                 resolve();
               } else {
-                onServerError();
+                onServerError('Not ready to accept connections');
               }
             } catch (e) {
-              onServerError();
+              onServerError(e.message);
             }
           });
         } else {
-          onServerError();
+          onServerError('Received non 200 status (' + res.statusCode + ')');
         }
       }).on('error', onServerError);
     };

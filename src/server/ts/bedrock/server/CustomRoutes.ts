@@ -66,7 +66,7 @@ const matchesFromRequest = (matchRequest: CustomRequest) => {
     matches.push(Matchers.queryMatch(matchRequest.query));
   }
 
-  if (Type.isObject(matchRequest.json)) {
+  if (!Type.isNull(matchRequest.json) && !Type.isUndefined(matchRequest.json)) {
     matches.push(Matchers.jsonBodyMatch(matchRequest.json));
   }
 
@@ -92,7 +92,7 @@ const goFromResponse = (matchResponse: CustomResponse, configPath: string): Rout
     const headers = matchResponse.headers ? Obj.toLowerCaseKeys(matchResponse.headers) : { };
     const status = matchResponse.status ? matchResponse.status : 200;
 
-    if (Type.isObject(matchResponse.json)) {
+    if (!Type.isNull(matchResponse.json) && !Type.isUndefined(matchResponse.json)) {
       concludeJson(response, status, headers, matchResponse.json);
     } else if (Type.isString(matchResponse.json_file)) {
       const json = parseJsonFromFile(matchResponse.json_file, configPath);

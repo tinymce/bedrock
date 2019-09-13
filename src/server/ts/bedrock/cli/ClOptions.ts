@@ -74,7 +74,7 @@ export const configTo = (defaultValue: string): ClOption => {
   };
 };
 
-export const config: ClOption = configTo('tsconfig.server.json');
+export const config: ClOption = configTo('tsconfig.json');
 
 export const files: ClOption = {
   name: 'files',

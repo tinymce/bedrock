@@ -22,7 +22,8 @@ const getTargetFromFrame = (driver: BrowserObject, selector: string) => {
   const sections = selector.split('=>');
   const frameSelector = sections[0];
   const targetSelector = sections[1];
-  // Note: Don't use driver.$() here as it doesn't work on Edge
+  // Note: Don't use driver.$() here to lookup the frame as the object reference
+  // returned doesn't work when passed to driver.switchToFrame() on Edge.
   return driver.findElement('css selector', frameSelector).then((frame) => {
     return driver.waitUntil(frameSelected(driver, frame), 100).then(() => {
       return driver.$(targetSelector).then((target) => {
