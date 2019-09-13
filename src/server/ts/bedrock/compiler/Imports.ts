@@ -35,7 +35,7 @@ const addTest = (testFilePath: string) => {
     const lastTest = __tests[__tests.length - 1];
     if (!lastTest.filePath) {
       const tests = __tests.slice(__lastTestIndex + 1);
-      tests.forEach((test) => {
+      tests.forEach((test: any) => {
         test.filePath = testFilePath;
       });
     } else if (lastTest.filePath === testFilePath) {
