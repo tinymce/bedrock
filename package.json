@@ -75,6 +75,7 @@
     "bin/**",
     "lib/**",
     "dist/**",
+    "src/client/**",
     "src/css/**",
     "src/resources/**",
     "tasks/**"
