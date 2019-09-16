@@ -89,8 +89,7 @@
     "bin/**",
     "lib/**",
     "dist/**",
-    "src/css/**",
-    "src/resources/**",
+    "src/**",
     "tasks/**"
   ],
   "publishConfig": {
