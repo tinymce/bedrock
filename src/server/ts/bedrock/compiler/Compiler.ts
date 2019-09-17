@@ -2,20 +2,20 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as Webpack from '../compiler/Webpack';
 
-export const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompileError, files, coverage) {
-  const getCompileFunc = function () {
+export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, files: string[], coverage: string[])  =>{
+  const getCompileFunc = () => {
     return Webpack.compile;
   };
 
-  const isTs = function (filePath) {
+  const isTs = (filePath: string) => {
     const ext = path.extname(filePath);
     return ext === '.ts' || ext === '.tsx';
   };
 
   const tsFiles = files.filter(isTs);
 
-  const generate = function () {
-    return new Promise((resolve) => {
+  const generate = () => {
+    return new Promise<Buffer | string>((resolve) => {
       const compile = getCompileFunc();
       if (tsFiles.length > 0) {
         compile(
@@ -25,7 +25,7 @@ export const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompil
           exitOnCompileError,
           tsFiles,
           coverage,
-          function (compiledJsFilePath) {
+          (compiledJsFilePath) => {
             resolve(fs.readFileSync(compiledJsFilePath));
           }
         );
@@ -36,9 +36,7 @@ export const compile = function (tsConfigFile, scratchDir, basedir, exitOnCompil
   };
 
   return {
-    jsFiles: files.filter(function (filePath) {
-      return !isTs(filePath);
-    }),
-    generate: generate
+    jsFiles: files.filter((filePath) => !isTs(filePath)),
+    generate
   };
 };

@@ -1,88 +1,76 @@
 export interface Attempt<E, A> {
-  foldAttempt: <B> (onFailed: (e: E) => B, onPassed: (a: A) => B) => B;
+  foldAttempt: <B>(onFailed: (e: E) => B, onPassed: (a: A) => B) => B;
 }
 
-const failed = function <E, A> (err): Attempt<E, A> {
-  const foldAttempt = function (onFailed, onPassed) {
-    return onFailed(err);
-  };
-
+const failed = <E>(err: E): Attempt<E, never> => {
   return {
-    foldAttempt: foldAttempt
+    foldAttempt: (onFailed, onPassed) => {
+      return onFailed(err);
+    }
   };
 };
 
-const passed = function <E, A> (value): Attempt<E, A> {
-  const foldAttempt = function (onFailed, onPassed) {
-    return onPassed(value);
-  };
-
+const passed = <A>(value: A): Attempt<never, A> =>  {
   return {
-    foldAttempt: foldAttempt
+    foldAttempt: (onFailed, onPassed) => {
+      return onPassed(value);
+    }
   };
 };
 
-const cata = function <E, A, B> (attempt: Attempt<E, A>, onFailed, onPassed) {
+const cata = <E, A, B>(attempt: Attempt<E, A>, onFailed: (e: E) => B, onPassed: (a: A) => B) => {
   return attempt.foldAttempt(onFailed, onPassed);
 };
 
-const bind = function (firstAttempt, f) {
-  return firstAttempt.foldAttempt(function (err) {
-    return failed(err);
-  }, f);
+const bind = <E, A, B>(firstAttempt: Attempt<E, A>, f: (a: A) => Attempt<E, B>) => {
+  return firstAttempt.foldAttempt<Attempt<E, B>>(failed, f);
 };
 
-const map = function (firstAttempt, f) {
-  return firstAttempt.foldAttempt(failed, function (v) {
-    return passed(f(v));
-  });
+const map = <E, A, B>(firstAttempt: Attempt<E, A>, f: (a: A) => B) => {
+  return firstAttempt.foldAttempt<Attempt<E, B>>(failed, (v) => passed(f(v)));
 };
 
-const list = function (firstAttempt, fs) {
-  return fs.reduce(function (rest, x) {
+const list = <E, A>(firstAttempt: Attempt<E, A>, fs: Array<(a: A) => Attempt<E, A>>) => {
+  return fs.reduce((rest, x) => {
     return bind(rest, x);
   }, firstAttempt);
 };
 
-const carry = function (firstAttempt, secondAttempt, f) {
-  return cata(firstAttempt, function (errs) {
-    return cata(secondAttempt, function (sErrs) {
+const carry = <E, A, B, C> (firstAttempt: Attempt<E[], A>, secondAttempt: Attempt<E[], B>, f: (a: A, b: B) => Attempt<E[], C>): Attempt<E[], C> => {
+  return cata(firstAttempt, (errs) => {
+    return cata(secondAttempt, (sErrs) => {
       return failed(errs.concat(sErrs));
-    }, function (_) {
+    }, (_) => {
       return failed(errs);
     });
-  }, function (fValue) {
-    return cata(secondAttempt, function (sErrs) {
+  }, (fValue) => {
+    return cata(secondAttempt, (sErrs) => {
       return failed(sErrs);
-    }, function (sValue) {
+    }, (sValue) => {
       return f(fValue, sValue);
     });
   });
 };
 
-const concat = function (attempts) {
+const concat = <E, A>(attempts: Array<Attempt<E[], A>>): Attempt<E[], A[]> => {
   // take a list of attempts, and turn them info an attempt of a list.
-  return attempts.reduce(function (rest, b) {
-    return carry(rest, b, function (x, y) {
+  return attempts.reduce((rest: Attempt<E[], A[]>, b) => {
+    return carry(rest, b, (x, y) => {
       return passed(x.concat([y]));
     });
-  }, passed([]));
+  }, passed([] as A[]));
 };
 
-const toString = function (attempt) {
-  return cata(attempt, function (errs) {
+const toString = <E, A>(attempt: Attempt<E, A>): string => {
+  return cata(attempt, (errs) => {
     return 'attempt.failed(' + JSON.stringify(errs) + ')';
-  }, function (value) {
+  }, (value) => {
     return 'attempt.passed(' + JSON.stringify(value) + ')';
   });
 };
 
-const hasPassed = function (attempt) {
-  return cata(attempt, function () {
-    return false;
-  }, function () {
-    return true;
-  });
+const hasPassed = <E, A>(attempt: Attempt<E, A>): boolean => {
+  return cata(attempt, () => false, () => true);
 };
 
 export const Attempt = {

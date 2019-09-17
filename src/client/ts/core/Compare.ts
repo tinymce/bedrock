@@ -49,7 +49,7 @@ const sortArray = (x: any[]): any[] => {
 const sortedKeys = (o: object) =>
   sortArray(Obj.keys(o));
 
-const compareObjects = (x, y) => {
+const compareObjects = (x: any, y: any) => {
   const constructorX = x.constructor;
   const constructorY = y.constructor;
   if (constructorX !== constructorY)

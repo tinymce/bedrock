@@ -1,11 +1,18 @@
 import * as cli from './Cli';
 import * as ClOptions from './ClOptions';
 import { ExitCodes } from '../util/ExitCodes';
+import { Attempt } from '../core/Attempt';
+import { BedrockAutoSettings, BedrockFrameworkSettings, BedrockSettings } from '../core/Settings';
 
-const commonOptions = function (directories) {
+export interface Directories {
+  current: string;
+  bin: string;
+}
+
+const commonOptions = (directories: Directories) => {
   return [
-    ClOptions.projectdir(directories),
-    ClOptions.basedir(directories),
+    ClOptions.projectdir(directories.current),
+    ClOptions.basedir(directories.bin),
     ClOptions.overallTimeout,
     ClOptions.singleTimeout,
     ClOptions.chunk,
@@ -16,7 +23,7 @@ const commonOptions = function (directories) {
   ];
 };
 
-export const forAuto = function (directories) {
+export const forAuto = (directories: Directories) => {
   return cli.extract(
     'bedrock-auto',
     'Use a Webdriver to launch a browser and run tests against it',
@@ -37,10 +44,10 @@ export const forAuto = function (directories) {
       ClOptions.skipResetMousePosition,
       ClOptions.coverage
     ])
-  );
+  ) as Attempt<cli.CliError, BedrockAutoSettings>;
 };
 
-export const forManual = function (directories) {
+export const forManual = (directories: Directories) => {
   return cli.extract(
     'bedrock',
     'Launch a testing process on a localhost port and allow the user to navigate to it in any browser',
@@ -53,10 +60,10 @@ export const forManual = function (directories) {
       ClOptions.customRoutes,
       ClOptions.coverage
     ])
-  );
+  ) as Attempt<cli.CliError, BedrockSettings>;
 };
 
-export const forFramework = function (directories) {
+export const forFramework = (directories: Directories) => {
   return cli.extract(
     'bedrock-framework',
     'Load bedrock against a specific page using a framework',
@@ -69,10 +76,10 @@ export const forFramework = function (directories) {
       ClOptions.framework,
       ClOptions.debuggingPort
     ])
-  );
+  ) as Attempt<cli.CliError, BedrockFrameworkSettings>;
 };
 
-export const logAndExit = function (errs) {
+export const logAndExit = (errs: cli.CliError) => {
   console.error('\n****\nError while processing command line for ' + errs.command);
   const messages = errs.errors.join('\n');
   console.error(messages);

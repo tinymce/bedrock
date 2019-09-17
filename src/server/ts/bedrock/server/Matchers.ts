@@ -1,47 +1,50 @@
+import { IncomingMessage } from 'http';
 import * as url from 'url';
 import * as Cmp from '../util/Cmp';
 import * as Obj from '../util/Obj';
 
-export const prefixMatch = function (prefix) {
-  return function (request) {
-    return request.url.indexOf(prefix) === 0;
+export type Matcher = (request: IncomingMessage & { originalUrl: string; body?: string }) => boolean;
+
+export const prefixMatch = (prefix: string): Matcher => {
+  return (request) => {
+    return request.url !== undefined && request.url.indexOf(prefix) === 0;
   };
 };
 
-export const methodMatch = function (method) {
-  return function (request) {
+export const methodMatch = (method: string): Matcher => {
+  return (request) => {
     return request.method === method.toUpperCase();
   };
 };
 
-export const urlMatch = function (url) {
-  return function (request) {
+export const urlMatch = (url: string): Matcher => {
+  return (request) => {
     return request.url === url;
   };
 };
 
-export const pathMatch = function (path) {
-  return function (request) {
+export const pathMatch = (path: string): Matcher => {
+  return (request) => {
     return url.parse(request.originalUrl).pathname === path;
   };
 };
 
-export const headersMatch = function (headers) {
+export const headersMatch = (headers: Record<string, string>): Matcher => {
   const lcHeaders = Obj.toLowerCaseKeys(headers);
-  return function (request) {
+  return (request) => {
     return Cmp.hasAllOf(Obj.toLowerCaseKeys(request.headers), lcHeaders);
   };
 };
 
-export const queryMatch = function (query) {
-  return function (request) {
+export const queryMatch = (query: Record<string, string>): Matcher => {
+  return (request) => {
     const reqQuery = url.parse(request.originalUrl, true).query;
     return Cmp.hasAllOf(reqQuery, query);
   };
 };
 
-export const jsonBodyMatch = function (json) {
-  return function (request) {
+export const jsonBodyMatch = (json: any): Matcher => {
+  return (request) => {
     const data = request.body ? JSON.parse(request.body) : { };
     return Cmp.deepEq(json, data);
   };

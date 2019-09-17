@@ -5,8 +5,15 @@ import * as Validation from './Validation';
 import * as CliUsage from './CliUsage';
 import { ExitCodes } from '../util/ExitCodes';
 import { CommandLineOptions } from 'command-line-args';
+import { ClOption } from './ClOptions';
 
-const parseCommandLine = function (definitions: commandLineArgs.OptionDefinition[]): Attempt<string[], CommandLineOptions> {
+export type CliError = {
+  command: string;
+  errors: string[];
+  usage: string;
+}
+
+const parseCommandLine = (definitions: commandLineArgs.OptionDefinition[]): Attempt<string[], CommandLineOptions> => {
   try {
     const settings: commandLineArgs.CommandLineOptions = commandLineArgs(definitions);
     return Attempt.passed(settings);
@@ -15,32 +22,28 @@ const parseCommandLine = function (definitions: commandLineArgs.OptionDefinition
   }
 };
 
-export const extract = function (command, desc, definitions) {
+export const extract = (command: string, desc: string, definitions: ClOption[]) => {
   const parsed = parseCommandLine(definitions);
 
-  Attempt.cata(parsed, function () {
+  Attempt.cata(parsed, () => {
     // TODO: this should report an error
-  }, function (s) {
+  }, (s) => {
     if (s.help === true) {
       // Print usage information if used with --help or -h.
       console.log(CliUsage.generateUsage(command, desc, definitions));
       process.exit(ExitCodes.success);
     } else if (s.version === true) {
-      console.log(command + ' version: ' + Version);
+      console.log(command + ' version: ' + Version.get());
       process.exit(ExitCodes.success);
     }
   });
 
   const extracted = Attempt.list(parsed, [
-    function (settings) {
-      return Validation.scan(definitions, settings);
-    },
-    function (results) {
-      return Validation.scanRequired(definitions, results);
-    }
+    (settings) => Validation.scan(definitions, settings),
+    (results) => Validation.scanRequired(definitions, results)
   ]);
 
-  return Attempt.cata(extracted, function (errs) {
+  return Attempt.cata<string[], CommandLineOptions, Attempt<CliError, CommandLineOptions>>(extracted, (errs) => {
     return Attempt.failed({
       command: command,
       errors: errs,

@@ -1,6 +1,6 @@
 import * as Routes from './Routes';
 
-export const generate = function (projectdir, basedir) {
+export const generate = (projectdir: string, basedir: string) => {
   const routers = [
     Routes.hostOn('GET', '/page', basedir)
   ];

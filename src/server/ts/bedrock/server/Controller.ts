@@ -1,16 +1,54 @@
 import * as Hud from '../cli/Hud';
 
+export interface TestResult {
+  name: string;
+  file: string;
+  passed: boolean;
+  time: string;
+  skipped?: boolean;
+  error: string;
+}
+
+export interface TestResults {
+  message?: string;
+  results: TestResult[];
+  start: number;
+  now: number;
+}
+
+interface InflightTest {
+  name: string;
+  file: string;
+  start: number;
+}
+
+interface PreviousTest extends InflightTest {
+  end: number;
+}
+
+interface TestSession {
+  id: string;
+  alive: number;
+  updated: number;
+  results: TestResult[];
+  lookup: Record<string, Record<string, number>>;
+  inflight: InflightTest | null;
+  previous: PreviousTest | null;
+  done: boolean;
+  totalTests: number;
+}
+
 // allow a little extra time for a test timeout so the runner can handle it gracefully
 const timeoutGrace = 2000;
-export const create = function (stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel) {
+export const create = (stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced') => {
   const hud = Hud.create(testfiles, loglevel);
-  const sessions = {};
-  let stickyId = null;
+  const sessions: Record<string, TestSession> = {};
+  let stickyId: string | null = null;
   let timeoutError = false;
   let outputToHud = false;
 
   // clean up any sessions which have not had any activity in the last 10 seconds
-  setInterval(function () {
+  setInterval(() => {
     const now = Date.now();
     const ids = Object.keys(sessions);
     ids.forEach((id) => {
@@ -24,7 +62,7 @@ export const create = function (stickyFirstSession, singleTimeout, overallTimeou
     });
   }, 10000);
 
-  const getSession = function (sessionId) {
+  const getSession = (sessionId: string): TestSession => {
     if (stickyFirstSession && stickyId === null && !timeoutError) {
       stickyId = sessionId;
     }
@@ -39,7 +77,8 @@ export const create = function (stickyFirstSession, singleTimeout, overallTimeou
         lookup: {},
         inflight: null,
         previous: null,
-        done: false
+        done: false,
+        totalTests: testfiles.length
       };
       sessions[sessionId] = session;
     }
@@ -47,11 +86,11 @@ export const create = function (stickyFirstSession, singleTimeout, overallTimeou
     return session;
   };
 
-  const enableHud = function () {
+  const enableHud = () => {
     outputToHud = true;
   };
 
-  const updateHud = function (session) {
+  const updateHud = (session: TestSession) => {
     if (!outputToHud) return;
     if (stickyFirstSession && (timeoutError || session.id !== stickyId)) return;
     const id = session.id;
@@ -62,11 +101,11 @@ export const create = function (stickyFirstSession, singleTimeout, overallTimeou
     hud.update({id, test, numPassed, numFailed, done, totalTests: session.totalTests});
   };
 
-  const recordAlive = function (sessionId) {
+  const recordAlive = (sessionId: string) => {
     getSession(sessionId);
   };
 
-  const recordTestStart = function (id, name, file, totalTests) {
+  const recordTestStart = (id: string, name: string, file: string, totalTests: number) => {
     const session = getSession(id);
     const start = Date.now();
     session.inflight = {name, file, start};
@@ -76,7 +115,7 @@ export const create = function (stickyFirstSession, singleTimeout, overallTimeou
     updateHud(session);
   };
 
-  const recordTestResult = function (id, name, file, passed, time, error) {
+  const recordTestResult = (id: string, name: string, file: string, passed: boolean, time: string, error: string) => {
     const now = Date.now();
     const session = getSession(id);
     const record = {name, file, passed, time, error};
@@ -91,27 +130,29 @@ export const create = function (stickyFirstSession, singleTimeout, overallTimeou
     }
     // this check is just in case the test start arrives before the result of the previous
     if (session.inflight !== null && session.inflight.file === file && session.inflight.name === name) {
-      session.previous = session.inflight;
+      session.previous = {
+        ...session.inflight,
+        end: now
+      };
       session.inflight = null;
-      session.previous.end = now;
     }
     session.updated = now;
     session.done = false;
     updateHud(session);
   };
 
-  const recordDone = function (id) {
+  const recordDone = (id: string) => {
     const session = getSession(id);
     session.done = true;
     session.updated = Date.now();
     updateHud(session);
   };
 
-  const formatTime = function (time) {
+  const formatTime = (time: number) => {
     return (time / 1000) + 's';
   };
 
-  const testName = function (test) {
+  const testName = (test: { name: string; file: string }) => {
     if (test !== null) {
       return test.name + ' [' + test.file + ']';
     } else {
@@ -119,15 +160,15 @@ export const create = function (stickyFirstSession, singleTimeout, overallTimeou
     }
   };
 
-  const awaitDone = function () {
+  const awaitDone = (): Promise<TestResults> => {
     const start = Date.now();
     if (!stickyFirstSession) {
       const message = 'Must specify sticky session mode to wait for it';
       const now = start;
-      const results = [];
+      const results: TestResult[] = [];
       return Promise.reject({message, results, start, now});
     }
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
       const poller = setInterval(() => {
         const now = Date.now();
         const allElapsed = now - start;
@@ -158,7 +199,7 @@ export const create = function (stickyFirstSession, singleTimeout, overallTimeou
                 lastTest = 'No tests have been run.';
               }
               // find the top 10 longest running tests
-              const time2num = (time) => parseFloat(time.charAt(time.length - 1) === 's' ? time.substr(0, time.length - 2) : time);
+              const time2num = (time: string) => parseFloat(time.charAt(time.length - 1) === 's' ? time.substr(0, time.length - 2) : time);
               const top10 = session.results.slice(0).sort((a, b) => time2num(b.time) - time2num(a.time)).slice(0, 10);
               const longest = top10.map((result, i) => '' + (i + 1) + '. ' + testName(result) + ' in ' + result.time).join('\n');
               const estimatedTotal = Math.ceil(((allElapsed / session.results.length) * testfiles.length) / 1000) * 1000;
@@ -172,7 +213,7 @@ export const create = function (stickyFirstSession, singleTimeout, overallTimeou
         } else if (allElapsed > overallTimeout) {
           // combined tests took too long
           const message = 'Tests took too long to start';
-          const results = [];
+          const results: TestResult[] = [];
           reject({message, results, start, now});
           clearInterval(poller);
           timeoutError = true;

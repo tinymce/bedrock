@@ -1,22 +1,32 @@
 import { UrlParams } from './core/UrlParams';
 import { AssertionError, HtmlDiffAssertionError, LoggedError, NormalizedTestError } from './alien/ErrorTypes';
+import { HarnessResponse } from './core/ServerTypes';
 
 declare const $: JQueryStatic;
 
 // webpack makes this available
 const Global: any = window;
 
+interface TestData {
+  filePath: string;
+  name: string;
+  test: (success: () => void, failure: (e: any) => void) => void;
+}
+
+type onSuccessCallback = (data: any) => void;
+type onErrorCallback = (err: any) => void;
+
 const makeSessionId = (): string =>
   '' + Math.ceil((Math.random() * 100000000));
 
-let chunk; // set during loadtests
-let retries; // set during loadtests
-let timeout; // set during loadtests
-const globalTests = Global.__tests ? Global.__tests : [];
+let chunk: number; // set during loadtests
+let retries: number; // set during loadtests
+let timeout: number; // set during loadtests
+const globalTests: TestData[] = Global.__tests ? Global.__tests : [];
 
 const params = UrlParams.parse(window.location.search, makeSessionId);
 
-const makeUrl = (session, offset, failed, retry): string => {
+const makeUrl = (session: string, offset: number, failed: number, retry: number): string => {
   const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
   if (offset > 0) {
     const rt = (retry > 0 ? '&retry=' + retry : '');
@@ -28,7 +38,7 @@ const makeUrl = (session, offset, failed, retry): string => {
 
 const noop = (): void => {};
 
-const sendJson = (url, data, onSuccess = noop, onError = noop): void => {
+const sendJson = (url: string, data: any, onSuccess: onSuccessCallback = noop, onError: onErrorCallback = noop): void => {
   // noinspection JSIgnoredPromiseFromCall
   $.ajax({
     method: 'post',
@@ -40,13 +50,13 @@ const sendJson = (url, data, onSuccess = noop, onError = noop): void => {
   });
 };
 
-const sendKeepAlive = (session, onSuccess, onError): void => {
+const sendKeepAlive = (session: string, onSuccess: onSuccessCallback, onError: onErrorCallback): void => {
   sendJson('/tests/alive', {
     session: session,
   }, onSuccess, onError);
 };
 
-const sendTestStart = (session, file, name, onSuccess, onError): void => {
+const sendTestStart = (session: string, file: string, name: string, onSuccess: onSuccessCallback, onError: onErrorCallback): void => {
   sendJson('/tests/start', {
     totalTests: globalTests.length,
     session: session,
@@ -55,7 +65,7 @@ const sendTestStart = (session, file, name, onSuccess, onError): void => {
   }, onSuccess, onError);
 };
 
-const sendTestResult = (session, file, name, passed, time, error, onSuccess, onError): void => {
+const sendTestResult = (session: string, file: string, name: string, passed: boolean, time: string, error: string | null, onSuccess: onSuccessCallback, onError: onErrorCallback): void => {
   sendJson('/tests/result', {
     session: session,
     file: file,
@@ -66,8 +76,8 @@ const sendTestResult = (session, file, name, passed, time, error, onSuccess, onE
   }, onSuccess, onError);
 };
 
-const sendDone = (session, onSuccess, onError): void => {
-  const getCoverage = (): any => typeof Global.__coverage__ === 'undefined' ? {} : Global.__coverage__;
+const sendDone = (session: string, onSuccess: onSuccessCallback, onError: onErrorCallback): void => {
+  const getCoverage = (): Record<string, any> => typeof Global.__coverage__ === 'undefined' ? {} : Global.__coverage__;
 
   sendJson('/tests/done', {
     session: session,
@@ -75,11 +85,11 @@ const sendDone = (session, onSuccess, onError): void => {
   }, onSuccess, onError);
 };
 
-const htmlentities = (str): string =>
+const htmlentities = (str: string): string =>
   String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /* Required to make <del> and <ins> stay as tags.*/
-const processQUnit = (html): string =>
+const processQUnit = (html: string): string =>
   (html
     .replace(/&lt;del&gt;/g, '<del>')
     .replace(/&lt;\/del&gt;/g, '</del>')
@@ -96,12 +106,12 @@ const isAssertionError = (err: NormalizedTestError): err is AssertionError => {
 
 const formatExtra = (e: LoggedError): string => {
   if (!e.logs) {
-    if (!e.error.stack) {
-      return '';
-    } else {
+    if (e.error && e.error.stack) {
       const lines = e.error.stack.split('\n').filter((line) =>
         line.indexOf('at') !== -1);
       return '\n\nStack:\n' + lines.join('\n');
+    } else {
+      return '';
     }
   } else {
     const lines = e.logs.map((log) =>
@@ -145,7 +155,7 @@ const summary = (): {passed: number; failed: number} => ({
 const reporter = (() => {
   const current = $('<span />').addClass('progress').text(params.offset);
   const restartBtn = $('<button />').text('Restart').on('click', () => {
-    const url = makeUrl(null, 0, 0, 0);
+    const url = makeUrl('', 0, 0, 0);
     window.location.assign(url);
   });
   const retryBtn = $('<button />').text('Retry').on('click', () => {
@@ -179,7 +189,7 @@ const reporter = (() => {
   let stopOnFailure = false;
 
   const keepAliveTimer = setInterval(() => {
-    sendKeepAlive(params.session, undefined, () => {
+    sendKeepAlive(params.session, noop, () => {
       // if the server shutsdown stop trying to send messages
       clearInterval(keepAliveTimer);
     });
@@ -197,18 +207,18 @@ const reporter = (() => {
     return seconds + '.' + printable + 's';
   };
 
-  const test = (file, name) => {
-    let starttime;
-    let el;
-    let output;
-    let marker;
-    let testfile;
-    let nameSpan;
-    let error;
-    let time;
-    let reported;
+  const test = (file: string, name: string) => {
+    let starttime: Date;
+    let el: JQuery<HTMLElement>;
+    let output: JQuery<HTMLElement>;
+    let marker: JQuery<HTMLSpanElement>;
+    let testfile: JQuery<HTMLSpanElement>;
+    let nameSpan: JQuery<HTMLSpanElement>;
+    let error: JQuery<HTMLSpanElement>;
+    let time: JQuery<HTMLSpanElement>;
+    let reported: boolean;
 
-    const start = (onDone): void => {
+    const start = (onDone: onSuccessCallback): void => {
       starttime = new Date();
       el = $('<div />').addClass('test running');
 
@@ -226,7 +236,7 @@ const reporter = (() => {
       sendTestStart(params.session, file, name, onDone, onDone);
     };
 
-    const pass = (onDone): void => {
+    const pass = (onDone: onSuccessCallback): void => {
       if (reported) return;
       reported = true;
       passCount++;
@@ -238,7 +248,7 @@ const reporter = (() => {
       sendTestResult(params.session, file, name, true, testTime, null, onDone, onDone);
     };
 
-    const fail = (e, onDone): void => {
+    const fail = (e: LoggedError, onDone: onSuccessCallback): void => {
       if (reported) return;
       reported = true;
       failCount++;
@@ -263,9 +273,9 @@ const reporter = (() => {
     };
 
     return {
-      start: start,
-      pass: pass,
-      fail: fail,
+      start,
+      pass,
+      fail,
     };
   };
 
@@ -279,22 +289,22 @@ const reporter = (() => {
     sendDone(params.session, setAsDone, setAsDone);
   };
 
-  const setStopOnFailure = (flag): void => {
+  const setStopOnFailure = (flag: boolean): void => {
     stopOnFailure = flag;
   };
 
   const shouldStopOnFailure = (): boolean => stopOnFailure;
 
   return {
-    summary: summary,
-    test: test,
-    done: done,
-    setStopOnFailure: setStopOnFailure,
-    shouldStopOnFailure: shouldStopOnFailure,
+    summary,
+    test,
+    done,
+    setStopOnFailure,
+    shouldStopOnFailure,
   };
 })();
 
-const initError = (e): void => {
+const initError = (e: any): void => {
   $('body').append('<div class="failed done">ajax error: ' + JSON.stringify(e) + '</div>');
 };
 
@@ -348,12 +358,12 @@ const runGlobalTests = (): void => {
     }
   };
 
-  const loop = (tests): void => {
-    if (tests.length > 0) {
-      const test = tests.shift();
+  const loop = (tests: TestData[]): void => {
+    const test = tests.shift();
+    if (test !== undefined) {
       const report = reporter.test(test.filePath, test.name);
       const timer = setTimeout(() => {
-        report.fail('Test ran too long', afterFail);
+        report.fail({ error: new Error('Test ran too long'), logs: [] }, afterFail);
       }, timeout);
       try {
         report.start(() => {
@@ -386,11 +396,15 @@ const runGlobalTests = (): void => {
   loop(globalTests.slice(params.offset, params.offset + chunk));
 };
 
-const loadtests = (data): void => {
+const loadtests = (data: HarnessResponse): void => {
   chunk = data.chunk;
   retries = data.retries;
   timeout = data.timeout;
   reporter.setStopOnFailure(data.stopOnFailure);
+  if (data.mode === 'auto') {
+    // Try to ensure the page has focus
+    window.focus();
+  }
   runGlobalTests();
 };
 

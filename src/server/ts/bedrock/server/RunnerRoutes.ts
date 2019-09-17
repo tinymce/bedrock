@@ -6,8 +6,13 @@ import * as Compiler from '../compiler/Compiler';
 import * as FileUtils from '../util/FileUtils'
 import * as Arr from '../util/Arr';
 
-export const generate = function (mode, projectdir, basedir, configFile, bundler, testfiles, chunk, retries, singleTimeout, stopOnFailure, basePage, coverage) {
-  const files = testfiles.map(function (filePath) {
+interface Runner {
+  routers: Routes.Route[];
+  fallback: Routes.Route;
+}
+
+export const generate = (mode: string, projectdir: string, basedir: string, configFile: string, bundler: 'webpack' | 'rollup', testfiles: string[], chunk: number, retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[]): Promise<Runner> => {
+  const files = testfiles.map((filePath) => {
     return path.relative(projectdir, filePath);
   });
 
@@ -50,7 +55,7 @@ export const generate = function (mode, projectdir, basedir, configFile, bundler
 
   const resourceRoutes = resourceRoots.map(({name, folder}) => Routes.routing('GET', `/project/${name}`, path.join(projectdir, folder)));
 
-  const precompiledTests = (mode === 'auto' ? testGenerator.generate() : Promise.resolve(null));
+  const precompiledTests: Promise<Buffer | string | null> = (mode === 'auto' ? testGenerator.generate() : Promise.resolve(null));
 
   return precompiledTests.then(
     (precompTests) => {
@@ -65,7 +70,7 @@ export const generate = function (mode, projectdir, basedir, configFile, bundler
         Routes.routing('GET', '/css', path.join(basedir, 'src/css')),
 
         // test code
-        Routes.asyncJs('GET', '/compiled/tests.js', function (done) {
+        Routes.asyncJs('GET', '/compiled/tests.js', (done) => {
           if (precompTests !== null) {
             done(precompTests);
           } else {
@@ -79,15 +84,16 @@ export const generate = function (mode, projectdir, basedir, configFile, bundler
           stopOnFailure: stopOnFailure,
           chunk: chunk,
           retries: retries,
-          timeout: singleTimeout
+          timeout: singleTimeout,
+          mode: mode
         })
       ]);
 
       const fallback = Routes.constant('GET', basedir, basePage);
 
       return {
-        routers: routers,
-        fallback: fallback
+        routers,
+        fallback
       };
     }
   );

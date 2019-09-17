@@ -1,14 +1,20 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
+    "strict": true,
+    "noUnusedLocals": true,
     "target": "es2018",
     "module": "commonjs",
     "lib": ["es2018", "dom"],
     "declaration": true,
     "sourceMap": true,
-    "outDir": "lib/server/ts"
+    "outDir": "lib/server/ts",
+    "types": [
+      "node"
+    ]
   },
   "include": [
-    "src/server/ts"
+    "src/server/ts",
+    "typings"
   ]
 }

@@ -2,18 +2,15 @@ import { Attempt } from './bedrock/core/Attempt';
 import * as Version from './bedrock/core/Version';
 import * as RunnerRoutes from './bedrock/server/RunnerRoutes';
 import * as Webpack from './bedrock/compiler/Webpack';
+import { BedrockSettings } from './bedrock/core/Settings';
 
-export const go = function (settings) {
-  settings.stopOnFailure = true;
+export const go = (settings: BedrockSettings) => {
+  const routes = RunnerRoutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, 0, settings.singleTimeout, true, 'src/resources/bedrock.html', settings.coverage);
 
-  // TODO: where should this setting come from? Is it used?
-  const delayExiting = false;
-  const routes = RunnerRoutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, 'src/resources/bedrock.html', delayExiting);
-
-  console.log('bedrock-manual ' + Version + ' starting...');
+  console.log('bedrock-manual ' + Version.get() + ' starting...');
 
   routes.then((runner) => {
-    const serveSettings = {
+    const serveSettings: Webpack.WebpackServeSettings = {
       projectdir: settings.projectdir,
       basedir: settings.basedir,
       testfiles: settings.testfiles,
@@ -27,11 +24,13 @@ export const go = function (settings) {
       coverage: settings.coverage,
       overallTimeout: settings.overallTimeout,
       singleTimeout: settings.singleTimeout,
+      // sticky session is used by auto mode only
+      stickyFirstSession: false,
       // reset mouse position will never work on manual
       skipResetMousePosition: true
     };
 
-    Webpack.devserver(serveSettings, function (service/* , done */) {
+    return Webpack.devserver(serveSettings).then((service) => {
       service.enableHud();
       console.log('bedrock-manual ' + Version.get() + ' available at: http://localhost:' + service.port);
     });

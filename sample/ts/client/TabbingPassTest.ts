@@ -14,7 +14,7 @@ UnitTest.asynctest('Tabbing Test', (success, failure) => {
 
   input1.focus();
 
-  // Dupe with IFrameTest.ts
+  // Dupe with IFramePassTest.ts
   var post = function (url, data, onSuccess, onFailure) {
     var request = new XMLHttpRequest();
     request.open('POST', url, true);
@@ -39,7 +39,11 @@ UnitTest.asynctest('Tabbing Test', (success, failure) => {
   var sendText = function (selector, keys, onSuccess, onFailure) {
     post('/keys', { selector: selector, keys: keys }, () => {
       setTimeout(() => {
-        onSuccess();
+        try {
+          onSuccess();
+        } catch (err) {
+          onFailure(err);
+        }
       }, 2000);
     }, onFailure);
   };

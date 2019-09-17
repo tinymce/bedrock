@@ -1,192 +1,216 @@
 import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
-import * as webdriver from 'selenium-webdriver';
+import { Options } from 'webdriver';
+import * as webdriverio from 'webdriverio';
+import * as portfinder from 'portfinder';
+import * as Shutdown from '../util/Shutdown';
+import * as DriverLoader from './DriverLoader';
 
-const browserVariants = {
+export interface DriverSettings {
+  basedir: string;
+  browser: string;
+  debuggingPort: number;
+  useSandboxForHeadless: boolean;
+  webdriverPort?: number;
+  webdriverTimeout?: number;
+}
+
+export interface Driver {
+  webdriver: webdriverio.BrowserObject;
+  shutdown: (immediate?: boolean) => Promise<void>;
+}
+
+const browserVariants: Record<string, string> = {
   'chrome-headless': 'chrome',
-  'firefox-headless': 'firefox'
+  'firefox-headless': 'firefox',
+  'ie': 'internet explorer'
 };
 
-const browserDrivers = {
-  'chrome': 'chromedriver',
-  'firefox': 'geckodriver',
-  'internet explorer': 'iedriver',
-  'MicrosoftEdge': 'edgedriver'
-};
-
-const cscriptFocus = function (basedir, script) {
-  return new Promise(function (resolve) {
+const cscriptFocus = (basedir: string, script: string) => {
+  return new Promise<void>((resolve) => {
     const focusScript = path.join(basedir, 'bin/focus/' + script);
-    childProcess.exec('cscript ' + focusScript, function () {
-      resolve();
-    });
+    childProcess.exec('cscript ' + focusScript, () => resolve());
   });
-};
-
-// Makes sure that Edge has proper focus and is the top most window
-const focusEdge = function (basedir) {
-  return cscriptFocus(basedir, 'edge.js');
 };
 
 // Mac doesn't focus windows opened through automation, so use AppleScript to do it for us
-const focusMac = function (basedir, browser) {
-  return new Promise(function (resolve) {
-    const macFocusScript = path.join(basedir, 'bin/focus/mac.applescript');
-    childProcess.exec(`osascript ${macFocusScript} ${browser}`, function () {
-      resolve();
-    });
-  });
-};
-
-// Firefox insists on having focus in the address bar, and while F6 will focus the body
-// mozilla haven't implemented browser-wide sendkeys in their webdriver
-const focusFirefox = function (basedir) {
-  // mac F6 is handled in the applescript, we haven't looked at linux FF yet so it's just windows for now
-  if (os.platform() === 'win32') return cscriptFocus(basedir, 'winff.js');
-  else return Promise.resolve();
-};
-
-const getWinVersion = function () {
-  if (os.platform() === 'win32') {
-    const release = os.release().split('.');
-    return {
-      major: parseInt(release[0]),
-      minor: parseInt(release[1]),
-      build: parseInt(release[2])
-    };
+const focusMac = (basedir: string, browser: string) => {
+  if (browser === 'phantomjs') {
+    return Promise.resolve();
   } else {
-    throw new Error('Unable to determine windows version');
+    return new Promise<void>((resolve) => {
+      const macFocusScript = path.join(basedir, 'bin/focus/mac.applescript');
+      childProcess.exec(`osascript ${macFocusScript} ${browser}`, () => resolve());
+    });
   }
 };
 
-// Sets logging level to WARNING instead of the verbose default for phantomjs.
-const addPhantomCapabilities = function (blueprints, settings) {
-  const prefs = new webdriver.logging.Preferences();
-  prefs.setLevel(webdriver.logging.Type.DRIVER, webdriver.logging.Level.WARNING);
-
-  const caps = webdriver.Capabilities.phantomjs();
-  caps.setLoggingPrefs(prefs);
-  caps.set('phantomjs.cli.args', '--remote-debugger-port=' + settings.debuggingPort);
-  return blueprints.withCapabilities(caps);
+const focusWindows = (basedir: string, browser: string) => {
+  if (browser === 'MicrosoftEdge') {
+    // Makes sure that Edge has proper focus and is the top most window
+    return cscriptFocus(basedir, 'edge.js');
+  } else if (browser === 'firefox') {
+    // Firefox insists on having focus in the address bar, and while F6 will focus the body
+    // mozilla haven't implemented browser-wide sendkeys in their webdriver
+    return cscriptFocus(basedir, 'winff.js');
+  } else {
+    return Promise.resolve();
+  }
 };
 
-const setupHeadlessModes = function (settings, browser, chromeOptions) {
-  if (browser === 'firefox-headless') {
-    process.env.MOZ_HEADLESS = '1';
-  } else if (browser === 'chrome-headless') {
-    chromeOptions.addArguments('headless');
-    chromeOptions.addArguments('remote-debugging-port=' + settings.debuggingPort);
+const addArguments = (capabilities: Record<string, any>, name: string, args: string[]) => {
+  if (!capabilities.hasOwnProperty(name)) {
+    capabilities[name] = { args: [] };
+  }
+  const currentArgs = capabilities[name].args || [];
+  capabilities[name].args = currentArgs.concat(args);
+};
+
+const getOptions = (port: number, browserName: string, browserFamily: string, settings: DriverSettings): Options => {
+  const options = {
+    path: '/',
+    port: port,
+    logLevel: 'silent' as 'silent',
+    capabilities: {
+      browserName: browserFamily
+    }
+  };
+
+  // Support for disabling the Automation Chrome Extension
+  // https://stackoverflow.com/questions/43261516/selenium-chrome-i-just-cant-use-driver-maximize-window-to-maximize-window
+  const caps: Record<string, any> = options.capabilities;
+  if (browserFamily === 'chrome') {
+    addArguments(caps, 'goog:chromeOptions', ['--start-maximized', '--disable-extensions']);
+  }
+
+  // Setup any headless mode options
+  if (browserName === 'phantomjs') {
+    caps['phantomjs.cli.args'] = '--remote-debugger-port=' + settings.debuggingPort;
+  } else if (browserName === 'firefox-headless') {
+    // https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode#Debugging_headless_Firefox
+    addArguments(caps, 'moz:firefoxOptions', ['-headless', '-start-debugger-server=' + settings.debuggingPort]);
+    caps['moz:firefoxOptions'].prefs = {
+      'devtools.debugger.remote-enabled': true,
+      'devtools.debugger.prompt-connection': false,
+      'devtools.chrome.enabled': true
+    }
+  } else if (browserName === 'chrome-headless') {
+    addArguments(caps, 'goog:chromeOptions', ['--headless', '--remote-debugging-port=' + settings.debuggingPort]);
     if (settings.useSandboxForHeadless) {
-      chromeOptions.addArguments('no-sandbox');
+      addArguments(caps, 'goog:chromeOptions', [ '--no-sandbox' ]);
     }
   }
+
+  return options;
 };
 
-const logBrowserDetails = function (driver) {
-  return function () {
-    return driver.getCapabilities().then((caps) => {
-      const browser = caps.get('browserName');
+const logDriverDetails = (driver: webdriverio.BrowserObject) => {
+  const caps: Record<string, any> = driver.capabilities;
+  const browserName = caps.browserName;
+  const browserVersion = caps.browserVersion || caps.version;
 
-      if (browser === 'chrome') {
-        console.log('browser:', caps.get('version'), 'driver:', caps.get('chrome').chromedriverVersion);
-      } else if (browser === 'firefox') {
-        console.log('browser:', caps.get('browserVersion'));
-      } else if (browser === 'phantomjs') {
-        console.log('browser:', caps.get('version'), 'driver:', caps.get('driverVersion'));
-      } else if (browser === 'MicrosoftEdge') {
-        console.log('browser:', caps.get('browserVersion'));
+  if (browserName === 'chrome') {
+    console.log('browser:', browserVersion, 'driver:', caps.chrome.chromedriverVersion);
+  } else if (browserName === 'firefox') {
+    console.log('browser:', browserVersion, 'driver:', caps['moz:geckodriverVersion']);
+  } else if (browserName === 'phantomjs') {
+    console.log('browser:', browserVersion, 'driver:', caps.driverVersion);
+  } else if (browserName === 'MicrosoftEdge') {
+    console.log('browser:', browserVersion);
+  }
+};
+
+const focusBrowser = (browserName: string, settings: DriverSettings) => {
+  if (os.platform() === 'darwin') {
+    return focusMac(settings.basedir, browserName);
+  } else if (os.platform() === 'win32') {
+    return focusWindows(settings.basedir, browserName);
+  } else {
+    return Promise.resolve();
+  }
+};
+
+const setupShutdown = (driver: webdriverio.BrowserObject, driverApi: DriverLoader.DriverAPI): (immediate?: boolean) => Promise<void> => {
+  const driverShutdown = (immediate?: boolean) => {
+    try {
+      if (immediate) {
+        driver.deleteSession();
+        driverApi.stop();
+        return Promise.resolve();
+      } else {
+        return driver.deleteSession().then(driverApi.stop).catch(driverApi.stop);
       }
-    });
+    } catch (e) {
+      // The above may throw an exception (eg if the connection to the browser is lost)
+      // and we want to make sure the driver process is always stopped
+      driverApi.stop();
+      return Promise.reject(e);
+    }
   };
+
+  Shutdown.registerShutdown((code, immediate) => {
+    driverShutdown(immediate).then(() => process.exit(code));
+  });
+
+  return driverShutdown;
 };
 
 /* Settings:
  *
  * browser: the name of the browser
  * basedir: base directory for bedrock
+ * webdriverPort: port to use for the webdriver server
+ * webdriverTimeout: how long to wait for the webdriver server to start
  */
-export const create = function (settings): Promise<webdriver.WebDriver> {
-  const browser = settings.browser;
-  const browserFamily = browserVariants.hasOwnProperty(browser) ? browserVariants[browser] : browser;
-  const driverDep = browserDrivers[browserFamily];
-  if (driverDep === undefined) console.log('Not loading a driver for browser ' + browser);
-  else {
-    try {
-      require(driverDep);
-    } catch (e) {
-      console.log(`No local ${driverDep} for ${browser}. Searching system path...`);
-    }
-  }
+export const create = (settings: DriverSettings): Promise<Driver> => {
+  const webdriverPort = settings.webdriverPort || 4444;
+  const webdriverTimeout = settings.webdriverTimeout || 30000;
 
-  /* Add additional logging
-   * const logging = webdriver.logging;
-   * logging.installConsoleHandler();
-   * logging.getLogger('promise.ControlFlow').setLevel(logging.Level.ALL);
-   */
+  const browserName = settings.browser;
+  const browserFamily = browserVariants[browserName] || browserName;
 
-  // Support for disabling the Automation Chrome Extension
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const chrome = require('selenium-webdriver/chrome');
-  const chromeOptions = new chrome.Options();
-  chromeOptions.addArguments('chrome.switches', '--disable-extensions');
+  const driverApi = DriverLoader.loadDriver(browserFamily);
 
-  // https://stackoverflow.com/questions/43261516/selenium-chrome-i-just-cant-use-driver-maximize-window-to-maximize-window
-  chromeOptions.addArguments('start-maximized');
+  // Find an open port to start the driver on
+  return portfinder.getPortPromise({
+    port: webdriverPort,
+    stopPort: webdriverPort + 100
+  }).then((port) => {
+    // Wait for the driver to start up and then start the webdriver session
+    return DriverLoader.startAndWaitForAlive(driverApi, port, webdriverTimeout).then(() => {
+      const webdriverOptions = getOptions(port, browserName, browserFamily, settings);
+      return webdriverio.remote(webdriverOptions);
+    }).then((driver) => {
+      // Ensure the driver gets shutdown correctly if shutdown
+      // by the user instead of the application
+      const driverShutdown = setupShutdown(driver, driverApi);
 
-  // As of Windows build 1809 the edge driver starts in W3C mode instead of JSON Wire Protocol, so we need to start the driver with the '--jwp' flag
-  // https://github.com/SeleniumHQ/selenium/issues/6464
-  if (os.platform() === 'win32' && browser === 'MicrosoftEdge') {
-    const winVersion = getWinVersion();
-    // The "--jwp" argument doesn't exist in older versions of `MicrosoftWebDriver` so we need to detect the windows version
-    if (winVersion.major > 10 || winVersion.major === 10 && winVersion.build >= 17763) {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const edge = require('selenium-webdriver/edge');
-      const edgeService = new edge.ServiceBuilder().addArguments('--jwp').build();
-      edge.setDefaultService(edgeService);
-    }
-  }
+      // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
+      // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
+      return driver.pause(1500).then(() => {
+        // Log driver details
+        logDriverDetails(driver);
 
-  const rawBlueprints: webdriver.Builder = new webdriver.Builder()
-    .forBrowser(browserFamily).setChromeOptions(chromeOptions);
-
-  const blueprint = browser === 'phantomjs' ? addPhantomCapabilities(rawBlueprints, settings) : rawBlueprints;
-
-  const driver = blueprint.build();
-
-  setupHeadlessModes(settings, browser, chromeOptions);
-
-  const setSize = function () {
-    /* If maximize does not work on your system (esp. firefox hangs), hard-code the size (like so) */
-    // return driver.manage().window().setSize(800, 600);
-    return driver.manage().window().maximize();
-  };
-
-  const resume = function () {
-    return Promise.resolve(driver);
-  };
-
-  // Andy made some attempt to catch errors in this code but it never worked, I suspect the webdriver implementation
-  // of promise is broken. Node gives 'unhandled rejection' errors no matter where I put the rejection handlers.
-  return new Promise(function (resolve) {
-    // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
-    // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
-    setTimeout(function () {
-      // Some tests require large windows, so make it as large as it can be.
-      return setSize().then(resume, resume).then(function () {
-        const systemFocus = os.platform() === 'darwin' && browser !== 'phantomjs' ? focusMac(settings.basedir, browser) : Promise.resolve();
-
-        const browserFocus = browser === 'MicrosoftEdge' ? focusEdge(settings.basedir) :
-          browser === 'firefox' ? focusFirefox(settings.basedir) :
-            Promise.resolve();
-
-        systemFocus
-          .then(() => browserFocus)
-          .then(logBrowserDetails(driver))
-          .then(function () {
-            resolve(driver);
-          });
+        // Some tests require large windows, so make it as large as it can be.
+        // Headless modes can't use maximize, so just set the dimensions to 1280x1024
+        if (browserName === 'chrome-headless' || browserName === 'firefox-headless') {
+          return driver.setWindowSize(1280, 1024) as any;
+        } else {
+          return driver.maximizeWindow();
+        }
+      }).then(() => {
+        return focusBrowser(browserFamily, settings);
+      }).then(() => {
+        // Return the public driver api
+        return {
+          webdriver: driver,
+          shutdown: driverShutdown
+        };
       });
-    }, 1500);
+    });
+  }).catch((e) => {
+    driverApi.stop();
+    return Promise.reject(e);
   });
 };
