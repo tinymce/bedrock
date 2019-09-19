@@ -1,3 +1,7 @@
+Version 8.0.2
+
+* Upgraded to Webdriver 5.13.1
+
 Version 8.0.0
 
 * Changed to using webdriver.io instead of selenium's webdriver implementation under the hood.
