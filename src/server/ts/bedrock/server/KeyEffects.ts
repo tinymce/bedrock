@@ -69,7 +69,7 @@ const KEYS: Record<string, string> = {
   'f11': '\uE03B',
   'f12': '\uE03C',
 
-  'meta': '\uE053'
+  'meta': '\uE03D'
 };
 
 const mapKeys = (action: string[]): string[] => {

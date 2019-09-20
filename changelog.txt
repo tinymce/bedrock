@@ -1,3 +1,8 @@
+Version 8.0.2
+
+* Changed key effects to use left meta key instead of right meta key.
+* Upgraded to Webdriver 5.13.1
+
 Version 8.0.0
 
 * Changed to using webdriver.io instead of selenium's webdriver implementation under the hood.
