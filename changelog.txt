@@ -1,6 +1,6 @@
 Version 8.0.2
 
-* Fixed using right meta key instead of the more common left meta key for key effects.
+* Changed key effects to use left meta key instead of right meta key.
 * Upgraded to Webdriver 5.13.1
 
 Version 8.0.0
