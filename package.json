@@ -19,11 +19,9 @@
     "test-client": "mocha -r esm lib/client/test/**/*Test.js",
     "test-runner": "mocha -r esm lib/runner/test/**/*Test.js",
     "test-server": "mocha -r esm lib/server/test/**/*Test.js",
-    "test-atomic": "tape test/atomic/*.js",
-    "test-props": "tape test/props/*.js",
     "test-samples-pass": "bin/bedrock-auto.js -b phantomjs --config sample/tsconfig.json --files sample/ts/**/*PassTest.ts sample/ts/**/*PassTest.tsx",
     "test-samples-fail": "bin/bedrock-auto.js -b phantomjs --config sample/tsconfig.json --files sample/ts/**/*FailTest.ts",
-    "test": "yarn build && yarn test-client && yarn test-runner && yarn test-server && yarn test-atomic && yarn test-props && yarn test-samples-pass"
+    "test": "yarn build && yarn test-client && yarn test-runner && yarn test-server && yarn test-samples-pass"
   },
   "private": false,
   "dependencies": {

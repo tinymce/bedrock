@@ -57,7 +57,7 @@ describe('Validation', () => {
       {name: 'testdir', validate: Extraction.files(['Test.js']), output: 'other', description: 'blah'}
     ],
     {
-      testdir: 'test/resources'
+      testdir: 'modules/server/src/test/resources'
     }
   );
 
@@ -65,15 +65,15 @@ describe('Validation', () => {
     'Testing a directory -> files where the directory does exist, but has a file matching pattern',
     {
       other: [
-        'test/resources/html/screen.html',
-        'test/resources/test.file1'
+        'modules/server/src/test/resources/html/screen.html',
+        'modules/server/src/test/resources/test.file1'
       ]
     },
     [
       {name: 'testdir', validate: Extraction.files(['']), output: 'other', description: 'blah'}
     ],
     {
-      testdir: 'test/resources'
+      testdir: 'modules/server/src/test/resources'
     }
   );
 
@@ -112,8 +112,8 @@ describe('Validation', () => {
     {
       alpha: 'Alpha',
       'new.beta': 'Beta',
-      gamma: ['test/resources/html/screen.html', 'test/resources/test.file1'],
-      delta: 'test/resources'
+      gamma: ['modules/server/src/test/resources/html/screen.html', 'modules/server/src/test/resources/test.file1'],
+      delta: 'modules/server/src/test/resources'
     },
     [
       {name: 'alpha', validate: Extraction.any, description: 'blah'},
@@ -124,8 +124,8 @@ describe('Validation', () => {
     {
       alpha: 'Alpha',
       beta: 'Beta',
-      gamma: 'test/resources',
-      delta: 'test/resources'
+      gamma: 'modules/server/src/test/resources',
+      delta: 'modules/server/src/test/resources'
     }
   );
 
@@ -146,7 +146,7 @@ describe('Validation', () => {
     {
       alpha: 'Alpha',
       beta: 'Beta',
-      gamma: 'test/resources',
+      gamma: 'modules/server/src/test/resources',
       delta: 'Delta',
       epsilon: 'test/resources.fake',
       rho: 'Rho'
