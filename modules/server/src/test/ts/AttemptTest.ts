@@ -1,25 +1,8 @@
-import { assert } from 'chai';
 import { describe, it } from 'mocha';
 import { Attempt } from '../../main/ts/bedrock/core/Attempt';
 import * as fc from 'fast-check';
-import { Arbitrary } from 'fast-check';
 import * as deepEqual from 'fast-deep-equal';
-
-const assertErrors = <E> (expected: E, actual: Attempt<E, any>) => {
-  Attempt.cata(actual, (errs) => {
-    assert.deepEqual(errs, expected);
-  }, () => {
-    assert.fail('Expected errors: ' + JSON.stringify(expected));
-  });
-};
-
-const assertResult = <A>(expected: A, actual: Attempt<any, A>) => {
-  Attempt.cata(actual, (errs) => {
-    assert.fail('Unexpected errors: ' + JSON.stringify(errs));
-  }, result => {
-    assert.deepEqual(result, expected);
-  });
-};
+import { arbAttempt, arbAttemptFailed, arbAttemptPassed, assertErrors, assertResult } from './AttemptUtils';
 
 describe('attempt.carry', () => {
 
@@ -101,13 +84,6 @@ describe('attempt.list', () => {
     ]));
   });
 });
-
-const arbAttemptFailed = <E, A> (arbe: Arbitrary<E>): Arbitrary<Attempt<E, A>> => arbe.map<Attempt<E, A>>(Attempt.failed);
-
-const arbAttemptPassed = <E, A> (arba: Arbitrary<A>): Arbitrary<Attempt<E, A>> => arba.map<Attempt<E, A>>(Attempt.passed);
-
-const arbAttempt = <E, A> (arbe: Arbitrary<E>, arba: Arbitrary<A>): Arbitrary<Attempt<E, A>> =>
-  fc.oneof(arbAttemptFailed(arbe), arbAttemptPassed(arba));
 
 describe("Attempt.hasPassed", () => {
   it('is true when passed', () => {
