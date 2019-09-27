@@ -14,7 +14,8 @@
   "scripts": {
     "lint": "yarn eslint 'src/server/**/*.ts' 'src/runner/**/*.ts'",
     "prepublishOnly": "yarn build",
-    "build": "yarn lint && tsc -p tsconfig.client.json && tsc -p tsconfig.runner.json && tsc -p tsconfig.server.json && rollup --config",
+    "clean": "git clean -dfx lib dist",
+    "build": "yarn lint && tsc -p modules/client/tsconfig.json && tsc -p tsconfig.runner.json && tsc -p tsconfig.server.json && rollup --config",
     "test-atomic": "tape test/atomic/*.js",
     "test-props": "tape test/props/*.js",
     "test-samples-pass": "bin/bedrock-auto.js -b phantomjs --config sample/tsconfig.json --files sample/ts/**/*PassTest.ts sample/ts/**/*PassTest.tsx",
@@ -78,9 +79,9 @@
   },
   "author": "Ephox Corporation",
   "license": "Apache-2.0",
-  "main": "./lib/client/ts/api/Main.js",
-  "module": "./lib/client/ts/api/Main.js",
-  "types": "./lib/client/ts/api/Main.d.ts",
+  "main": "./lib/client/main/ts/api/Main.js",
+  "module": "./lib/client/main/ts/api/Main.js",
+  "types": "./lib/client/main/ts/api/Main.d.ts",
   "files": [
     "bin/**",
     "lib/**",
