@@ -16,10 +16,12 @@ const throws = function (f: () => void, expected?: string, message?: TestLabel) 
     // noinspection ExceptionCaughtLocallyJS
     throw token;
   } catch (e) {
-    if (e === token)
+    if (e === token) {
       throw new Error(TestLabel.asStringOr(message, () => 'Expected function to throw, but it didn\'t.'));
-    if (expected !== undefined)
+    }
+    if (expected !== undefined) {
       eq(expected, e, message);
+    }
   }
 };
 
@@ -31,10 +33,12 @@ const throwsError = function (f: () => void, expected?: string, message?: TestLa
     // noinspection ExceptionCaughtLocallyJS
     throw token;
   } catch (e) {
-    if (e === token)
+    if (e === token) {
       throw new Error(TestLabel.asStringOr(message, () => 'Expected function to throw, but it didn\'t.'));
-    if (expected !== undefined)
+    }
+    if (expected !== undefined) {
       eq(expected, e.message, message);
+    }
   }
 };
 
