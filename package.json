@@ -12,17 +12,18 @@
     "bedrock": "./bin/bedrock.js"
   },
   "scripts": {
-    "lint": "yarn eslint 'src/server/**/*.ts' 'modules/runner/**/*.ts'",
+    "lint": "yarn eslint 'modules/server/**/*.ts' 'modules/runner/**/*.ts'",
     "prepublishOnly": "yarn build",
     "clean": "git clean -dfx lib dist",
-    "build": "yarn lint && tsc -p modules/client/tsconfig.json && tsc -p modules/runner/tsconfig.json && tsc -p tsconfig.server.json && rollup --config",
+    "build": "yarn lint && tsc -p modules/client/tsconfig.json && tsc -p modules/runner/tsconfig.json && tsc -p modules/server/tsconfig.json && rollup --config",
     "test-client": "mocha -r esm lib/client/test/**/*Test.js",
     "test-runner": "mocha -r esm lib/runner/test/**/*Test.js",
+    "test-server": "mocha -r esm lib/server/test/**/*Test.js",
     "test-atomic": "tape test/atomic/*.js",
     "test-props": "tape test/props/*.js",
     "test-samples-pass": "bin/bedrock-auto.js -b phantomjs --config sample/tsconfig.json --files sample/ts/**/*PassTest.ts sample/ts/**/*PassTest.tsx",
     "test-samples-fail": "bin/bedrock-auto.js -b phantomjs --config sample/tsconfig.json --files sample/ts/**/*FailTest.ts",
-    "test": "yarn build && yarn test-client && yarn test-runner && yarn test-atomic && yarn test-props && yarn test-samples-pass"
+    "test": "yarn build && yarn test-client && yarn test-runner && yarn test-server && yarn test-atomic && yarn test-props && yarn test-samples-pass"
   },
   "private": false,
   "dependencies": {

@@ -1,4 +1,4 @@
-var Attempt = require('../../lib/server/ts/bedrock/core/Attempt').Attempt;
+var Attempt = require('../../lib/server/main/ts/bedrock/core/Attempt').Attempt;
 var tape = require('tape');
 var jsc = require('jsverify');
 

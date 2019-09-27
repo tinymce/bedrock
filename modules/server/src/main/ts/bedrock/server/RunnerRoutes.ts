@@ -67,7 +67,7 @@ export const generate = (mode: string, projectdir: string, basedir: string, conf
         Routes.routing('GET', '/runner', path.join(basedir, 'dist/bedrock/www/runner')),
         Routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery'))),
         Routes.routing('GET', '/lib/babel-polyfill', path.join(path.dirname(require.resolve('babel-polyfill')), '../dist')),
-        Routes.routing('GET', '/css', path.join(basedir, 'src/css')),
+        Routes.routing('GET', '/css', path.join(basedir, 'modules/server/src/resources/css')),
 
         // test code
         Routes.asyncJs('GET', '/compiled/tests.js', (done) => {

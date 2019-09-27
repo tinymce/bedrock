@@ -14,7 +14,7 @@ export const go = (settings: BedrockAutoSettings) => {
 
   const isPhantom = settings.browser === 'phantomjs';
 
-  const basePage = isPhantom ? 'src/resources/bedrock-phantom.html' : 'src/resources/bedrock.html';
+  const basePage = 'modules/server/src/resources/html/' + (isPhantom ? 'bedrock-phantom.html' : 'bedrock.html');
   const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage);
 
   console.log('bedrock-auto ' + Version.get() + ' starting...');

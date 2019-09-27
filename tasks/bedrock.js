@@ -1,7 +1,7 @@
 const path = require('path');
-const cloptions = require('../lib/server/ts/bedrock/cli/ClOptions');
-const bedrockManual = require('../lib/server/ts/BedrockManual');
-const bedrockAuto = require('../lib/server/ts/BedrockAuto');
+const cloptions = require('../lib/server/main/ts/bedrock/cli/ClOptions');
+const bedrockManual = require('../lib/server/main/ts/BedrockManual');
+const bedrockAuto = require('../lib/server/main/ts/BedrockAuto');
 
 module.exports = function(grunt) {
 
