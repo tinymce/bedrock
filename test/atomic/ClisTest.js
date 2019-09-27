@@ -21,11 +21,6 @@ var exclude = function (fields) {
   };
 };
 
-
-var mutateArgs = function (newArgs) {
-  process.argv = [ "$executable", "$file" ].concat(newArgs);
-};
-
 var cleanError = function (result) {
   return Attempt.cata(result, function (err) {
     return Attempt.failed(err.errors);
@@ -39,12 +34,12 @@ var cleanResult = function (result) {
 };
 
 tape('Minimal specification of bedrock-auto', function (t) {
-  mutateArgs([
+  const args = [
     "--browser", "MicrosoftEdge",
     "--files", "test/resources/test.file1",
     "--config", "sample/tsconfig.json"
-  ]);
-  var actual = Clis.forAuto(directories);
+  ];
+  var actual = Clis.forAuto(directories, args);
   AttemptUtils.assertResult(t, {
     browser: 'MicrosoftEdge',
     bundler: 'webpack',
@@ -70,22 +65,22 @@ tape('Minimal specification of bedrock-auto', function (t) {
 });
 
 tape('Specification of bedrock-auto missing required field: browser', function (t) {
-  mutateArgs([
+  const args = [
     "--files", "test/resources/test.file1",
     "--config", "sample/tsconfig.json"
-  ]);
-  var actual = Clis.forAuto(directories);
+  ];
+  var actual = Clis.forAuto(directories, args);
   AttemptUtils.assertErrors(t, [
     'The *required* output property [browser] from [browser] must be specified'
   ], cleanError(actual));
 });
 
 tape('Minimal specification of bedrock-manual', function (t) {
-  mutateArgs([
+  const args = [
     "--files", "test/resources/test.file1",
     "--config", "sample/tsconfig.json"
-  ]);
-  var actual = Clis.forManual(directories);
+  ];
+  var actual = Clis.forManual(directories, args);
   AttemptUtils.assertResult(t, {
     config: 'sample/tsconfig.json',
     testfiles: [

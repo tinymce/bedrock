@@ -13,17 +13,17 @@ export type CliError = {
   usage: string;
 }
 
-const parseCommandLine = (definitions: commandLineArgs.OptionDefinition[]): Attempt<string[], CommandLineOptions> => {
+const parseCommandLine = (definitions: commandLineArgs.OptionDefinition[], argv: string[]): Attempt<string[], CommandLineOptions> => {
   try {
-    const settings: commandLineArgs.CommandLineOptions = commandLineArgs(definitions);
+    const settings: commandLineArgs.CommandLineOptions = commandLineArgs(definitions, {argv});
     return Attempt.passed(settings);
   } catch (err) {
     return Attempt.failed([err.message !== undefined ? err.message : err]);
   }
 };
 
-export const extract = (command: string, desc: string, definitions: ClOption[]) => {
-  const parsed = parseCommandLine(definitions);
+export const extract = (command: string, desc: string, definitions: ClOption[], argv: string[]) => {
+  const parsed = parseCommandLine(definitions, argv);
 
   Attempt.cata(parsed, () => {
     // TODO: this should report an error
