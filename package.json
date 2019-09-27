@@ -72,6 +72,7 @@
     "eslint-config-google": "^0.13.0",
     "esm": "^3.2.25",
     "fast-check": "^1.17.0",
+    "fast-deep-equal": "^2.0.1",
     "grunt": "^1.0.1",
     "jscheck": "^0.2.0",
     "jsverify": "^0.7.1",
