@@ -8,13 +8,15 @@
     "lib": ["es2018", "dom"],
     "declaration": true,
     "sourceMap": true,
-    "outDir": "lib/server/ts",
+    "outDir": "../../lib/server",
     "types": [
       "node"
-    ]
+    ],
+    "rootDir": "src"
   },
   "include": [
-    "src/server/ts",
-    "typings"
+    "src/main/ts",
+    "src/test/ts",
+    "src/typings/ts"
   ]
 }

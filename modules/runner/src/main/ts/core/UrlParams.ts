@@ -7,7 +7,7 @@ export interface UrlParams {
   retry: number;
 }
 
-const posInt = (str: string | undefined): number => {
+const nat = (str: string | undefined): number => {
   if (typeof str === 'string') {
     const num = parseInt(str, 10);
     if (!isNaN(num) && num > 0) {
@@ -26,13 +26,13 @@ const parse = (search: string, makeSessionId: () => string): UrlParams => {
   } = QS.parse(search);
   return {
     session: params.session || makeSessionId(),
-    offset: posInt(params.offset),
-    failed: posInt(params.failed),
-    retry: posInt(params.retry),
+    offset: nat(params.offset),
+    failed: nat(params.failed),
+    retry: nat(params.retry),
   };
 };
 
 export const UrlParams = {
   parse,
-  posInt
+  nat
 };

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-var Clis = require('../../lib/server/ts/bedrock/cli/Clis.js');
+var Clis = require('../../lib/server/main/ts/bedrock/cli/Clis.js');
 var AttemptUtils = require('../util/AttemptUtils.js');
-var Attempt = require('../../lib/server/ts/bedrock/core/Attempt.js').Attempt;
+var Attempt = require('../../lib/server/main/ts/bedrock/core/Attempt.js').Attempt;
 var tape = require('tape');
 
 var directories = {

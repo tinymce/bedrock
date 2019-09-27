@@ -1,4 +1,4 @@
-var Attempt = require('../../lib/server/ts/bedrock/core/Attempt.js').Attempt;
+var Attempt = require('../../lib/server/main/ts/bedrock/core/Attempt.js').Attempt;
 
 var assertErrors = function (t, expected, actual) {
   Attempt.cata(actual, function (errs) {
