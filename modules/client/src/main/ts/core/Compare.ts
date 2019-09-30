@@ -12,7 +12,7 @@ const Obj = {
 
 export interface Comparison {
   eq: boolean;
-  why: () => string
+  why: () => string;
 }
 
 const pass = (): Comparison =>
@@ -21,21 +21,23 @@ const pass = (): Comparison =>
 const fail = (why: () => string): Comparison =>
   ({eq: false, why: why});
 
-const failCompare = (x: any, y: any, prefix ?: string): Comparison => {
-  return fail(()  => (prefix || 'Values were different') + ': [' + String(x) + '] vs [' + String(y) + ']');
+const failCompare = (x: any, y: any, prefix?: string): Comparison => {
+  return fail(() => (prefix || 'Values were different') + ': [' + String(x) + '] vs [' + String(y) + ']');
 };
 
 const isEquatableType = (x: string): boolean =>
-  Arr.contains([ 'undefined', 'boolean', 'number', 'string', 'function', 'xml', 'null' ], x);
+  Arr.contains(['undefined', 'boolean', 'number', 'string', 'function', 'xml', 'null'], x);
 
 const compareArrays = (x: any[], y: any[]): Comparison => {
-  if (x.length !== y.length)
+  if (x.length !== y.length) {
     return failCompare(x.length, y.length, 'Array lengths were different');
+  }
 
   for (let i = 0; i < x.length; i++) {
     const result = doCompare(x[i], y[i]);
-    if (!result.eq)
+    if (!result.eq) {
       return fail(() => 'Array elements ' + i + ' were different: ' + result.why());
+    }
   }
   return pass();
 };
@@ -52,23 +54,26 @@ const sortedKeys = (o: object) =>
 const compareObjects = (x: any, y: any) => {
   const constructorX = x.constructor;
   const constructorY = y.constructor;
-  if (constructorX !== constructorY)
+  if (constructorX !== constructorY) {
     return failCompare(constructorX, constructorY, 'Constructors were different');
+  }
 
   const keysX = sortedKeys(x);
   const keysY = sortedKeys(y);
 
   const keysResult = compareArrays(keysX, keysY);
-  if (!keysResult.eq)
+  if (!keysResult.eq) {
     return failCompare(JSON.stringify(keysX), JSON.stringify(keysY), 'Object keys were different');
+  }
 
-  for (let i in x) {
+  for (const i in x) {
     if (x.hasOwnProperty(i)) {
       const xValue = x[i];
       const yValue = y[i];
       const valueResult = doCompare(xValue, yValue);
-      if (!valueResult.eq)
+      if (!valueResult.eq) {
         return fail(() => 'Objects were different for key: [' + i + ']: ' + valueResult.why());
+      }
     }
   }
   return pass();
@@ -83,7 +88,7 @@ const doCompare = (x: any, y: any): Comparison => {
   if (typeX !== typeY) return failCompare(typeX, typeY, 'Types were different');
 
   if (isEquatableType(typeX)) {
-    if (x !== y) return failCompare(x, y , 'Reference equality failed');
+    if (x !== y) return failCompare(x, y, 'Reference equality failed');
 
   } else if (x == null) {
     if (y !== null) return failCompare(x, y, 'Both values were not null');

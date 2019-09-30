@@ -2,7 +2,7 @@ export interface Attempt<E, A> {
   foldAttempt: <B>(onFailed: (e: E) => B, onPassed: (a: A) => B) => B;
 }
 
-const failed = <E>(err: E): Attempt<E, never> => {
+const failed = <E, A>(err: E): Attempt<E, A> => {
   return {
     foldAttempt: (onFailed, onPassed) => {
       return onFailed(err);
@@ -10,7 +10,7 @@ const failed = <E>(err: E): Attempt<E, never> => {
   };
 };
 
-const passed = <A>(value: A): Attempt<never, A> =>  {
+const passed = <E, A>(value: A): Attempt<E, A> =>  {
   return {
     foldAttempt: (onFailed, onPassed) => {
       return onPassed(value);

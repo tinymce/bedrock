@@ -23,60 +23,48 @@ const commonOptions = (directories: Directories) => {
   ];
 };
 
-export const forAuto = (directories: Directories) => {
-  return cli.extract(
-    'bedrock-auto',
-    'Use a Webdriver to launch a browser and run tests against it',
-    commonOptions(directories).concat([
-      ClOptions.browser,
-      ClOptions.config,
-      ClOptions.files,
-      ClOptions.testdir,
-      ClOptions.testdirs,
-      ClOptions.name,
-      ClOptions.output,
-      ClOptions.debuggingPort,
-      ClOptions.customRoutes,
-      ClOptions.stopOnFailure,
-      ClOptions.retries,
-      ClOptions.delayExiting,
-      ClOptions.useSandboxForHeadless,
-      ClOptions.skipResetMousePosition,
-      ClOptions.coverage
-    ])
-  ) as Attempt<cli.CliError, BedrockAutoSettings>;
+export const forAuto = (directories: Directories, argv: string[] = process.argv) => {
+  return cli.extract('bedrock-auto', 'Use a Webdriver to launch a browser and run tests against it', commonOptions(directories).concat([
+    ClOptions.browser,
+    ClOptions.config,
+    ClOptions.files,
+    ClOptions.testdir,
+    ClOptions.testdirs,
+    ClOptions.name,
+    ClOptions.output,
+    ClOptions.debuggingPort,
+    ClOptions.customRoutes,
+    ClOptions.stopOnFailure,
+    ClOptions.retries,
+    ClOptions.delayExiting,
+    ClOptions.useSandboxForHeadless,
+    ClOptions.skipResetMousePosition,
+    ClOptions.coverage
+  ]), argv) as Attempt<cli.CliError, BedrockAutoSettings>;
 };
 
-export const forManual = (directories: Directories) => {
-  return cli.extract(
-    'bedrock',
-    'Launch a testing process on a localhost port and allow the user to navigate to it in any browser',
-    commonOptions(directories).concat([
-      ClOptions.stopOnFailure__hidden,
-      ClOptions.config,
-      ClOptions.files,
-      ClOptions.testdir,
-      ClOptions.testdirs,
-      ClOptions.customRoutes,
-      ClOptions.coverage
-    ])
-  ) as Attempt<cli.CliError, BedrockSettings>;
+export const forManual = (directories: Directories, argv: string[] = process.argv) => {
+  return cli.extract('bedrock', 'Launch a testing process on a localhost port and allow the user to navigate to it in any browser', commonOptions(directories).concat([
+    ClOptions.stopOnFailure__hidden,
+    ClOptions.config,
+    ClOptions.files,
+    ClOptions.testdir,
+    ClOptions.testdirs,
+    ClOptions.customRoutes,
+    ClOptions.coverage
+  ]), argv) as Attempt<cli.CliError, BedrockSettings>;
 };
 
-export const forFramework = (directories: Directories) => {
-  return cli.extract(
-    'bedrock-framework',
-    'Load bedrock against a specific page using a framework',
-    commonOptions(directories).concat([
-      ClOptions.stopOnFailure,
-      ClOptions.name,
-      ClOptions.page,
-      ClOptions.browser,
-      ClOptions.output,
-      ClOptions.framework,
-      ClOptions.debuggingPort
-    ])
-  ) as Attempt<cli.CliError, BedrockFrameworkSettings>;
+export const forFramework = (directories: Directories, argv: string[] = process.argv) => {
+  return cli.extract('bedrock-framework', 'Load bedrock against a specific page using a framework', commonOptions(directories).concat([
+    ClOptions.stopOnFailure,
+    ClOptions.name,
+    ClOptions.page,
+    ClOptions.browser,
+    ClOptions.output,
+    ClOptions.framework,
+    ClOptions.debuggingPort
+  ]), argv) as Attempt<cli.CliError, BedrockFrameworkSettings>;
 };
 
 export const logAndExit = (errs: cli.CliError) => {

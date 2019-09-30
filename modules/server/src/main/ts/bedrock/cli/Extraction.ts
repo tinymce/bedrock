@@ -30,7 +30,7 @@ export const inSet = (candidates: string[]) => {
   };
 };
 
-export const any = (name: string, value: any) => {
+export const any = <E, A> (name: string, value: A): Attempt<E, A> => {
   return Attempt.passed(value);
 };
 
