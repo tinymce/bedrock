@@ -25,6 +25,7 @@
   },
   "private": false,
   "dependencies": {
+    "@ephox/dispute": "^1.0.0",
     "async": "^1.5.2",
     "babel-polyfill": "^6.23.0",
     "command-line-args": "^5.0.0",
