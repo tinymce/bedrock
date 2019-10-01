@@ -1,5 +1,5 @@
 import * as UnitTest from '../../../modules/client/src/main/ts/api/UnitTest';
-import * as assert from '../../../modules/client/src/main/ts/api/Assert';
+import * as assert from '../../../modules/client/src/main/ts/api/LegacyAssert';
 
 UnitTest.asynctest('IFrame Test', (success, failure) => {
 

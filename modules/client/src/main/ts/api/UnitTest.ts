@@ -44,11 +44,7 @@ const normalizeError = (err: TestError): NormalizedTestError => {
     return error;
   } else if (typeof err === 'function') {
     return normalizeError(err());
-  } else if (err instanceof Error) {
-    // types might not be quite right here...
-    return err;
   } else {
-    // types might not be quite right here...
     return err;
   }
 };

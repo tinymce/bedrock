@@ -1,4 +1,4 @@
-interface JsError extends Error {
+export interface JsError extends Error {
   toString?: () => string;
 }
 
@@ -15,10 +15,17 @@ export interface HtmlDiffAssertionError extends JsError {
     comparison: string;
   };
   label: string;
-  stack: string;
 }
 
-export type NormalizedTestError = JsError | AssertionError | HtmlDiffAssertionError;
+export interface PprintAssertionError extends JsError {
+  diff: {
+    expected: string;
+    actual: string;
+    comparison: string;
+  };
+}
+
+export type NormalizedTestError = JsError | AssertionError | PprintAssertionError | HtmlDiffAssertionError;
 
 export interface LoggedError {
   error: NormalizedTestError;

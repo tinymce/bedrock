@@ -1,5 +1,11 @@
 import { UrlParams } from './core/UrlParams';
-import { AssertionError, HtmlDiffAssertionError, LoggedError, NormalizedTestError } from './alien/ErrorTypes';
+import {
+  AssertionError,
+  HtmlDiffAssertionError,
+  LoggedError,
+  NormalizedTestError,
+  PprintAssertionError
+} from './alien/ErrorTypes';
 import { HarnessResponse } from './core/ServerTypes';
 
 declare const $: JQueryStatic;
@@ -96,6 +102,10 @@ const processQUnit = (html: string): string =>
     .replace(/&lt;ins&gt;/g, '<ins>')
     .replace(/&lt;\/ins&gt;/g, '</ins>'));
 
+const isPprintAssertionError = (err: NormalizedTestError): err is PprintAssertionError => {
+  return err.name === 'PprintAssertionError';
+};
+
 const isHTMLDiffError = (err: NormalizedTestError): err is HtmlDiffAssertionError => {
   return err.name === 'HtmlAssertion';
 };
@@ -131,6 +141,10 @@ const clean = (err: LoggedError): string => {
       '\nActual: ' + htmlentities(e.diff.actual) +
       '\n\nHTML Diff: ' + processQUnit(htmlentities(e.diff.comparison)) +
       extra;
+  } else if (isPprintAssertionError(e)) {
+    return 'Test failure: ' + e.message +
+      '\nExpected: \n' + htmlentities(e.diff.expected) +
+      '\nActual: \n' + htmlentities(e.diff.actual);
   } else if (isAssertionError(e)) {
     return 'Assertion error' + (e.message ? ' [' + e.message + ']' : '') +
       ': [' + htmlentities(JSON.stringify(e.expected)) + '] ' + e.operator +
