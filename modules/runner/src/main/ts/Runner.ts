@@ -7,6 +7,7 @@ import {
   PprintAssertionError
 } from './alien/ErrorTypes';
 import { HarnessResponse } from './core/ServerTypes';
+import * as Differ from './core/Differ';
 
 declare const $: JQueryStatic;
 
@@ -142,9 +143,12 @@ const clean = (err: LoggedError): string => {
       '\n\nHTML Diff: ' + processQUnit(htmlentities(e.diff.comparison)) +
       extra;
   } else if (isPprintAssertionError(e)) {
+    const d = Differ.diffLineMode(e.diff.expected, e.diff.actual);
+    const dh = Differ.diffPrettyHtml(d);
     return 'Test failure: ' + e.message +
       '\nExpected: \n' + htmlentities(e.diff.expected) +
-      '\nActual: \n' + htmlentities(e.diff.actual);
+      '\nActual: \n' + htmlentities(e.diff.actual) +
+      '\nDiff: \n' + dh;
   } else if (isAssertionError(e)) {
     return 'Assertion error' + (e.message ? ' [' + e.message + ']' : '') +
       ': [' + htmlentities(JSON.stringify(e.expected)) + '] ' + e.operator +

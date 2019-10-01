@@ -26,11 +26,13 @@
   "private": false,
   "dependencies": {
     "@ephox/dispute": "^1.0.1",
+    "@types/diff-match-patch": "^1.0.32",
     "async": "^1.5.2",
     "babel-polyfill": "^6.23.0",
     "command-line-args": "^5.0.0",
     "command-line-usage": "^5.0.1",
     "cross-spawn": "^7.0.0",
+    "diff-match-patch": "^1.0.4",
     "finalhandler": "^1.1.2",
     "fork-ts-checker-webpack-plugin": "~1.0.4",
     "istanbul-instrumenter-loader": "^3.0.1",
