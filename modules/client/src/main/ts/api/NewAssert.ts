@@ -11,8 +11,7 @@ const eq = function <T> (message: TestLabel, expected: T, actual: T, tt: Testabl
     e.name = 'PprintAssertionError';
     e.diff = {
       actual: ppActual,
-      expected: ppExpected,
-      comparison: 'INSERT DIFF HERE' // TODO
+      expected: ppExpected
     };
     throw e;
   }

@@ -21,7 +21,6 @@ export interface PprintAssertionError extends JsError {
   diff: {
     expected: string;
     actual: string;
-    comparison: string;
   };
 }
 
