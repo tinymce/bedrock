@@ -5,11 +5,8 @@ import {
   NormalizedTestError,
   PprintAssertionError
 } from '../alien/ErrorTypes';
-import * as Differ from '../core/Differ';
-
-
-const htmlentities = (str: string): string =>
-  String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+import * as Differ from './Differ';
+import { htmlentities } from './StringUtils';
 
 /* Required to make <del> and <ins> stay as tags.*/
 const processQUnit = (html: string): string =>
@@ -49,8 +46,8 @@ const formatExtra = (e: LoggedError): string => {
 
 export const html = (err: LoggedError): string => {
   const e = err === undefined ? new Error('no error given') : err.error;
-
   const extra = formatExtra(err);
+
   if (isHTMLDiffError(e)) {
     // Provide detailed HTML comparison information
     return 'Test failure: ' + e.message +
@@ -59,12 +56,11 @@ export const html = (err: LoggedError): string => {
       '\n\nHTML Diff: ' + processQUnit(htmlentities(e.diff.comparison)) +
       extra;
   } else if (isPprintAssertionError(e)) {
-    const d = Differ.diffLineMode(e.diff.expected, e.diff.actual);
-    const dh = Differ.diffPrettyHtml(d);
+    const dh = Differ.diffPrettyHtml(e.diff.expected, e.diff.actual);
     return 'Test failure: ' + e.message +
       '\nExpected: \n' + htmlentities(e.diff.expected) +
       '\nActual: \n' + htmlentities(e.diff.actual) +
-      '\nDiff: \n' + dh;
+      '\nDiff: \n' + dh + extra;
   } else if (isAssertionError(e)) {
     return 'Assertion error' + (e.message ? ' [' + e.message + ']' : '') +
       ': [' + htmlentities(JSON.stringify(e.expected)) + '] ' + e.operator +
@@ -75,5 +71,20 @@ export const html = (err: LoggedError): string => {
     return htmlentities(String(e) + extra);
   } else {
     return htmlentities(JSON.stringify(e) + extra);
+  }
+};
+
+export const text = (err: LoggedError): string => {
+  const e = err === undefined ? new Error('no error given') : err.error;
+  const extra = formatExtra(err);
+
+  if (isPprintAssertionError(e)) {
+    const dh = Differ.diffPrettyText(e.diff.expected, e.diff.actual);
+    return 'Test failure: ' + e.message +
+      '\nExpected: \n' + htmlentities(e.diff.expected) +
+      '\nActual: \n' + htmlentities(e.diff.actual) +
+      '\nDiff: \n' + dh + extra;
+  } else {
+    return html(err);
   }
 };

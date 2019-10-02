@@ -3,7 +3,7 @@ import {
   LoggedError,
 } from './alien/ErrorTypes';
 import { HarnessResponse } from './core/ServerTypes';
-import * as Reporter from './reporter/Reporter';
+import * as Reporter from './core/Reporter';
 
 declare const $: JQueryStatic;
 
@@ -200,10 +200,11 @@ const reporter = (() => {
       marker.text('[failed]').addClass('failed');
       // Don't use .text() as it strips out newlines in IE, even when used
       // on a pre tag.
-      const errorMessage = Reporter.html(e);
+      const htmlError = Reporter.html(e);
+      const textError = Reporter.text(e);
       const pre = $('<pre/>')
         .addClass('error')
-        .html(errorMessage);
+        .html(htmlError);
       error.append(pre);
       const testTime = elapsed(starttime);
       time.text(testTime);
@@ -213,7 +214,7 @@ const reporter = (() => {
         retryBtn.show();
         skipBtn.show();
       }
-      sendTestResult(params.session, file, name, false, testTime, errorMessage, onDone, onDone);
+      sendTestResult(params.session, file, name, false, testTime, textError, onDone, onDone);
     };
 
     return {
