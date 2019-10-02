@@ -47,7 +47,7 @@ const formatExtra = (e: LoggedError): string => {
   }
 };
 
-export const report = (err: LoggedError): string => {
+export const html = (err: LoggedError): string => {
   const e = err === undefined ? new Error('no error given') : err.error;
 
   const extra = formatExtra(err);

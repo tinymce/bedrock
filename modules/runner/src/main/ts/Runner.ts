@@ -3,7 +3,7 @@ import {
   LoggedError,
 } from './alien/ErrorTypes';
 import { HarnessResponse } from './core/ServerTypes';
-import * as HtmlReporter from './reporter/HtmlReporter';
+import * as Reporter from './reporter/Reporter';
 
 declare const $: JQueryStatic;
 
@@ -200,7 +200,7 @@ const reporter = (() => {
       marker.text('[failed]').addClass('failed');
       // Don't use .text() as it strips out newlines in IE, even when used
       // on a pre tag.
-      const errorMessage = HtmlReporter.report(e);
+      const errorMessage = Reporter.html(e);
       const pre = $('<pre/>')
         .addClass('error')
         .html(errorMessage);
