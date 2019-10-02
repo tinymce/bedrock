@@ -93,7 +93,7 @@
     "bin/**",
     "lib/**",
     "dist/**",
-    "src/**",
+    "modules/**",
     "tasks/**"
   ],
   "publishConfig": {
