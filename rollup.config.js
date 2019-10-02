@@ -13,10 +13,6 @@ export default {
   context: 'window',
   plugins: [
     resolve(),
-    commonjs({
-      namedExports: {
-        'diff-match-patch': [ 'diff_match_patch', 'DIFF_DELETE', 'DIFF_EQUAL', 'DIFF_INSERT' ]
-      }
-    })
+    commonjs()
   ]
 };
