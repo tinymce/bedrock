@@ -1,5 +1,5 @@
 import { describe, it } from 'mocha';
-import * as Assert from '../../main/ts/api/NewAssert';
+import { Assert } from '../../main/ts/api/Main';
 import * as fc from 'fast-check';
 import { Testable } from '@ephox/dispute';
 import { PprintAssertionError } from '../../main/ts/core/ErrorTypes';
