@@ -30,5 +30,9 @@ export const generateReport = (data: TestResults): string => {
   }
 };
 
-export const printReport = (data: TestResults): void =>
-  console.log(generateReport(data));
+export const printReport = (data: TestResults): void => {
+  const message = generateReport(data);
+  if (message !== '') {
+    console.error(message);
+  }
+};
