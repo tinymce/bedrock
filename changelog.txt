@@ -1,3 +1,8 @@
+Version 8.1.0
+
+* New assertions library with composable equality, based on "@ephox/dispute" library.
+* Test failures output to stderr (max of 5 failures shown)
+
 Version 8.0.2
 
 * Changed key effects to use left meta key instead of right meta key.
