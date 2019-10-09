@@ -2,7 +2,7 @@ import { Testable, Pprint } from '@ephox/dispute';
 import { TestLabel } from './TestLabel';
 import { PprintAssertionError } from '../core/ErrorTypes';
 
-const eq = function <T> (message: TestLabel, expected: T, actual: T, tt: Testable.Testable<T> = Testable.tDeepAny) {
+const eq = function <T> (message: TestLabel, expected: T, actual: T, tt: Testable.Testable<T> = Testable.tAny) {
   const result = tt.eq(expected, actual);
   if (!result) {
     const ppActual = Pprint.render(actual, tt);
