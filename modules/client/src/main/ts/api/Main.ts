@@ -1,5 +1,6 @@
-import * as Assert from './Assert';
+import * as LegacyAssert from './LegacyAssert';
+import * as NewAssert from './NewAssert';
 import * as UnitTest from './UnitTest';
 import { TestLabel } from './TestLabel';
 
-export { Assert as assert, UnitTest, TestLabel };
+export { LegacyAssert as assert, NewAssert as Assert, UnitTest, TestLabel };
