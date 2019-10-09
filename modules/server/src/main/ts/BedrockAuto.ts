@@ -8,6 +8,8 @@ import * as Driver from './bedrock/auto/Driver';
 import * as Lifecycle from './bedrock/core/Lifecycle';
 import { BedrockAutoSettings } from './bedrock/core/Settings';
 import { ExitCodes } from './bedrock/util/ExitCodes';
+import * as ConsoleReporter from './bedrock/core/ConsoleReporter';
+import { TestResults } from './bedrock/server/Controller';
 
 export const go = (settings: BedrockAutoSettings) => {
   const master = DriverMaster.create();
@@ -48,16 +50,18 @@ export const go = (settings: BedrockAutoSettings) => {
           console.log(isPhantom ? '\nPhantom tests loading ...\n' : '\nInitial page has loaded ...\n');
           service.markLoaded();
           service.enableHud();
-          return service.awaitDone().then((data) => {
+          return service.awaitDone().then((data: TestResults) => {
+            ConsoleReporter.printReport(data);
             return Reporter.write({
               name: settings.name,
               output: settings.output
             })(data);
-          }).catch((pollExit) => {
+          }).catch((data: TestResults) => {
+            ConsoleReporter.printReport(data);
             return Reporter.writePollExit({
               name: settings.name,
               output: settings.output
-            }, pollExit);
+            }, data);
           });
         });
 
