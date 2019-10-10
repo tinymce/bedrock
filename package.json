@@ -14,20 +14,19 @@
     "build-client": "yarn workspace @ephox/bedrock-client build",
     "build-runner": "yarn workspace @ephox/bedrock-runner build",
     "build-server": "yarn workspace @ephox/bedrock-server build",
-    "build": "yarn lint && yarn build-common && yarn build-client && yarn build-runner && yarn build-server",
+    "build": "yarn lerna run build --ignore @ephox/bedrock-sample",
     "test-common": "yarn workspace @ephox/bedrock-common test",
     "test-client": "yarn workspace @ephox/bedrock-client test",
     "test-runner": "yarn workspace @ephox/bedrock-runner test",
     "test-server": "yarn workspace @ephox/bedrock-server test",
-    "test-samples-pass": "yarn workspace @ephox/bedrock-sample test-samples-pass",
+    "test-sample": "yarn workspace @ephox/bedrock-sample test",
     "test-samples-fail": "yarn workspace @ephox/bedrock-sample test-samples-fail",
-    "test": "yarn build && yarn test-common && yarn test-client && yarn test-runner && yarn test-server && yarn test-samples-pass"
+    "test": "yarn build && yarn lerna run test"
   },
   "private": true,
   "workspaces": [
     "modules/*"
   ],
-  "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.2.3",
     "@types/mocha": "^5.2.7",
@@ -39,6 +38,7 @@
     "esm": "^3.2.25",
     "fast-check": "^1.17.0",
     "fast-deep-equal": "^2.0.1",
+    "lerna": "^3.17.0",
     "mocha": "^6.2.0",
     "typescript": "^3.3.0"
   },
