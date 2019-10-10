@@ -18,9 +18,7 @@
   "module": "./lib/main/ts/api/Main.js",
   "types": "./lib/main/ts/api/Main.d.ts",
   "files": [
-    "bin/**",
     "lib/**",
-    "dist/**",
     "src/**"
   ],
   "publishConfig": {

@@ -1,12 +1,12 @@
-import {
-  AssertionError,
-  HtmlDiffAssertionError,
-  LoggedError,
-  NormalizedTestError,
-  PprintAssertionError
-} from '../alien/ErrorTypes';
+import { ErrorTypes } from '@ephox/bedrock-common';
 import * as Differ from './Differ';
 import { htmlentities } from './StringUtils';
+
+type AssertionError = ErrorTypes.AssertionError;
+type HtmlDiffAssertionError = ErrorTypes.HtmlDiffAssertionError;
+type LoggedError = ErrorTypes.LoggedError;
+type NormalizedTestError = ErrorTypes.NormalizedTestError;
+type PprintAssertionError = ErrorTypes.PprintAssertionError;
 
 /* Required to make <del> and <ins> stay as tags.*/
 const processQUnit = (html: string): string =>

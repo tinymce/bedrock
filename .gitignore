@@ -6,5 +6,5 @@ lib
 *.sublime-workspace
 package-lock.json
 /.idea
-/dist
+dist
 yarn-error.log
