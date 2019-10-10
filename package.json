@@ -7,7 +7,7 @@
     "url": "https://github.com/ephox/bedrock"
   },
   "scripts": {
-    "lint": "yarn eslint 'modules/client/**/*.ts' 'modules/runner/**/*.ts' 'modules/server/**/*.ts'",
+    "lint": "yarn eslint 'modules/common/src/**/*.ts' 'modules/client/src/**/*.ts' 'modules/runner/src/**/*.ts' 'modules/server/src/**/*.ts'",
     "prepublishOnly": "yarn build",
     "clean": "git clean -dfx lib dist",
     "build-common": "yarn workspace @ephox/bedrock-common build",
@@ -21,7 +21,7 @@
     "test-server": "yarn workspace @ephox/bedrock-server test",
     "test-samples-pass": "yarn workspace @ephox/bedrock-sample test-samples-pass",
     "test-samples-fail": "yarn workspace @ephox/bedrock-sample test-samples-fail",
-    "test": "yarn test-common && test-client && yarn test-runner && yarn test-server && yarn test-samples-pass"
+    "test": "yarn test-common && yarn test-client && yarn test-runner && yarn test-server && yarn test-samples-pass"
   },
   "private": true,
   "workspaces": [
