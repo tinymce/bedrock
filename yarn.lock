@@ -324,7 +324,7 @@
     loglevel-plugin-prefix "^0.8.4"
     strip-ansi "^5.2.0"
 
-"@wdio/protocols@5.14.0":
+"@wdio/protocols@5.14.0", "@wdio/protocols@^5.13.0-alpha.0":
   version "5.14.0"
   resolved "https://registry.yarnpkg.com/@wdio/protocols/-/protocols-5.14.0.tgz#9007b67d14f4bcebd2b9097f611d4a558024c308"
   integrity sha512-7jRxGkreibkqHKQV5jlQmAyqzIIU43lg9KSNGy0ThrUz8kLsOzClaTdL2qDlFUkLcplqMvRFcnmwFPjvCptmVg==
@@ -6178,15 +6178,27 @@ wbuf@^1.1.0, wbuf@^1.7.3:
   dependencies:
     minimalistic-assert "^1.0.0"
 
-webdriver@^5.13.1:
-  version "5.14.4"
-  resolved "https://registry.yarnpkg.com/webdriver/-/webdriver-5.14.4.tgz#02a8f7f35df5568f0987999b87c4ea89aff0a77b"
-  integrity sha512-4O3QrInHcfvYWF+MG6cCYnxcWxE5tS70DPbNRNhhw9SJvh0sj2vpwSIYMwSEsGXuB799s3c8Rhq9Ow3QzVyiJw==
+webdriver@5.13.1:
+  version "5.13.1"
+  resolved "https://registry.yarnpkg.com/webdriver/-/webdriver-5.13.1.tgz#24f2839a9af8bd932057487749aab67efc21e59d"
+  integrity sha512-Gvsf2o8jrfZMgLWIC9C9bcT5T0OZvNHq7WO5PhNSB2pbg3ypSj4kk4zJZSyP331FTgib+qxneRtg7r/3Ea7mLw==
   dependencies:
-    "@wdio/config" "5.14.0"
-    "@wdio/logger" "5.13.2"
-    "@wdio/protocols" "5.14.0"
-    "@wdio/utils" "5.14.4"
+    "@wdio/config" "^5.13.0-alpha.0"
+    "@wdio/logger" "^5.12.1"
+    "@wdio/protocols" "^5.13.0-alpha.0"
+    "@wdio/utils" "^5.13.0"
+    lodash.merge "^4.6.1"
+    request "^2.83.0"
+
+webdriver@^5.13.1:
+  version "5.13.1"
+  resolved "https://registry.yarnpkg.com/webdriver/-/webdriver-5.13.1.tgz#24f2839a9af8bd932057487749aab67efc21e59d"
+  integrity sha512-Gvsf2o8jrfZMgLWIC9C9bcT5T0OZvNHq7WO5PhNSB2pbg3ypSj4kk4zJZSyP331FTgib+qxneRtg7r/3Ea7mLw==
+  dependencies:
+    "@wdio/config" "^5.13.0-alpha.0"
+    "@wdio/logger" "^5.12.1"
+    "@wdio/protocols" "^5.13.0-alpha.0"
+    "@wdio/utils" "^5.13.0"
     lodash.merge "^4.6.1"
     request "^2.83.0"
 
