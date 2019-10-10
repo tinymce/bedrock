@@ -1,4 +1,4 @@
-import * as UnitTest from '../../../modules/client/src/main/ts/api/UnitTest';
+import { UnitTest } from '@ephox/bedrock-client'
 
 UnitTest.asynctest('Clipboard Test', (success, failure) => {
 

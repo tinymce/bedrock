@@ -11,6 +11,7 @@
   "dependencies": {
     "@ephox/bedrock-common": "9.0.0",
     "@ephox/bedrock-runner": "9.0.0",
+    "@ephox/bedrock-client": "9.0.0",
     "@types/command-line-args": "^5.0.0",
     "@types/command-line-usage": "^5.0.1"
   },
