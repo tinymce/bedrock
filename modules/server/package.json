@@ -1,0 +1,30 @@
+{
+  "name": "@ephox/bedrock-server",
+  "version": "9.0.0",
+  "author": "Tiny Technologies Inc",
+  "license": "Apache-2.0",
+  "scripts": {
+    "prepublishOnly": "tsc -b && rollup --config",
+    "test": "mocha -r esm lib/test/ts/**/*Test.js",
+    "buildAndTest": "yarn prepublishOnly && yarn test"
+  },
+  "dependencies": {
+    "@ephox/bedrock-common": "9.0.0",
+    "@ephox/bedrock-runner": "9.0.0",
+    "@types/command-line-args": "^5.0.0",
+    "@types/command-line-usage": "^5.0.1"
+  },
+  "devDependencies": {
+  },
+  "main": "./lib/main/ts/api/Main.js",
+  "module": "./lib/main/ts/api/Main.js",
+  "types": "./lib/main/ts/api/Main.d.ts",
+  "files": [
+    "bin/**",
+    "lib/**",
+    "src/**"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  }
+}
