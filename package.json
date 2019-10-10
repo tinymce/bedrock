@@ -30,8 +30,7 @@
   "workspaces": [
     "modules/*"
   ],
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.2.3",
     "@types/jquery": "^3.3.31",
@@ -52,6 +51,5 @@
   },
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
-  "files": [
-  ]
+  "files": []
 }
