@@ -21,7 +21,7 @@
     "test-server": "yarn workspace @ephox/bedrock-server test",
     "test-samples-pass": "yarn workspace @ephox/bedrock-sample test-samples-pass",
     "test-samples-fail": "yarn workspace @ephox/bedrock-sample test-samples-fail",
-    "test": "yarn test-common && yarn test-client && yarn test-runner && yarn test-server && yarn test-samples-pass"
+    "test": "yarn build && yarn test-common && yarn test-client && yarn test-runner && yarn test-server && yarn test-samples-pass"
   },
   "private": true,
   "workspaces": [
