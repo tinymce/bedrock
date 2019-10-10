@@ -61,7 +61,6 @@
   },
   "devDependencies": {
     "@types/chai": "^4.2.3",
-
     "@types/cross-spawn": "^6.0.0",
     "@types/finalhandler": "^1.1.0",
     "@types/jquery": "^3.3.31",
@@ -90,21 +89,10 @@
     "rollup-plugin-sourcemaps": "^0.4.2"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=10.0.0"
   },
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
-  "main": "./lib/client/main/ts/api/Main.js",
-  "module": "./lib/client/main/ts/api/Main.js",
-  "types": "./lib/client/main/ts/api/Main.d.ts",
   "files": [
-    "bin/**",
-    "lib/**",
-    "dist/**",
-    "modules/**",
-    "tasks/**"
-  ],
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
-  }
+  ]
 }

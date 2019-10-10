@@ -4,7 +4,7 @@
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
   "scripts": {
-    "prepublishOnly": "tsc -b && rollup --config",
+    "prepublishOnly": "tsc -b",
     "test": "mocha -r esm lib/test/ts/**/*Test.js",
     "buildAndTest": "yarn prepublishOnly && yarn test"
   },
@@ -22,7 +22,8 @@
   "files": [
     "bin/**",
     "lib/**",
-    "src/**"
+    "src/**",
+    "tasks/**"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

@@ -30,7 +30,7 @@ describe('cli', () => {
   it('Minimal specification of bedrock-auto', () => {
     const args = [
       "--browser", "MicrosoftEdge",
-      "--files", "modules/server/src/test/resources/test.file1",
+      "--files", "src/test/resources/test.file1",
       "--config", "sample/tsconfig.json"
     ];
     const actual = Clis.forAuto(directories, args);
@@ -42,7 +42,7 @@ describe('cli', () => {
       output: 'scratch',
       help: false,
       testfiles: [
-        'modules/server/src/test/resources/test.file1'
+        'src/test/resources/test.file1'
       ],
       debuggingPort: 9000,
       delayExit: false,
@@ -60,7 +60,7 @@ describe('cli', () => {
 
   it('Specification of bedrock-auto missing required field: browser', () => {
     const args = [
-      "--files", "modules/server/src/test/resources/test.file1",
+      "--files", "src/test/resources/test.file1",
       "--config", "sample/tsconfig.json"
     ];
     const actual = Clis.forAuto(directories, args);
@@ -71,14 +71,14 @@ describe('cli', () => {
 
   it('Minimal specification of bedrock-manual', () => {
     const args = [
-      "--files", "modules/server/src/test/resources/test.file1",
+      "--files", "src/test/resources/test.file1",
       "--config", "sample/tsconfig.json"
     ];
     const actual = Clis.forManual(directories, args);
     AttemptUtils.assertResult( {
       config: 'sample/tsconfig.json',
       testfiles: [
-        'modules/server/src/test/resources/test.file1'
+        'src/test/resources/test.file1'
       ],
       help: false,
       bundler: 'webpack',
