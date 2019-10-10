@@ -26,7 +26,10 @@
     "test-samples-fail": "bin/bedrock-auto.js -b phantomjs --config sample/tsconfig.json --files sample/ts/**/*FailTest.ts",
     "test": "yarn build && yarn test-client && yarn test-runner && yarn test-server && yarn test-samples-pass"
   },
-  "private": false,
+  "private": true,
+  "workspaces": [
+    "modules/*"
+  ],
   "dependencies": {
     "@ephox/dispute": "^1.0.2",
     "@types/diff": "^4.0.2",
@@ -90,7 +93,7 @@
   "engines": {
     "node": ">=8.0.0"
   },
-  "author": "Ephox Corporation",
+  "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
   "main": "./lib/client/main/ts/api/Main.js",
   "module": "./lib/client/main/ts/api/Main.js",

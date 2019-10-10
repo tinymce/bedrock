@@ -1,9 +1,10 @@
 .rpt2_cache
-/node_modules
+node_modules
 /scratch
 /*.log
-/lib
+lib
 *.sublime-workspace
 package-lock.json
 /.idea
 /dist
+yarn-error.log
