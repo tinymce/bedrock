@@ -39,7 +39,7 @@
     "@typescript-eslint/parser": "^2.0.0",
     "chai": "^4.2.0",
     "eslint": "^6.3.0",
-    "eslint-config-google": "^0.13.0",
+    "eslint-config-google": "^0.14.0",
     "esm": "^3.2.25",
     "fast-check": "^1.17.0",
     "fast-deep-equal": "^2.0.1",
