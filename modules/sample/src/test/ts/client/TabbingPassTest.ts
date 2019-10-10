@@ -1,5 +1,4 @@
-import { UnitTest } from '@ephox/bedrock-client'
-import * as assert from '../../../modules/client/src/main/ts/api/LegacyAssert';
+import { UnitTest, assert } from '@ephox/bedrock-client'
 
 UnitTest.asynctest('Tabbing Test', (success, failure) => {
   var input1 = document.createElement('input');

@@ -1,7 +1,7 @@
-import { UrlParams } from './core/UrlParams';
+import { UrlParams } from '../core/UrlParams';
 import { ErrorTypes } from '@ephox/bedrock-common';
-import { HarnessResponse } from './core/ServerTypes';
-import * as Reporter from './core/Reporter';
+import { HarnessResponse } from '../core/ServerTypes';
+import * as Reporter from '../core/Reporter';
 
 declare const $: JQueryStatic;
 

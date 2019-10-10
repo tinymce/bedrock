@@ -3,8 +3,14 @@
   "version": "9.0.0",
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
+  "bin": {
+    "bedrock-auto": "./bin/bedrock-auto.js",
+    "bedrock-framework": "./bin/bedrock-framework.js",
+    "bedrock": "./bin/bedrock.js"
+  },
   "scripts": {
     "prepublishOnly": "tsc -b",
+    "build": "yarn prepublishOnly",
     "test": "mocha -r esm lib/test/ts/**/*Test.js",
     "buildAndTest": "yarn prepublishOnly && yarn test"
   },

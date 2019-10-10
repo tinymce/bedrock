@@ -2,7 +2,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 
 export default {
-  input: 'lib/main/ts/Runner.js',
+  input: 'lib/main/ts/api/Main.js',
   output: {
     file: 'dist/runner.js',
     format: 'iife',

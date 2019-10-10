@@ -5,6 +5,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "prepublishOnly": "tsc -b && rollup --config",
+    "build": "yarn prepublishOnly",
     "test": "mocha -r esm lib/test/ts/**/*Test.js",
     "buildAndTest": "yarn prepublishOnly && yarn test"
   },

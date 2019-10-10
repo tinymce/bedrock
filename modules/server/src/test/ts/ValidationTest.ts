@@ -66,7 +66,8 @@ describe('Validation', () => {
     {
       other: [
         'src/test/resources/html/screen.html',
-        'src/test/resources/test.file1'
+        'src/test/resources/test.file1',
+        'src/test/resources/tsconfig.sample.json'
       ]
     },
     [
@@ -112,7 +113,7 @@ describe('Validation', () => {
     {
       alpha: 'Alpha',
       'new.beta': 'Beta',
-      gamma: ['src/test/resources/html/screen.html', 'src/test/resources/test.file1'],
+      gamma: ['src/test/resources/html/screen.html', 'src/test/resources/test.file1', 'src/test/resources/tsconfig.sample.json'],
       delta: 'src/test/resources'
     },
     [

@@ -1,8 +1,6 @@
-import { UnitTest } from '@ephox/bedrock-client'
-import * as assert from '../../../modules/client/src/main/ts/api/LegacyAssert';
+import { UnitTest, assert } from '@ephox/bedrock-client'
 
 UnitTest.asynctest('IFrame Test', (success, failure) => {
-
 
   /*
     * This frame will get sent keyboard events to its content editable body

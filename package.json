@@ -6,11 +6,6 @@
     "type": "git",
     "url": "https://github.com/ephox/bedrock"
   },
-  "bin": {
-    "bedrock-auto": "./bin/bedrock-auto.js",
-    "bedrock-framework": "./bin/bedrock-framework.js",
-    "bedrock": "./bin/bedrock.js"
-  },
   "scripts": {
     "lint": "yarn eslint 'modules/client/**/*.ts' 'modules/runner/**/*.ts' 'modules/server/**/*.ts'",
     "prepublishOnly": "yarn build",

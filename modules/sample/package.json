@@ -1,0 +1,23 @@
+{
+  "name": "@ephox/bedrock-sample",
+  "version": "9.0.0",
+  "author": "Tiny Technologies Inc",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test-samples-pass": "../server/bin/bedrock-auto.js -b phantomjs --config tsconfig.json --files src/test/ts/**/*PassTest.ts src/test/ts/**/*PassTest.tsx",
+    "test-samples-pass-manual": "../server/bin/bedrock.js --config tsconfig.json --files src/test/ts/**/*PassTest.ts src/test/ts/**/*PassTest.tsx",
+    "test-samples-fail": "../server/bin/bedrock-auto.js -b phantomjs --config tsconfig.json --files src/test/ts/**/*FailTest.ts",
+    "test": "yarn test-samples-pass"
+  },
+  "dependencies": {
+    "@ephox/bedrock-client": "9.0.0"
+  },
+  "devDependencies": {
+    "@ephox/bedrock-server": "9.0.0"
+  },
+  "files": [],
+  "private": true,
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  }
+}
