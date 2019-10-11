@@ -22,7 +22,7 @@ node("primary") {
     checkout scm
   }
 
-  plumbing.withBitbucket {
+  withBitbucket {
     stage("clean") {
       sh 'yarn clean'
     }
