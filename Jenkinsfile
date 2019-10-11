@@ -1,7 +1,18 @@
+library identifier: 'jenkins-plumbing@feature/TINY-4149', retriever: modernSCM(
+  [$class: 'GitSCMSource',
+   remote: 'ssh://git@stash:7999/van/jenkins-plumbing.git',
+   credentialsId: '8aa93893-84cc-45fc-a029-a42f21197bb3'])
+
 properties([
   disableConcurrentBuilds(),
   pipelineTriggers([])
 ])
+
+def isReleaseBranch() {
+  // The branch name could be in the BRANCH_NAME or GIT_BRANCH variable depending on the type of job
+  def branchName = env.BRANCH_NAME ? env.BRANCH_NAME : env.GIT_BRANCH
+  return branchName == 'master' || branchName == 'origin/master';
+}
 
 node("primary") {
   echo "Clean workspace"
@@ -9,24 +20,37 @@ node("primary") {
 
   stage ("Checkout SCM") {
     checkout scm
-    sh "mkdir -p jenkins-plumbing"
-    dir ("jenkins-plumbing") {
-      git([branch: "master", url:'ssh://git@stash:7999/van/jenkins-plumbing.git', credentialsId: '8aa93893-84cc-45fc-a029-a42f21197bb3'])
-    }
   }
 
   def runBuild = load("jenkins-plumbing/standard-build.groovy")
 
-  notifyBitbucket()
-  try {
+  plumbing.withBitbucket {
+
     runBuild()
 
-    // bitbucket plugin requires the result to explicitly be success
-    if (currentBuild.resultIsBetterOrEqualTo("SUCCESS")) {
-      currentBuild.result = "SUCCESS"
+    stage("clean") {
+      sh 'yarn clean'
     }
-  } catch (err) {
-    currentBuild.result = "FAILED"
+
+    stage("install") {
+      sh 'yarn install'
+    }
+
+    stage("build") {
+      sh 'yarn build'
+    }
+
+    stage("test") {
+      sh 'yarn test'
+    }
+
+    if (isReleaseBranch()) {
+      stage("publish") {
+        sshagent(credentials: ['8aa93893-84cc-45fc-a029-a42f21197bb3']) {
+          sh 'yarn do-publish'
+        }
+      }
+    }
+
   }
-  notifyBitbucket()
 }

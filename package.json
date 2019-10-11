@@ -9,7 +9,7 @@
   "scripts": {
     "lint": "yarn eslint 'modules/common/src/**/*.ts' 'modules/client/src/**/*.ts' 'modules/runner/src/**/*.ts' 'modules/server/src/**/*.ts'",
     "prepublishOnly": "yarn build",
-    "clean": "git clean -dfx lib dist",
+    "clean": "git clean -dfx lib dist modules/* && yarn lerna clean -y",
     "build-common": "yarn workspace @ephox/bedrock-common build",
     "build-client": "yarn workspace @ephox/bedrock-client build",
     "build-runner": "yarn workspace @ephox/bedrock-runner build",
@@ -21,7 +21,8 @@
     "test-server": "yarn workspace @ephox/bedrock-server test",
     "test-sample": "yarn workspace @ephox/bedrock-sample test",
     "test-samples-fail": "yarn workspace @ephox/bedrock-sample test-samples-fail",
-    "test": "yarn build && yarn lerna run test"
+    "test": "yarn build && yarn lerna run test",
+    "do-publish": "yarn lerna publish --ignore @ephox/bedrock-sample"
   },
   "private": true,
   "workspaces": [
