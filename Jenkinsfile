@@ -1,4 +1,4 @@
-library identifier: 'jenkins-plumbing@feature/TINY-4149', retriever: modernSCM(
+library identifier: 'jenkins-plumbing@feature/TINY-4234', retriever: modernSCM(
   [$class: 'GitSCMSource',
    remote: 'ssh://git@stash:7999/van/jenkins-plumbing.git',
    credentialsId: '8aa93893-84cc-45fc-a029-a42f21197bb3'])
@@ -22,12 +22,7 @@ node("primary") {
     checkout scm
   }
 
-  def runBuild = load("jenkins-plumbing/standard-build.groovy")
-
   plumbing.withBitbucket {
-
-    runBuild()
-
     stage("clean") {
       sh 'yarn clean'
     }
