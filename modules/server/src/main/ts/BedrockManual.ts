@@ -3,6 +3,7 @@ import * as Version from './bedrock/core/Version';
 import * as RunnerRoutes from './bedrock/server/RunnerRoutes';
 import * as Webpack from './bedrock/compiler/Webpack';
 import { BedrockSettings } from './bedrock/core/Settings';
+import { ExitCodes } from './bedrock/util/ExitCodes';
 
 export const go = (settings: BedrockSettings) => {
   const basePage = 'src/resources/html/bedrock.html';
@@ -34,6 +35,9 @@ export const go = (settings: BedrockSettings) => {
     return Webpack.devserver(serveSettings).then((service) => {
       service.enableHud();
       console.log('bedrock-manual ' + Version.get() + ' available at: http://localhost:' + service.port);
+    }, (err) => {
+      console.error(err);
+      process.exit(ExitCodes.failures.error);
     });
   });
 };

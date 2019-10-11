@@ -1,3 +1,7 @@
+Version 9.1.0
+
+* Added support for Test.bs.js files and made typescript optional.
+
 Version 9.0.1
 
 * Jenkinsfile refactor

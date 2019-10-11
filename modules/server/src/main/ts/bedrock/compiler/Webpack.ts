@@ -7,10 +7,17 @@ import * as WebpackDevServer from 'webpack-dev-server';
 import * as Serve from '../server/Serve';
 import { ExitCodes } from '../util/ExitCodes';
 import * as Imports from './Imports';
+import { hasTs } from './TsUtils';
 
 export interface WebpackServeSettings extends Serve.ServeSettings {
   config: string;
   coverage: string[];
+}
+
+interface CompileInfo {
+  scratchFile: string;
+  dest: string;
+  config: webpack.Configuration;
 }
 
 const moduleAvailable = (name: string) => {
@@ -29,7 +36,7 @@ const webpackRemap: Array<Record<string, any>> = moduleAvailable('@ephox/swag') 
   }
 ] : [];
 
-const getWebPackConfig = (tsConfigFile: string, scratchFile: string, dest: string, coverage: string[], manualMode: boolean, basedir: string): webpack.Configuration => {
+const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, coverage: string[], manualMode: boolean, basedir: string): webpack.Configuration => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
   return {
@@ -129,15 +136,70 @@ const getWebPackConfig = (tsConfigFile: string, scratchFile: string, dest: strin
   };
 };
 
-export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], coverage: string[], success: (dest: string) => void) => {
-  const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
-  const dest = path.join(scratchDir, 'compiled/tests.js');
+const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[], manualMode: boolean, basedir: string): webpack.Configuration => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  return {
+    stats: 'none',
+    entry: scratchFile,
+    devtool: manualMode ? 'source-map' : false,
+    mode: manualMode ? 'development' : 'none',
+
+    optimization: {
+      usedExports: !manualMode
+    },
+
+    resolve: {
+      extensions: ['.js']
+    },
+
+    // Webpack by default only resolves from the ./node_modules directory which will cause issues if the project that uses bedrock
+    // doesn't also depend on the webpack loaders. So we need to add the path to the bedrock node_modules directory as well.
+    resolveLoader: {
+      modules: [
+        path.join(basedir, 'node_modules'),
+        'node_modules'
+      ]
+    },
+
+    module: {
+      rules: webpackRemap.concat([
+        {
+          test: /\.js$/,
+          use: ['source-map-loader'],
+          enforce: 'pre'
+        },
+        {
+          test: /\.(html|htm|css|bower|hex|rtf|xml|yml)$/,
+          use: ['raw-loader']
+        }
+      ]).concat(
+        coverage ? [
+          {
+            test: /\.js?$/,
+            enforce: 'post',
+            loader: 'istanbul-instrumenter-loader',
+            include: coverage.map((p) => path.resolve(p)),
+            options: {
+              esModules: true
+            }
+          }
+        ] : []
+      )
+    },
+    output: {
+      filename: path.basename(dest),
+      path: path.resolve(path.dirname(dest))
+    }
+  };
+};
+
+const compileTests = (compileInfo: CompileInfo, exitOnCompileError: boolean, srcFiles: string[], success: (dest: string) => void) => {
   console.log(`Compiling ${srcFiles.length} tests...`);
 
-  mkdirp.sync(path.dirname(scratchFile));
-  fs.writeFileSync(scratchFile, Imports.generateImports(true, scratchFile, srcFiles));
+  mkdirp.sync(path.dirname(compileInfo.scratchFile));
+  fs.writeFileSync(compileInfo.scratchFile, Imports.generateImports(true, compileInfo.scratchFile, srcFiles));
 
-  webpack(getWebPackConfig(tsConfigFile, scratchFile, dest, coverage, false, basedir), (err, stats) => {
+  webpack(compileInfo.config, (err, stats) => {
     if (err || stats.hasErrors()) {
       const msg = stats.toString({
         all: false,
@@ -154,8 +216,41 @@ export const compile = (tsConfigFile: string, scratchDir: string, basedir: strin
       }
     }
 
-    success(dest);
+    success(compileInfo.dest);
   });
+};
+
+const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, coverage: string[]): CompileInfo => {
+  const scratchFile = path.join(scratchDir, 'compiled/tests-imports.ts');
+  const dest = path.join(scratchDir, 'compiled/tests.js');
+
+  if (!fs.existsSync(tsConfigFile)) {
+    throw new Error(`Could not find the required tsconfig file: ${tsConfigFile}`);
+  } 
+
+  const config = getWebPackConfigTs(tsConfigFile, scratchFile, dest, coverage, false, basedir);
+
+  return { scratchFile, dest, config };
+};
+
+const getJsCompileInfo = (scratchDir: string, basedir: string, coverage: string[]): CompileInfo => {
+  const scratchFile = path.join(scratchDir, 'compiled/tests-imports.js');
+  const dest = path.join(scratchDir, 'compiled/tests.js');
+  const config = getWebPackConfigJs(scratchFile, dest, coverage, false, basedir);
+
+  return { scratchFile, dest, config };
+};
+
+const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, srcFiles: string[], coverage: string[]) => {
+  if (hasTs(srcFiles)) {
+    return getTsCompileInfo(tsConfigFile, scratchDir, basedir, coverage);
+  } else {
+    return getJsCompileInfo(scratchDir, basedir, coverage);
+  }
+};
+
+export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], coverage: string[], success: (dest: string) => void) => {
+  compileTests(getCompileInfo(tsConfigFile, scratchDir, basedir, srcFiles, coverage), exitOnCompileError, srcFiles, success);
 };
 
 const isCompiledRequest = (request: { url: string }) => request.url.startsWith('/compiled/');
@@ -163,15 +258,15 @@ const isCompiledRequest = (request: { url: string }) => request.url.startsWith('
 export const devserver = (settings: WebpackServeSettings) => {
   return Serve.startCustom(settings, (handler) => {
     const scratchDir = path.resolve('scratch');
-    const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
-    const dest = path.join(scratchDir, 'compiled/tests.js');
     const tsConfigFile = settings.config;
+    const compileInfo = getCompileInfo(tsConfigFile, scratchDir, settings.basedir, settings.testfiles, settings.coverage);
+    const scratchFile = compileInfo.scratchFile;
     console.log(`Loading ${settings.testfiles.length} tests...`);
 
     mkdirp.sync(path.dirname(scratchFile));
     fs.writeFileSync(scratchFile, Imports.generateImports(true, scratchFile, settings.testfiles));
 
-    const compiler = webpack(getWebPackConfig(tsConfigFile, scratchFile, dest, settings.coverage, true, settings.basedir));
+    const compiler = webpack(compileInfo.config);
 
     // Prevents webpack from doing a recompilation of a change of tests.ts over and over
     compiler.hooks.emit.tap('bedrock', (compilation) => {
