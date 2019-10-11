@@ -27,13 +27,8 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt, {
     requireResolution: true,
     config: 'package.json',
-    pattern: ['@ephox/bedrock', 'grunt-shell']
+    pattern: ['@ephox/bedrock-server', 'grunt-shell']
   });
 
-  // let gruntTasks = require("load-grunt-tasks");
-  // gruntTasks(grunt);
-  // grunt.loadTasks("../bin/grunt-tasks");
-  // grunt.loadTasks("../tasks");
-  //
   grunt.registerTask("default", ["bedrock-manual"]);
 };
