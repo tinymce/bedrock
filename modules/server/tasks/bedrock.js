@@ -5,22 +5,22 @@ const bedrockAuto = require('../lib/main/ts/BedrockAuto');
 
 module.exports = function(grunt) {
 
-  var bucketize = function(array, bucket, buckets) {
+  const bucketize = function(array, bucket, buckets) {
     return array.filter(function(x, i) {
       return i % buckets === (bucket - 1);
     })
   };
 
-  var enrichSettings = function (settings) {
-    var newSettings = { };
+  const enrichSettings = function (settings) {
+    const newSettings = { };
 
-    for (var j in cloptions) {
-      var clo = cloptions[j];
-      var outputKey = clo.output !== undefined ? clo.output : clo.name;
+    for (const j in cloptions) {
+      const clo = cloptions[j];
+      const outputKey = clo.output !== undefined ? clo.output : clo.name;
       if (clo.defaultValue !== undefined) newSettings[outputKey] = clo.defaultValue;
     }
 
-    for (var k in settings) {
+    for (const k in settings) {
       newSettings[k] = settings[k];
     }
 
@@ -36,7 +36,7 @@ module.exports = function(grunt) {
 
     console.log("Running bucket " + newSettings.bucket + " of " + newSettings.buckets);
 
-    var testfiles = getFiles(settings.testfiles, newSettings.bucket, newSettings.buckets);
+    const testfiles = getFiles(settings.testfiles, newSettings.bucket, newSettings.buckets);
 
     newSettings.testfiles = testfiles;
 
@@ -46,13 +46,13 @@ module.exports = function(grunt) {
     return newSettings;
   };
 
-  var getFiles = function (testfiles, bucket, buckets) {
+  const getFiles = function (testfiles, bucket, buckets) {
     const all = grunt.file.expand(testfiles);
     return bucketize(all, bucket, buckets);
   };
 
   grunt.registerMultiTask('bedrock-manual', 'Bedrock manual test runner', function () {
-    var settings = grunt.config([this.name, this.target]);
+    const settings = grunt.config([this.name, this.target]);
     
     // We don't keep a reference because we never call done on purpose. 
     // This is a never ending task
@@ -61,7 +61,7 @@ module.exports = function(grunt) {
     this.requiresConfig([this.name, this.target, 'config']);
     this.requiresConfig([this.name, this.target, 'testfiles']);
 
-    var manualSettings = enrichSettings(settings);
+    const manualSettings = enrichSettings(settings);
 
     try {
       bedrockManual.go(manualSettings);
@@ -71,19 +71,19 @@ module.exports = function(grunt) {
   });
 
   grunt.registerMultiTask('bedrock-auto', 'Bedrock auto test runner', function () {
-    var settings = grunt.config([this.name, this.target]);
+    const settings = grunt.config([this.name, this.target]);
 
-    var done = this.async();
+    const done = this.async();
 
     this.requiresConfig([this.name, this.target, 'config']);
     this.requiresConfig([this.name, this.target, 'testfiles']);
     this.requiresConfig([this.name, this.target, 'browser']);
 
-    var options = this.options({
+    const options = this.options({
       stopOnFailure: false
     });
 
-    var autoSettings = enrichSettings(settings);
+    const autoSettings = enrichSettings(settings);
     autoSettings.gruntDone = function (passed) {
       done(passed);
     };
