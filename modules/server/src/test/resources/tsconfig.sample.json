@@ -1,17 +1,19 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "moduleResolution": "node",
-    "strict": true,
     "target": "es5",
+    "jsx": "react",
     "module": "es2015",
-    "lib": ["es2015", "dom"],
+    "lib": [
+      "es2015",
+      "dom"
+    ],
     "declaration": true,
-    "sourceMap": true,
-    "outDir": "lib",
-    "rootDir": "src"
+    "outDir": "../../scratch/dist",
+    "sourceMap": true
   },
   "include": [
-    "src/main/ts",
     "src/test/ts"
   ]
 }

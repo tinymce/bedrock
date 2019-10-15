@@ -30,19 +30,19 @@ describe('cli', () => {
   it('Minimal specification of bedrock-auto', () => {
     const args = [
       "--browser", "MicrosoftEdge",
-      "--files", "modules/server/src/test/resources/test.file1",
-      "--config", "sample/tsconfig.json"
+      "--files", "src/test/resources/test.file1",
+      "--config", "src/test/resources/tsconfig.sample.json"
     ];
     const actual = Clis.forAuto(directories, args);
     AttemptUtils.assertResult({
       browser: 'MicrosoftEdge',
       bundler: 'webpack',
-      config: 'sample/tsconfig.json',
+      config: 'src/test/resources/tsconfig.sample.json',
       name: 'bedrock-run',
       output: 'scratch',
       help: false,
       testfiles: [
-        'modules/server/src/test/resources/test.file1'
+        'src/test/resources/test.file1'
       ],
       debuggingPort: 9000,
       delayExit: false,
@@ -60,8 +60,8 @@ describe('cli', () => {
 
   it('Specification of bedrock-auto missing required field: browser', () => {
     const args = [
-      "--files", "modules/server/src/test/resources/test.file1",
-      "--config", "sample/tsconfig.json"
+      "--files", "src/test/resources/test.file1",
+      "--config", "src/test/resources/tsconfig.sample.json"
     ];
     const actual = Clis.forAuto(directories, args);
     AttemptUtils.assertErrors([
@@ -71,14 +71,14 @@ describe('cli', () => {
 
   it('Minimal specification of bedrock-manual', () => {
     const args = [
-      "--files", "modules/server/src/test/resources/test.file1",
-      "--config", "sample/tsconfig.json"
+      "--files", "src/test/resources/test.file1",
+      "--config", "src/test/resources/tsconfig.sample.json"
     ];
     const actual = Clis.forManual(directories, args);
     AttemptUtils.assertResult( {
-      config: 'sample/tsconfig.json',
+      config: 'src/test/resources/tsconfig.sample.json',
       testfiles: [
-        'modules/server/src/test/resources/test.file1'
+        'src/test/resources/test.file1'
       ],
       help: false,
       bundler: 'webpack',

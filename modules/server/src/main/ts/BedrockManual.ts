@@ -5,7 +5,7 @@ import * as Webpack from './bedrock/compiler/Webpack';
 import { BedrockSettings } from './bedrock/core/Settings';
 
 export const go = (settings: BedrockSettings) => {
-  const basePage = 'modules/server/src/resources/html/bedrock.html';
+  const basePage = 'src/resources/html/bedrock.html';
   const routes = RunnerRoutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, 0, settings.singleTimeout, true, basePage, settings.coverage);
 
   console.log('bedrock-manual ' + Version.get() + ' starting...');

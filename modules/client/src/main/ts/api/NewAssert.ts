@@ -1,6 +1,8 @@
 import { Testable, Pprint } from '@ephox/dispute';
 import { TestLabel } from './TestLabel';
-import { PprintAssertionError } from '../core/ErrorTypes';
+import { ErrorTypes } from '@ephox/bedrock-common';
+
+type PprintAssertionError = ErrorTypes.PprintAssertionError;
 
 const eq = function <T> (message: TestLabel, expected: T, actual: T, tt: Testable.Testable<T> = Testable.tAny) {
   const result = tt.eq(expected, actual);

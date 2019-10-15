@@ -1,8 +1,11 @@
 import { TestLabel } from "./TestLabel";
 import { TestLogEntry, TestLogs } from "./TestLogs";
-import { HtmlDiffAssertionError, LoggedError, NormalizedTestError } from '../core/ErrorTypes';
+import { ErrorTypes } from '@ephox/bedrock-common';
 
-export type HtmlDiffError = HtmlDiffAssertionError;
+type NormalizedTestError = ErrorTypes.NormalizedTestError;
+type LoggedError = ErrorTypes.LoggedError;
+
+export type HtmlDiffError = ErrorTypes.HtmlDiffAssertionError;
 
 export type SuccessCallback = () => void;
 export type TestError = TestLabel | NormalizedTestError;
