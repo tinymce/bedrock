@@ -19,7 +19,13 @@ node("primary") {
   cleanWs()
 
   stage ("Checkout SCM") {
-    checkout scm
+    checkout([
+         $class: 'GitSCM',
+         branches: '**',
+         doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
+         extensions: scm.extensions,
+         userRemoteConfigs: scm.userRemoteConfigs
+    ])
   }
 
   withBitbucket {
