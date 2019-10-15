@@ -193,55 +193,58 @@ const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[
   };
 };
 
-const compileTests = (compileInfo: CompileInfo, exitOnCompileError: boolean, srcFiles: string[], success: (dest: string) => void) => {
-  console.log(`Compiling ${srcFiles.length} tests...`);
+const compileTests = (compileInfo: CompileInfo, exitOnCompileError: boolean, srcFiles: string[]): Promise<string> => {
+  return new Promise((resolve) => {
+    console.log(`Compiling ${srcFiles.length} tests...`);
 
-  mkdirp.sync(path.dirname(compileInfo.scratchFile));
-  fs.writeFileSync(compileInfo.scratchFile, Imports.generateImports(true, compileInfo.scratchFile, srcFiles));
+    mkdirp.sync(path.dirname(compileInfo.scratchFile));
+    fs.writeFileSync(compileInfo.scratchFile, Imports.generateImports(true, compileInfo.scratchFile, srcFiles));
 
-  webpack(compileInfo.config, (err, stats) => {
-    if (err || stats.hasErrors()) {
-      const msg = stats.toString({
-        all: false,
-        errors: true,
-        moduleTrace: true,
-        chunks: false,
-        colors: false
-      });
-
-      console.log(msg);
-
-      if (exitOnCompileError) {
-        process.exit(ExitCodes.failures.error);
+    webpack(compileInfo.config, (err, stats) => {
+      if (err || stats.hasErrors()) {
+        const msg = stats.toString({
+          all: false,
+          errors: true,
+          moduleTrace: true,
+          chunks: false,
+          colors: false
+        });
+  
+        console.log(msg);
+  
+        if (exitOnCompileError) {
+          process.exit(ExitCodes.failures.error);
+        }
       }
-    }
 
-    success(compileInfo.dest);
+      resolve(compileInfo.dest);
+    });
   });
 };
 
-const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, coverage: string[]): CompileInfo => {
-  const scratchFile = path.join(scratchDir, 'compiled/tests-imports.ts');
-  const dest = path.join(scratchDir, 'compiled/tests.js');
-
-  if (!fs.existsSync(tsConfigFile)) {
-    throw new Error(`Could not find the required tsconfig file: ${tsConfigFile}`);
-  } 
-
-  const config = getWebPackConfigTs(tsConfigFile, scratchFile, dest, coverage, false, basedir);
-
-  return { scratchFile, dest, config };
+const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, coverage: string[]): Promise<CompileInfo> => {
+  return new Promise((resolve, reject) => {
+    const scratchFile = path.join(scratchDir, 'compiled/tests-imports.ts');
+    const dest = path.join(scratchDir, 'compiled/tests.js');
+  
+    if (!fs.existsSync(tsConfigFile)) {
+      reject(`Could not find the required tsconfig file: ${tsConfigFile}`);
+    } else {
+      const config = getWebPackConfigTs(tsConfigFile, scratchFile, dest, coverage, false, basedir);
+      resolve({ scratchFile, dest, config });
+    }
+  });
 };
 
-const getJsCompileInfo = (scratchDir: string, basedir: string, coverage: string[]): CompileInfo => {
+const getJsCompileInfo = (scratchDir: string, basedir: string, coverage: string[]): Promise<CompileInfo> => {
   const scratchFile = path.join(scratchDir, 'compiled/tests-imports.js');
   const dest = path.join(scratchDir, 'compiled/tests.js');
   const config = getWebPackConfigJs(scratchFile, dest, coverage, false, basedir);
 
-  return { scratchFile, dest, config };
+  return Promise.resolve({ scratchFile, dest, config });
 };
 
-const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, srcFiles: string[], coverage: string[]) => {
+const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, srcFiles: string[], coverage: string[]): Promise<CompileInfo> => {
   if (hasTs(srcFiles)) {
     return getTsCompileInfo(tsConfigFile, scratchDir, basedir, coverage);
   } else {
@@ -249,49 +252,53 @@ const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: strin
   }
 };
 
-export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], coverage: string[], success: (dest: string) => void) => {
-  compileTests(getCompileInfo(tsConfigFile, scratchDir, basedir, srcFiles, coverage), exitOnCompileError, srcFiles, success);
+export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], coverage: string[]): Promise<string> => {
+  return getCompileInfo(tsConfigFile, scratchDir, basedir, srcFiles, coverage)
+  .then((compileInfo) => compileTests(compileInfo, exitOnCompileError, srcFiles))
 };
 
 const isCompiledRequest = (request: { url: string }) => request.url.startsWith('/compiled/');
 
-export const devserver = (settings: WebpackServeSettings) => {
-  return Serve.startCustom(settings, (handler) => {
-    const scratchDir = path.resolve('scratch');
-    const tsConfigFile = settings.config;
-    const compileInfo = getCompileInfo(tsConfigFile, scratchDir, settings.basedir, settings.testfiles, settings.coverage);
-    const scratchFile = compileInfo.scratchFile;
-    console.log(`Loading ${settings.testfiles.length} tests...`);
+export const devserver = (settings: WebpackServeSettings): Promise<Serve.ServeService> => {
+  const scratchDir = path.resolve('scratch');
+  const tsConfigFile = settings.config;
 
-    mkdirp.sync(path.dirname(scratchFile));
-    fs.writeFileSync(scratchFile, Imports.generateImports(true, scratchFile, settings.testfiles));
-
-    const compiler = webpack(compileInfo.config);
-
-    // Prevents webpack from doing a recompilation of a change of tests.ts over and over
-    compiler.hooks.emit.tap('bedrock', (compilation) => {
-      compilation.fileDependencies.delete(scratchFile);
-    });
-
-    return new WebpackDevServer(compiler, {
-      publicPath: '/compiled/',
-      disableHostCheck: true,
-      stats: {
-        // copied from `'minimal'`
-        all: false,
-        modules: true,
-        maxModules: 0,
-        errors: true,
-        warnings: true,
-
-        // suppress type re-export warnings caused by `transpileOnly: true`
-        warningsFilter: /export .* was not found in/
-      },
-      before: (app) => {
-        app.all('*', (request, response, next) => {
-          return isCompiledRequest(request) ? next() : handler(request, response);
-        });
-      }
+  return getCompileInfo(tsConfigFile, scratchDir, settings.basedir, settings.testfiles, settings.coverage)
+  .then((compileInfo) => {
+    return Serve.startCustom(settings, (handler) => {
+      const scratchFile = compileInfo.scratchFile;
+      console.log(`Loading ${settings.testfiles.length} tests...`);
+  
+      mkdirp.sync(path.dirname(scratchFile));
+      fs.writeFileSync(scratchFile, Imports.generateImports(true, scratchFile, settings.testfiles));
+  
+      const compiler = webpack(compileInfo.config);
+  
+      // Prevents webpack from doing a recompilation of a change of tests.ts over and over
+      compiler.hooks.emit.tap('bedrock', (compilation) => {
+        compilation.fileDependencies.delete(scratchFile);
+      });
+  
+      return new WebpackDevServer(compiler, {
+        publicPath: '/compiled/',
+        disableHostCheck: true,
+        stats: {
+          // copied from `'minimal'`
+          all: false,
+          modules: true,
+          maxModules: 0,
+          errors: true,
+          warnings: true,
+  
+          // suppress type re-export warnings caused by `transpileOnly: true`
+          warningsFilter: /export .* was not found in/
+        },
+        before: (app) => {
+          app.all('*', (request, response, next) => {
+            return isCompiledRequest(request) ? next() : handler(request, response);
+          });
+        }
+      });
     });
   });
 };

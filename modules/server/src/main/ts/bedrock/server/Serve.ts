@@ -106,8 +106,6 @@ export const startCustom = (settings: ServeSettings, createServer: (listener: ht
         });
       }
     };
-  }).catch((err) => {
-    return Promise.reject(err);
   });
 };
 
