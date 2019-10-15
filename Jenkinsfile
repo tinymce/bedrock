@@ -1,3 +1,5 @@
+// NOTE: This Jenkinsfile relies on Tiny's internal infrastructure
+
 library identifier: 'jenkins-plumbing@master', retriever: modernSCM(
   [$class: 'GitSCMSource',
    remote: 'ssh://git@stash:7999/van/jenkins-plumbing.git',
