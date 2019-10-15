@@ -1,4 +1,4 @@
-library identifier: 'jenkins-plumbing@feature/TINY-4234', retriever: modernSCM(
+library identifier: 'jenkins-plumbing@feature/TINY-4252', retriever: modernSCM(
   [$class: 'GitSCMSource',
    remote: 'ssh://git@stash:7999/van/jenkins-plumbing.git',
    credentialsId: '8aa93893-84cc-45fc-a029-a42f21197bb3'])
@@ -19,13 +19,7 @@ node("primary") {
   cleanWs()
 
   stage ("Checkout SCM") {
-    checkout([
-         $class: 'GitSCM',
-         branches: scm.branches,
-         doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
-         extensions: scm.extensions + [$class: 'LocalBranch', localBranch: "**"],
-         userRemoteConfigs: scm.userRemoteConfigs
-    ])
+    checkout localBranch(scm)
   }
 
   withBitbucket {
