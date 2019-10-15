@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock-common",
-  "version": "9.0.0",
+  "version": "9.0.1",
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
   "scripts": {
@@ -8,10 +8,6 @@
     "build": "yarn prepublishOnly",
     "test": "mocha -r esm lib/test/ts/**/*Test.js",
     "buildAndTest": "yarn prepublishOnly && yarn test"
-  },
-  "dependencies": {
-  },
-  "devDependencies": {
   },
   "main": "./lib/main/ts/api/Main.js",
   "module": "./lib/main/ts/api/Main.js",

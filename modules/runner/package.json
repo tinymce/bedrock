@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock-runner",
-  "version": "9.0.0",
+  "version": "9.0.1",
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
   "scripts": {
@@ -10,7 +10,7 @@
     "buildAndTest": "yarn prepublishOnly && yarn test"
   },
   "dependencies": {
-    "@ephox/bedrock-common": "9.0.0",
+    "@ephox/bedrock-common": "^9.0.1",
     "diff": "^4.0.1",
     "jquery": "^3.4.1",
     "querystringify": "^2.1.1"

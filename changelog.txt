@@ -1,3 +1,12 @@
+Version 9.0.1
+
+* Jenkinsfile refactor
+
+Version 9.0.0
+
+* Split into several packages. Users will now need to depend on "@ephox/bedrock-client" and "@ephox-bedrock-server"
+* Monorepo using yarn workspaces and lerna.
+
 Version 8.1.0
 
 * New assertions library with composable equality, based on "@ephox/dispute" library.
