@@ -18,7 +18,7 @@ node("primary") {
   echo "Clean workspace"
   cleanWs()
 
-  echo scm
+  echo scm.toString()
 
   stage ("Checkout SCM") {
     checkout([
