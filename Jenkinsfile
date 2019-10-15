@@ -18,12 +18,10 @@ node("primary") {
   echo "Clean workspace"
   cleanWs()
 
-  echo scm.branches.get(0).toString()
-
   stage ("Checkout SCM") {
     checkout([
          $class: 'GitSCM',
-         branches: '**',
+         branches: scm.branches,
          doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
          extensions: scm.extensions + [$class: 'LocalBranch', localBranch: "**"],
          userRemoteConfigs: scm.userRemoteConfigs
