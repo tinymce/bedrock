@@ -14,6 +14,11 @@ const outputTime = (runnerTime: string) => {
   return time.charAt(time.length - 1) === 's' ? time.substr(0, time.length - 2) : time;
 };
 
+/**
+ * XML has no way of "escaping" the CDATA end token ("]]>"), so we split into several CDATA sections
+ * in the middle of this token. Jenkins seems fine with multiple CDATA sections within a <failure> tag.
+ * @param s
+ */
 export const splitCdatas =
   (s: string): string[] => {
     const raw = s.split(/]]>/g);
