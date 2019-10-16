@@ -1,4 +1,5 @@
 import * as path from 'path';
+import { hasTs } from './TsUtils';
 
 const filePathToImport = (useRequire: boolean, scratchFile: string) => {
   return (filePath: string) => {
@@ -21,7 +22,7 @@ const filePathToImport = (useRequire: boolean, scratchFile: string) => {
   };
 };
 
-export const generateImports = (useRequire: boolean, scratchFile: string, srcFiles: string[]) => {
+const generateImportsTs = (useRequire: boolean, scratchFile: string, srcFiles: string[]) => {
   const imports = srcFiles.map(filePathToImport(useRequire, scratchFile)).join('\n');
   // header code for tests.ts
   return [
@@ -55,4 +56,45 @@ const addTest = (testFilePath: string) => {
     imports,
     'export {};'
   ].join('\n');
+};
+
+const generateImportsJs = (useRequire: boolean, scratchFile: string, srcFiles: string[]) => {
+  const imports = srcFiles.map(filePathToImport(useRequire, scratchFile)).join('\n');
+  // header code for tests-imports.js
+  return [
+    `
+var __lastTestIndex = -1;
+var addTest = function (testFilePath) {
+  if (__tests && __tests[__tests.length - 1]) {
+    var lastTest = __tests[__tests.length - 1];
+    if (!lastTest.filePath) {
+      var tests = __tests.slice(__lastTestIndex + 1);
+      tests.forEach(function (test) {
+        test.filePath = testFilePath;
+      });
+    } else if (lastTest.filePath === testFilePath) {
+      // repeated test, duplicate the test entry
+      __tests.push(__tests.slice(__lastTestIndex + 1));
+    } else {
+      console.warn('file ' + testFilePath + ' did not add a new test to the list, ignoring');
+    }
+    
+    // Save the last test index
+    __lastTestIndex = __tests.length - 1;
+  } else {
+    console.error('no test list to add tests to');
+  }
+};
+`,
+    imports,
+    'export {};'
+  ].join('\n');
+};
+
+export const generateImports = (useRequire: boolean, scratchFile: string, srcFiles: string[]) => {
+  if (hasTs(srcFiles)) {
+    return generateImportsTs(useRequire, scratchFile, srcFiles);
+  } else {
+    return generateImportsJs(useRequire, scratchFile, srcFiles);
+  }
 };

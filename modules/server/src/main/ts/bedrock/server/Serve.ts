@@ -83,6 +83,8 @@ export const startCustom = (settings: ServeSettings, createServer: (listener: ht
   return portfinder.getPortPromise({
     port: 8000,
     stopPort: 20000
+  }).catch((err) => {
+    return Promise.reject('Error looking for open port between 8000 and 20000: ' + err);
   }).then((port) => {
     const server = createServer((request, response) => {
       const done = finalhandler(request, response);
@@ -104,8 +106,6 @@ export const startCustom = (settings: ServeSettings, createServer: (listener: ht
         });
       }
     };
-  }).catch((err) => {
-    return Promise.reject('Error looking for open port between 8000 and 20000: ' + err);
   });
 };
 
