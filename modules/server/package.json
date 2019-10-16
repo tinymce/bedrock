@@ -15,9 +15,9 @@
     "buildAndTest": "yarn prepublishOnly && yarn test"
   },
   "dependencies": {
-    "@ephox/bedrock-client": "^9.0.1",
-    "@ephox/bedrock-common": "^9.0.1",
-    "@ephox/bedrock-runner": "^9.0.1",
+    "@ephox/bedrock-client": "^9.1.0",
+    "@ephox/bedrock-common": "^9.1.0",
+    "@ephox/bedrock-runner": "^9.1.0",
     "async": "^1.5.2",
     "babel-polyfill": "^6.23.0",
     "command-line-args": "^5.0.0",
