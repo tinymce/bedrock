@@ -83,3 +83,12 @@ If you just want to run the basic tests (not property-based), use `$ npm run tes
 ## Docker
 
 The `dockerfile` is just to test the no-sandbox option for chrome-headless. We should build automated tests for it.
+
+# FAQ
+
+## Why is the junit XML output not pretty-printed?
+
+It's to do with "escaping" CDATA end tokens ("]]>") in the output. 
+If we pretty-print it, we get extraneous whitespace in the junit output rendered in Jenkins. 
+
+See the comment in modules/server/src/main/ts/bedrock/core/Reporter.ts
