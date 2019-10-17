@@ -14,6 +14,23 @@ const outputTime = (runnerTime: string) => {
   return time.charAt(time.length - 1) === 's' ? time.substr(0, time.length - 2) : time;
 };
 
+/**
+ * XML has no way of "escaping" the CDATA end token ("]]>"), so we split into several CDATA sections
+ * in the middle of this token. Jenkins seems fine with multiple CDATA sections within a <failure> tag.
+ * @param s
+ */
+export const splitCdatas =
+  (s: string): string[] => {
+    const raw = s.split(/]]>/g);
+    return raw.map((x, i) => {
+      let r = '';
+      if (i > 0) r = '>' + r;
+      r = r + x;
+      if (i < raw.length - 1) r = r + ']]';
+      return r;
+    })
+  };
+
 export const write = (settings: ReporterSettings) => {
   return (data: TestResults) => {
     return new Promise<Attempt<string[], TestResult[]>>((resolve) => {
@@ -26,7 +43,20 @@ export const write = (settings: ReporterSettings) => {
         return result.passed !== true && !result.skipped;
       });
 
-      const w = new XMLWriter(true);
+      /*
+      We need to NOT indent.
+      Yes, it would make the output prettier... but...
+      There's a situation where the test failure contains a CDATA end token ("]]>").
+      XML has no way of escaping this, so we have to break each of these into "]]" and ">" in separate CDATA sections.
+      We need these CDATA sections to be immediately beside each other, otherwise any indent whitespace is
+      displayed in the Jenkins test results.
+
+      As of Bedrock 8, we have errors printed to system error, so the xml file should be read by humans less often,
+      so the lack of pretty-printing should be tolerable.
+
+      An alternative would be to replace the XMLWriter with one that pretty-prints everything EXCEPT adjacent CDATA sections.
+       */
+      const w = new XMLWriter(false);
       w.startDocument();
 
       const root = w.startElement('testsuites')
@@ -58,8 +88,10 @@ export const write = (settings: ReporterSettings) => {
           } else {
             elem.startElement('failure')
               .writeAttribute('Test FAILED: some failed assert')
-              .writeAttribute('type', 'failure')
-              .writeCData(res.error)
+              .writeAttribute('type', 'failure');
+            const cdatas = splitCdatas(res.error);
+            cdatas.forEach((c) => elem.writeCData(c));
+            elem
               .endElement();
           }
         }

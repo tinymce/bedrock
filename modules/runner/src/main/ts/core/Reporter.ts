@@ -81,8 +81,8 @@ export const text = (err: LoggedError): string => {
   if (isPprintAssertionError(e)) {
     const dh = Differ.diffPrettyText(e.diff.expected, e.diff.actual);
     return 'Test failure: ' + e.message +
-      '\nExpected: \n' + htmlentities(e.diff.expected) +
-      '\nActual: \n' + htmlentities(e.diff.actual) +
+      '\nExpected: \n' + e.diff.expected +
+      '\nActual: \n' + e.diff.actual +
       '\nDiff: \n' + dh + extra;
   } else {
     return html(err);
