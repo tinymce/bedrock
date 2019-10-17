@@ -1,7 +1,7 @@
 Version 9.2.0
 
 * XML CDATA sections are now split if they contain a CDATA end token
-  "]]>" is split into "]]" and "<" in two CDATA sections.
+  "]]>" is split into "]]" and ">" in two CDATA sections.
 * XML output is no longer pretty-printed as a result.
 * Assertions made with the new Assert library are no longer encoded as HTML entites in XML and stderr output.
 
