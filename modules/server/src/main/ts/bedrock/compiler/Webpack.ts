@@ -209,9 +209,9 @@ const compileTests = (compileInfo: CompileInfo, exitOnCompileError: boolean, src
           chunks: false,
           colors: false
         });
-  
+
         console.log(msg);
-  
+
         if (exitOnCompileError) {
           process.exit(ExitCodes.failures.error);
         }
@@ -222,21 +222,21 @@ const compileTests = (compileInfo: CompileInfo, exitOnCompileError: boolean, src
   });
 };
 
-const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, coverage: string[]): Promise<CompileInfo> => {
+const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean, coverage: string[]): Promise<CompileInfo> => {
   return new Promise((resolve, reject) => {
     const scratchFile = path.join(scratchDir, 'compiled/tests-imports.ts');
     const dest = path.join(scratchDir, 'compiled/tests.js');
-  
+
     if (!fs.existsSync(tsConfigFile)) {
       reject(`Could not find the required tsconfig file: ${tsConfigFile}`);
     } else {
-      const config = getWebPackConfigTs(tsConfigFile, scratchFile, dest, coverage, false, basedir);
+      const config = getWebPackConfigTs(tsConfigFile, scratchFile, dest, coverage, manualMode, basedir);
       resolve({ scratchFile, dest, config });
     }
   });
 };
 
-const getJsCompileInfo = (scratchDir: string, basedir: string, coverage: string[]): Promise<CompileInfo> => {
+const getJsCompileInfo = (scratchDir: string, basedir: string, manualMode: boolean, coverage: string[]): Promise<CompileInfo> => {
   const scratchFile = path.join(scratchDir, 'compiled/tests-imports.js');
   const dest = path.join(scratchDir, 'compiled/tests.js');
   const config = getWebPackConfigJs(scratchFile, dest, coverage, false, basedir);
@@ -244,16 +244,16 @@ const getJsCompileInfo = (scratchDir: string, basedir: string, coverage: string[
   return Promise.resolve({ scratchFile, dest, config });
 };
 
-const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, srcFiles: string[], coverage: string[]): Promise<CompileInfo> => {
+const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean, srcFiles: string[], coverage: string[]): Promise<CompileInfo> => {
   if (hasTs(srcFiles)) {
-    return getTsCompileInfo(tsConfigFile, scratchDir, basedir, coverage);
+    return getTsCompileInfo(tsConfigFile, scratchDir, basedir, manualMode, coverage);
   } else {
-    return getJsCompileInfo(scratchDir, basedir, coverage);
+    return getJsCompileInfo(scratchDir, basedir, manualMode, coverage);
   }
 };
 
 export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], coverage: string[]): Promise<string> => {
-  return getCompileInfo(tsConfigFile, scratchDir, basedir, srcFiles, coverage)
+  return getCompileInfo(tsConfigFile, scratchDir, basedir, false, srcFiles, coverage)
   .then((compileInfo) => compileTests(compileInfo, exitOnCompileError, srcFiles))
 };
 
@@ -263,22 +263,22 @@ export const devserver = (settings: WebpackServeSettings): Promise<Serve.ServeSe
   const scratchDir = path.resolve('scratch');
   const tsConfigFile = settings.config;
 
-  return getCompileInfo(tsConfigFile, scratchDir, settings.basedir, settings.testfiles, settings.coverage)
+  return getCompileInfo(tsConfigFile, scratchDir, settings.basedir, true, settings.testfiles, settings.coverage)
   .then((compileInfo) => {
     return Serve.startCustom(settings, (handler) => {
       const scratchFile = compileInfo.scratchFile;
       console.log(`Loading ${settings.testfiles.length} tests...`);
-  
+
       mkdirp.sync(path.dirname(scratchFile));
       fs.writeFileSync(scratchFile, Imports.generateImports(true, scratchFile, settings.testfiles));
-  
+
       const compiler = webpack(compileInfo.config);
-  
+
       // Prevents webpack from doing a recompilation of a change of tests.ts over and over
       compiler.hooks.emit.tap('bedrock', (compilation) => {
         compilation.fileDependencies.delete(scratchFile);
       });
-  
+
       return new WebpackDevServer(compiler, {
         publicPath: '/compiled/',
         disableHostCheck: true,
@@ -289,7 +289,7 @@ export const devserver = (settings: WebpackServeSettings): Promise<Serve.ServeSe
           maxModules: 0,
           errors: true,
           warnings: true,
-  
+
           // suppress type re-export warnings caused by `transpileOnly: true`
           warningsFilter: /export .* was not found in/
         },
