@@ -8,6 +8,8 @@ type LoggedError = ErrorTypes.LoggedError;
 type NormalizedTestError = ErrorTypes.NormalizedTestError;
 type PprintAssertionError = ErrorTypes.PprintAssertionError;
 
+const { isHTMLDiffError, isPprintAssertionError, isAssertionError } = ErrorTypes;
+
 /* Required to make <del> and <ins> stay as tags.*/
 const processQUnit = (html: string): string =>
   (html
@@ -15,18 +17,6 @@ const processQUnit = (html: string): string =>
     .replace(/&lt;\/del&gt;/g, '</del>')
     .replace(/&lt;ins&gt;/g, '<ins>')
     .replace(/&lt;\/ins&gt;/g, '</ins>'));
-
-const isPprintAssertionError = (err: NormalizedTestError): err is PprintAssertionError => {
-  return err.name === 'PprintAssertionError';
-};
-
-const isHTMLDiffError = (err: NormalizedTestError): err is HtmlDiffAssertionError => {
-  return err.name === 'HtmlAssertion';
-};
-
-const isAssertionError = (err: NormalizedTestError): err is AssertionError => {
-  return err.name === 'AssertionError';
-};
 
 const formatExtra = (e: LoggedError): string => {
   if (!e.logs) {
