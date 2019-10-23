@@ -1,9 +1,9 @@
 import { describe, it } from 'mocha';
 import { assert } from 'chai';
-// import { ErrorTypes } from '../../../main/ts/api/Main';
+// import { TestError } from '../../../main/ts/api/Main';
 
 // TODO: add some tests
-describe("ErrorTypes", () => {
+describe("TestError", () => {
   it("TODO", () => {
     assert.deepEqual('blah', 'blah');
   });

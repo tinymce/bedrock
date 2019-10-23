@@ -1,14 +1,15 @@
-import { ErrorTypes } from '@ephox/bedrock-common';
+import { TestError, LoggedError } from '@ephox/bedrock-common';
 import * as Differ from './Differ';
 import { htmlentities } from './StringUtils';
 
-type AssertionError = ErrorTypes.AssertionError;
-type HtmlDiffAssertionError = ErrorTypes.HtmlDiffAssertionError;
-type LoggedError = ErrorTypes.LoggedError;
-type NormalizedTestError = ErrorTypes.NormalizedTestError;
-type PprintAssertionError = ErrorTypes.PprintAssertionError;
+type LoggedError = LoggedError.LoggedError;
 
-const { isHTMLDiffError, isPprintAssertionError, isAssertionError } = ErrorTypes;
+type AssertionError = TestError.AssertionError;
+type HtmlDiffAssertionError = TestError.HtmlDiffAssertionError;
+type TestError = TestError.TestError;
+type PprintAssertionError = TestError.PprintAssertionError;
+
+const { isHTMLDiffError, isPprintAssertionError, isAssertionError } = TestError;
 
 /* Required to make <del> and <ins> stay as tags.*/
 const processQUnit = (html: string): string =>

@@ -1,5 +1,5 @@
 import { UrlParams } from '../core/UrlParams';
-import { ErrorTypes } from '@ephox/bedrock-common';
+import { TestError, LoggedError } from '@ephox/bedrock-common';
 import { HarnessResponse } from '../core/ServerTypes';
 import * as Reporter from '../core/Reporter';
 
@@ -190,7 +190,7 @@ const reporter = (() => {
       sendTestResult(params.session, file, name, true, testTime, null, onDone, onDone);
     };
 
-    const fail = (e: ErrorTypes.LoggedError, onDone: onSuccessCallback): void => {
+    const fail = (e: LoggedError.LoggedError, onDone: onSuccessCallback): void => {
       if (reported) return;
       reported = true;
       failCount++;

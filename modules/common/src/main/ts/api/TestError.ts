@@ -24,12 +24,7 @@ export interface PprintAssertionError extends JsError {
   };
 }
 
-export type NormalizedTestError = JsError | AssertionError | PprintAssertionError | HtmlDiffAssertionError;
-
-export interface LoggedError {
-  error: NormalizedTestError;
-  logs: string[];
-}
+export type TestError = JsError | AssertionError | PprintAssertionError | HtmlDiffAssertionError;
 
 export const pprintAssertionError = (message: string, actual: string, expected: string): PprintAssertionError => {
   const e: Partial<PprintAssertionError> = new Error(message);
@@ -41,11 +36,11 @@ export const pprintAssertionError = (message: string, actual: string, expected: 
   return e as PprintAssertionError;
 };
 
-export const isPprintAssertionError = (err: NormalizedTestError): err is PprintAssertionError =>
+export const isPprintAssertionError = (err: TestError): err is PprintAssertionError =>
   err.name === 'PprintAssertionError';
 
-export const isHTMLDiffError = (err: NormalizedTestError): err is HtmlDiffAssertionError =>
+export const isHTMLDiffError = (err: TestError): err is HtmlDiffAssertionError =>
   err.name === 'HtmlAssertion';
 
-export const isAssertionError = (err: NormalizedTestError): err is AssertionError =>
+export const isAssertionError = (err: TestError): err is AssertionError =>
   err.name === 'AssertionError';

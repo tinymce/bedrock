@@ -1,6 +1,6 @@
 import { Testable, Pprint } from '@ephox/dispute';
 import { TestLabel } from './TestLabel';
-import { ErrorTypes } from '@ephox/bedrock-common';
+import { TestError } from '@ephox/bedrock-common';
 
 const eq = function <T> (message: TestLabel, expected: T, actual: T, tt: Testable.Testable<T> = Testable.tAny) {
   const result = tt.eq(expected, actual);
@@ -8,7 +8,7 @@ const eq = function <T> (message: TestLabel, expected: T, actual: T, tt: Testabl
     const ppActual = Pprint.render(actual, tt);
     const ppExpected = Pprint.render(expected, tt);
     const sMessage = TestLabel.asString(message);
-    throw ErrorTypes.pprintAssertionError(sMessage, ppActual, ppExpected);
+    throw TestError.pprintAssertionError(sMessage, ppActual, ppExpected);
   }
 };
 

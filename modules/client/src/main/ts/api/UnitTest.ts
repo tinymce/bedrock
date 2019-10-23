@@ -1,15 +1,15 @@
 import { TestLabel } from "./TestLabel";
 import { TestLogEntry, TestLogs } from "./TestLogs";
-import { ErrorTypes } from '@ephox/bedrock-common';
+import { TestError, LoggedError } from '@ephox/bedrock-common';
 
-type NormalizedTestError = ErrorTypes.NormalizedTestError;
-type LoggedError = ErrorTypes.LoggedError;
+type TestError = TestError.TestError;
+type LoggedError = LoggedError.LoggedError;
 
-export type HtmlDiffError = ErrorTypes.HtmlDiffAssertionError;
+export type HtmlDiffError = TestError.HtmlDiffAssertionError;
 
 export type SuccessCallback = () => void;
-export type TestError = TestLabel | NormalizedTestError;
-export type FailureCallback = (error: TestError, logs?: TestLogs) => void;
+export type TestThrowable = TestLabel | TestError;
+export type FailureCallback = (error: TestThrowable, logs?: TestLogs) => void;
 
 const Global = (function () {
   if (typeof window !== 'undefined') {
@@ -38,7 +38,7 @@ const cleanStack = (error: Error, linesToRemove = 1) => {
   return message + '\n' + stack.join('\n');
 };
 
-const normalizeError = (err: TestError): NormalizedTestError => {
+const normalizeError = (err: TestThrowable): TestError => {
   if (typeof err === 'string') {
     // Create an error object, but strip the stack of the 2 latest calls as it'll
     // just be this function and the previous function that called this (ie asyncTest)
@@ -86,7 +86,7 @@ const processLog = (logs: TestLogs): string[] => {
   return outputToStr(2, logs.history);
 };
 
-const prepFailure = (err: TestError, logs: TestLogs = TestLogs.emptyLogs()): LoggedError => {
+const prepFailure = (err: TestThrowable, logs: TestLogs = TestLogs.emptyLogs()): LoggedError => {
   const normalizedErr = normalizeError(err);
   const failureMessage = processLog(logs);
   return {
@@ -97,7 +97,7 @@ const prepFailure = (err: TestError, logs: TestLogs = TestLogs.emptyLogs()): Log
 
 export const asynctest = (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) => {
   register(name, function (success: () => void, failure: (e: LoggedError) => void) {
-    test(success, function (err: TestError, logs: TestLogs = TestLogs.emptyLogs()) {
+    test(success, function (err: TestThrowable, logs: TestLogs = TestLogs.emptyLogs()) {
       const r = prepFailure(err, logs);
       failure(r);
     });
