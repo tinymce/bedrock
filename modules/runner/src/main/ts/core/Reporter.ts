@@ -1,12 +1,15 @@
-import { ErrorTypes } from '@ephox/bedrock-common';
+import { TestError, LoggedError } from '@ephox/bedrock-common';
 import * as Differ from './Differ';
 import { htmlentities } from './StringUtils';
 
-type AssertionError = ErrorTypes.AssertionError;
-type HtmlDiffAssertionError = ErrorTypes.HtmlDiffAssertionError;
-type LoggedError = ErrorTypes.LoggedError;
-type NormalizedTestError = ErrorTypes.NormalizedTestError;
-type PprintAssertionError = ErrorTypes.PprintAssertionError;
+type LoggedError = LoggedError.LoggedError;
+
+type AssertionError = TestError.AssertionError;
+type HtmlDiffAssertionError = TestError.HtmlDiffAssertionError;
+type TestError = TestError.TestError;
+type PprintAssertionError = TestError.PprintAssertionError;
+
+const { isHTMLDiffError, isPprintAssertionError, isAssertionError } = TestError;
 
 /* Required to make <del> and <ins> stay as tags.*/
 const processQUnit = (html: string): string =>
@@ -15,18 +18,6 @@ const processQUnit = (html: string): string =>
     .replace(/&lt;\/del&gt;/g, '</del>')
     .replace(/&lt;ins&gt;/g, '<ins>')
     .replace(/&lt;\/ins&gt;/g, '</ins>'));
-
-const isPprintAssertionError = (err: NormalizedTestError): err is PprintAssertionError => {
-  return err.name === 'PprintAssertionError';
-};
-
-const isHTMLDiffError = (err: NormalizedTestError): err is HtmlDiffAssertionError => {
-  return err.name === 'HtmlAssertion';
-};
-
-const isAssertionError = (err: NormalizedTestError): err is AssertionError => {
-  return err.name === 'AssertionError';
-};
 
 const formatExtra = (e: LoggedError): string => {
   if (!e.logs) {

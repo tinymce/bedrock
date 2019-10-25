@@ -2,7 +2,7 @@ import { describe, it } from 'mocha';
 import { Assert } from '../../main/ts/api/Main';
 import * as fc from 'fast-check';
 import { Testable } from '@ephox/dispute';
-import { ErrorTypes } from '@ephox/bedrock-common';
+import { TestError } from '@ephox/bedrock-common';
 
 import * as chai from 'chai';
 
@@ -33,7 +33,7 @@ describe('Assert.eq', () => {
     try {
       Assert.eq("blah", "a", "b");
     } catch (e) {
-      const ee = e as ErrorTypes.PprintAssertionError;
+      const ee = e as TestError.PprintAssertionError;
       chai.assert.deepEqual(ee.message, 'blah');
       chai.assert.deepEqual(ee.diff.actual, '"b"');
       chai.assert.deepEqual(ee.diff.expected, '"a"');

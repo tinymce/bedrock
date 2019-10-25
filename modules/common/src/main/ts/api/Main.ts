@@ -1,3 +1,4 @@
-import * as ErrorTypes from './ErrorTypes';
+import * as TestError from './TestError';
+import * as LoggedError from './LoggedError';
 
-export { ErrorTypes };
+export { TestError, LoggedError };

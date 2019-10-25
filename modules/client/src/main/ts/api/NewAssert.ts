@@ -1,21 +1,14 @@
 import { Testable, Pprint } from '@ephox/dispute';
 import { TestLabel } from './TestLabel';
-import { ErrorTypes } from '@ephox/bedrock-common';
-
-type PprintAssertionError = ErrorTypes.PprintAssertionError;
+import { TestError } from '@ephox/bedrock-common';
 
 const eq = function <T> (message: TestLabel, expected: T, actual: T, tt: Testable.Testable<T> = Testable.tAny) {
   const result = tt.eq(expected, actual);
   if (!result) {
     const ppActual = Pprint.render(actual, tt);
     const ppExpected = Pprint.render(expected, tt);
-    const e: Partial<PprintAssertionError> = new Error(TestLabel.asString(message));
-    e.name = 'PprintAssertionError';
-    e.diff = {
-      actual: ppActual,
-      expected: ppExpected
-    };
-    throw e;
+    const sMessage = TestLabel.asString(message);
+    throw TestError.pprintAssertionError(sMessage, ppActual, ppExpected);
   }
 };
 
