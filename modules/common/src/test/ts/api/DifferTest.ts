@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import { describe, it } from 'mocha';
-import * as Differ from '../../main/ts/core/Differ';
+import * as Differ from '../../../main/ts/api/Differ';
 
 describe("Differ", () => {
   it("does stuff", () => {
