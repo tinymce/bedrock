@@ -1,3 +1,9 @@
+Version 9.3.0
+
+* Re-exported TestError in bedrock-client
+* Moved more code into bedrock-common
+* Added toString on PprintAssertionError, so that diffs print nicely in fast-check error reports.
+
 Version 9.2.1
 
 * Fixed sourcemaps not working in bedrock manual mode.
@@ -5,7 +11,6 @@ Version 9.2.1
 Version 9.2.0
 
 * XML CDATA sections are now split if they contain a CDATA end token
-  "]]>" is split into "]]" and ">" in two CDATA sections.
 * XML output is no longer pretty-printed as a result.
 * Assertions made with the new Assert library are no longer encoded as HTML entites in XML and stderr output.
 
