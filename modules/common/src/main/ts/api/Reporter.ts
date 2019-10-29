@@ -34,34 +34,39 @@ const formatExtra = (e: LoggedError): string => {
   }
 };
 
-export const html = (err: LoggedError): string => {
-  const e = err === undefined ? new Error('no error given') : err.error;
-  const extra = formatExtra(err);
+const extractError = (err: LoggedError): TestError =>
+  err === undefined ? new Error('no error given') : err.error;
 
+
+const mkHtml = (e: TestError): string => {
   if (TestError.isHTMLDiffError(e)) {
     // Provide detailed HTML comparison information
     return 'Test failure: ' + e.message +
-      '\nExpected: ' + htmlentities(e.diff.expected) +
-      '\nActual: ' + htmlentities(e.diff.actual) +
-      '\n\nHTML Diff: ' + processQUnit(htmlentities(e.diff.comparison)) +
-      extra;
+        '\nExpected: ' + htmlentities(e.diff.expected) +
+        '\nActual: ' + htmlentities(e.diff.actual) +
+        '\n\nHTML Diff: ' + processQUnit(htmlentities(e.diff.comparison));
   } else if (TestError.isPprintAssertionError(e)) {
     const dh = Differ.diffPrettyHtml(e.diff.actual, e.diff.expected);
     return 'Test failure: ' + e.message +
-      '\nExpected: \n' + htmlentities(e.diff.expected) +
-      '\nActual: \n' + htmlentities(e.diff.actual) +
-      '\nDiff: \n' + dh + extra;
+        '\nExpected: \n' + htmlentities(e.diff.expected) +
+        '\nActual: \n' + htmlentities(e.diff.actual) +
+        '\nDiff: \n' + dh;
   } else if (TestError.isAssertionError(e)) {
     return 'Assertion error' + (e.message ? ' [' + e.message + ']' : '') +
-      ': [' + htmlentities(JSON.stringify(e.expected)) + '] ' + e.operator +
-      ' [' + htmlentities(JSON.stringify(e.actual)) + ']' + extra;
+        ': [' + htmlentities(JSON.stringify(e.expected)) + '] ' + e.operator +
+        ' [' + htmlentities(JSON.stringify(e.actual)) + ']';
   } else if (e.name && e.message) {
-    return htmlentities(e.name + ': ' + e.message + extra);
+    return htmlentities(e.name + ': ' + e.message);
   } else if (e.toString !== undefined) {
-    return htmlentities(String(e) + extra);
+    return htmlentities(String(e));
   } else {
-    return htmlentities(JSON.stringify(e) + extra);
+    return htmlentities(JSON.stringify(e));
   }
+};
+
+export const html = (err: LoggedError): string => {
+  const e = extractError(err);
+  return mkHtml(e) + formatExtra(err);
 };
 
 export const text = (err: LoggedError): string => {
