@@ -5,10 +5,10 @@ import { TestError } from '@ephox/bedrock-common';
 const eq = function <T> (message: TestLabel, expected: T, actual: T, tt: Testable.Testable<T> = Testable.tAny) {
   const result = tt.eq(expected, actual);
   if (!result) {
-    const ppActual = Pprint.render(actual, tt);
-    const ppExpected = Pprint.render(expected, tt);
     const sMessage = TestLabel.asString(message);
-    throw TestError.pprintAssertionError(sMessage, ppActual, ppExpected);
+    const ppExpected = Pprint.render(expected, tt);
+    const ppActual = Pprint.render(actual, tt);
+    throw TestError.pprintAssertionError(sMessage, ppExpected, ppActual);
   }
 };
 

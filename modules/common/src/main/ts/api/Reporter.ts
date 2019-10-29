@@ -1,4 +1,5 @@
-import { TestError, LoggedError } from '@ephox/bedrock-common';
+import * as TestError from './TestError';
+import * as LoggedError from './LoggedError';
 import * as Differ from './Differ';
 import { htmlentities } from './StringUtils';
 
@@ -8,8 +9,6 @@ type AssertionError = TestError.AssertionError;
 type HtmlDiffAssertionError = TestError.HtmlDiffAssertionError;
 type TestError = TestError.TestError;
 type PprintAssertionError = TestError.PprintAssertionError;
-
-const { isHTMLDiffError, isPprintAssertionError, isAssertionError } = TestError;
 
 /* Required to make <del> and <ins> stay as tags.*/
 const processQUnit = (html: string): string =>
@@ -39,20 +38,20 @@ export const html = (err: LoggedError): string => {
   const e = err === undefined ? new Error('no error given') : err.error;
   const extra = formatExtra(err);
 
-  if (isHTMLDiffError(e)) {
+  if (TestError.isHTMLDiffError(e)) {
     // Provide detailed HTML comparison information
     return 'Test failure: ' + e.message +
       '\nExpected: ' + htmlentities(e.diff.expected) +
       '\nActual: ' + htmlentities(e.diff.actual) +
       '\n\nHTML Diff: ' + processQUnit(htmlentities(e.diff.comparison)) +
       extra;
-  } else if (isPprintAssertionError(e)) {
-    const dh = Differ.diffPrettyHtml(e.diff.expected, e.diff.actual);
+  } else if (TestError.isPprintAssertionError(e)) {
+    const dh = Differ.diffPrettyHtml(e.diff.actual, e.diff.expected);
     return 'Test failure: ' + e.message +
       '\nExpected: \n' + htmlentities(e.diff.expected) +
       '\nActual: \n' + htmlentities(e.diff.actual) +
       '\nDiff: \n' + dh + extra;
-  } else if (isAssertionError(e)) {
+  } else if (TestError.isAssertionError(e)) {
     return 'Assertion error' + (e.message ? ' [' + e.message + ']' : '') +
       ': [' + htmlentities(JSON.stringify(e.expected)) + '] ' + e.operator +
       ' [' + htmlentities(JSON.stringify(e.actual)) + ']' + extra;
@@ -69,13 +68,17 @@ export const text = (err: LoggedError): string => {
   const e = err === undefined ? new Error('no error given') : err.error;
   const extra = formatExtra(err);
 
-  if (isPprintAssertionError(e)) {
-    const dh = Differ.diffPrettyText(e.diff.expected, e.diff.actual);
-    return 'Test failure: ' + e.message +
-      '\nExpected: \n' + e.diff.expected +
-      '\nActual: \n' + e.diff.actual +
-      '\nDiff: \n' + dh + extra;
+  if (TestError.isPprintAssertionError(e)) {
+    return pprintAssertionText(e) + extra;
   } else {
     return html(err);
   }
+};
+
+export const pprintAssertionText = (e: PprintAssertionError): string => {
+  const dh = Differ.diffPrettyText(e.diff.actual, e.diff.expected);
+  return 'Test failure: ' + e.message +
+    '\nExpected: \n' + e.diff.expected +
+    '\nActual: \n' + e.diff.actual +
+    '\nDiff: \n' + dh;
 };

@@ -1,3 +1,5 @@
+import * as Reporter from './Reporter';
+
 export interface JsError extends Error {
   toString?: () => string;
 }
@@ -22,16 +24,20 @@ export interface PprintAssertionError extends JsError {
     expected: string;
     actual: string;
   };
+  toString: () => string;
 }
 
 export type TestError = JsError | AssertionError | PprintAssertionError | HtmlDiffAssertionError;
 
-export const pprintAssertionError = (message: string, actual: string, expected: string): PprintAssertionError => {
+export const pprintAssertionError = (message: string, expected: string, actual: string): PprintAssertionError => {
   const e: Partial<PprintAssertionError> = new Error(message);
   e.name = 'PprintAssertionError';
   e.diff = {
     actual,
     expected
+  };
+  e.toString = (): string => {
+    return Reporter.pprintAssertionText(e as PprintAssertionError);
   };
   return e as PprintAssertionError;
 };
