@@ -73,6 +73,8 @@ export const pprintAssertionText = (e: PprintAssertionError): string => {
 const mkText = (e: TestError): string => {
   if (TestError.isHTMLDiffError(e)) {
     // Provide detailed HTML comparison information
+    // TODO: make this look more like the PprintAssertionError
+    // TODO: get rid of the <ins> and <del> in the text output. Probably need to change the code that throws this.
     return 'Test failure: ' + e.message +
         '\nExpected: ' + (e.diff.expected) +
         '\nActual: ' + (e.diff.actual) +
