@@ -39,3 +39,4 @@ After merging, run `yarn lerna version` to choose a new version, then push direc
 To add a dependency to the root package: `yarn add -W package`
 To add a dependency to a module, use `yarn add @ephox/bedrock-XXX package`.
 Add a `-D` to the above for `devDependencies`
+
