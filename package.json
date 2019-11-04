@@ -27,18 +27,18 @@
     "modules/*"
   ],
   "devDependencies": {
-    "@types/chai": "^4.2.3",
+    "@types/chai": "^4.2.4",
     "@types/mocha": "^5.2.7",
-    "@typescript-eslint/eslint-plugin": "^2.0.0",
-    "@typescript-eslint/parser": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.6.0",
+    "@typescript-eslint/parser": "^2.6.0",
     "chai": "^4.2.0",
-    "eslint": "^6.3.0",
+    "eslint": "^6.6.0",
     "eslint-config-google": "^0.14.0",
     "esm": "^3.2.25",
-    "fast-check": "^1.17.0",
+    "fast-check": "^1.18.1",
     "fast-deep-equal": "^2.0.1",
-    "lerna": "^3.17.0",
-    "mocha": "^6.2.0",
+    "lerna": "^3.18.3",
+    "mocha": "^6.2.2",
     "typescript": "^3.3.0"
   },
   "engines": {
