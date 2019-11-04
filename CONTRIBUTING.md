@@ -27,7 +27,7 @@ Projects would usually include bedrock-client and bedrock-server as devDependenc
 
 Trunk-based development with semver.
 
-All modules share the same version (managed by lerna).
+All modules share the same version (managed by `lerna`).
 
 DO NOT manually edit the `package.json` files. 
 
