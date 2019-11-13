@@ -1,5 +1,6 @@
 Version 9.3.2
 
+* Fixed bedrock manual html logs not being escaped.
 * Upgrade dependencies.
 
 Version 9.3.1
