@@ -125,7 +125,7 @@ const mkText = (e: TestError): string => {
 
 export const html = (err: LoggedError): string => {
   const e = extractError(err);
-  return mkHtml(e) + formatExtra(err);
+  return mkHtml(e) + htmlentities(formatExtra(err));
 };
 
 export const text = (err: LoggedError): string => {

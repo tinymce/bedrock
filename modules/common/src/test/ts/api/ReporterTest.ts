@@ -1,8 +1,7 @@
 import { assert } from 'chai';
 import { describe, it } from 'mocha';
 import * as Reporter from '../../../main/ts/api/Reporter';
-import * as NodeAssert from 'assert';
-import * as LoggedError from "../../../main/ts/api/LoggedError";
+import * as LoggedError from '../../../main/ts/api/LoggedError';
 
 function htmlAssertion() {
   const e: any = new Error('message"');
@@ -24,6 +23,20 @@ describe("Reporter", () => {
     } catch (e) {
       const actual = Reporter.html(LoggedError.loggedError(e, []));
       const expected = 'Error: blarg&lt;span&gt;\n\nLogs:\n';
+      assert.deepEqual(actual, expected, 'Error message')
+    }
+  });
+
+  it('Reports thrown js errors with html in logs as html', () => {
+    try {
+      // noinspection ExceptionCaughtLocallyJS
+      throw new Error('blarg<span>');
+    } catch (e) {
+      const actual = Reporter.html(LoggedError.loggedError(e, [
+        'PprintAssertionError: Checking attribute: "height" of <iframe src="http://www.example.com/" width="200" height="200"></iframe>'
+      ]));
+      const expected = 'Error: blarg&lt;span&gt;\n\nLogs:\n' +
+        'PprintAssertionError: Checking attribute: &quot;height&quot; of &lt;iframe src=&quot;http://www.example.com/&quot; width=&quot;200&quot; height=&quot;200&quot;&gt;&lt;/iframe&gt;';
       assert.deepEqual(actual, expected, 'Error message')
     }
   });
