@@ -31,7 +31,7 @@
     "load-grunt-tasks": "^3.5.0",
     "mkdirp": "^0.5.1",
     "node-glob": "^1.2.0",
-    "portfinder": "1.0.21",
+    "portfinder": "^1.0.25",
     "raw-loader": "^0.5.1",
     "recursive-readdir-sync": "^1.0.6",
     "rollup": "^1.23.1",
