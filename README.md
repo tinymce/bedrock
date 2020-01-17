@@ -18,8 +18,6 @@ A global install will put the bedrock commands (e.g. `bedrock-auto`) automatical
 
 `$ npm install -g .`
 
-
-
 ## Local Install
 
 A local install will not put the bedrock commands automatically on your path. After installing locally, you can access the commands via:
