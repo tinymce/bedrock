@@ -1,20 +1,12 @@
-// NOTE: This Jenkinsfile relies on Tiny's internal infrastructure
+#!groovy
+@Library('waluigi@feature/ARCH-105') _
 
-library identifier: 'jenkins-plumbing@master', retriever: modernSCM(
-  [$class: 'GitSCMSource',
-   remote: 'ssh://git@stash:7999/van/jenkins-plumbing.git',
-   credentialsId: '8aa93893-84cc-45fc-a029-a42f21197bb3'])
+// NOTE: This Jenkinsfile relies on Tiny's internal infrastructure
 
 properties([
   disableConcurrentBuilds(),
   pipelineTriggers([])
 ])
-
-def isReleaseBranch() {
-  // The branch name could be in the BRANCH_NAME or GIT_BRANCH variable depending on the type of job
-  def branchName = env.BRANCH_NAME ? env.BRANCH_NAME : env.GIT_BRANCH
-  return branchName == 'master' || branchName == 'origin/master';
-}
 
 node("primary") {
   echo "Clean workspace"
