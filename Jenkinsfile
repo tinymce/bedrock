@@ -34,9 +34,7 @@ node("primary") {
 
   if (isReleaseBranch()) {
     stage("publish") {
-      sshagent(credentials: ['8aa93893-84cc-45fc-a029-a42f21197bb3']) {
-        sh 'yarn lerna publish from-package --yes --ignore @ephox/bedrock-sample'
-      }
+      sh 'yarn lerna publish from-package --yes --ignore @ephox/bedrock-sample'
     }
   }
 }
