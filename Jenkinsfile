@@ -16,30 +16,27 @@ node("primary") {
     checkout localBranch(scm)
   }
 
-  withBitbucket {
-    stage("clean") {
-      sh 'yarn clean'
-    }
+  stage("clean") {
+    sh 'yarn clean'
+  }
 
-    stage("install") {
-      sh 'yarn install'
-    }
+  stage("install") {
+    sh 'yarn install'
+  }
 
-    stage("build") {
-      sh 'yarn build'
-    }
+  stage("build") {
+    sh 'yarn build'
+  }
 
-    stage("test") {
-      sh 'yarn test'
-    }
+  stage("test") {
+    sh 'yarn test'
+  }
 
-    if (isReleaseBranch()) {
-      stage("publish") {
-        sshagent(credentials: ['8aa93893-84cc-45fc-a029-a42f21197bb3']) {
-          sh 'yarn lerna publish from-package --yes --ignore @ephox/bedrock-sample'
-        }
+  if (isReleaseBranch()) {
+    stage("publish") {
+      sshagent(credentials: ['8aa93893-84cc-45fc-a029-a42f21197bb3']) {
+        sh 'yarn lerna publish from-package --yes --ignore @ephox/bedrock-sample'
       }
     }
-
   }
 }
