@@ -69,9 +69,9 @@ export const create = () => {
     // Locking has failed many times ... so just assume the lock should have been released.
     if (attempts === 0) return use(f);
     // Nothing has a lock, and there is no queue
-    if (inUse === false && queue.length === 0) return use(f);
+    if (!inUse && queue.length === 0) return use(f);
     // Nothing has a lock and this process is at the head of the queue
-    else if (inUse === false && queue[0].identifier === identifier) {
+    else if (!inUse && queue[0].identifier === identifier) {
       const first = queue[0];
       queue = queue.slice(1);
       return use(first.f);
@@ -85,7 +85,7 @@ export const create = () => {
   };
 
   const waitForIdle = <T>(f: Executor<T>, label: string): Promise<T> => {
-    if (inUse === false && queue.length === 0) {
+    if (!inUse && queue.length === 0) {
       return use(f);
     } else {
       const identifier = label + '_' + new Date().getTime() + Math.floor(Math.random() * 10000);
