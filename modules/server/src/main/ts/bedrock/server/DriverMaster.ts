@@ -17,7 +17,7 @@ export const create = () => {
 
   let queue: QueueItem<any>[] = [];
 
-  const use = <T>(f: Executor<T>, label: string) => {
+  const use = <T>(f: Executor<T>) => {
     inUse = true;
 
     return f().then((v) => {
@@ -67,14 +67,14 @@ export const create = () => {
 
   const doWaitForIdle = <T>(identifier: string, f: Executor<T>, label: string, attempts: number): Promise<T> => {
     // Locking has failed many times ... so just assume the lock should have been released.
-    if (attempts === 0) return use(f, label);
+    if (attempts === 0) return use(f);
     // Nothing has a lock, and there is no queue
-    if (inUse === false && queue.length === 0) return use(f, label);
+    if (inUse === false && queue.length === 0) return use(f);
     // Nothing has a lock and this process is at the head of the queue
     else if (inUse === false && queue[0].identifier === identifier) {
       const first = queue[0];
       queue = queue.slice(1);
-      return use(first.f, first.label);
+      return use(first.f);
     // Either something has a lock, or this process is not at the head of the queue,
     // so it needs to wait its turn
     } else {
@@ -86,7 +86,7 @@ export const create = () => {
 
   const waitForIdle = <T>(f: Executor<T>, label: string): Promise<T> => {
     if (inUse === false && queue.length === 0) {
-      return use(f, label);
+      return use(f);
     } else {
       const identifier = label + '_' + new Date().getTime() + Math.floor(Math.random() * 10000);
       queue = queue.concat({
