@@ -28,7 +28,7 @@ const performAction = (target: EffectUtils.ElementWithActions, type: string) => 
   });
 };
 
-const doAction = (driver: BrowserObject, target: EffectUtils.ElementWithActions, type: MouseData['type']): Promise<void> => {
+const doAction = (target: EffectUtils.ElementWithActions, type: MouseData['type']): Promise<void> => {
   if (type === 'move') {
     return target.moveTo();
   } else if (type === 'down' || type === 'up') {
@@ -45,7 +45,7 @@ const doAction = (driver: BrowserObject, target: EffectUtils.ElementWithActions,
 
 const execute = (driver: BrowserObject, data: MouseData) => {
   return EffectUtils.performActionOnTarget(driver, data, (target) => {
-    return doAction(driver, target, data.type);
+    return doAction(target, data.type);
   });
 };
 

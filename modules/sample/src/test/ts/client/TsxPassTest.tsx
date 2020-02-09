@@ -4,6 +4,6 @@ UnitTest.test('SyncPass Test', () => {
   const React = {
     createElement: (...props) => {}
   };
-  const el = <div></div>;
-  assert.eq(1, 1);
+  const el = <div>blah</div>;
+  assert.eq(el, el);
 });

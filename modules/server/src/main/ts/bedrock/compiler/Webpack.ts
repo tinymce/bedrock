@@ -32,7 +32,7 @@ const moduleAvailable = (name: string) => {
 const webpackRemap: Array<Record<string, any>> = moduleAvailable('@ephox/swag') ? [
   {
     test: /\.js|\.tsx?$/,
-    use: ['@ephox/swag/webpack/remapper']
+    use: [ '@ephox/swag/webpack/remapper' ]
   }
 ] : [];
 
@@ -50,13 +50,13 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
     },
 
     resolve: {
-      extensions: ['.ts', '.tsx', '.js'],
+      extensions: [ '.ts', '.tsx', '.js' ],
       plugins: [
         new TsConfigPathsPlugin({
           configFile: tsConfigFile,
           // awesome-typescript-loader could read this from above, but the new plugin can't?
           // lol whatever
-          extensions: ['.ts', '.tsx', '.js']
+          extensions: [ '.ts', '.tsx', '.js' ]
         })
       ]
     },
@@ -74,7 +74,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
       rules: webpackRemap.concat([
         {
           test: /\.js$/,
-          use: ['source-map-loader'],
+          use: [ 'source-map-loader' ],
           enforce: 'pre'
         },
 
@@ -101,7 +101,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
 
         {
           test: /\.(html|htm|css|bower|hex|rtf|xml|yml)$/,
-          use: ['raw-loader']
+          use: [ 'raw-loader' ]
         }
       ]).concat(
         coverage ? [
@@ -149,7 +149,7 @@ const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[
     },
 
     resolve: {
-      extensions: ['.js']
+      extensions: [ '.js' ]
     },
 
     // Webpack by default only resolves from the ./node_modules directory which will cause issues if the project that uses bedrock
@@ -165,12 +165,12 @@ const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[
       rules: webpackRemap.concat([
         {
           test: /\.js$/,
-          use: ['source-map-loader'],
+          use: [ 'source-map-loader' ],
           enforce: 'pre'
         },
         {
           test: /\.(html|htm|css|bower|hex|rtf|xml|yml)$/,
-          use: ['raw-loader']
+          use: [ 'raw-loader' ]
         }
       ]).concat(
         coverage ? [
@@ -236,7 +236,7 @@ const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: str
   });
 };
 
-const getJsCompileInfo = (scratchDir: string, basedir: string, manualMode: boolean, coverage: string[]): Promise<CompileInfo> => {
+const getJsCompileInfo = (scratchDir: string, basedir: string, coverage: string[]): Promise<CompileInfo> => {
   const scratchFile = path.join(scratchDir, 'compiled/tests-imports.js');
   const dest = path.join(scratchDir, 'compiled/tests.js');
   const config = getWebPackConfigJs(scratchFile, dest, coverage, false, basedir);
@@ -248,13 +248,13 @@ const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: strin
   if (hasTs(srcFiles)) {
     return getTsCompileInfo(tsConfigFile, scratchDir, basedir, manualMode, coverage);
   } else {
-    return getJsCompileInfo(scratchDir, basedir, manualMode, coverage);
+    return getJsCompileInfo(scratchDir, basedir, coverage);
   }
 };
 
 export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], coverage: string[]): Promise<string> => {
   return getCompileInfo(tsConfigFile, scratchDir, basedir, false, srcFiles, coverage)
-  .then((compileInfo) => compileTests(compileInfo, exitOnCompileError, srcFiles))
+    .then((compileInfo) => compileTests(compileInfo, exitOnCompileError, srcFiles))
 };
 
 const isCompiledRequest = (request: { url: string }) => request.url.startsWith('/compiled/');
@@ -264,41 +264,41 @@ export const devserver = (settings: WebpackServeSettings): Promise<Serve.ServeSe
   const tsConfigFile = settings.config;
 
   return getCompileInfo(tsConfigFile, scratchDir, settings.basedir, true, settings.testfiles, settings.coverage)
-  .then((compileInfo) => {
-    return Serve.startCustom(settings, (handler) => {
-      const scratchFile = compileInfo.scratchFile;
-      console.log(`Loading ${settings.testfiles.length} tests...`);
+    .then((compileInfo) => {
+      return Serve.startCustom(settings, (handler) => {
+        const scratchFile = compileInfo.scratchFile;
+        console.log(`Loading ${settings.testfiles.length} tests...`);
 
-      mkdirp.sync(path.dirname(scratchFile));
-      fs.writeFileSync(scratchFile, Imports.generateImports(true, scratchFile, settings.testfiles));
+        mkdirp.sync(path.dirname(scratchFile));
+        fs.writeFileSync(scratchFile, Imports.generateImports(true, scratchFile, settings.testfiles));
 
-      const compiler = webpack(compileInfo.config);
+        const compiler = webpack(compileInfo.config);
 
-      // Prevents webpack from doing a recompilation of a change of tests.ts over and over
-      compiler.hooks.emit.tap('bedrock', (compilation) => {
-        compilation.fileDependencies.delete(scratchFile);
-      });
+        // Prevents webpack from doing a recompilation of a change of tests.ts over and over
+        compiler.hooks.emit.tap('bedrock', (compilation) => {
+          compilation.fileDependencies.delete(scratchFile);
+        });
 
-      return new WebpackDevServer(compiler, {
-        publicPath: '/compiled/',
-        disableHostCheck: true,
-        stats: {
-          // copied from `'minimal'`
-          all: false,
-          modules: true,
-          maxModules: 0,
-          errors: true,
-          warnings: true,
+        return new WebpackDevServer(compiler, {
+          publicPath: '/compiled/',
+          disableHostCheck: true,
+          stats: {
+            // copied from `'minimal'`
+            all: false,
+            modules: true,
+            maxModules: 0,
+            errors: true,
+            warnings: true,
 
-          // suppress type re-export warnings caused by `transpileOnly: true`
-          warningsFilter: /export .* was not found in/
-        },
-        before: (app) => {
-          app.all('*', (request, response, next) => {
-            return isCompiledRequest(request) ? next() : handler(request, response);
-          });
-        }
+            // suppress type re-export warnings caused by `transpileOnly: true`
+            warningsFilter: /export .* was not found in/
+          },
+          before: (app) => {
+            app.all('*', (request, response, next) => {
+              return isCompiledRequest(request) ? next() : handler(request, response);
+            });
+          }
+        });
       });
     });
-  });
 };

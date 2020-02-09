@@ -16,7 +16,7 @@ export const shutdown = (promise: Promise<Attempt<string[], TestResult[]>>, driv
 
   return promise.then((res) => {
     // Only check the delay exit option if tests failed.
-    const delay = Attempt.cata(res, (_errs) => exitDelay(), () => Promise.resolve());
+    const delay = Attempt.cata(res, () => exitDelay(), () => Promise.resolve());
 
     return delay.then(() => {
       return Attempt.cata(res, (errs) => {
