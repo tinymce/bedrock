@@ -1,5 +1,5 @@
 #!groovy
-@Library('waluigi@v1.0.0') _
+@Library('waluigi@v2.0.0') _
 
 // NOTE: This Jenkinsfile relies on Tiny's internal infrastructure
 
@@ -21,7 +21,7 @@ node("primary") {
   }
 
   stage("install") {
-    sh 'yarn install'
+    yarnInstall() 
   }
 
   stage("build") {
