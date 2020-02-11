@@ -1,12 +1,9 @@
 #!groovy
-@Library('waluigi@v1.0.0') _
+@Library('waluigi@v3.1.0') _
 
 // NOTE: This Jenkinsfile relies on Tiny's internal infrastructure
 
-properties([
-  disableConcurrentBuilds(),
-  pipelineTriggers([])
-])
+standardProperties()
 
 node("primary") {
   echo "Clean workspace"
@@ -21,7 +18,7 @@ node("primary") {
   }
 
   stage("install") {
-    sh 'yarn install'
+    yarnInstall() 
   }
 
   stage("build") {
