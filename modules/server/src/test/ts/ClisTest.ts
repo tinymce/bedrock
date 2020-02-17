@@ -54,7 +54,8 @@ describe('cli', () => {
       chunk: 100,
       retries: 0,
       useSandboxForHeadless: false,
-      skipResetMousePosition: false
+      skipResetMousePosition: false,
+      wipeBrowserCache: false
     }, cleanResult(actual));
   });
 

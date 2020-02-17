@@ -282,6 +282,9 @@ export const devserver = (settings: WebpackServeSettings): Promise<Serve.ServeSe
         return new WebpackDevServer(compiler, {
           publicPath: '/compiled/',
           disableHostCheck: true,
+          headers: {
+            'Cache-Control': 'public, max-age=0'  // Ensure compiled assets are re-validated
+          },
           stats: {
             // copied from `'minimal'`
             all: false,

@@ -249,6 +249,14 @@ export const stopOnFailure: ClOption = {
   validate: Extraction.any
 };
 
+export const wipeBrowserCache: ClOption = {
+  name: 'wipeBrowserCache',
+  type: Boolean,
+  defaultValue: false,
+  description: 'Wipe the browsers cache when starting the webdriver session (IE only)',
+  validate: Extraction.any
+};
+
 // TODO: what is this setting?
 // eslint-disable-next-line camelcase,@typescript-eslint/camelcase
 export const stopOnFailure__hidden: ClOption = {

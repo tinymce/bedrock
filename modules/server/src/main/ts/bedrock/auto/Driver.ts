@@ -14,6 +14,7 @@ export interface DriverSettings {
   useSandboxForHeadless: boolean;
   webdriverPort?: number;
   webdriverTimeout?: number;
+  wipeBrowserCache?: boolean;
 }
 
 export interface Driver {
@@ -84,6 +85,13 @@ const getOptions = (port: number, browserName: string, browserFamily: string, se
     addArguments(caps, 'goog:chromeOptions', ['--start-maximized', '--disable-extensions']);
   }
 
+  // Setup wiping the browser cache if required, as IE 11 doesn't use a clean session by default
+  if (browserFamily === 'internet explorer' && settings.wipeBrowserCache) {
+    caps['se:ieOptions'] = {
+      'ie.ensureCleanSession': true
+    };
+  }
+
   // Setup any headless mode options
   if (browserName === 'phantomjs') {
     caps['phantomjs.cli.args'] = '--remote-debugger-port=' + settings.debuggingPort;
@@ -96,7 +104,7 @@ const getOptions = (port: number, browserName: string, browserFamily: string, se
       'devtools.chrome.enabled': true
     }
   } else if (browserName === 'chrome-headless') {
-    addArguments(caps, 'goog:chromeOptions', ['--headless', '--remote-debugging-port=' + settings.debuggingPort]);
+    addArguments(caps, 'goog:chromeOptions', [ '--headless', '--remote-debugging-port=' + settings.debuggingPort ]);
     if (settings.useSandboxForHeadless) {
       addArguments(caps, 'goog:chromeOptions', [ '--no-sandbox' ]);
     }

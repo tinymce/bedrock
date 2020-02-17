@@ -23,6 +23,7 @@ export interface BedrockAutoSettings extends BedrockSettings {
   skipResetMousePosition: boolean;
   stopOnFailure: boolean;
   useSandboxForHeadless: boolean;
+  wipeBrowserCache: boolean;
 }
 
 export interface BedrockFrameworkSettings extends BedrockSettings {
