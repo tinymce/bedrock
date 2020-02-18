@@ -26,7 +26,8 @@ export const go = (settings: BedrockAutoSettings) => {
       browser: settings.browser,
       basedir: settings.basedir,
       debuggingPort: settings.debuggingPort,
-      useSandboxForHeadless: settings.useSandboxForHeadless
+      useSandboxForHeadless: settings.useSandboxForHeadless,
+      wipeBrowserCache: settings.wipeBrowserCache
     }).then((driver) => {
       const webdriver = driver.webdriver;
       const serveSettings: Serve.ServeSettings = {

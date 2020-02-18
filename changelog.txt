@@ -1,5 +1,7 @@
-Version 9.3.3
+Version 9.4.0
 
+* Added new `wipeBrowserCache` setting for auto mode to ensure Internet Explorers cache is cleared.
+* Fixed cache headers not being set for certain assets.
 * Upgrade dependencies.
 
 Version 9.3.2
