@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock-sample",
-  "version": "9.3.2",
+  "version": "9.4.0",
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
   "scripts": {
@@ -13,7 +13,7 @@
     "@ephox/bedrock-client": "^9.3.2"
   },
   "devDependencies": {
-    "@ephox/bedrock-server": "^9.3.2"
+    "@ephox/bedrock-server": "^9.4.0"
   },
   "files": [],
   "private": true,
