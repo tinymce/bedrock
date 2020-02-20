@@ -22,10 +22,19 @@ const filePathToImport = (useRequire: boolean, scratchFile: string) => {
   };
 };
 
+const generatePolyfills = (useRequire: boolean): string[] => {
+  // For IE support we need to load some polyfills
+  const loadPolyfill = `if (navigator.userAgent.indexOf('MSIE ') !== -1 || navigator.userAgent.indexOf('; rv:') !== -1) {
+  ${useRequire ? `window.Symbol = require('core-js/es/symbol');` : `import 'core-js/es/symbol';`}
+}
+`;
+  return [ loadPolyfill ];
+};
+
 const generateImportsTs = (useRequire: boolean, scratchFile: string, srcFiles: string[]) => {
   const imports = srcFiles.map(filePathToImport(useRequire, scratchFile)).join('\n');
   // header code for tests.ts
-  return [
+  return generatePolyfills(useRequire).concat([
     `
 declare let require: any;
 declare let __tests: any;
@@ -55,13 +64,13 @@ const addTest = (testFilePath: string) => {
 `,
     imports,
     'export {};'
-  ].join('\n');
+  ]).join('\n');
 };
 
 const generateImportsJs = (useRequire: boolean, scratchFile: string, srcFiles: string[]) => {
   const imports = srcFiles.map(filePathToImport(useRequire, scratchFile)).join('\n');
   // header code for tests-imports.js
-  return [
+  return generatePolyfills(useRequire).concat([
     `
 var __lastTestIndex = -1;
 var addTest = function (testFilePath) {
@@ -88,7 +97,7 @@ var addTest = function (testFilePath) {
 `,
     imports,
     'export {};'
-  ].join('\n');
+  ]).join('\n');
 };
 
 export const generateImports = (useRequire: boolean, scratchFile: string, srcFiles: string[]) => {
