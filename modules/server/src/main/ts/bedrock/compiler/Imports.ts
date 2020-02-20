@@ -15,19 +15,21 @@ const filePathToImport = (useRequire: boolean, scratchFile: string) => {
     filePath = filePath.replace(/\\/g, '/');
 
     return [
-      useRequire ? `require("${relativePath}");` : `import "${relativePath}";`, // rollup doesn't support require
-
-      `addTest("${filePath}");`
+      'try {',
+      useRequire ? `  require("${relativePath}");` : `  import "${relativePath}";`, // rollup doesn't support require
+      '} catch (e) {',
+      `  handleParseError("${filePath}", e);`,
+      '}',
+      `addTest("${filePath}");`,
     ].join('\n');
   };
 };
 
 const generatePolyfills = (useRequire: boolean): string[] => {
   // For IE support we need to load some polyfills
-  const loadPolyfill = `if (navigator.userAgent.indexOf('MSIE ') !== -1 || navigator.userAgent.indexOf('; rv:') !== -1) {
-  ${useRequire ? `window.Symbol = require('core-js/es/symbol');` : `import 'core-js/es/symbol';`}
-}
-`;
+  const loadPolyfill = `if (window['Symbol'] === undefined) {
+  ${useRequire ? 'window.Symbol = require(\'core-js/es/symbol\');' : 'import \'core-js/es/symbol\';'}
+}`;
   return [ loadPolyfill ];
 };
 
@@ -61,6 +63,10 @@ const addTest = (testFilePath: string) => {
     console.error('no test list to add tests to');
   }
 };
+const handleParseError = (testFilePath: string, error: any) => {
+  ${useRequire ? 'const UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
+  UnitTest.test(testFilePath, () => { throw error; });
+};
 `,
     imports,
     'export {};'
@@ -93,6 +99,10 @@ var addTest = function (testFilePath) {
   } else {
     console.error('no test list to add tests to');
   }
+};
+var handleParseError = function (testFilePath, error) {
+  ${useRequire ? 'var UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
+  UnitTest.test(testFilePath', function () { throw error; });
 };
 `,
     imports,
