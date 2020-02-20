@@ -1,3 +1,8 @@
+Version 9.5.0
+
+* Added support for polyfilling `Symbol` if required.
+* Fixed tests not running if an imported test can't be parsed.
+
 Version 9.4.0
 
 * Added new `wipeBrowserCache` setting for auto mode to ensure Internet Explorers cache is cleared.
