@@ -14,14 +14,14 @@ const filePathToImport = (useRequire: boolean, scratchFile: string) => {
     // let's just go with forward slash.
     filePath = filePath.replace(/\\/g, '/');
 
-    return [
-      'try {',
-      useRequire ? `  require("${relativePath}");` : `  import "${relativePath}";`, // rollup doesn't support require
-      '} catch (e) {',
-      `  handleParseError("${filePath}", e);`,
-      '}',
-      `addTest("${filePath}");`,
-    ].join('\n');
+    const importString = useRequire ? `require("${relativePath}");` : `import "${relativePath}";`;
+    return `
+try {
+  ${importString}
+} catch (e) {
+  handleParseError("${filePath}", e);
+}
+addTest("${filePath}");`;
   };
 };
 
@@ -69,7 +69,7 @@ const handleParseError = (testFilePath: string, error: any) => {
 };
 `,
     imports,
-    'export {};'
+    '\nexport {};'
   ]).join('\n');
 };
 
@@ -106,7 +106,7 @@ var handleParseError = function (testFilePath, error) {
 };
 `,
     imports,
-    'export {};'
+    '\nexport {};'
   ]).join('\n');
 };
 
