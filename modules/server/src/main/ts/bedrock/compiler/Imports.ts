@@ -102,7 +102,7 @@ var addTest = function (testFilePath) {
 };
 var handleParseError = function (testFilePath, error) {
   ${useRequire ? 'var UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
-  UnitTest.test(testFilePath', function () { throw error; });
+  UnitTest.test(testFilePath, function () { throw error; });
 };
 `,
     imports,
