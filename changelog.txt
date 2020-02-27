@@ -1,6 +1,7 @@
 Version 9.5.1
 
 * Fixed broken import generation for js tests.
+* Fixed webpack getting stuck in an infinite compilation loop when compiling many tests.
 
 Version 9.5.0
 
