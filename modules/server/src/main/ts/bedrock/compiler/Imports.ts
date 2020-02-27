@@ -62,7 +62,8 @@ const addTest = (testFilePath: string) => {
 };
 const handleImportError = (testFilePath: string, error: any) => {
   ${useRequire ? 'const UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
-  UnitTest.test('Import Error - ' + testFilePath, () => { throw error; });
+  UnitTest.test('Import Error', () => { throw error; });
+  addTest(testFilePath);
 };
 
 let __currentTestFile;
@@ -104,7 +105,8 @@ var addTest = function (testFilePath) {
 };
 var handleImportError = function (testFilePath, error) {
   ${useRequire ? 'var UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
-  UnitTest.test('Import Error - ' + testFilePath, function () { throw error; });
+  UnitTest.test('Import Error', function () { throw error; });
+  addTest(testFilePath);
 };
 
 var __currentTestFile;
