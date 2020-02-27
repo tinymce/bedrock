@@ -1,3 +1,7 @@
+Version 9.5.1
+
+* Fixed broken import generation for js tests.
+
 Version 9.5.0
 
 * Added support for polyfilling `Symbol` if required.
