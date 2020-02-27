@@ -16,9 +16,9 @@ const filePathToImport = (useRequire: boolean, scratchFile: string) => {
 
     const importString = useRequire ? `require("${relativePath}");` : `import "${relativePath}";`;
     return `
-  __currentTestFile = "${filePath}";
-  ${importString}
-  addTest("${filePath}");`;
+__currentTestFile = "${filePath}";
+${importString}
+addTest("${filePath}");`;
   };
 };
 
@@ -39,6 +39,7 @@ declare let require: any;
 declare let __tests: any;
 declare let console: any;
 let __lastTestIndex: number = -1;
+let __currentTestFile;
 const addTest = (testFilePath: string) => {
   if (__tests && __tests[__tests.length - 1]) {
     const lastTest = __tests[__tests.length - 1];
@@ -60,18 +61,20 @@ const addTest = (testFilePath: string) => {
     console.error('no test list to add tests to');
   }
 };
-const handleImportError = (testFilePath: string, error: any) => {
-  ${useRequire ? 'const UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
-  UnitTest.test('Import Error', () => { throw error; });
-  addTest(testFilePath);
-};
 
-let __currentTestFile;
-try {
+window.addEventListener('error', (event: any) => { 
+  ${useRequire ? 'const UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
+  UnitTest.test('Error', () => {
+    if (event.error) {
+      throw event.error;
+    } else {
+      throw new Error(event.message);
+    }
+  });
+  addTest(__currentTestFile);
+});
+
 ${imports}
-} catch (e) {
-  handleImportError(__currentTestFile, e);
-}
 
 export {};`;
 };
@@ -82,6 +85,7 @@ const generateImportsJs = (useRequire: boolean, scratchFile: string, srcFiles: s
   return `${generatePolyfills(useRequire)}
 
 var __lastTestIndex = -1;
+var __currentTestFile;
 var addTest = function (testFilePath) {
   if (__tests && __tests[__tests.length - 1]) {
     var lastTest = __tests[__tests.length - 1];
@@ -103,18 +107,20 @@ var addTest = function (testFilePath) {
     console.error('no test list to add tests to');
   }
 };
-var handleImportError = function (testFilePath, error) {
-  ${useRequire ? 'var UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
-  UnitTest.test('Import Error', function () { throw error; });
-  addTest(testFilePath);
-};
 
-var __currentTestFile;
-try {
+window.addEventListener('error', function (event) {
+  ${useRequire ? 'var UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
+  UnitTest.test('Error', function () {
+    if (event.error) {
+      throw event.error;
+    } else {
+      throw new Error(event.message);
+    }
+  });
+  addTest(__currentTestFile);
+});
+
 ${imports}
-} catch (e) {
-  handleImportError(__currentTestFile, e);
-}
 
 export {};`;
 };
