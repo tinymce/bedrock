@@ -16,11 +16,8 @@ const filePathToImport = (useRequire: boolean, scratchFile: string) => {
 
     const importString = useRequire ? `require("${relativePath}");` : `import "${relativePath}";`;
     return `
-try {
-  ${importString}
-} catch (e) {
-  handleParseError("${filePath}", e);
-}
+__currentTestFile = "${filePath}";
+${importString}
 addTest("${filePath}");`;
   };
 };
@@ -36,12 +33,13 @@ const generatePolyfills = (useRequire: boolean): string[] => {
 const generateImportsTs = (useRequire: boolean, scratchFile: string, srcFiles: string[]) => {
   const imports = srcFiles.map(filePathToImport(useRequire, scratchFile)).join('\n');
   // header code for tests.ts
-  return generatePolyfills(useRequire).concat([
-    `
+  return `${generatePolyfills(useRequire)}
+
 declare let require: any;
 declare let __tests: any;
 declare let console: any;
 let __lastTestIndex: number = -1;
+let __currentTestFile;
 const addTest = (testFilePath: string) => {
   if (__tests && __tests[__tests.length - 1]) {
     const lastTest = __tests[__tests.length - 1];
@@ -56,29 +54,38 @@ const addTest = (testFilePath: string) => {
     } else {
       console.warn('file ' + testFilePath + ' did not add a new test to the list, ignoring');
     }
-    
+
     // Save the last test index
     __lastTestIndex = __tests.length - 1;
   } else {
     console.error('no test list to add tests to');
   }
 };
-const handleParseError = (testFilePath: string, error: any) => {
+
+window.addEventListener('error', (event: any) => { 
   ${useRequire ? 'const UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
-  UnitTest.test(testFilePath, () => { throw error; });
-};
-`,
-    imports,
-    '\nexport {};'
-  ]).join('\n');
+  UnitTest.test('Error', () => {
+    if (event.error) {
+      throw event.error;
+    } else {
+      throw new Error(event.message);
+    }
+  });
+  addTest(__currentTestFile);
+});
+
+${imports}
+
+export {};`;
 };
 
 const generateImportsJs = (useRequire: boolean, scratchFile: string, srcFiles: string[]) => {
   const imports = srcFiles.map(filePathToImport(useRequire, scratchFile)).join('\n');
   // header code for tests-imports.js
-  return generatePolyfills(useRequire).concat([
-    `
+  return `${generatePolyfills(useRequire)}
+
 var __lastTestIndex = -1;
+var __currentTestFile;
 var addTest = function (testFilePath) {
   if (__tests && __tests[__tests.length - 1]) {
     var lastTest = __tests[__tests.length - 1];
@@ -93,21 +100,29 @@ var addTest = function (testFilePath) {
     } else {
       console.warn('file ' + testFilePath + ' did not add a new test to the list, ignoring');
     }
-    
+
     // Save the last test index
     __lastTestIndex = __tests.length - 1;
   } else {
     console.error('no test list to add tests to');
   }
 };
-var handleParseError = function (testFilePath, error) {
+
+window.addEventListener('error', function (event) {
   ${useRequire ? 'var UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
-  UnitTest.test(testFilePath, function () { throw error; });
-};
-`,
-    imports,
-    '\nexport {};'
-  ]).join('\n');
+  UnitTest.test('Error', function () {
+    if (event.error) {
+      throw event.error;
+    } else {
+      throw new Error(event.message);
+    }
+  });
+  addTest(__currentTestFile);
+});
+
+${imports}
+
+export {};`;
 };
 
 export const generateImports = (useRequire: boolean, scratchFile: string, srcFiles: string[]) => {
