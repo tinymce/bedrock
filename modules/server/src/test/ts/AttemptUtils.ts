@@ -9,7 +9,7 @@ export const arbAttemptPassed = <E, A> (arba: Arbitrary<A>): Arbitrary<Attempt<E
   arba.map<Attempt<E, A>>(Attempt.passed);
 
 export const arbAttempt = <E, A> (arbe: Arbitrary<E>, arba: Arbitrary<A>): Arbitrary<Attempt<E, A>> =>
-  fc.oneof(arbAttemptFailed(arbe), arbAttemptPassed(arba));
+  fc.oneof(arbAttemptFailed<E, A>(arbe), arbAttemptPassed<E, A>(arba));
 
 export const assertErrors = <E> (expected: E, actual: Attempt<E, any>) => {
   Attempt.cata(actual, (errs) => {
