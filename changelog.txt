@@ -1,3 +1,7 @@
+Version 9.5.2
+
+* Fixed JS sourcemaps not working in bedrock manual mode.
+
 Version 9.5.1
 
 * Fixed broken import generation for js tests.
@@ -31,7 +35,7 @@ Version 9.3.0
 
 Version 9.2.1
 
-* Fixed sourcemaps not working in bedrock manual mode.
+* Fixed TS sourcemaps not working in bedrock manual mode.
 
 Version 9.2.0
 
