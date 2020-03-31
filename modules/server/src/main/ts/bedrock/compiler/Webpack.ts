@@ -236,10 +236,10 @@ const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: str
   });
 };
 
-const getJsCompileInfo = (scratchDir: string, basedir: string, coverage: string[]): Promise<CompileInfo> => {
+const getJsCompileInfo = (scratchDir: string, basedir: string, manualMode: boolean, coverage: string[]): Promise<CompileInfo> => {
   const scratchFile = path.join(scratchDir, 'compiled/tests-imports.js');
   const dest = path.join(scratchDir, 'compiled/tests.js');
-  const config = getWebPackConfigJs(scratchFile, dest, coverage, false, basedir);
+  const config = getWebPackConfigJs(scratchFile, dest, coverage, manualMode, basedir);
 
   return Promise.resolve({ scratchFile, dest, config });
 };
@@ -248,7 +248,7 @@ const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: strin
   if (hasTs(srcFiles)) {
     return getTsCompileInfo(tsConfigFile, scratchDir, basedir, manualMode, coverage);
   } else {
-    return getJsCompileInfo(scratchDir, basedir, coverage);
+    return getJsCompileInfo(scratchDir, basedir, manualMode, coverage);
   }
 };
 
