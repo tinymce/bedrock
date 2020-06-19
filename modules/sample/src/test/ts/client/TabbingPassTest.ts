@@ -1,6 +1,6 @@
 import { UnitTest, assert } from '@ephox/bedrock-client'
 
-UnitTest.asynctest('Tabbing Test', (success, failure) => {
+UnitTest.asyncTest('Tabbing Test', (success, failure) => {
   var input1 = document.createElement('input');
   input1.classList.add('input-1');
 
