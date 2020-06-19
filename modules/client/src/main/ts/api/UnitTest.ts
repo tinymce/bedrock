@@ -98,10 +98,15 @@ const prepFailure = (err: TestThrowable, logs: TestLogs = TestLogs.emptyLogs()):
 /** An asynchronous test with callbacks. */
 export const asyncTest = (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) => {
   register(name, function (success: () => void, failure: (e: LoggedError) => void) {
-    test(success, function (err: TestThrowable, logs: TestLogs = TestLogs.emptyLogs()) {
-      const r = prepFailure(err, logs);
+    try {
+      test(success, function (err: TestThrowable, logs: TestLogs = TestLogs.emptyLogs()) {
+        const r = prepFailure(err, logs);
+        failure(r);
+      });
+    } catch (e) {
+      const r = prepFailure(e, TestLogs.emptyLogs());
       failure(r);
-    });
+    }
   });
 };
 
