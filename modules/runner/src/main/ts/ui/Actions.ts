@@ -15,7 +15,8 @@ export const Actions = (session: string): Actions => {
   };
 
   const updateHistory = (offset: number, failed: number, retry = 0) => {
-    window.history.pushState({}, '', makeUrl(session, offset, failed, retry));
+    const url = makeUrl(session, offset, failed, retry);
+    window.history.pushState({}, '', url);
   };
 
   return {
