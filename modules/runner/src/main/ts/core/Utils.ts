@@ -1,13 +1,17 @@
 export const noop = (): void => {};
 
-export const makeUrl = (session: string, offset: number, failed: number, retry: number): string => {
-  const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
+export const makeQueryParams = (session: string, offset: number, failed: number, retry: number): string => {
   if (offset > 0) {
     const rt = (retry > 0 ? '&retry=' + retry : '');
-    return baseUrl + '?session=' + session + '&offset=' + offset + '&failed=' + failed + rt;
+    return '?session=' + session + '&offset=' + offset + '&failed=' + failed + rt;
   } else {
-    return baseUrl;
+    return '';
   }
+};
+
+export const makeUrl = (session: string, offset: number, failed: number, retry: number): string => {
+  const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
+  return baseUrl + makeQueryParams(session, offset, failed, retry);
 };
 
 export const formatElapsedTime = (start: Date, end: Date): string => {
@@ -20,3 +24,5 @@ export const formatElapsedTime = (start: Date, end: Date): string => {
         '' + point;
   return seconds + '.' + printable + 's';
 };
+
+export const makeSessionId = (): string => '' + Math.ceil((Math.random() * 100000000));

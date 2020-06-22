@@ -1,4 +1,4 @@
-import { noop } from './Utils';
+import { noop } from '../core/Utils';
 
 export type onSuccessCallback = (data: any) => void;
 export type onErrorCallback = (err: any) => void;
@@ -12,11 +12,9 @@ export interface Callbacks {
 
 declare const $: JQueryStatic;
 
-// webpack makes this available
 const Global: any = window;
 
 const sendJson = (url: string, data: any, onSuccess: onSuccessCallback = noop, onError: onErrorCallback = noop): void => {
-  // noinspection JSIgnoredPromiseFromCall
   $.ajax({
     method: 'post',
     url: url,
@@ -55,6 +53,7 @@ export const Callbacks = (): Callbacks => {
   };
 
   const sendDone = (session: string, onSuccess: onSuccessCallback, onError: onErrorCallback): void => {
+    // webpack makes this available
     const getCoverage = (): Record<string, any> => typeof Global.__coverage__ === 'undefined' ? {} : Global.__coverage__;
 
     sendJson('/tests/done', {
