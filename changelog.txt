@@ -1,6 +1,7 @@
 Version 9.5.2
 
 * Fixed JS sourcemaps not working in bedrock manual mode.
+* Fixed incorrectly reported test times.
 
 Version 9.5.1
 

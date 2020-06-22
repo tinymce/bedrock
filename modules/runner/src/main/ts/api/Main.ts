@@ -138,7 +138,7 @@ const reporter = (() => {
 
   const elapsed = (since: Date): string => {
     const end = new Date();
-    const millis = end.getDate() - since.getDate();
+    const millis = end.getTime() - since.getTime();
     const seconds = Math.floor(millis / 1000);
     const point = Math.floor(millis - (seconds * 1000) / 100);
     const printable =
