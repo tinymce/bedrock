@@ -1,3 +1,10 @@
+Version 9.6.0
+
+* Added `promiseTest` to test async functions (functions returning promises)
+* Changed `asynctest` to `asyncTest`, following camelCase conventions. Old spelling remains for compatibility.
+* Changed `asyncTest` so that it fails (instead of timing out) when an exception is thrown during execution of the test method.
+* Remove the sample "suite" tests. The failing ones were causing timeouts.
+
 Version 9.5.2
 
 * Fixed JS sourcemaps not working in bedrock manual mode.
