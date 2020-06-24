@@ -1,6 +1,6 @@
 import { UnitTest } from '@ephox/bedrock-client'
 
-UnitTest.asynctest('AsyncFail with Logs Test', (success, failure) => {
+UnitTest.asyncTest('AsyncFail with Logs Test', (success, failure) => {
 
   failure('This is a fake failure', {
     history: [

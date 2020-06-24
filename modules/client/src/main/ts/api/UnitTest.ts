@@ -95,15 +95,25 @@ const prepFailure = (err: TestThrowable, logs: TestLogs = TestLogs.emptyLogs()):
   }
 };
 
-export const asynctest = (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) => {
+/** An asynchronous test with callbacks. */
+export const asyncTest = (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) => {
   register(name, function (success: () => void, failure: (e: LoggedError) => void) {
-    test(success, function (err: TestThrowable, logs: TestLogs = TestLogs.emptyLogs()) {
-      const r = prepFailure(err, logs);
+    try {
+      test(success, function (err: TestThrowable, logs: TestLogs = TestLogs.emptyLogs()) {
+        const r = prepFailure(err, logs);
+        failure(r);
+      });
+    } catch (e) {
+      const r = prepFailure(e, TestLogs.emptyLogs());
       failure(r);
-    });
+    }
   });
 };
 
+/** Migrate to asyncTest */
+export const asynctest = asyncTest;
+
+/** A synchronous test that fails if an exception is thrown */
 export const test = (name: string, test: () => void) => {
   register(name, function (success: () => void, failure: (e: LoggedError) => void) {
     try {
@@ -115,3 +125,9 @@ export const test = (name: string, test: () => void) => {
     }
   });
 };
+
+/** Tests an async function (function that returns a Promise). */
+export const promiseTest = (name: string, test: () => Promise<void>) =>
+  asyncTest(name, (success, failure) => {
+    test().then(success).catch(failure);
+  });
