@@ -12,7 +12,8 @@
     "test": "yarn test-samples-pass && yarn test-samples-pass-js"
   },
   "dependencies": {
-    "@ephox/bedrock-client": "^9.6.0"
+    "@ephox/bedrock-client": "^9.6.0",
+    "@ephox/wrap-promise-polyfill": "^2.2.0"
   },
   "devDependencies": {
     "@ephox/bedrock-server": "^9.6.0"

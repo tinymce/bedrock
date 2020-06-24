@@ -1,4 +1,5 @@
-import { UnitTest } from '@ephox/bedrock-client'
+import { UnitTest } from '@ephox/bedrock-client';
+import Promise from '@ephox/wrap-promise-polyfill';
 
 UnitTest.asyncTest('AsyncFail Test 1', (success, failure) => {
   setTimeout(() => {
@@ -7,20 +8,17 @@ UnitTest.asyncTest('AsyncFail Test 1', (success, failure) => {
 });
 
 const asyncFail = () =>
-  new Promise((resolve, reject) => {
+  new Promise<void>((resolve, reject) => {
     setTimeout(() => {
       reject('failed');
     }, 100);
   });
 
 const asyncPass = () =>
-  new Promise((resolve, reject) => {
+  new Promise<void>((resolve, reject) => {
     setTimeout(() => {
       resolve();
     }, 100);
   });
 
-UnitTest.promiseTest('AsyncFail Test 2', async () => {
-  await asyncPass();
-  await asyncFail();
-});
+UnitTest.promiseTest('AsyncFail Test 2', () => asyncPass().then(asyncFail));
