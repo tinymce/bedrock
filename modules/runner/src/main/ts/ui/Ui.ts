@@ -2,13 +2,13 @@ import { LoggedError, Reporter } from '@ephox/bedrock-common';
 import { ReporterUi } from '../reporter/Reporter';
 
 export interface Ui extends ReporterUi {
-  showRetry: () => void;
-  hideRetry: () => void;
-  showSkip: () => void;
-  hideSkip: () => void;
-  render: (offset: number, totalNumTests: number, onRestart: () => void, onRetry: () => void, onSkip: () => void) => void;
-  error: (e: any) => void;
-  setStopOnFailure: (stopOnFailure: boolean) => void;
+  readonly showRetry: () => void;
+  readonly hideRetry: () => void;
+  readonly showSkip: () => void;
+  readonly hideSkip: () => void;
+  readonly render: (offset: number, totalNumTests: number, onRestart: () => void, onRetry: () => void, onSkip: () => void) => void;
+  readonly error: (e: any) => void;
+  readonly setStopOnFailure: (stopOnFailure: boolean) => void;
 }
 
 declare const $: JQueryStatic;

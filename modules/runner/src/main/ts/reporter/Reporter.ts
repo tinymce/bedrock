@@ -4,24 +4,24 @@ import { UrlParams } from '../core/UrlParams';
 import { formatElapsedTime } from '../core/Utils';
 
 export interface TestReporter {
-  start: (onDone: onSuccessCallback) => void;
-  pass: (onDone: onSuccessCallback) => void;
-  fail: (e: LoggedError.LoggedError, onDone: onSuccessCallback) => void;
+  readonly start: (onDone: onSuccessCallback) => void;
+  readonly pass: (onDone: onSuccessCallback) => void;
+  readonly fail: (e: LoggedError.LoggedError, onDone: onSuccessCallback) => void;
 }
 
 export interface Reporter {
-  summary: () => { offset: number; passed: number; failed: number };
-  test: (file: string, name: string, totalNumTests: number) => TestReporter;
-  done: () => void;
+  readonly summary: () => { offset: number; passed: number; failed: number };
+  readonly test: (file: string, name: string, totalNumTests: number) => TestReporter;
+  readonly done: () => void;
 }
 
 export interface ReporterUi {
-  test: () => {
-    start: (file: string, name: string) => void;
-    pass: (testTime: string, currentCount: number) => void;
-    fail: (e: LoggedError.LoggedError, testTime: string, currentCount: number) => void;
+  readonly test: () => {
+    readonly start: (file: string, name: string) => void;
+    readonly pass: (testTime: string, currentCount: number) => void;
+    readonly fail: (e: LoggedError.LoggedError, testTime: string, currentCount: number) => void;
   };
-  done: (totalTime: string) => void;
+  readonly done: (totalTime: string) => void;
 }
 
 const elapsed = (since: Date): string => formatElapsedTime(since, new Date());

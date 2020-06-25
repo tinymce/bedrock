@@ -1,5 +1,5 @@
 export interface TestData {
-  filePath: string;
-  name: string;
-  test: (success: () => void, failure: (e: any) => void) => void;
+  readonly filePath: string;
+  readonly name: string;
+  readonly test: (success: () => void, failure: (e: any) => void) => void;
 }

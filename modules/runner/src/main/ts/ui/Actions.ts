@@ -1,11 +1,11 @@
 import { makeUrl } from '../core/Utils';
 
 export interface Actions {
-  restartTests: () => void;
-  retryTest: (offset: number, failed: number, retry?: number) => void;
-  skipTest: (offset: number, failed: number) => void;
-  reloadPage: (offset: number, failed: number, retry?: number) => void;
-  updateHistory: (offset: number, failed: number, retry?: number) => void;
+  readonly restartTests: () => void;
+  readonly retryTest: (offset: number, failed: number, retry?: number) => void;
+  readonly skipTest: (offset: number, failed: number) => void;
+  readonly reloadPage: (offset: number, failed: number, retry?: number) => void;
+  readonly updateHistory: (offset: number, failed: number, retry?: number) => void;
 }
 
 export const Actions = (session: string): Actions => {

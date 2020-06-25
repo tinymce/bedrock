@@ -4,10 +4,10 @@ export type onSuccessCallback = (data: any) => void;
 export type onErrorCallback = (err: any) => void;
 
 export interface Callbacks {
-  sendKeepAlive: (session: string, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
-  sendTestStart: (session: string, totalTests: number, file: string, name: string, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
-  sendTestResult: (session: string, file: string, name: string, passed: boolean, time: string, error: string | null, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
-  sendDone: (session: string, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
+  readonly sendKeepAlive: (session: string, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
+  readonly sendTestStart: (session: string, totalTests: number, file: string, name: string, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
+  readonly sendTestResult: (session: string, file: string, name: string, passed: boolean, time: string, error: string | null, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
+  readonly sendDone: (session: string, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
 }
 
 declare const $: JQueryStatic;

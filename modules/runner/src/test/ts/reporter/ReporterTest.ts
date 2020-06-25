@@ -6,19 +6,19 @@ import { Callbacks } from '../../../main/ts/reporter/Callbacks';
 import { Reporter } from '../../../main/ts/reporter/Reporter';
 
 interface StartTestData {
-  session: string;
-  totalTests: number;
-  file: string;
-  name: string;
+  readonly session: string;
+  readonly totalTests: number;
+  readonly file: string;
+  readonly name: string;
 }
 
 interface EndTestData {
-  session: string;
-  file: string;
-  name: string;
-  passed: boolean;
-  time: string;
-  error: string | null;
+  readonly session: string;
+  readonly file: string;
+  readonly name: string;
+  readonly passed: boolean;
+  readonly time: string;
+  readonly error: string | null;
 }
 
 const sessionId = '111111';

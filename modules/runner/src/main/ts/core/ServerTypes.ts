@@ -1,7 +1,7 @@
 export interface HarnessResponse {
-  chunk: number;
-  mode: 'auto' | 'manual';
-  stopOnFailure: boolean;
-  retries: number;
-  timeout: number;
+  readonly chunk: number;
+  readonly mode: 'auto' | 'manual';
+  readonly stopOnFailure: boolean;
+  readonly retries: number;
+  readonly timeout: number;
 }
