@@ -15,9 +15,9 @@ const KEEP_ALIVE_INTERVAL = 5000;
 export const Runner = (globalTests: TestData[], params: UrlParams, callbacks: Callbacks, reporter: Reporter, ui: Ui) => {
   const actions = Actions(params.session);
 
-  const withSum = (action: (offset: number, failed: number, retry?: number) => void) => (retry?: number) => {
+  const withSum = (action: (offset: number, failed: number, retry?: number) => void, offset = 0, failedOffset = 0) => (retry?: number) => {
     const sum = reporter.summary();
-    action(sum.offset, sum.failed, retry);
+    action(sum.offset + offset, sum.failed + failedOffset, retry);
   };
 
   const loadNextChunk = (chunk: number): void => {
@@ -31,14 +31,14 @@ export const Runner = (globalTests: TestData[], params: UrlParams, callbacks: Ca
   };
 
   const retryTest = withSum(actions.retryTest);
-  const loadNextTest = withSum(actions.reloadPage);
+  const loadNextTest = withSum(actions.skipTest);
+  const stopTest = withSum(actions.updateHistory, 0, -1);
 
   const afterFail = (retries: number, stopOnFailure: boolean): void => {
     if (stopOnFailure) {
       reporter.done();
       // make it easy to restart at this test
-      const sum = reporter.summary();
-      actions.updateHistory(sum.offset, sum.failed - 1);
+      stopTest();
     } else if (params.retry < retries) {
       retryTest(params.retry + 1);
     } else {
@@ -48,7 +48,7 @@ export const Runner = (globalTests: TestData[], params: UrlParams, callbacks: Ca
 
   const init = (onSuccess: (data: HarnessResponse) => void, onError: (e: any) => void) => {
     // Render the initial UI
-    ui.render(params.offset, globalTests.length, actions.restartTests, withSum(actions.retryTest), withSum(actions.skipTest));
+    ui.render(params.offset, globalTests.length, actions.restartTests, retryTest, loadNextTest);
 
     // delay this ajax call until after the reporter status elements are in the page
     $((): void => {

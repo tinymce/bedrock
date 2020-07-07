@@ -1,7 +1,7 @@
 export const noop = (): void => {};
 
 export const makeQueryParams = (session: string, offset: number, failed: number, retry: number): string => {
-  if (offset > 0) {
+  if (offset > 0 || retry > 0) {
     const rt = (retry > 0 ? '&retry=' + retry : '');
     return '?session=' + session + '&offset=' + offset + '&failed=' + failed + rt;
   } else {
