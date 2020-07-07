@@ -4,7 +4,7 @@ import { describe, it } from 'mocha';
 import * as Utils from '../../../main/ts/core/Utils';
 
 describe('Utils.makeQueryParams', () => {
-  it('should be empty if offset is 0', () => {
+  it('should be empty if offset and retry is 0', () => {
     const str = Utils.makeQueryParams('1', 0, 1, 0);
     assert.equal(str, '');
   });
@@ -12,6 +12,12 @@ describe('Utils.makeQueryParams', () => {
   it('should always include a session, offset and failed params if offset > 0', () => {
     fc.assert(fc.property(fc.hexaString(), fc.integer(1, 1000), fc.nat(), (session, offset, failed) => {
       assert.equal(Utils.makeQueryParams(session, offset, failed, 0), '?session=' + session + '&offset=' + offset + '&failed=' + failed);
+    }))
+  });
+
+  it('should always include a session, offset and failed params if retries > 0', () => {
+    fc.assert(fc.property(fc.hexaString(), fc.integer(1, 1000), fc.nat(), (session, retries, failed) => {
+      assert.equal(Utils.makeQueryParams(session, 0, failed, retries), '?session=' + session + '&offset=' + 0 + '&failed=' + failed + '&retry=' + retries);
     }))
   });
 

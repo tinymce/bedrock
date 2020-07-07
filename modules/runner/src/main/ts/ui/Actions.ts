@@ -21,7 +21,7 @@ export const Actions = (session: string): Actions => {
 
   return {
     restartTests: () => reloadPage(0, 0),
-    retryTest: reloadPage,
+    retryTest: (offset, failed, retry) => reloadPage(offset, failed - 1, retry),
     skipTest: (offset, failed) => reloadPage(offset + 1, failed),
     reloadPage,
     updateHistory
