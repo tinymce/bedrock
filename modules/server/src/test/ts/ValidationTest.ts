@@ -37,7 +37,7 @@ describe('Validation', () => {
   checkErrors(
     'Testing a directory -> files where the directory does not exist',
     [
-      '[test/resources.not.existing] is not a directory'
+      '[test/resources.not.existing] does not match any directories'
     ],
     [
       {name: 'testdir', validate: Extraction.files(['Test.js']), description: 'blah'}
@@ -75,6 +75,23 @@ describe('Validation', () => {
     ],
     {
       testdir: 'src/test/resources'
+    }
+  );
+
+  checkResult(
+    'Testing a directory -> glob search for directories',
+    {
+      other: [
+        'src/test/resources/html/screen.html',
+        'src/test/resources/test.file1',
+        'src/test/resources/tsconfig.sample.json'
+      ]
+    },
+    [
+      {name: 'testdir', validate: Extraction.files(['']), output: 'other', description: 'blah'}
+    ],
+    {
+      testdir: 'src/*/resources'
     }
   );
 
