@@ -1,3 +1,7 @@
+Version 9.6.3
+
+* Changed the `--testdir` and `--testdirs` command line parameters to expand glob patterns
+
 Version 9.6.2
 
 * Fixed tests getting stuck when reaching the maximum retry count.
