@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import glob = require('glob');
 import readdirSyncRec = require('recursive-readdir-sync');
 import { Attempt } from '../core/Attempt';
 import * as Qstring from '../util/Qstring';
@@ -45,22 +46,27 @@ export const directory = (name: string, value: string): Attempt<string[], string
 
 export const files = (patterns: string[]) => {
   return (name: string, value: string): Attempt<string[], string[]> => {
-    const dir = directory(name, value);
-    return Attempt.bind(dir, (d) => {
+    const dirs = glob.sync(value);
+
+    if (dirs.length === 0) {
+      return Attempt.failed(['[' + value + '] does not match any directories']);
+    } else {
       try {
-        const scanned = readdirSyncRec(d).filter((f) => {
+        const scanned = dirs.reduce((result, d) => result.concat(readdirSyncRec(d)), [] as string[]);
+
+        const filtered = scanned.filter((f) => {
           const matches = patterns.filter((p) => {
             return f.indexOf(p) > -1;
           });
 
           return matches.length > 0 && fs.lstatSync(f).isFile();
         });
-        return Attempt.passed(scanned);
+        return Attempt.passed(filtered);
       } catch (err) {
         return Attempt.failed([
-          'Error scanning directory [' + d + '] for files matching pattern: [' + patterns.join(', ') + ']'
+          'Error scanning [' + value + '] for files matching pattern: [' + patterns.join(', ') + ']'
         ]);
       }
-    });
+    }
   };
 };
