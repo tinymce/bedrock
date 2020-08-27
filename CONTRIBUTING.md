@@ -29,12 +29,12 @@ Trunk-based development with semver.
 
 All modules share the same version (managed by `lerna`).
 
-DO NOT manually edit the `package.json` files. 
+DO NOT manually edit the `package.json` files. DO NOT manually publish.
 
 Create feature branches named `feature/XXXX` where XXXX is a Jira issue key or Github issue number.
 
-Feature branches are merged to `master`. 
-After merging, run `yarn lerna version` to choose a new version, then push directly to `master`.
+Feature branches are merged to `master`.
+After merging, run `yarn lerna version` to choose a new version, then push directly to `master`. This will be published by Jenkins.
 
 To add a dependency to the root package: `yarn add -W package`
 To add a dependency to a module, use `yarn add @ephox/bedrock-XXX package`.
