@@ -25,9 +25,9 @@ const getTargetFromFrame = (driver: BrowserObject, selector: string) => {
   // Note: Don't use driver.$() here to lookup the frame as the object reference
   // returned doesn't work when passed to driver.switchToFrame() on Edge.
   return driver.findElement('css selector', frameSelector).then((frame) => {
-    return driver.waitUntil(frameSelected(driver, frame), 100).then(() => {
+    return driver.waitUntil(frameSelected(driver, frame), { timeout: 100 }).then(() => {
       return driver.$(targetSelector).then((target) => {
-        return target.waitForDisplayed(100).then(() => {
+        return target.waitForDisplayed({ timeout: 100 }).then(() => {
           return target as ElementWithActions;
         });
       });
