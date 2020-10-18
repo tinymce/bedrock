@@ -126,6 +126,8 @@ const logDriverDetails = (driver: webdriverio.BrowserObject) => {
     console.log('browser:', browserVersion, 'driver:', caps.driverVersion);
   } else if (browserName === 'MicrosoftEdge') {
     console.log('browser:', browserVersion);
+  } else if (browserName === 'msedge') {
+    console.log('browser:', browserVersion, 'driver:', caps.msedge.msedgedriverVersion);
   }
 };
 
