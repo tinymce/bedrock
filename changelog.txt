@@ -1,5 +1,6 @@
 Version 9.7.0
 
+* Added support for the new Chromium based Microsoft Edge Browser.
 * Changed `typescript` to be a peer dependency to ensure the project TypeScript version is used.
 * Upgraded to WebdriverIO 6 and upgraded other dependencies.
 

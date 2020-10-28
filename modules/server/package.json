@@ -46,6 +46,7 @@
     "webdriverio": "^6.0.0",
     "webpack": "^4.41.0",
     "webpack-dev-server": "^3.2.1",
+    "which": "^2.0.0",
     "xml-writer": "^1.6.0"
   },
   "devDependencies": {

@@ -1,6 +1,8 @@
 import { ChildProcess } from 'child_process';
 import * as crossSpawn from 'cross-spawn';
 import * as http from 'http';
+import * as which from 'which';
+import * as Arr from '../util/Arr';
 
 export interface DriverAPI {
   start: (args?: string[]) => ChildProcess;
@@ -8,19 +10,19 @@ export interface DriverAPI {
   defaultInstance: ChildProcess | null;
 }
 
-const browserModules: Record<string, string> = {
-  'chrome': 'chromedriver',
-  'firefox': 'geckodriver',
-  'internet explorer': 'iedriver',
-  'MicrosoftEdge': 'edgedriver'
+const browserModules: Record<string, string[]> = {
+  'chrome': [ 'chromedriver' ],
+  'firefox': [ 'geckodriver' ],
+  'internet explorer': [ 'iedriver' ],
+  'MicrosoftEdge': [ 'msedgedriver', 'edgedriver' ]
 };
 
-const browserExecutables: Record<string, string> = {
-  'safari': 'safaridriver',
-  'chrome': 'chromedriver',
-  'firefox': 'geckodriver',
-  'internet explorer': 'IEDriverServer',
-  'MicrosoftEdge': 'MicrosoftWebDriver'
+const browserExecutables: Record<string, string[]> = {
+  'safari': [ 'safaridriver' ],
+  'chrome': [ 'chromedriver' ],
+  'firefox': [ 'geckodriver' ],
+  'internet explorer': [ 'IEDriverServer' ],
+  'MicrosoftEdge': [ 'msedgedriver', 'MicrosoftWebDriver' ]
 };
 
 const execLoader = (exec: string, driverArgs: string[] = []) => {
@@ -41,6 +43,18 @@ const execLoader = (exec: string, driverArgs: string[] = []) => {
   return api;
 };
 
+const findNpmPackage = (driverDeps: string[]) => Arr.findMap(driverDeps, (driverDep) => {
+  try {
+    return require(driverDep);
+  } catch (e) {
+    return null;
+  }
+});
+
+const findExecutable = (execNames: string[]) => Arr.findMap(execNames, (execName) => {
+  return which.sync(execName, { nothrow: true });
+});
+
 const loadPhantomJs = () => {
   const api = execLoader('phantomjs');
 
@@ -56,24 +70,29 @@ const loadPhantomJs = () => {
 };
 
 export const loadDriver = (browserName: string): DriverAPI => {
-  const driverDep = browserModules[browserName];
-  if (driverDep === undefined) {
+  const driverDeps = browserModules[browserName] || [];
+  if (driverDeps.length === 0) {
     console.log('Not loading a local driver for browser ' + browserName);
   } else {
-    try {
-      return require(driverDep);
-    } catch (e) {
-      console.log(`No local ${driverDep} for ${browserName}. Searching system path...`);
+    const driver = findNpmPackage(driverDeps);
+    if (driver !== null) {
+      return driver;
+    } else {
+      console.log(`No local ${driverDeps[0]} for ${browserName}. Searching system path...`);
     }
   }
 
-  const execName = browserExecutables[browserName] || driverDep;
+  // Handle phantomjs a little differently
   if (browserName === 'phantomjs') {
     return loadPhantomJs();
-  } else if (execName !== undefined) {
-    return execLoader(execName);
+  }
+
+  const execNames = browserExecutables[browserName] || [];
+  const execPath = findExecutable(execNames);
+  if (execPath !== null) {
+    return execLoader(execPath);
   } else {
-    throw new Error('Unable to find a suitable driver for ' + browserName)
+    throw new Error('Unable to find a suitable driver for ' + browserName);
   }
 };
 
