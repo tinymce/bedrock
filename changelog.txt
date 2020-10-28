@@ -1,3 +1,8 @@
+Version 9.7.0
+
+* Changed `typescript` to be a peer dependency to ensure the project TypeScript version is used.
+* Upgraded to WebdriverIO 6 and upgraded other dependencies.
+
 Version 9.6.3
 
 * Changed the `--testdir` and `--testdirs` command line parameters to expand glob patterns
