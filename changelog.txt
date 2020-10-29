@@ -1,3 +1,7 @@
+Version 9.7.1
+
+* Fixed IE 11 not shutting down with newer IEDriverServer versions.
+
 Version 9.7.0
 
 * Added support for the new Chromium based Microsoft Edge Browser.
