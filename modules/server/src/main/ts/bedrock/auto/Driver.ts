@@ -141,7 +141,7 @@ const focusBrowser = (browserName: string, settings: DriverSettings) => {
   }
 };
 
-const setupShutdown = (driver: webdriverio.BrowserObject, driverApi: DriverLoader.DriverAPI): (immediate?: boolean) => Promise<void> => {
+const setupShutdown = (driver: webdriverio.BrowserObject, driverApi: DriverLoader.DriverAPI, shutdownDelay: number = 0): (immediate?: boolean) => Promise<void> => {
   const driverShutdown = (immediate?: boolean) => {
     try {
       if (immediate) {
@@ -149,7 +149,9 @@ const setupShutdown = (driver: webdriverio.BrowserObject, driverApi: DriverLoade
         driverApi.stop();
         return Promise.resolve();
       } else {
-        return driver.deleteSession().then(driverApi.stop).catch(driverApi.stop);
+        return driver.pause(shutdownDelay)
+          .then(() => driver.deleteSession())
+          .then(driverApi.stop, driverApi.stop);
       }
     } catch (e) {
       // The above may throw an exception (eg if the connection to the browser is lost)
@@ -192,9 +194,12 @@ export const create = (settings: DriverSettings): Promise<Driver> => {
       const webdriverOptions = getOptions(port, browserName, browserFamily, settings);
       return webdriverio.remote(webdriverOptions);
     }).then((driver) => {
+      // IEDriverServer ignores a delete session call if done too quickly so it needs a small delay
+      const shutdownDelay = browserName === 'ie' ? 500 : 0;
+
       // Ensure the driver gets shutdown correctly if shutdown
       // by the user instead of the application
-      const driverShutdown = setupShutdown(driver, driverApi);
+      const driverShutdown = setupShutdown(driver, driverApi, shutdownDelay);
 
       // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
       // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
