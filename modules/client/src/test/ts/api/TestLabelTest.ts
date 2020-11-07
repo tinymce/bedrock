@@ -1,5 +1,5 @@
 import * as fc from 'fast-check';
-import { TestLabel } from '../../main/ts/api/TestLabel';
+import { TestLabel } from '../../../main/ts/api/TestLabel';
 import { describe, it } from 'mocha';
 
 describe('TestLabel.asString', () => {

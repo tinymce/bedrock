@@ -36,27 +36,27 @@ const generateImportsTs = (useRequire: boolean, scratchFile: string, srcFiles: s
   return `${generatePolyfills(useRequire)}
 
 declare let require: any;
-declare let __tests: any;
+declare let __suites: any;
 declare let console: any;
-let __lastTestIndex: number = -1;
-let __currentTestFile;
+let __lastSuiteIndex: number = -1;
+let __currentTestFile: string;
 const addTest = (testFilePath: string) => {
-  if (__tests && __tests[__tests.length - 1]) {
-    const lastTest = __tests[__tests.length - 1];
-    if (!lastTest.filePath) {
-      const tests = __tests.slice(__lastTestIndex + 1);
-      tests.forEach((test: any) => {
-        test.filePath = testFilePath;
+  if (__suites && __suites[__suites.length - 1]) {
+    const lastSuite = __suites[__suites.length - 1];
+    if (!lastSuite.filePath) {
+      const suites = __suites.slice(__lastSuiteIndex + 1);
+      suites.forEach((suite: any) => {
+        suite.filePath = testFilePath;
       });
-    } else if (lastTest.filePath === testFilePath) {
+    } else if (lastSuite.filePath === testFilePath) {
       // repeated test, duplicate the test entry
-      __tests.push(__tests.slice(__lastTestIndex + 1));
+      __suites.push(__suites.slice(__lastSuiteIndex + 1));
     } else {
       console.warn('file ' + testFilePath + ' did not add a new test to the list, ignoring');
     }
 
     // Save the last test index
-    __lastTestIndex = __tests.length - 1;
+    __lastSuiteIndex = __suites.length - 1;
   } else {
     console.error('no test list to add tests to');
   }
@@ -84,25 +84,25 @@ const generateImportsJs = (useRequire: boolean, scratchFile: string, srcFiles: s
   // header code for tests-imports.js
   return `${generatePolyfills(useRequire)}
 
-var __lastTestIndex = -1;
+var __lastSuiteIndex = -1;
 var __currentTestFile;
 var addTest = function (testFilePath) {
-  if (__tests && __tests[__tests.length - 1]) {
-    var lastTest = __tests[__tests.length - 1];
-    if (!lastTest.filePath) {
-      var tests = __tests.slice(__lastTestIndex + 1);
-      tests.forEach(function (test) {
-        test.filePath = testFilePath;
+  if (__suites && __suites[__suites.length - 1]) {
+    var lastSuite = __suites[__suites.length - 1];
+    if (!lastSuite.filePath) {
+      var suites = __suites.slice(__lastSuiteIndex + 1);
+      suites.forEach(function (suite) {
+        suite.filePath = testFilePath;
       });
-    } else if (lastTest.filePath === testFilePath) {
+    } else if (lastSuite.filePath === testFilePath) {
       // repeated test, duplicate the test entry
-      __tests.push(__tests.slice(__lastTestIndex + 1));
+      __suites.push(__suites.slice(__lastSuiteIndex + 1));
     } else {
       console.warn('file ' + testFilePath + ' did not add a new test to the list, ignoring');
     }
 
     // Save the last test index
-    __lastTestIndex = __tests.length - 1;
+    __lastSuiteIndex = __suites.length - 1;
   } else {
     console.error('no test list to add tests to');
   }

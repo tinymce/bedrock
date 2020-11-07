@@ -1,3 +1,7 @@
+Version 9.8.0
+
+*  Added BDD style testing capabilities: describe, it, before, beforeEach, after, afterEach.
+
 Version 9.7.1
 
 * Fixed IE 11 not shutting down with newer IEDriverServer versions.

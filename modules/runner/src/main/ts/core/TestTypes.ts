@@ -1,5 +1,5 @@
-export interface TestData {
+import { Tests } from '@ephox/bedrock-common';
+
+export interface RootSuite extends Tests.Suite {
   readonly filePath: string;
-  readonly name: string;
-  readonly test: (success: () => void, failure: (e: any) => void) => void;
 }

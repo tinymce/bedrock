@@ -127,7 +127,7 @@ describe('Reporter.test', () => {
       test.start(() => {
         test.fail(error, () => {
           assert.equal(endTestData.length, 1);
-          const data = endTestData[ 0 ];
+          const data = endTestData[0];
           assert.equal(data.session, sessionId);
           assert.equal(data.file, fileName + 'Test.ts');
           assert.equal(data.name, testName);
