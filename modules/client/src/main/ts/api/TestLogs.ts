@@ -11,10 +11,25 @@ export interface TestLogs {
   history: TestLogEntry[ ];
 }
 
-const emptyLogs = (): TestLogs => ({
+export const init = (): TestLogs => ({
   history: []
 });
 
-export const TestLogs = {
-  emptyLogs
+export const createLogEntry = (message: string): TestLogEntry => ({
+  message,
+  trace: null,
+  state: TestLogEntryState.Original,
+  entries: [ ]
+});
+
+export const addLogEntry = (log: TestLogEntry, message: string): TestLogEntry => {
+  const newEntry = createLogEntry(message);
+  log.entries.push(newEntry);
+  return newEntry;
+};
+
+export const addStackTrace = (log: TestLogEntry, err: { stack?: any }) => {
+  if (err.stack) {
+    log.trace = err.stack;
+  }
 };
