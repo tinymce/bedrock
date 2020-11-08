@@ -1,8 +1,23 @@
-import * as Bdd from './Bdd';
+import { TestError } from '@ephox/bedrock-common';
+import { after, afterEach, before, beforeEach, context, describe, it, specify } from './Bdd';
 import * as LegacyAssert from './LegacyAssert';
 import * as NewAssert from './NewAssert';
-import * as UnitTest from './UnitTest';
 import { TestLabel } from './TestLabel';
-import { TestError } from '@ephox/bedrock-common';
+import * as UnitTest from './UnitTest';
 
-export { Bdd, LegacyAssert as assert, NewAssert as Assert, UnitTest, TestLabel, TestError };
+export {
+  describe,
+  context,
+  before,
+  beforeEach,
+  after,
+  afterEach,
+  it,
+  specify,
+
+  LegacyAssert as assert,
+  NewAssert as Assert,
+  UnitTest,
+  TestLabel,
+  TestError
+};

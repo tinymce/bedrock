@@ -1,36 +1,36 @@
-import { Bdd, assert } from '@ephox/bedrock-client';
+import { after, afterEach, assert, before, beforeEach, describe, it } from '@ephox/bedrock-client';
 
-Bdd.describe('BDD Sync Pass', () => {
-  Bdd.describe('Test count', () => {
+describe('BDD Sync Pass', () => {
+  describe('Test count', () => {
     let count = 0;
 
-    Bdd.before(() => {
+    before(() => {
       console.log('before');
     });
 
-    Bdd.beforeEach(() => {
+    beforeEach(() => {
       console.log('before each');
       count++;
     });
 
-    Bdd.after(() => {
+    after(() => {
       console.log('after');
     });
 
-    Bdd.afterEach(() => {
+    afterEach(() => {
       console.log('after each');
     });
 
-    Bdd.it('should be 1', () => {
+    it('should be 1', () => {
       assert.eq(1, count);
     });
 
-    Bdd.it('should be 2', (done) => {
+    it('should be 2', (done) => {
       assert.eq(2, count);
       setTimeout(done, 100);
     });
 
-    Bdd.it('should be 3', () => {
+    it('should be 3', () => {
       assert.eq(3, count);
     });
   });
