@@ -7,7 +7,7 @@ import * as Imports from './Imports';
 import {ExitCodes} from '../util/ExitCodes';
 import * as FileUtils from '../util/FileUtils';
 
-export const compile = (tsConfigFile: string, scratchDir: string, exitOnCompileError: boolean, srcFiles: string[], success: (dest: string) => void) => {
+export const compile = (tsConfigFile: string, scratchDir: string, exitOnCompileError: boolean, srcFiles: string[], success: (dest: string) => void): void => {
   const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   const dest = path.join(scratchDir, 'compiled/tests.js');
 

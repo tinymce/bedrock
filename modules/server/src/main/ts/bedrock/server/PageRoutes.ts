@@ -1,6 +1,6 @@
 import * as Routes from './Routes';
 
-export const generate = (projectdir: string, basedir: string) => {
+export const generate = (projectdir: string, basedir: string): Routes.Runner => {
   const routers = [
     Routes.hostOn('GET', '/page', basedir)
   ];
@@ -8,8 +8,8 @@ export const generate = (projectdir: string, basedir: string) => {
   const fallback = Routes.host('GET', projectdir);
 
   return {
-    routers: routers,
-    fallback: fallback
+    routers,
+    fallback
   };
 };
 

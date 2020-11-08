@@ -1,14 +1,14 @@
 import * as Compare from '../core/Compare';
 import { TestLabel } from './TestLabel';
 
-const eq = function (expected: any, actual: any, message?: TestLabel) {
+const eq = function (expected: any, actual: any, message?: TestLabel): void {
   const result = Compare.compare(expected, actual);
   if (!result.eq) {
     throw new Error(TestLabel.asStringOr(message, result.why));
   }
 };
 
-const throws = function (f: () => void, expected?: string, message?: TestLabel) {
+const throws = function (f: () => void, expected?: string, message?: TestLabel): void {
   const token = {};
 
   try {
@@ -25,7 +25,7 @@ const throws = function (f: () => void, expected?: string, message?: TestLabel) 
   }
 };
 
-const throwsError = function (f: () => void, expected?: string, message?: TestLabel) {
+const throwsError = function (f: () => void, expected?: string, message?: TestLabel): void {
   const token = {};
 
   try {
@@ -42,7 +42,7 @@ const throwsError = function (f: () => void, expected?: string, message?: TestLa
   }
 };
 
-const succeeds = function (f: () => void, message?: TestLabel) {
+const succeeds = function (f: () => void, message?: TestLabel): void {
   try {
     f();
   } catch (e) {
@@ -50,7 +50,7 @@ const succeeds = function (f: () => void, message?: TestLabel) {
   }
 };
 
-const fail = function (message?: TestLabel) {
+const fail = function (message?: TestLabel): void {
   throw new Error(TestLabel.asStringOr(message, () => 'Test failed'));
 };
 

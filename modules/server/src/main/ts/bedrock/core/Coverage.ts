@@ -3,7 +3,7 @@ import * as path from 'path';
 
 const coverageDataDir = 'scratch';
 
-export const writeCoverageData = (data: Record<string, any>) => {
+export const writeCoverageData = (data: Record<string, any>): void => {
   if (Object.keys(data).length > 0) {
     const coverageDataFilePath = path.join(coverageDataDir, 'coverage.json');
 

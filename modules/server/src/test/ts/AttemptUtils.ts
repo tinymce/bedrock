@@ -11,7 +11,7 @@ export const arbAttemptPassed = <E, A> (arba: Arbitrary<A>): Arbitrary<Attempt<E
 export const arbAttempt = <E, A> (arbe: Arbitrary<E>, arba: Arbitrary<A>): Arbitrary<Attempt<E, A>> =>
   fc.oneof(arbAttemptFailed<E, A>(arbe), arbAttemptPassed<E, A>(arba));
 
-export const assertErrors = <E> (expected: E, actual: Attempt<E, any>) => {
+export const assertErrors = <E> (expected: E, actual: Attempt<E, any>): void => {
   Attempt.cata(actual, (errs) => {
     assert.deepEqual(errs, expected);
   }, () => {
@@ -19,7 +19,7 @@ export const assertErrors = <E> (expected: E, actual: Attempt<E, any>) => {
   });
 };
 
-export const assertResult = <A>(expected: A, actual: Attempt<any, A>) => {
+export const assertResult = <A>(expected: A, actual: Attempt<any, A>): void => {
   Attempt.cata(actual, (errs) => {
     assert.fail('Unexpected errors: ' + JSON.stringify(errs));
   }, result => {

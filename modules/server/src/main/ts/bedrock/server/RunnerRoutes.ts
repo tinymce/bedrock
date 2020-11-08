@@ -3,15 +3,15 @@ import * as fs from 'fs';
 import * as glob from 'glob';
 import * as Routes from './Routes';
 import * as Compiler from '../compiler/Compiler';
-import * as FileUtils from '../util/FileUtils'
+import * as FileUtils from '../util/FileUtils';
 import * as Arr from '../util/Arr';
 
-interface Runner {
-  routers: Routes.Route[];
-  fallback: Routes.Route;
+interface PackageJson {
+  readonly name: string;
+  readonly workspaces: string[];
 }
 
-export const generate = (mode: string, projectdir: string, basedir: string, configFile: string, bundler: 'webpack' | 'rollup', testfiles: string[], chunk: number, retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[]): Promise<Runner> => {
+export const generate = (mode: string, projectdir: string, basedir: string, configFile: string, bundler: 'webpack' | 'rollup', testfiles: string[], chunk: number, retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[]): Promise<Routes.Runner> => {
   const files = testfiles.map((filePath) => {
     return path.relative(projectdir, filePath);
   });
@@ -24,11 +24,6 @@ export const generate = (mode: string, projectdir: string, basedir: string, conf
     files,
     coverage
   );
-
-  interface PackageJson {
-    name: string;
-    workspaces: string[];
-  }
 
   // read the project json file to determine the project name to expose resources as `/project/${name}`
   const pkjson: PackageJson = FileUtils.readFileAsJson(`${projectdir}/package.json`);
@@ -43,6 +38,7 @@ export const generate = (mode: string, projectdir: string, basedir: string, conf
       return [];
     }
   };
+
   const workspaceRoots = (
     pkjson.workspaces
       ? Arr.bind2(pkjson.workspaces, (w) => glob.sync(w), findWorkspaceResources)
@@ -81,11 +77,11 @@ export const generate = (mode: string, projectdir: string, basedir: string, conf
 
         // harness API
         Routes.json('GET', '/harness', {
-          stopOnFailure: stopOnFailure,
-          chunk: chunk,
-          retries: retries,
+          stopOnFailure,
+          chunk,
+          retries,
           timeout: singleTimeout,
-          mode: mode
+          mode
         })
       ]);
 

@@ -12,13 +12,13 @@ describe('Utils.makeQueryParams', () => {
   it('should always include a session, offset and failed params if offset > 0', () => {
     fc.assert(fc.property(fc.hexaString(), fc.integer(1, 1000), fc.nat(), (session, offset, failed) => {
       assert.equal(Utils.makeQueryParams(session, offset, failed, 0), '?session=' + session + '&offset=' + offset + '&failed=' + failed);
-    }))
+    }));
   });
 
   it('should always include a session, offset and failed params if retries > 0', () => {
     fc.assert(fc.property(fc.hexaString(), fc.integer(1, 1000), fc.nat(), (session, retries, failed) => {
       assert.equal(Utils.makeQueryParams(session, 0, failed, retries), '?session=' + session + '&offset=' + 0 + '&failed=' + failed + '&retry=' + retries);
-    }))
+    }));
   });
 
   it('should exclude retries if 0', () => {
@@ -47,5 +47,5 @@ describe('Utils.formatElapsedTime', () => {
     const result = Utils.formatElapsedTime(now, now);
     assert.equal(parseFloat(result), 0.0);
     assert.equal(result, '0.000s');
-  })
+  });
 });

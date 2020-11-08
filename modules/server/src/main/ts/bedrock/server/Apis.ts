@@ -1,16 +1,23 @@
 import { BrowserObject } from 'webdriverio';
-import * as KeyEffects from './KeyEffects';
-import * as EffectUtils from './EffectUtils';
-import * as MouseEffects from './MouseEffects';
-import * as ClipboardEffects from './ClipboardEffects';
-import * as Routes from './Routes';
-import * as Controller from './Controller';
 import { Attempt } from '../core/Attempt';
-import * as Waiter from '../util/Waiter';
 import * as Coverage from '../core/Coverage';
+import * as Waiter from '../util/Waiter';
+import * as ClipboardEffects from './ClipboardEffects';
+import * as Controller from './Controller';
 import { DriverMaster } from './DriverMaster';
+import * as EffectUtils from './EffectUtils';
+import * as KeyEffects from './KeyEffects';
+import * as MouseEffects from './MouseEffects';
+import * as Routes from './Routes';
 
 type Executor<D, T> = (driver: BrowserObject) => (data: D) => Promise<T>;
+
+export interface Apis {
+  readonly routers: Routes.Route[];
+  readonly markLoaded: () => void;
+  readonly enableHud: () => void;
+  readonly awaitDone: () => Promise<Controller.TestResults>;
+}
 
 // This is how long to wait before checking if the driver is ready again
 const pollRate = 200;
@@ -18,7 +25,7 @@ const pollRate = 200;
 const maxInvalidAttempts = 300;
 
 // TODO: Do not use files here.
-export const create = (master: DriverMaster, maybeDriver: Attempt<any, BrowserObject>, projectdir: string, basedir: string, stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced', resetMousePosition: boolean) => {
+export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, BrowserObject>, projectdir: string, basedir: string, stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced', resetMousePosition: boolean): Apis => {
   let pageHasLoaded = false;
 
   // On IE, the webdriver seems to load the page before it's ready to start
@@ -110,7 +117,7 @@ export const create = (master: DriverMaster, maybeDriver: Attempt<any, BrowserOb
 
   return {
     routers,
-    markLoaded: markLoaded,
+    markLoaded,
     enableHud: c.enableHud,
     awaitDone: c.awaitDone
   };

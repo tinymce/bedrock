@@ -85,7 +85,7 @@ describe('attempt.list', () => {
   });
 });
 
-describe("Attempt.hasPassed", () => {
+describe('Attempt.hasPassed', () => {
   it('is true when passed', () => {
     fc.assert(fc.property(arbAttemptPassed(fc.nat()), Attempt.hasPassed));
   });
@@ -94,8 +94,8 @@ describe("Attempt.hasPassed", () => {
   });
 });
 
-describe("Attempt.concat", () => {
-  it("passes if all true", () => {
+describe('Attempt.concat', () => {
+  it('passes if all true', () => {
     fc.assert(fc.property(fc.array(arbAttemptPassed<string[], number>(fc.nat())), (attempts) =>
       Attempt.hasPassed(Attempt.concat(attempts))));
   });

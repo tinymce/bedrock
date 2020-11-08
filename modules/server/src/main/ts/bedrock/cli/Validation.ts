@@ -21,7 +21,7 @@ const validateRequired = (defn: ClOption, settings: CommandLineOptions): Attempt
   ]) : Attempt.passed(defn);
 };
 
-export const scanRequired = (definitions: ClOption[], settings: CommandLineOptions) => {
+export const scanRequired = (definitions: ClOption[], settings: CommandLineOptions): Attempt<string[], CommandLineOptions> => {
   const requiredInfo = definitions.map((defn) => {
     return validateRequired(defn, settings);
   });

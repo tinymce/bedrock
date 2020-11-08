@@ -10,32 +10,32 @@ import { DriverMaster } from './DriverMaster';
 import { TestResults } from './Controller';
 
 interface Server {
-  listen: (port: number) => http.Server;
-  close: (callback?: () => void) => void;
+  readonly listen: (port: number) => http.Server;
+  readonly close: (callback?: () => void) => void;
 }
 
 export interface ServeSettings {
-  basedir: string;
-  customRoutes: string;
-  driver: Attempt<string, BrowserObject>;
-  loglevel: 'simple' | 'advanced';
-  master: DriverMaster | null;
-  overallTimeout: number;
-  projectdir: string;
-  runner: any;
-  singleTimeout: number;
-  skipResetMousePosition: boolean;
-  stickyFirstSession: boolean;
-  testfiles: string[];
+  readonly basedir: string;
+  readonly customRoutes: string;
+  readonly driver: Attempt<string, BrowserObject>;
+  readonly loglevel: 'simple' | 'advanced';
+  readonly master: DriverMaster | null;
+  readonly overallTimeout: number;
+  readonly projectdir: string;
+  readonly runner: Routes.Runner;
+  readonly singleTimeout: number;
+  readonly skipResetMousePosition: boolean;
+  readonly stickyFirstSession: boolean;
+  readonly testfiles: string[];
 }
 
 export interface ServeService {
-  port: number;
-  server: Server;
-  markLoaded: () => void;
-  enableHud: () => void;
-  awaitDone: () => Promise<TestResults>;
-  shutdown: () => Promise<void>;
+  readonly port: number;
+  readonly server: Server;
+  readonly markLoaded: () => void;
+  readonly enableHud: () => void;
+  readonly awaitDone: () => Promise<TestResults>;
+  readonly shutdown: () => Promise<void>;
 }
 
 /*
@@ -50,7 +50,7 @@ export interface ServeService {
  */
 export const startCustom = (settings: ServeSettings, createServer: (listener: http.RequestListener) => Server): Promise<ServeService> => {
 
-  const pref = (f: keyof ServeSettings): any => {
+  const pref = <K extends keyof ServeSettings>(f: K): ServeSettings[K] => {
     const v = settings[f];
     if (v === undefined) {
       throw new Error('Object: does not have field: ' + f);
@@ -92,8 +92,8 @@ export const startCustom = (settings: ServeSettings, createServer: (listener: ht
     }).listen(port);
 
     return {
-      port: port,
-      server: server,
+      port,
+      server,
       markLoaded: api.markLoaded,
       enableHud: api.enableHud,
       awaitDone: api.awaitDone,
@@ -109,6 +109,6 @@ export const startCustom = (settings: ServeSettings, createServer: (listener: ht
   });
 };
 
-export const start = (settings: ServeSettings) => {
+export const start = (settings: ServeSettings): Promise<ServeService> => {
   return startCustom(settings, http.createServer);
 };

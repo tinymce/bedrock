@@ -23,7 +23,7 @@ const commonOptions = (directories: Directories) => {
   ];
 };
 
-export const forAuto = (directories: Directories, argv: string[] = process.argv) => {
+export const forAuto = (directories: Directories, argv: string[] = process.argv): Attempt<cli.CliError, BedrockAutoSettings> => {
   return cli.extract('bedrock-auto', 'Use a Webdriver to launch a browser and run tests against it', commonOptions(directories).concat([
     ClOptions.browser,
     ClOptions.config,
@@ -44,7 +44,7 @@ export const forAuto = (directories: Directories, argv: string[] = process.argv)
   ]), argv) as Attempt<cli.CliError, BedrockAutoSettings>;
 };
 
-export const forManual = (directories: Directories, argv: string[] = process.argv) => {
+export const forManual = (directories: Directories, argv: string[] = process.argv): Attempt<cli.CliError, BedrockSettings> => {
   return cli.extract('bedrock', 'Launch a testing process on a localhost port and allow the user to navigate to it in any browser', commonOptions(directories).concat([
     ClOptions.stopOnFailure__hidden,
     ClOptions.config,
@@ -56,7 +56,7 @@ export const forManual = (directories: Directories, argv: string[] = process.arg
   ]), argv) as Attempt<cli.CliError, BedrockSettings>;
 };
 
-export const forFramework = (directories: Directories, argv: string[] = process.argv) => {
+export const forFramework = (directories: Directories, argv: string[] = process.argv): Attempt<cli.CliError, BedrockFrameworkSettings> => {
   return cli.extract('bedrock-framework', 'Load bedrock against a specific page using a framework', commonOptions(directories).concat([
     ClOptions.stopOnFailure,
     ClOptions.name,
@@ -68,7 +68,7 @@ export const forFramework = (directories: Directories, argv: string[] = process.
   ]), argv) as Attempt<cli.CliError, BedrockFrameworkSettings>;
 };
 
-export const logAndExit = (errs: cli.CliError) => {
+export const logAndExit = (errs: cli.CliError): void => {
   console.error('\n****\nError while processing command line for ' + errs.command);
   const messages = errs.errors.join('\n');
   console.error(messages);

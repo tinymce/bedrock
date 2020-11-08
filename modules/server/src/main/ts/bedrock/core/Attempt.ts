@@ -1,5 +1,5 @@
 export interface Attempt<E, A> {
-  foldAttempt: <B>(onFailed: (e: E) => B, onPassed: (a: A) => B) => B;
+  readonly foldAttempt: <B>(onFailed: (e: E) => B, onPassed: (a: A) => B) => B;
 }
 
 const failed = <E, A>(err: E): Attempt<E, A> => {
@@ -18,19 +18,19 @@ const passed = <E, A>(value: A): Attempt<E, A> =>  {
   };
 };
 
-const cata = <E, A, B>(attempt: Attempt<E, A>, onFailed: (e: E) => B, onPassed: (a: A) => B) => {
+const cata = <E, A, B>(attempt: Attempt<E, A>, onFailed: (e: E) => B, onPassed: (a: A) => B): B => {
   return attempt.foldAttempt(onFailed, onPassed);
 };
 
-const bind = <E, A, B>(firstAttempt: Attempt<E, A>, f: (a: A) => Attempt<E, B>) => {
+const bind = <E, A, B>(firstAttempt: Attempt<E, A>, f: (a: A) => Attempt<E, B>): Attempt<E, B> => {
   return firstAttempt.foldAttempt<Attempt<E, B>>(failed, f);
 };
 
-const map = <E, A, B>(firstAttempt: Attempt<E, A>, f: (a: A) => B) => {
+const map = <E, A, B>(firstAttempt: Attempt<E, A>, f: (a: A) => B): Attempt<E, B> => {
   return firstAttempt.foldAttempt<Attempt<E, B>>(failed, (v) => passed(f(v)));
 };
 
-const list = <E, A>(firstAttempt: Attempt<E, A>, fs: Array<(a: A) => Attempt<E, A>>) => {
+const list = <E, A>(firstAttempt: Attempt<E, A>, fs: Array<(a: A) => Attempt<E, A>>): Attempt<E, A> => {
   return fs.reduce((rest, x) => {
     return bind(rest, x);
   }, firstAttempt);

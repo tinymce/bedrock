@@ -1,29 +1,29 @@
-import { UnitTest, assert } from '@ephox/bedrock-client'
+import { UnitTest, assert } from '@ephox/bedrock-client';
 
 UnitTest.asyncTest('IFrame Test', (success, failure) => {
 
   /*
     * This frame will get sent keyboard events to its content editable body
     */
-  var iframe1 = document.createElement('iframe');
+  const iframe1 = document.createElement('iframe');
   iframe1.setAttribute('class', 'iframe-keyboard');
 
   /*
     * This textarea will get sent keyboard events
     */
-  var textarea = document.createElement('textarea');
+  const textarea = document.createElement('textarea');
 
 
   /*
     * This frame will get sent mouse events to its select inside
     */
-  var iframe2 = document.createElement('iframe');
+  const iframe2 = document.createElement('iframe');
   iframe2.setAttribute('class', 'iframe-mouse');
 
   /*
     * This button will get sent mouse events
     */
-  var button = document.createElement('button');
+  const button = document.createElement('button');
   button.innerHTML = 'Click me';
   button.setAttribute('class', 'button-mouse');
   button.addEventListener('click', function () {
@@ -32,8 +32,8 @@ UnitTest.asyncTest('IFrame Test', (success, failure) => {
   });
 
 
-  var post = function (url, data, onSuccess, onFailure) {
-    var request = new XMLHttpRequest();
+  const post = function (url, data, onSuccess, onFailure) {
+    const request = new XMLHttpRequest();
     request.open('POST', url, true);
     request.onload = function () {
       try {
@@ -53,20 +53,20 @@ UnitTest.asyncTest('IFrame Test', (success, failure) => {
   };
 
 
-  var sendText = function (selector, text, onSuccess, onFailure) {
-    post('/keys', { selector: selector, keys: [ { text: text } ] }, onSuccess, onFailure);
+  const sendText = function (selector, text, onSuccess, onFailure) {
+    post('/keys', { selector, keys: [ { text } ] }, onSuccess, onFailure);
   };
 
-  var sendMouse = function (selector, type, onSuccess, onFailure) {
-    post('/mouse', { selector: selector, type: type }, onSuccess, onFailure);
+  const sendMouse = function (selector, type, onSuccess, onFailure) {
+    post('/mouse', { selector, type }, onSuccess, onFailure);
   };
 
 
-  var loadContentIntoFrame = function (fr, content, onSuccess, onFailure) {
-    var listener = function () {
+  const loadContentIntoFrame = function (fr, content, onSuccess, onFailure) {
+    const listener = function () {
       fr.removeEventListener('load', listener);
       try {
-        var doc = fr.contentWindow.document;
+        const doc = fr.contentWindow.document;
         doc.open('text/html', 'replace');
         doc.writeln(content);
         doc.close();

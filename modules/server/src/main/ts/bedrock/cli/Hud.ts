@@ -1,16 +1,21 @@
 import * as readline from 'readline';
 
-type ResultData = {
-  done: boolean;
-  id: string;
-  numFailed: number;
-  numPassed: number;
-  test?: string;
-  totalFiles?: number;
-  totalTests?: number;
+interface ResultData {
+  readonly done: boolean;
+  readonly id: string;
+  readonly numFailed: number;
+  readonly numPassed: number;
+  readonly test?: string;
+  readonly totalFiles?: number;
+  readonly totalTests?: number;
 }
 
-export const create = (testfiles: string[], loglevel: 'simple' | 'advanced') => {
+export interface Hud {
+  readonly update: (data: ResultData) => Promise<void>;
+  readonly complete: () => Promise<void>;
+}
+
+export const create = (testfiles: string[], loglevel: 'simple' | 'advanced'): Hud => {
   let started = false;
 
   const stream = process.stdout;
@@ -25,7 +30,7 @@ export const create = (testfiles: string[], loglevel: 'simple' | 'advanced') => 
       ', Failed: ' + numFailed + ' ... ' + '\n'
     );
     readline.clearLine(stream, 1);
-    return Promise.resolve({});
+    return Promise.resolve();
   };
 
   const advUpdate = (data: ResultData) => {
@@ -44,12 +49,12 @@ export const create = (testfiles: string[], loglevel: 'simple' | 'advanced') => 
   };
 
   const complete = () => {
-    return Promise.resolve({});
+    return Promise.resolve();
   };
 
   const basicUpdate = (data: ResultData) => {
     stream.write('.');
-    return Promise.resolve({});
+    return Promise.resolve();
   };
 
   const supportsAdvanced = (() => {

@@ -17,7 +17,7 @@ export const deepEq = (obj1: any, obj2: any): boolean => {
   });
 };
 
-export const hasAllOf = (obj1: Record<string, any>, obj2: Record<string, any>) => {
+export const hasAllOf = (obj1: Record<string, any>, obj2: Record<string, any>): boolean => {
   return Object.keys(obj2).every((key) => {
     return obj1[key] === obj2[key];
   });

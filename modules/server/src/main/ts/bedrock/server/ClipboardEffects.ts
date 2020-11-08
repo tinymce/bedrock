@@ -8,10 +8,10 @@ import { ExitCodes } from '../util/ExitCodes';
  }
  */
 export interface ClipboardData {
-  import: string;
+  readonly import: string;
 }
 
-const importClipboard = (basedir: string, clipboarddir: string, data: ClipboardData) => {
+const importClipboard = (basedir: string, clipboarddir: string, data: ClipboardData): Promise<void> => {
   const fileName = data.import;
   const fullPath = path.join(clipboarddir, fileName);
   const args = [
@@ -29,7 +29,7 @@ const importClipboard = (basedir: string, clipboarddir: string, data: ClipboardD
 };
 
 export const route = (basedir: string, clipboarddir: string) => {
-  return (data: ClipboardData) => {
+  return (data: ClipboardData): Promise<void> => {
     return importClipboard(basedir, clipboarddir, data);
   };
 };

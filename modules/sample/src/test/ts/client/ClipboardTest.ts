@@ -1,10 +1,10 @@
-import { UnitTest } from '@ephox/bedrock-client'
+import { UnitTest } from '@ephox/bedrock-client';
 
 UnitTest.asynctest('Clipboard Test', (success, failure) => {
 
   if (window.fetch === undefined) return failure('This sample only runs on Chrome');
 
-  var importClipboard = function (fileName) {
+  const importClipboard = function (fileName) {
     return fetch('/clipboard', {
       method: 'POST',
       headers: {
@@ -17,7 +17,7 @@ UnitTest.asynctest('Clipboard Test', (success, failure) => {
     });
   };
 
-  var pasteInto = function (elm) {
+  const pasteInto = function (elm) {
     return fetch('/keys', {
       method: 'POST',
       headers: {
@@ -33,7 +33,7 @@ UnitTest.asynctest('Clipboard Test', (success, failure) => {
     });
   };
 
-  var assert = function () {
+  const assert = function () {
     return new Promise(function (done) {
       setTimeout(function() {
         alert(body.innerHTML);
@@ -42,7 +42,7 @@ UnitTest.asynctest('Clipboard Test', (success, failure) => {
     });
   };
 
-  var body = document.createElement('div');
+  const body = document.createElement('div');
   body.id = 'test';
   body.contentEditable = 'true';
   document.body.appendChild(body);

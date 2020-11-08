@@ -1,46 +1,55 @@
 import * as Hud from '../cli/Hud';
 
 export interface TestResult {
-  name: string;
-  file: string;
-  passed: boolean;
-  time: string;
-  skipped?: boolean;
-  error: string;
+  readonly name: string;
+  readonly file: string;
+  readonly passed: boolean;
+  readonly time: string;
+  readonly skipped?: boolean;
+  readonly error: string;
 }
 
 export interface TestResults {
-  message?: string;
-  results: TestResult[];
-  start: number;
-  now: number;
+  readonly message?: string;
+  readonly results: TestResult[];
+  readonly start: number;
+  readonly now: number;
 }
 
 interface InflightTest {
-  name: string;
-  file: string;
-  start: number;
+  readonly name: string;
+  readonly file: string;
+  readonly start: number;
 }
 
 interface PreviousTest extends InflightTest {
-  end: number;
+  readonly end: number;
 }
 
 interface TestSession {
-  id: string;
+  readonly id: string;
+  readonly results: TestResult[];
+  readonly lookup: Record<string, Record<string, number>>;
   alive: number;
   updated: number;
-  results: TestResult[];
-  lookup: Record<string, Record<string, number>>;
   inflight: InflightTest | null;
   previous: PreviousTest | null;
   done: boolean;
   totalTests: number;
 }
 
+export interface Controller {
+  readonly enableHud: () => void;
+  readonly recordAlive: (sessionId: string) => void;
+  readonly recordTestStart: (id: string, name: string, file: string, totalTests: number) => void;
+  readonly recordTestResult: (id: string, name: string, file: string, passed: boolean, time: string, error: string) => void;
+  readonly recordDone: (id: string) => void;
+  readonly awaitDone: () => Promise<TestResults>;
+}
+
 // allow a little extra time for a test timeout so the runner can handle it gracefully
 const timeoutGrace = 2000;
-export const create = (stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced') => {
+export const create = (stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced'): Controller => {
   const hud = Hud.create(testfiles, loglevel);
   const sessions: Record<string, TestSession> = {};
   let stickyId: string | null = null;

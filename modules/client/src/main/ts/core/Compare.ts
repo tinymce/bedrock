@@ -6,7 +6,7 @@ const Arr = {
 };
 
 const Obj = {
-  keys: (obj: object): string[] =>
+  keys: (obj: Record<string, unknown>): string[] =>
     Object.keys(obj)
 };
 
@@ -16,10 +16,10 @@ export interface Comparison {
 }
 
 const pass = (): Comparison =>
-  ({eq: true, why: () => ''});
+  ({ eq: true, why: () => '' });
 
 const fail = (why: () => string): Comparison =>
-  ({eq: false, why: why});
+  ({ eq: false, why });
 
 const failCompare = (x: any, y: any, prefix?: string): Comparison => {
   return fail(() => (prefix || 'Values were different') + ': [' + String(x) + '] vs [' + String(y) + ']');
@@ -48,7 +48,7 @@ const sortArray = (x: any[]): any[] => {
   return y;
 };
 
-const sortedKeys = (o: object) =>
+const sortedKeys = (o: Record<string, unknown>) =>
   sortArray(Obj.keys(o));
 
 const compareObjects = (x: any, y: any) => {

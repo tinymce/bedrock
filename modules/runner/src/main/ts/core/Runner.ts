@@ -7,12 +7,17 @@ import { TestData } from './TestTypes';
 import { UrlParams } from './UrlParams';
 import { noop } from './Utils';
 
+export interface Runner {
+  readonly init: (onSuccess: (data: HarnessResponse) => void, onError: (e: any) => void) => void;
+  readonly run: (chunk: number, retries: number, timeout: number, stopOnFailure: boolean) => void;
+}
+
 // 5sec interval for the server to know the client hasn't disconnected
 // Note: The interval needs to be less than 10secs, otherwise the server will disconnect.
 //       See `Controller.ts` in the server.
 const KEEP_ALIVE_INTERVAL = 5000;
 
-export const Runner = (globalTests: TestData[], params: UrlParams, callbacks: Callbacks, reporter: Reporter, ui: Ui) => {
+export const Runner = (globalTests: TestData[], params: UrlParams, callbacks: Callbacks, reporter: Reporter, ui: Ui): Runner => {
   const actions = Actions(params.session);
 
   const withSum = (action: (offset: number, failed: number, retry?: number) => void, offset = 0, failedOffset = 0) => (retry?: number) => {
@@ -113,5 +118,5 @@ export const Runner = (globalTests: TestData[], params: UrlParams, callbacks: Ca
   return {
     init,
     run
-  }
+  };
 };

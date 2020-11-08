@@ -11,7 +11,7 @@ import { ExitCodes } from './bedrock/util/ExitCodes';
 import * as ConsoleReporter from './bedrock/core/ConsoleReporter';
 import { TestResults } from './bedrock/server/Controller';
 
-export const go = (settings: BedrockAutoSettings) => {
+export const go = (settings: BedrockAutoSettings): void => {
   const master = DriverMaster.create();
 
   const isPhantom = settings.browser === 'phantomjs';
@@ -35,8 +35,8 @@ export const go = (settings: BedrockAutoSettings) => {
         basedir: settings.basedir,
         testfiles: settings.testfiles,
         driver: Attempt.passed(webdriver),
-        master: master,
-        runner: runner,
+        master,
+        runner,
         loglevel: settings.loglevel,
         customRoutes: settings.customRoutes,
         stickyFirstSession: true,

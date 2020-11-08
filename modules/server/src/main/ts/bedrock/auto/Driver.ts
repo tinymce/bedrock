@@ -71,8 +71,8 @@ const addArguments = (capabilities: Record<string, any>, name: string, args: str
 const getOptions = (port: number, browserName: string, browserFamily: string, settings: DriverSettings): Options => {
   const options = {
     path: '/',
-    port: port,
-    logLevel: 'silent' as 'silent',
+    port,
+    logLevel: 'silent' as const,
     capabilities: {
       browserName: browserFamily
     }
@@ -102,7 +102,7 @@ const getOptions = (port: number, browserName: string, browserFamily: string, se
       'devtools.debugger.remote-enabled': true,
       'devtools.debugger.prompt-connection': false,
       'devtools.chrome.enabled': true
-    }
+    };
   } else if (browserName === 'chrome-headless') {
     addArguments(caps, 'goog:chromeOptions', [ '--headless', '--remote-debugging-port=' + settings.debuggingPort ]);
     if (settings.useSandboxForHeadless) {
@@ -141,7 +141,7 @@ const focusBrowser = (browserName: string, settings: DriverSettings) => {
   }
 };
 
-const setupShutdown = (driver: webdriverio.BrowserObject, driverApi: DriverLoader.DriverAPI, shutdownDelay: number = 0): (immediate?: boolean) => Promise<void> => {
+const setupShutdown = (driver: webdriverio.BrowserObject, driverApi: DriverLoader.DriverAPI, shutdownDelay = 0): (immediate?: boolean) => Promise<void> => {
   const driverShutdown = (immediate?: boolean) => {
     try {
       if (immediate) {

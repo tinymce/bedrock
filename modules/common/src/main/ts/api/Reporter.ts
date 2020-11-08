@@ -111,7 +111,7 @@ const mkText = (e: TestError): string => {
   if (TestError.isHTMLDiffError(e)) {
     return htmlDiffAssertionErrorText(e);
   } else if (TestError.isPprintAssertionError(e)) {
-    return pprintAssertionText(e)
+    return pprintAssertionText(e);
   } else if (TestError.isAssertionError(e)) {
     return assertionErrorText(e);
   } else if (e.name && e.message) {

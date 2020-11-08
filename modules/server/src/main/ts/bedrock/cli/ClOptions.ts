@@ -68,7 +68,7 @@ export const configTo = (defaultValue: string): ClOption => {
     name: 'config',
     alias: 'c',
     type: String,
-    defaultValue: defaultValue,
+    defaultValue,
     description: 'The location of the typescript config file',
     validate: Extraction.any
   };
@@ -258,7 +258,6 @@ export const wipeBrowserCache: ClOption = {
 };
 
 // TODO: what is this setting?
-// eslint-disable-next-line camelcase,@typescript-eslint/camelcase
 export const stopOnFailure__hidden: ClOption = {
   name: 'stopOnFailure',
   description: 'Stop on failure',

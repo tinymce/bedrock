@@ -1,4 +1,4 @@
-export const typeOf = function (x: any) {
+export const typeOf = function (x: any): string {
   if (x === null) {
     return 'null';
   }

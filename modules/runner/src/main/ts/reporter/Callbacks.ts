@@ -17,7 +17,7 @@ const Global: any = window;
 const sendJson = (url: string, data: any, onSuccess: onSuccessCallback = noop, onError: onErrorCallback = noop): void => {
   $.ajax({
     method: 'post',
-    url: url,
+    url,
     dataType: 'json',
     success: onSuccess,
     error: onError,
@@ -28,27 +28,27 @@ const sendJson = (url: string, data: any, onSuccess: onSuccessCallback = noop, o
 export const Callbacks = (): Callbacks => {
   const sendKeepAlive = (session: string, onSuccess: onSuccessCallback, onError: onErrorCallback): void => {
     sendJson('/tests/alive', {
-      session: session,
+      session,
     }, onSuccess, onError);
   };
 
   const sendTestStart = (session: string, totalTests: number, file: string, name: string, onSuccess: onSuccessCallback, onError: onErrorCallback): void => {
     sendJson('/tests/start', {
       totalTests,
-      session: session,
-      file: file,
-      name: name,
+      session,
+      file,
+      name,
     }, onSuccess, onError);
   };
 
   const sendTestResult = (session: string, file: string, name: string, passed: boolean, time: string, error: string | null, onSuccess: onSuccessCallback, onError: onErrorCallback): void => {
     sendJson('/tests/result', {
-      session: session,
-      file: file,
-      name: name,
-      passed: passed,
-      time: time,
-      error: error,
+      session,
+      file,
+      name,
+      passed,
+      time,
+      error,
     }, onSuccess, onError);
   };
 
@@ -57,7 +57,7 @@ export const Callbacks = (): Callbacks => {
     const getCoverage = (): Record<string, any> => typeof Global.__coverage__ === 'undefined' ? {} : Global.__coverage__;
 
     sendJson('/tests/done', {
-      session: session,
+      session,
       coverage: getCoverage(),
     }, onSuccess, onError);
   };

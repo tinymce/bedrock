@@ -3,16 +3,16 @@ import * as Waiter from '../util/Waiter';
 type Executor<T> = () => Promise<T>;
 
 interface QueueItem<T> {
-  f: Executor<T>;
-  label: string;
-  identifier: string;
+  readonly f: Executor<T>;
+  readonly label: string;
+  readonly identifier: string;
 }
 
 export interface DriverMaster {
-  waitForIdle: <T>(f: Executor<T>, label: string) => Promise<T>;
+  readonly waitForIdle: <T>(f: Executor<T>, label: string) => Promise<T>;
 }
 
-export const create = () => {
+export const create = (): DriverMaster => {
   let inUse = false;
 
   let queue: QueueItem<any>[] = [];
@@ -90,9 +90,9 @@ export const create = () => {
     } else {
       const identifier = label + '_' + new Date().getTime() + Math.floor(Math.random() * 10000);
       queue = queue.concat({
-        f: f,
-        label: label,
-        identifier: identifier
+        f,
+        label,
+        identifier
       });
       return doWaitForIdle(identifier, f, label, 100);
     }

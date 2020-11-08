@@ -2,11 +2,11 @@ import { BrowserObject, Element } from 'webdriverio';
 import * as EffectUtils from './EffectUtils';
 
 interface KeyCombo {
-  key: string;
-  altKey?: boolean;
-  ctrlKey?: boolean;
-  metaKey?: boolean;
-  shiftKey: boolean;
+  readonly key: string;
+  readonly altKey?: boolean;
+  readonly ctrlKey?: boolean;
+  readonly metaKey?: boolean;
+  readonly shiftKey: boolean;
 }
 
 type KeyTextItem = { text: string };
@@ -120,7 +120,7 @@ const performAction = (driver: BrowserObject, target: Element, actions: string[]
   }
 };
 
-const execute = (driver: BrowserObject, data: KeyData) => {
+const execute = (driver: BrowserObject, data: KeyData): Promise<void> => {
   const actions = scan(data.keys);
   return EffectUtils.performActionOnTarget(driver, data, (target) => {
     return performAction(driver, target, actions, driver.isW3C);
@@ -128,7 +128,7 @@ const execute = (driver: BrowserObject, data: KeyData) => {
 };
 
 export const executor = (driver: BrowserObject) => {
-  return (data: KeyData) => {
+  return (data: KeyData): Promise<void> => {
     return execute(driver, data);
   };
 };

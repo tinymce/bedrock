@@ -7,7 +7,7 @@ type Program = {
   mode: 'forAuto' | 'forManual' | 'forFramework';
 }
 
-export const run = (program: Program, directories: { current: string; bin: string }) => {
+export const run = (program: Program, directories: { current: string; bin: string }): void => {
   if (Clis[program.mode] === undefined) {
     throw new Error('Bedrock mode not known: ' + program.mode);
   }

@@ -29,9 +29,9 @@ const cleanResult = <T>(result: Attempt<CliError, T>) =>
 describe('cli', () => {
   it('Minimal specification of bedrock-auto', () => {
     const args = [
-      "--browser", "MicrosoftEdge",
-      "--files", "src/test/resources/test.file1",
-      "--config", "src/test/resources/tsconfig.sample.json"
+      '--browser', 'MicrosoftEdge',
+      '--files', 'src/test/resources/test.file1',
+      '--config', 'src/test/resources/tsconfig.sample.json'
     ];
     const actual = Clis.forAuto(directories, args);
     AttemptUtils.assertResult({
@@ -61,8 +61,8 @@ describe('cli', () => {
 
   it('Specification of bedrock-auto missing required field: browser', () => {
     const args = [
-      "--files", "src/test/resources/test.file1",
-      "--config", "src/test/resources/tsconfig.sample.json"
+      '--files', 'src/test/resources/test.file1',
+      '--config', 'src/test/resources/tsconfig.sample.json'
     ];
     const actual = Clis.forAuto(directories, args);
     AttemptUtils.assertErrors([
@@ -72,8 +72,8 @@ describe('cli', () => {
 
   it('Minimal specification of bedrock-manual', () => {
     const args = [
-      "--files", "src/test/resources/test.file1",
-      "--config", "src/test/resources/tsconfig.sample.json"
+      '--files', 'src/test/resources/test.file1',
+      '--config', 'src/test/resources/tsconfig.sample.json'
     ];
     const actual = Clis.forManual(directories, args);
     AttemptUtils.assertResult( {
