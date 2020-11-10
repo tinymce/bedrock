@@ -8,8 +8,8 @@ import * as EffectUtils from './EffectUtils';
  }
  */
 export interface MouseData {
-  type: 'move' | 'click' | 'down' | 'up';
-  selector: string;
+  readonly type: 'move' | 'click' | 'down' | 'up';
+  readonly selector: string;
 }
 
 const performAction = (target: EffectUtils.ElementWithActions, type: string) => {
@@ -18,9 +18,9 @@ const performAction = (target: EffectUtils.ElementWithActions, type: string) => 
     id: 'pointer1',
     parameters: { pointerType: 'mouse' },
     actions: [
-      { type: type, button: 0 },
+      { type, button: 0 },
       { type: 'pause', duration: 10 },
-      { type: type, button: 0 }
+      { type, button: 0 }
     ]
   };
   return target.performActions([action]).then(() => {
@@ -43,14 +43,14 @@ const doAction = (target: EffectUtils.ElementWithActions, type: MouseData['type'
   }
 };
 
-const execute = (driver: BrowserObject, data: MouseData) => {
+const execute = (driver: BrowserObject, data: MouseData): Promise<void> => {
   return EffectUtils.performActionOnTarget(driver, data, (target) => {
     return doAction(target, data.type);
   });
 };
 
 export const executor = (driver: BrowserObject) => {
-  return (data: MouseData) => {
+  return (data: MouseData): Promise<void> => {
     return execute(driver, data);
   };
 };

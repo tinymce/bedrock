@@ -5,7 +5,7 @@ import * as Webpack from './bedrock/compiler/Webpack';
 import { BedrockSettings } from './bedrock/core/Settings';
 import { ExitCodes } from './bedrock/util/ExitCodes';
 
-export const go = (settings: BedrockSettings) => {
+export const go = (settings: BedrockSettings): void => {
   const basePage = 'src/resources/html/bedrock.html';
   const routes = RunnerRoutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, 0, settings.singleTimeout, true, basePage, settings.coverage);
 
@@ -19,7 +19,7 @@ export const go = (settings: BedrockSettings) => {
       // There is no driver for manual mode.
       driver: Attempt.failed('There is no webdriver for manual mode'),
       master: null, // there is no need for master,
-      runner: runner,
+      runner,
       loglevel: settings.loglevel,
       customRoutes: settings.customRoutes,
       config: settings.config,

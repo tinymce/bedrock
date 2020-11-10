@@ -15,7 +15,7 @@ function htmlAssertion() {
   return e;
 }
 
-describe("Reporter", () => {
+describe('Reporter', () => {
   it('Reports thrown js errors as html', () => {
     try {
       // noinspection ExceptionCaughtLocallyJS
@@ -23,7 +23,7 @@ describe("Reporter", () => {
     } catch (e) {
       const actual = Reporter.html(LoggedError.loggedError(e, []));
       const expected = 'Error: blarg&lt;span&gt;\n\nLogs:\n';
-      assert.deepEqual(actual, expected, 'Error message')
+      assert.deepEqual(actual, expected, 'Error message');
     }
   });
 
@@ -37,7 +37,7 @@ describe("Reporter", () => {
       ]));
       const expected = 'Error: blarg&lt;span&gt;\n\nLogs:\n' +
         'PprintAssertionError: Checking attribute: &quot;height&quot; of &lt;iframe src=&quot;http://www.example.com/&quot; width=&quot;200&quot; height=&quot;200&quot;&gt;&lt;/iframe&gt;';
-      assert.deepEqual(actual, expected, 'Error message')
+      assert.deepEqual(actual, expected, 'Error message');
     }
   });
 
@@ -48,7 +48,7 @@ describe("Reporter", () => {
     } catch (e) {
       const actual = Reporter.text(LoggedError.loggedError(e, []));
       const expected = 'Error: blarg<span>\n\nLogs:\n';
-      assert.deepEqual(actual, expected, 'Error message')
+      assert.deepEqual(actual, expected, 'Error message');
     }
   });
 
@@ -67,7 +67,7 @@ describe("Reporter", () => {
         'HTML Diff: <ins>blah</ins><del>hello</del>&quot;hello&quot;&lt;span&gt;\n' +
         '\n' +
         'Logs:\n';
-      assert.deepEqual(actual, expected, 'Error message')
+      assert.deepEqual(actual, expected, 'Error message');
     }
   });
 
@@ -85,7 +85,7 @@ describe("Reporter", () => {
         'HTML Diff: <ins>blah</ins><del>hello</del>"hello"<span>\n' +
         '\n' +
         'Logs:\n';
-      assert.deepEqual(actual, expected, 'Error message')
+      assert.deepEqual(actual, expected, 'Error message');
     }
   });
 

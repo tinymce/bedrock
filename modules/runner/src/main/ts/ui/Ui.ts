@@ -98,7 +98,7 @@ export const Ui = (container: JQuery<HTMLElement>): Ui => {
       start,
       pass,
       fail
-    }
+    };
   };
 
   const error = (e: any) => {
@@ -119,5 +119,5 @@ export const Ui = (container: JQuery<HTMLElement>): Ui => {
     hideRetry: () => retryBtn.show(),
     showRetry: () => retryBtn.show(),
     setStopOnFailure
-  }
+  };
 };

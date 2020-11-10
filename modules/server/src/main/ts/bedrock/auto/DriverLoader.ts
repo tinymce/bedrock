@@ -96,7 +96,7 @@ export const loadDriver = (browserName: string): DriverAPI => {
   }
 };
 
-export const waitForAlive = (proc: ChildProcess, port: number, timeout = 30000) => {
+export const waitForAlive = (proc: ChildProcess, port: number, timeout = 30000): Promise<void> => {
   const url = 'http://localhost:' + port + '/status';
   const start = Date.now();
   return new Promise<void>((resolve, reject) => {
@@ -149,10 +149,10 @@ export const waitForAlive = (proc: ChildProcess, port: number, timeout = 30000) 
 
     // Start listening for the server to be ready
     checkServerStatus();
-  })
+  });
 };
 
-export const startAndWaitForAlive = (driverApi: DriverAPI, port: number, timeout = 30000) => {
+export const startAndWaitForAlive = (driverApi: DriverAPI, port: number, timeout = 30000): Promise<void> => {
   // Start the driver
   const driverProc = driverApi.start(['--port=' + port]);
   // Wait for it to be alive

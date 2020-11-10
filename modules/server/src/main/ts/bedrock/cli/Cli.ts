@@ -22,7 +22,7 @@ const parseCommandLine = (definitions: commandLineArgs.OptionDefinition[], argv:
   }
 };
 
-export const extract = (command: string, desc: string, definitions: ClOption[], argv: string[]) => {
+export const extract = (command: string, desc: string, definitions: ClOption[], argv: string[]): Attempt<CliError, CommandLineOptions> => {
   const parsed = parseCommandLine(definitions, argv);
 
   Attempt.cata(parsed, () => {
@@ -45,7 +45,7 @@ export const extract = (command: string, desc: string, definitions: ClOption[], 
 
   return Attempt.cata<string[], CommandLineOptions, Attempt<CliError, CommandLineOptions>>(extracted, (errs) => {
     return Attempt.failed({
-      command: command,
+      command,
       errors: errs,
       usage: CliUsage.generateUsage(command, desc, definitions)
     });

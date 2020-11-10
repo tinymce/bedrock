@@ -1,10 +1,10 @@
-import { UnitTest, assert } from '@ephox/bedrock-client'
+import { UnitTest, assert } from '@ephox/bedrock-client';
 
 UnitTest.asyncTest('Tabbing Test', (success, failure) => {
-  var input1 = document.createElement('input');
+  const input1 = document.createElement('input');
   input1.classList.add('input-1');
 
-  var input2 = document.createElement('input');
+  const input2 = document.createElement('input');
   input2.classList.add('input-2');
 
   document.body.appendChild(input1);
@@ -13,8 +13,8 @@ UnitTest.asyncTest('Tabbing Test', (success, failure) => {
   input1.focus();
 
   // Dupe with IFramePassTest.ts
-  var post = function (url, data, onSuccess, onFailure) {
-    var request = new XMLHttpRequest();
+  const post = function (url: string, data: any, onSuccess: () => void, onFailure: (err?: Error) => void) {
+    const request = new XMLHttpRequest();
     request.open('POST', url, true);
     request.onload = function () {
       try {

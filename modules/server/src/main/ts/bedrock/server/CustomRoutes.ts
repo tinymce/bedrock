@@ -7,24 +7,24 @@ import * as Routes from './Routes';
 import * as FileUtils from '../util/FileUtils';
 
 interface CustomRequest {
-  headers?: Record<string, string>;
-  method?: string;
-  path?: string;
-  url?: string;
-  query?: Record<string, string>;
-  json?: any;
+  readonly headers?: Record<string, string>;
+  readonly method?: string;
+  readonly path?: string;
+  readonly url?: string;
+  readonly query?: Record<string, string>;
+  readonly json?: any;
 }
 
 interface CustomResponse {
-  status?: number;
-  headers?: Record<string, string>;
-  json?: any;
-  json_file?: string;
+  readonly status?: number;
+  readonly headers?: Record<string, string>;
+  readonly json?: any;
+  readonly json_file?: string;
 }
 
 export interface CustomRouteSpec {
-  request: CustomRequest;
-  response: CustomResponse;
+  readonly request: CustomRequest;
+  readonly response: CustomResponse;
 }
 
 const readRequestBody = (request: IncomingMessage, done: (body: string) => void) => {
@@ -144,7 +144,7 @@ const routers = (filePath: string) => {
   ];
 };
 
-export const create = (filePath: string) => {
+export const create = (filePath: string): { routers: Routes.Route[] } => {
   return {
     routers: routers(filePath)
   };

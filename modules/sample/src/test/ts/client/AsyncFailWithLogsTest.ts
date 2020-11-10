@@ -1,4 +1,4 @@
-import { UnitTest } from '@ephox/bedrock-client'
+import { UnitTest } from '@ephox/bedrock-client';
 
 UnitTest.asyncTest('AsyncFail with Logs Test', (success, failure) => {
 

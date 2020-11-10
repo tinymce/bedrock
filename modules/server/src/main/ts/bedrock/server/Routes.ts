@@ -1,14 +1,19 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import * as server from 'serve-static';
-import * as RouteUtils from '../util/RouteUtils'
+import * as RouteUtils from '../util/RouteUtils';
 import * as Matchers from './Matchers';
 
 type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS';
 
 export type RouteGoFunc = (request: IncomingMessage, response: ServerResponse, done: () => void) => void;
 export interface Route {
-  matches: Matchers.Matcher[];
-  go: RouteGoFunc;
+  readonly matches: Matchers.Matcher[];
+  readonly go: RouteGoFunc;
+}
+
+export interface Runner {
+  readonly routers: Route[];
+  readonly fallback: Route;
 }
 
 const createServer = (root: string) => {
@@ -167,7 +172,7 @@ export const unsupported = (method: HTTPMethod, root: string, label: string): Ro
   };
 };
 
-export const route = (routes: Route[], fallback: Route, request: IncomingMessage, response: ServerResponse, done: (err?: any) => void) => {
+export const route = (routes: Route[], fallback: Route, request: IncomingMessage, response: ServerResponse, done: (err?: any) => void): void => {
   (request as any).originalUrl = request.url;
 
   const match = routes.find((candidate) => {

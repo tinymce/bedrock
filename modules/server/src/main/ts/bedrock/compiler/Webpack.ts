@@ -254,7 +254,7 @@ const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: strin
 
 export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], coverage: string[]): Promise<string> => {
   return getCompileInfo(tsConfigFile, scratchDir, basedir, false, srcFiles, coverage)
-    .then((compileInfo) => compileTests(compileInfo, exitOnCompileError, srcFiles))
+    .then((compileInfo) => compileTests(compileInfo, exitOnCompileError, srcFiles));
 };
 
 const isCompiledRequest = (request: { url: string }) => request.url.startsWith('/compiled/');

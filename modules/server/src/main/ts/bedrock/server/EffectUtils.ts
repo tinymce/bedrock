@@ -15,7 +15,7 @@ const frameSelected = (driver: BrowserObject, frame: string): () => Promise<bool
       }
       return false;
     });
-  }
+  };
 };
 
 const getTargetFromFrame = (driver: BrowserObject, selector: string) => {
@@ -59,7 +59,7 @@ const performActionOnMain = <T>(driver: BrowserObject, selector: string, action:
   });
 };
 
-export const getTarget = (driver: BrowserObject, data: { selector: string }) => {
+export const getTarget = (driver: BrowserObject, data: { selector: string }): Promise<ElementWithActions> => {
   const selector = data.selector;
   const getter = selector.indexOf('=>') > -1 ? getTargetFromFrame : getTargetFromMain;
   return getter(driver, selector);

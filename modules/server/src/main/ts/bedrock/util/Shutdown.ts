@@ -1,4 +1,4 @@
-export const registerShutdown = (cb: (code: number, immediate: boolean) => void) => {
+export const registerShutdown = (cb: (code: number, immediate: boolean) => void): void => {
   const killEvents = ['exit', 'SIGTERM', 'SIGINT'];
 
   function register (evName: string) {

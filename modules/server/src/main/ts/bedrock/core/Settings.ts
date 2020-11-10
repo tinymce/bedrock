@@ -1,35 +1,35 @@
 export interface BedrockSettings {
-  basedir: string;
-  bundler: 'webpack' | 'rollup';
-  chunk: number;
-  config: string;
-  coverage: string[];
-  customRoutes: string;
-  gruntDone?: (success: boolean) => void;
-  loglevel: 'simple' | 'advanced';
-  name: string;
-  output: string;
-  overallTimeout: number;
-  projectdir: string;
-  singleTimeout: number;
-  testfiles: string[];
+  readonly basedir: string;
+  readonly bundler: 'webpack' | 'rollup';
+  readonly chunk: number;
+  readonly config: string;
+  readonly coverage: string[];
+  readonly customRoutes: string;
+  readonly gruntDone?: (success: boolean) => void;
+  readonly loglevel: 'simple' | 'advanced';
+  readonly name: string;
+  readonly output: string;
+  readonly overallTimeout: number;
+  readonly projectdir: string;
+  readonly singleTimeout: number;
+  readonly testfiles: string[];
 }
 
 export interface BedrockAutoSettings extends BedrockSettings {
-  browser: string;
-  debuggingPort: number;
-  delayExit: boolean;
-  retries: number;
-  skipResetMousePosition: boolean;
-  stopOnFailure: boolean;
-  useSandboxForHeadless: boolean;
-  wipeBrowserCache: boolean;
+  readonly browser: string;
+  readonly debuggingPort: number;
+  readonly delayExit: boolean;
+  readonly retries: number;
+  readonly skipResetMousePosition: boolean;
+  readonly stopOnFailure: boolean;
+  readonly useSandboxForHeadless: boolean;
+  readonly wipeBrowserCache: boolean;
 }
 
 export interface BedrockFrameworkSettings extends BedrockSettings {
-  browser: string;
-  debuggingPort: number;
-  framework: string;
-  page: string;
-  stopOnFailure: boolean;
+  readonly browser: string;
+  readonly debuggingPort: number;
+  readonly framework: string;
+  readonly page: string;
+  readonly stopOnFailure: boolean;
 }

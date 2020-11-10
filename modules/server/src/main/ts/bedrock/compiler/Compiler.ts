@@ -1,7 +1,11 @@
 import * as fs from 'fs';
 import * as Webpack from '../compiler/Webpack';
 
-export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, files: string[], coverage: string[]) => {
+export interface Compiler {
+  readonly generate: () => Promise<Buffer | string>;
+}
+
+export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, files: string[], coverage: string[]): Compiler => {
   const getCompileFunc = () => {
     return Webpack.compile;
   };

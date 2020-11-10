@@ -1,5 +1,5 @@
-import { TestLabel } from "./TestLabel";
-import { TestLogEntry, TestLogs } from "./TestLogs";
+import { TestLabel } from './TestLabel';
+import { TestLogEntry, TestLogs } from './TestLogs';
 import { TestError, LoggedError } from '@ephox/bedrock-common';
 
 type TestError = TestError.TestError;
@@ -24,7 +24,7 @@ const register = (name: string, test: (success: () => void, failure: (e: LoggedE
     Global.__tests = [];
   }
 
-  Global.__tests.push({name: name, test: test});
+  Global.__tests.push({name, test});
 };
 
 const cleanStack = (error: Error, linesToRemove = 1) => {
@@ -78,7 +78,7 @@ const processLog = (logs: TestLogs): string[] => {
           ).concat(traceLines);
         }
       })();
-      everything = everything.concat(output)
+      everything = everything.concat(output);
     }
     return everything;
   };
@@ -92,11 +92,11 @@ const prepFailure = (err: TestThrowable, logs: TestLogs = TestLogs.emptyLogs()):
   return {
     error: normalizedErr,
     logs: failureMessage,
-  }
+  };
 };
 
 /** An asynchronous test with callbacks. */
-export const asyncTest = (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void) => {
+export const asyncTest = (name: string, test: (success: SuccessCallback, failure: FailureCallback) => void): void => {
   register(name, function (success: () => void, failure: (e: LoggedError) => void) {
     try {
       test(success, function (err: TestThrowable, logs: TestLogs = TestLogs.emptyLogs()) {
@@ -114,7 +114,7 @@ export const asyncTest = (name: string, test: (success: SuccessCallback, failure
 export const asynctest = asyncTest;
 
 /** A synchronous test that fails if an exception is thrown */
-export const test = (name: string, test: () => void) => {
+export const test = (name: string, test: () => void): void => {
   register(name, function (success: () => void, failure: (e: LoggedError) => void) {
     try {
       test();
@@ -127,7 +127,7 @@ export const test = (name: string, test: () => void) => {
 };
 
 /** Tests an async function (function that returns a Promise). */
-export const promiseTest = (name: string, test: () => Promise<void>) =>
+export const promiseTest = (name: string, test: () => Promise<void>): void =>
   asyncTest(name, (success, failure) => {
     test().then(success).catch(failure);
   });

@@ -4,8 +4,8 @@ import { TestResults, TestResult } from '../server/Controller';
 import { Attempt } from './Attempt';
 
 export interface ReporterSettings {
-  name: string;
-  output: string;
+  readonly name: string;
+  readonly output: string;
 }
 
 const outputTime = (runnerTime: string) => {
@@ -28,11 +28,11 @@ export const splitCdatas =
       r = r + x;
       if (i < raw.length - 1) r = r + ']]';
       return r;
-    })
+    });
   };
 
 export const write = (settings: ReporterSettings) => {
-  return (data: TestResults) => {
+  return (data: TestResults): Promise<Attempt<string[], TestResult[]>> => {
     return new Promise<Attempt<string[], TestResult[]>>((resolve) => {
       const results = data.results;
       const time = (data.now - data.start) / 1000;
@@ -116,7 +116,7 @@ export const write = (settings: ReporterSettings) => {
   };
 };
 
-export const writePollExit = (settings: ReporterSettings, results: TestResults) => {
+export const writePollExit = (settings: ReporterSettings, results: TestResults): Promise<Attempt<string[], TestResult[]>> => {
   return write({
     name: settings.name,
     output: settings.output

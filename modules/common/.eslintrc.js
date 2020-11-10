@@ -6,11 +6,15 @@ module.exports =  {
     'plugin:@typescript-eslint/recommended',
   ],
   parserOptions:  {
-    sourceType:  'module',
+    sourceType: 'module',
   },
   rules:  {
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/no-use-before-define": "off"
+    "@typescript-eslint/no-use-before-define": "off",
+
+    "object-shorthand": "error",
+    "quotes": [ "error", "single", { "allowTemplateLiterals": true } ],
+    "semi": "error"
   }
 };

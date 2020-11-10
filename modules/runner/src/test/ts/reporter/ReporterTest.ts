@@ -80,7 +80,7 @@ describe('Reporter.test', () => {
 
         assert.equal(endTestData.length, 0);
         assert.deepEqual(reporter.summary(), {
-          offset: offset,
+          offset,
           passed: offset,
           failed: 0
         }, 'Summary has no passed or failed tests');
@@ -97,7 +97,7 @@ describe('Reporter.test', () => {
       test.start(() => {
         test.pass(() => {
           assert.equal(endTestData.length, 1);
-          const data = endTestData[ 0 ];
+          const data = endTestData[0];
           assert.equal(data.session, sessionId);
           assert.equal(data.file, fileName + 'Test.ts');
           assert.equal(data.name, testName);
@@ -105,7 +105,7 @@ describe('Reporter.test', () => {
           assert.isString(data.time);
 
           assert.deepEqual(reporter.summary(), {
-            offset: offset,
+            offset,
             passed: offset + 1,
             failed: 0
           }, 'Summary has one passed test');
@@ -136,7 +136,7 @@ describe('Reporter.test', () => {
           assert.equal(data.error, 'Error: Failed\n\nLogs:\n');
 
           assert.deepEqual(reporter.summary(), {
-            offset: offset,
+            offset,
             passed: offset,
             failed: 1
           }, 'Summary has one failed test');
@@ -151,5 +151,5 @@ describe('Reporter.test', () => {
   it('should report done', () => {
     reporter.done();
     assert.isTrue(doneCalled);
-  })
+  });
 });

@@ -10,7 +10,7 @@ import * as Lifecycle from './bedrock/core/Lifecycle';
 import { BedrockFrameworkSettings } from './bedrock/core/Settings';
 
 /* eslint-disable no-undef */
-export const go = (settings: BedrockFrameworkSettings) => {
+export const go = (settings: BedrockFrameworkSettings): void => {
   const master = DriverMaster.create();
 
   const runner = PageRoutes.generate(settings.projectdir, settings.basedir);
@@ -27,8 +27,8 @@ export const go = (settings: BedrockFrameworkSettings) => {
       basedir: settings.basedir,
       driver: Attempt.passed(webdriver),
       testfiles: [],
-      master: master,
-      runner: runner,
+      master,
+      runner,
       loglevel: settings.loglevel,
       customRoutes: settings.customRoutes,
       stickyFirstSession: true,

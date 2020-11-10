@@ -125,7 +125,7 @@ ${imports}
 export {};`;
 };
 
-export const generateImports = (useRequire: boolean, scratchFile: string, srcFiles: string[]) => {
+export const generateImports = (useRequire: boolean, scratchFile: string, srcFiles: string[]): string => {
   if (hasTs(srcFiles)) {
     return generateImportsTs(useRequire, scratchFile, srcFiles);
   } else {
