@@ -9,10 +9,12 @@
     "declaration": true,
     "sourceMap": true,
     "outDir": "lib",
-    "rootDir": "src"
+    "rootDir": "src",
+    "types": [ "jquery" ]
   },
   "include": [
     "src/main/ts",
-    "src/test/ts"
+    "src/test/ts",
+    "src/typings"
   ]
 }

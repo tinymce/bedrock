@@ -26,26 +26,24 @@ export const Ui = (container: JQuery<HTMLElement>): Ui => {
     retryBtn = $('<button />').text('Retry').on('click', onRetry).hide();
     skipBtn = $('<button />').text('Skip').on('click', onSkip).hide();
 
-    $(() => {
-      container
-        .append($('<div />')
-          .append($('<span />').text('Suite progress: '))
-          .append(current)
-          .append($('<span />').text('/'))
-          .append($('<span />').text(totalNumTests))
-          .append('&nbsp;&nbsp;&nbsp;')
-          .append(restartBtn)
-          .append('&nbsp;&nbsp;&nbsp;')
-          .append(retryBtn)
-          .append('&nbsp;&nbsp;&nbsp;')
-          .append(skipBtn)
-        );
-    });
+    container
+      .append($('<div />')
+        .append($('<span />').text('Suite progress: '))
+        .append(current)
+        .append($('<span />').text('/'))
+        .append($('<span />').text(totalNumTests))
+        .append('&nbsp;&nbsp;&nbsp;')
+        .append(restartBtn)
+        .append('&nbsp;&nbsp;&nbsp;')
+        .append(retryBtn)
+        .append('&nbsp;&nbsp;&nbsp;')
+        .append(skipBtn)
+      );
   };
 
   const done = (totalTime: string) => {
     container.append('<div class="done">Test run completed in <span class="time">' + totalTime + '</span></div>');
-    $('.passed.hidden').removeClass('hidden');
+    $('.passed.hidden,.skipped.hidden').removeClass('hidden');
   };
 
   const test = () => {
@@ -75,6 +73,13 @@ export const Ui = (container: JQuery<HTMLElement>): Ui => {
       current.text(currentCount);
     };
 
+    const skip = (testTime: string, currentCount: number) => {
+      el.removeClass('running').addClass('skipped').addClass('hidden');
+      marker.text('[skipped]').addClass('skipped');
+      time.text(testTime);
+      current.text(currentCount);
+    };
+
     const fail = (e: LoggedError.LoggedError, testTime: string, currentCount: number) => {
       el.removeClass('running').addClass('failed');
       marker.text('[failed]').addClass('failed');
@@ -97,6 +102,7 @@ export const Ui = (container: JQuery<HTMLElement>): Ui => {
     return {
       start,
       pass,
+      skip,
       fail
     };
   };

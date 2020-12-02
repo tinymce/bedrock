@@ -6,7 +6,7 @@ export type onErrorCallback = (err: any) => void;
 export interface Callbacks {
   readonly sendKeepAlive: (session: string, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
   readonly sendTestStart: (session: string, totalTests: number, file: string, name: string, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
-  readonly sendTestResult: (session: string, file: string, name: string, passed: boolean, time: string, error: string | null, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
+  readonly sendTestResult: (session: string, file: string, name: string, passed: boolean, time: string, error: string | null, skipped: string | null, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
   readonly sendDone: (session: string, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
 }
 
@@ -41,12 +41,13 @@ export const Callbacks = (): Callbacks => {
     }, onSuccess, onError);
   };
 
-  const sendTestResult = (session: string, file: string, name: string, passed: boolean, time: string, error: string | null, onSuccess: onSuccessCallback, onError: onErrorCallback): void => {
+  const sendTestResult = (session: string, file: string, name: string, passed: boolean, time: string, error: string | null, skipped: string | null, onSuccess: onSuccessCallback, onError: onErrorCallback): void => {
     sendJson('/tests/result', {
       session,
       file,
       name,
       passed,
+      skipped,
       time,
       error,
     }, onSuccess, onError);

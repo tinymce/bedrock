@@ -4,6 +4,7 @@ export interface UrlParams {
   readonly session: string;
   readonly offset: number;
   readonly failed: number;
+  readonly skipped: number;
   retry: number;
 }
 
@@ -22,12 +23,14 @@ const parse = (search: string, makeSessionId: () => string): UrlParams => {
     session?: string;
     offset?: string;
     failed?: string;
+    skipped?: string;
     retry?: string;
   } = QS.parse(search);
   return {
     session: params.session || makeSessionId(),
     offset: nat(params.offset),
     failed: nat(params.failed),
+    skipped: nat(params.skipped),
     retry: nat(params.retry),
   };
 };

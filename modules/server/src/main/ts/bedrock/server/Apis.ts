@@ -103,7 +103,7 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
       }
     }),
     Routes.effect('POST', '/tests/result', (data: Controller.TestResult & { session: string }) => {
-      c.recordTestResult(data.session, data.name, data.file, data.passed, data.time, data.error);
+      c.recordTestResult(data.session, data.name, data.file, data.passed, data.time, data.error, data.skipped);
       return Promise.resolve();
     }),
     Routes.effect('POST', '/tests/done', (data: { session: string; coverage: Record<string, any> }) => {

@@ -18,13 +18,13 @@ const processQUnit = (html: string): string =>
     .replace(/&lt;ins&gt;/g, '<ins>')
     .replace(/&lt;\/ins&gt;/g, '</ins>'));
 
-const extractError = (err: LoggedError): TestError =>
-  err === undefined ? new Error('no error given') : err.error;
+const extractError = (err?: LoggedError): TestError =>
+  err === undefined ? new Error('no error given') : err;
 
 const formatExtra = (e: LoggedError): string => {
-  if (!e.logs) {
-    if (e.error && e.error.stack) {
-      const lines = e.error.stack.split('\n').filter((line) =>
+  if (!e.logs || e.logs.length === 0) {
+    if (e.stack) {
+      const lines = e.stack.split('\n').filter((line) =>
         line.indexOf('at') !== -1);
       return '\n\nStack:\n' + lines.join('\n');
     } else {

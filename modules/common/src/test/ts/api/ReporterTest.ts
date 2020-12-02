@@ -1,9 +1,10 @@
 import { assert } from 'chai';
 import { describe, it } from 'mocha';
-import * as Reporter from '../../../main/ts/api/Reporter';
 import * as LoggedError from '../../../main/ts/api/LoggedError';
+import * as Reporter from '../../../main/ts/api/Reporter';
+import { HtmlDiffAssertionError } from '../../../main/ts/api/TestError';
 
-function htmlAssertion() {
+function htmlAssertion(): HtmlDiffAssertionError {
   const e: any = new Error('message"');
   e.diff = {
     expected: 'abc"hello"',
@@ -15,14 +16,17 @@ function htmlAssertion() {
   return e;
 }
 
+const cleanStack = (message: string): string =>
+  message.replace(/Stack:(\n|.)*/, 'Stack:\n');
+
 describe('Reporter', () => {
   it('Reports thrown js errors as html', () => {
     try {
       // noinspection ExceptionCaughtLocallyJS
       throw new Error('blarg<span>');
     } catch (e) {
-      const actual = Reporter.html(LoggedError.loggedError(e, []));
-      const expected = 'Error: blarg&lt;span&gt;\n\nLogs:\n';
+      const actual = Reporter.html(LoggedError.loggedError(e, [ '  * Log Message' ]));
+      const expected = 'Error: blarg&lt;span&gt;\n\nLogs:\n  * Log Message';
       assert.deepEqual(actual, expected, 'Error message');
     }
   });
@@ -46,8 +50,8 @@ describe('Reporter', () => {
       // noinspection ExceptionCaughtLocallyJS
       throw new Error('blarg<span>');
     } catch (e) {
-      const actual = Reporter.text(LoggedError.loggedError(e, []));
-      const expected = 'Error: blarg<span>\n\nLogs:\n';
+      const actual = Reporter.text(LoggedError.loggedError(e, [ '  * Log Message' ]));
+      const expected = 'Error: blarg<span>\n\nLogs:\n  * Log Message';
       assert.deepEqual(actual, expected, 'Error message');
     }
   });
@@ -66,8 +70,8 @@ describe('Reporter', () => {
         '\n' +
         'HTML Diff: <ins>blah</ins><del>hello</del>&quot;hello&quot;&lt;span&gt;\n' +
         '\n' +
-        'Logs:\n';
-      assert.deepEqual(actual, expected, 'Error message');
+        'Stack:\n';
+      assert.deepEqual(cleanStack(actual), expected, 'Error message');
     }
   });
 
@@ -84,8 +88,8 @@ describe('Reporter', () => {
         '\n' +
         'HTML Diff: <ins>blah</ins><del>hello</del>"hello"<span>\n' +
         '\n' +
-        'Logs:\n';
-      assert.deepEqual(actual, expected, 'Error message');
+        'Stack:\n';
+      assert.deepEqual(cleanStack(actual), expected, 'Error message');
     }
   });
 

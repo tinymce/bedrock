@@ -39,16 +39,16 @@ declare let require: any;
 declare let __tests: any;
 declare let console: any;
 let __lastTestIndex: number = -1;
-let __currentTestFile;
+let __currentTestFile: string;
 const addTest = (testFilePath: string) => {
   if (__tests && __tests[__tests.length - 1]) {
     const lastTest = __tests[__tests.length - 1];
-    if (!lastTest.filePath) {
+    if (!lastTest.file) {
       const tests = __tests.slice(__lastTestIndex + 1);
       tests.forEach((test: any) => {
-        test.filePath = testFilePath;
+        test.file = testFilePath;
       });
-    } else if (lastTest.filePath === testFilePath) {
+    } else if (lastTest.file === testFilePath) {
       // repeated test, duplicate the test entry
       __tests.push(__tests.slice(__lastTestIndex + 1));
     } else {
@@ -61,18 +61,6 @@ const addTest = (testFilePath: string) => {
     console.error('no test list to add tests to');
   }
 };
-
-window.addEventListener('error', (event: any) => { 
-  ${useRequire ? 'const UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
-  UnitTest.test('Error', () => {
-    if (event.error) {
-      throw event.error;
-    } else {
-      throw new Error(event.message);
-    }
-  });
-  addTest(__currentTestFile);
-});
 
 ${imports}
 
@@ -89,12 +77,12 @@ var __currentTestFile;
 var addTest = function (testFilePath) {
   if (__tests && __tests[__tests.length - 1]) {
     var lastTest = __tests[__tests.length - 1];
-    if (!lastTest.filePath) {
+    if (!lastTest.file) {
       var tests = __tests.slice(__lastTestIndex + 1);
       tests.forEach(function (test) {
-        test.filePath = testFilePath;
+        test.file = testFilePath;
       });
-    } else if (lastTest.filePath === testFilePath) {
+    } else if (lastTest.file === testFilePath) {
       // repeated test, duplicate the test entry
       __tests.push(__tests.slice(__lastTestIndex + 1));
     } else {
@@ -107,18 +95,6 @@ var addTest = function (testFilePath) {
     console.error('no test list to add tests to');
   }
 };
-
-window.addEventListener('error', function (event) {
-  ${useRequire ? 'var UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
-  UnitTest.test('Error', function () {
-    if (event.error) {
-      throw event.error;
-    } else {
-      throw new Error(event.message);
-    }
-  });
-  addTest(__currentTestFile);
-});
 
 ${imports}
 

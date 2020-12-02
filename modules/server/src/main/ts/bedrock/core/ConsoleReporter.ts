@@ -3,9 +3,9 @@ import { TestResults } from '../server/Controller';
 const numberOfErrorsToPrint = 5;
 
 export const generateReport = (data: TestResults): string => {
-  
+
   const results = data.results;
-  const failures = results.filter((x) => !x.passed);
+  const failures = results.filter((x) => !x.passed && !x.skipped);
 
   if (failures.length > 0) {
     const r = [];

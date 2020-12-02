@@ -6,11 +6,12 @@ import { formatElapsedTime } from '../core/Utils';
 export interface TestReporter {
   readonly start: (onDone: onSuccessCallback) => void;
   readonly pass: (onDone: onSuccessCallback) => void;
+  readonly skip: (reason: string, onDone: onSuccessCallback) => void;
   readonly fail: (e: LoggedError.LoggedError, onDone: onSuccessCallback) => void;
 }
 
 export interface Reporter {
-  readonly summary: () => { offset: number; passed: number; failed: number };
+  readonly summary: () => { offset: number; passed: number; failed: number; skipped: number };
   readonly test: (file: string, name: string, totalNumTests: number) => TestReporter;
   readonly done: () => void;
 }
@@ -19,6 +20,7 @@ export interface ReporterUi {
   readonly test: () => {
     readonly start: (file: string, name: string) => void;
     readonly pass: (testTime: string, currentCount: number) => void;
+    readonly skip: (testTime: string, currentCount: number) => void;
     readonly fail: (e: LoggedError.LoggedError, testTime: string, currentCount: number) => void;
   };
   readonly done: (totalTime: string) => void;
@@ -30,12 +32,14 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
   const initial = new Date();
   let currentCount = params.offset || 0;
   let passCount = 0;
+  let skipCount = 0;
   let failCount = 0;
 
   const summary = () => ({
     offset: Math.max(0, currentCount - 1),
-    passed: passCount + (params.offset - params.failed),
+    passed: passCount + (params.offset - params.failed - params.skipped),
     failed: failCount + params.failed,
+    skipped: skipCount + params.skipped
   });
 
   const test = (file: string, name: string, totalNumTests: number) => {
@@ -59,7 +63,17 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
       const testTime = elapsed(starttime);
 
       testUi.pass(testTime, currentCount);
-      callbacks.sendTestResult(params.session, file, name, true, testTime, null, onDone, onDone);
+      callbacks.sendTestResult(params.session, file, name, true, testTime, null, null, onDone, onDone);
+    };
+
+    const skip = (reason: string, onDone: onSuccessCallback): void => {
+      if (reported) return;
+      reported = true;
+      skipCount++;
+      const testTime = elapsed(starttime);
+
+      testUi.skip(testTime, currentCount);
+      callbacks.sendTestResult(params.session, file, name, false, testTime, null, reason, onDone, onDone);
     };
 
     const fail = (e: LoggedError.LoggedError, onDone: onSuccessCallback): void => {
@@ -71,12 +85,13 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
       const testTime = elapsed(starttime);
 
       testUi.fail(e, testTime, currentCount);
-      callbacks.sendTestResult(params.session, file, name, false, testTime, textError, onDone, onDone);
+      callbacks.sendTestResult(params.session, file, name, false, testTime, textError, null, onDone, onDone);
     };
 
     return {
       start,
       pass,
+      skip,
       fail
     };
   };

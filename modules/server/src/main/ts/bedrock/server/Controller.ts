@@ -5,7 +5,7 @@ export interface TestResult {
   readonly file: string;
   readonly passed: boolean;
   readonly time: string;
-  readonly skipped?: boolean;
+  readonly skipped: string;
   readonly error: string;
 }
 
@@ -42,7 +42,7 @@ export interface Controller {
   readonly enableHud: () => void;
   readonly recordAlive: (sessionId: string) => void;
   readonly recordTestStart: (id: string, name: string, file: string, totalTests: number) => void;
-  readonly recordTestResult: (id: string, name: string, file: string, passed: boolean, time: string, error: string) => void;
+  readonly recordTestResult: (id: string, name: string, file: string, passed: boolean, time: string, error: string, skipped: string) => void;
   readonly recordDone: (id: string) => void;
   readonly awaitDone: () => Promise<TestResults>;
 }
@@ -103,11 +103,12 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     if (!outputToHud) return;
     if (stickyFirstSession && (timeoutError || session.id !== stickyId)) return;
     const id = session.id;
-    const numFailed = session.results.reduce((sum, res) => sum + (res.passed ? 0 : 1), 0);
-    const numPassed = session.results.length - numFailed;
+    const numFailed = session.results.reduce((sum, res) => sum + (res.passed || res.skipped ? 0 : 1), 0);
+    const numSkipped = session.results.reduce((sum, res) => sum + (res.skipped ? 1 : 0), 0);
+    const numPassed = session.results.length - numFailed - numSkipped;
     const test = session.inflight !== null ? session.inflight.name : (session.previous !== null ? session.previous.name : '');
     const done = session.done;
-    hud.update({id, test, numPassed, numFailed, done, totalTests: session.totalTests});
+    hud.update({id, test, numPassed, numSkipped, numFailed, done, totalTests: session.totalTests});
   };
 
   const recordAlive = (sessionId: string) => {
@@ -124,10 +125,10 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     updateHud(session);
   };
 
-  const recordTestResult = (id: string, name: string, file: string, passed: boolean, time: string, error: string) => {
+  const recordTestResult = (id: string, name: string, file: string, passed: boolean, time: string, error: string, skipped: string) => {
     const now = Date.now();
     const session = getSession(id);
-    const record = {name, file, passed, time, error};
+    const record = { name, file, passed, time, error, skipped };
     if (session.lookup[file] !== undefined && session.lookup[file][name] !== undefined) {
       // rerunning a test
       session.results[session.lookup[file][name]] = record;
