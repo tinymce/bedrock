@@ -1,44 +1,42 @@
+import Promise from '@ephox/wrap-promise-polyfill';
+
 export interface ResourceLocker {
-  readonly async: (fn: (unlock: () => void) => void, next?: () => void) => void;
-  readonly sync: (fn: () => void) => void;
+  readonly execute: <T>(fn: () => PromiseLike<T> | T) => PromiseLike<T>;
 }
 
 export const ResourceLocker = (): ResourceLocker => {
-  const callbacks: Array< { fn: (unlock: () => void) => void; next?: () => void }> = [];
+  const queue: Array<() => void> = [];
   let locked = false;
 
-  const unlock = (next?: () => void) => {
-    const callback = callbacks.shift();
-    if (callback) {
-      setTimeout(() => {
-        callback.fn(() => unlock(callback.next));
-      }, 0);
+  const unlock = () => {
+    const callback = queue.shift();
+    if (callback !== undefined) {
+      setTimeout(callback, 0);
     } else {
       locked = false;
     }
-    if (next !== undefined) {
-      next();
-    }
   };
 
-  const async = (fn: (unlock: () => void) => void, next?: () => void) => {
+  const lock = (): Promise<void> => {
     if (locked) {
-      callbacks.push({ fn, next });
+      return new Promise((resolve) => queue.push(resolve));
     } else {
       locked = true;
-      fn(() => unlock(next));
+      return Promise.resolve();
     }
   };
 
-  const sync = (fn: () => void) => {
-    async((unlock) => {
-      fn();
+  const execute = <T>(fn: () => PromiseLike<T> | T): PromiseLike<T> => {
+    return lock().then(fn).then((result) => {
       unlock();
+      return result;
+    }, (err) => {
+      unlock();
+      return Promise.reject(err);
     });
   };
 
   return {
-    async,
-    sync
+    execute
   };
 };

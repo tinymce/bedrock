@@ -12,7 +12,7 @@ export type FailureCallback = (error: TestThrowable, logs?: TestLogs) => void;
 /** An asynchronous test with callbacks. */
 export const asyncTest = (name: string, test: (this: Context, success: SuccessCallback, failure: FailureCallback) => void): void => {
   const mochaTest = it(name, function (done) {
-    test.call(this, done, ((err, logs) => {
+    test.call(this, () => done(), ((err, logs) => {
       const r = Failure.prepFailure(err, logs);
       done(r);
     }));

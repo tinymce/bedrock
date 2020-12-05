@@ -1,15 +1,14 @@
 import { Callbacks } from '../reporter/Callbacks';
 import { Reporter } from '../reporter/Reporter';
-import * as MochaReporter from '../reporter/MochaReporter';
+import { BedrockMochaReporter } from '../reporter/MochaReporter';
 import { Actions } from '../ui/Actions';
 import { Ui } from '../ui/Ui';
 import { HarnessResponse } from '../core/ServerTypes';
 import { UrlParams } from '../core/UrlParams';
-import { noop } from '../core/Utils';
 import { getTests, filterOmittedTests } from './Utils';
 
 export interface Runner {
-  readonly init: (onSuccess: (data: HarnessResponse) => void, onError: (e: any) => void) => void;
+  readonly init: () => Promise<HarnessResponse>;
   readonly run: (chunk: number, retries: number, timeout: number, stopOnFailure: boolean) => void;
 }
 
@@ -49,7 +48,7 @@ export const Runner = (params: UrlParams, callbacks: Callbacks, reporter: Report
     }
   };
 
-  const init = (onSuccess: (data: HarnessResponse) => void, onError: (e: any) => void) => {
+  const init = (): Promise<HarnessResponse> => {
     // Filter the tests to ensure we have an accurate total test count
     const rootSuite = mocha.suite;
     if (rootSuite.hasOnly()) {
@@ -65,21 +64,14 @@ export const Runner = (params: UrlParams, callbacks: Callbacks, reporter: Report
     allTests.slice(0, params.offset).forEach(filterOmittedTests);
 
     // delay this ajax call until after the reporter status elements are in the page
-    $((): void => {
-      const keepAliveTimer = setInterval(() => {
-        callbacks.sendKeepAlive(params.session, noop, () => {
-          // if the server shuts down stop trying to send messages
-          clearInterval(keepAliveTimer);
-        });
-      }, KEEP_ALIVE_INTERVAL);
-
-      $.ajax({
-        url: 'harness',
-        dataType: 'json',
-        success: onSuccess,
-        error: onError,
+    const keepAliveTimer = setInterval(() => {
+      callbacks.sendKeepAlive(params.session).catch(() => {
+        // if the server shuts down stop trying to send messages
+        clearInterval(keepAliveTimer);
       });
-    });
+    }, KEEP_ALIVE_INTERVAL);
+
+    return callbacks.loadHarness();
   };
 
   const run = (chunk: number, retries: number, timeout: number, stopOnFailure: boolean): void => {
@@ -95,7 +87,8 @@ export const Runner = (params: UrlParams, callbacks: Callbacks, reporter: Report
     };
 
     // Setup the custom bedrock reporter
-    mocha.reporter(MochaReporter.create(reporter) as any, {
+    mocha.reporter(BedrockMochaReporter, {
+      reporter,
       numTests,
       onFailure: () => afterFail(retries, stopOnFailure),
       onPass: finishedTest,

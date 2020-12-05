@@ -16,7 +16,7 @@ const xcontext = mochaGlobals.xcontext;
 const it = mochaGlobals.it;
 const xit = mochaGlobals.xit;
 const specify = mochaGlobals.specify;
-const xspecify= mochaGlobals.xspecify;
+const xspecify = mochaGlobals.xspecify;
 
 export {
   before,

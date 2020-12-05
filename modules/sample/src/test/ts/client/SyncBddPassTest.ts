@@ -3,6 +3,7 @@ import { after, afterEach, assert, before, beforeEach, it } from '@ephox/bedrock
 describe('BDD Sync Pass', () => {
   describe('Test count', () => {
     let count = 0;
+    let retryCount = 0;
 
     before(() => {
       console.log('before');
@@ -19,22 +20,28 @@ describe('BDD Sync Pass', () => {
 
     afterEach(() => {
       console.log('after each');
+      count--;
     });
 
-    it('should be 1', () => {
+    it('should work with sync function', () => {
       assert.eq(1, count);
     });
 
-    it('should be 2', (done) => {
-      assert.eq(2, count);
+    it('should work with async done function', (done) => {
+      assert.eq(1, count);
       setTimeout(done, 100);
     });
 
-    it.skip('should be skipped 1', () => {
+    it('should work with retries', () => {
+      retryCount++;
+      assert.eq(3, retryCount);
+    }).retries(2);
+
+    it.skip('should be skipped with outer call', () => {
       assert.eq(-1, count);
     });
 
-    it('should be skipped 2', function () {
+    it('should be skipped with inner call', function () {
       this.skip();
       assert.eq(-1, count);
     });

@@ -36,7 +36,7 @@ export const normalizeError = (err: TestThrowable): TestError => {
 };
 
 const processLog = (logs: TestLogs): string[] => {
-  const outputToStr = function (numIndent: number, entries: TestLogEntry[]) {
+  const outputToStr = (numIndent: number, entries: TestLogEntry[]) => {
     let everything: string[] = [];
     let indentString = '';
     for (let i = 0; i < numIndent; i++) {

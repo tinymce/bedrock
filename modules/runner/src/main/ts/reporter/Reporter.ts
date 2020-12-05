@@ -1,13 +1,13 @@
 import { LoggedError, Reporter as ErrorReporter } from '@ephox/bedrock-common';
-import { Callbacks, onSuccessCallback } from './Callbacks';
+import { Callbacks } from './Callbacks';
 import { UrlParams } from '../core/UrlParams';
 import { formatElapsedTime } from '../core/Utils';
 
 export interface TestReporter {
-  readonly start: (onDone: onSuccessCallback) => void;
-  readonly pass: (onDone: onSuccessCallback) => void;
-  readonly skip: (reason: string, onDone: onSuccessCallback) => void;
-  readonly fail: (e: LoggedError.LoggedError, onDone: onSuccessCallback) => void;
+  readonly start: () => Promise<void>;
+  readonly pass: () => Promise<void>;
+  readonly skip: (reason: string) => Promise<void>;
+  readonly fail: (e: LoggedError.LoggedError) => Promise<void>;
 }
 
 export interface Reporter {
@@ -44,48 +44,62 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
 
   const test = (file: string, name: string, totalNumTests: number) => {
     let starttime: Date;
-    let reported: boolean;
+    let reported = false;
+    let started = false;
     const testUi = ui.test();
 
-    const start = (onDone: onSuccessCallback): void => {
+    const start = (): Promise<void> => {
       starttime = new Date();
-      currentCount++;
+      if (started) {
+        return Promise.resolve();
+      } else {
+        started = true;
+        currentCount++;
 
-      reported = false;
-      testUi.start(file, name);
-      callbacks.sendTestStart(params.session, totalNumTests, file, name, onDone, onDone);
+        testUi.start(file, name);
+        return callbacks.sendTestStart(params.session, totalNumTests, file, name);
+      }
     };
 
-    const pass = (onDone: onSuccessCallback): void => {
-      if (reported) return;
-      reported = true;
-      passCount++;
-      const testTime = elapsed(starttime);
+    const pass = (): Promise<void> => {
+      if (reported) {
+        return Promise.resolve();
+      } else {
+        reported = true;
+        passCount++;
+        const testTime = elapsed(starttime);
 
-      testUi.pass(testTime, currentCount);
-      callbacks.sendTestResult(params.session, file, name, true, testTime, null, null, onDone, onDone);
+        testUi.pass(testTime, currentCount);
+        return callbacks.sendTestResult(params.session, file, name, true, testTime, null, null);
+      }
     };
 
-    const skip = (reason: string, onDone: onSuccessCallback): void => {
-      if (reported) return;
-      reported = true;
-      skipCount++;
-      const testTime = elapsed(starttime);
+    const skip = (reason: string): Promise<void> => {
+      if (reported) {
+        return Promise.resolve();
+      } else {
+        reported = true;
+        skipCount++;
+        const testTime = elapsed(starttime);
 
-      testUi.skip(testTime, currentCount);
-      callbacks.sendTestResult(params.session, file, name, false, testTime, null, reason, onDone, onDone);
+        testUi.skip(testTime, currentCount);
+        return callbacks.sendTestResult(params.session, file, name, false, testTime, null, reason);
+      }
     };
 
-    const fail = (e: LoggedError.LoggedError, onDone: onSuccessCallback): void => {
-      if (reported) return;
-      reported = true;
-      failCount++;
+    const fail = (e: LoggedError.LoggedError): Promise<void> => {
+      if (reported) {
+        return Promise.resolve();
+      } else {
+        reported = true;
+        failCount++;
 
-      const textError = ErrorReporter.text(e);
-      const testTime = elapsed(starttime);
+        const textError = ErrorReporter.text(e);
+        const testTime = elapsed(starttime);
 
-      testUi.fail(e, testTime, currentCount);
-      callbacks.sendTestResult(params.session, file, name, false, testTime, textError, null, onDone, onDone);
+        testUi.fail(e, testTime, currentCount);
+        return callbacks.sendTestResult(params.session, file, name, false, testTime, textError, null);
+      }
     };
 
     return {
@@ -102,7 +116,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
       ui.done(totalTime);
     };
 
-    callbacks.sendDone(params.session, setAsDone, setAsDone);
+    callbacks.sendDone(params.session).then(setAsDone, setAsDone);
   };
 
   return {

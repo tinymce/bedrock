@@ -1,4 +1,5 @@
 import { Failure, Global, TestError } from '@ephox/bedrock-common';
+import Promise from '@ephox/wrap-promise-polyfill';
 import * as Register from './Register';
 import { AsyncFunc, Context, Done, ExclusiveTestFunction, Func, MochaGlobals, PendingTestFunction, Test, TestFunction } from 'mocha';
 
@@ -22,13 +23,13 @@ const wrapTestFn = <T extends Func | AsyncFunc>(testFn: T): T => {
   // Patch promise errors
   } else {
     const wrappedFunc = function (this: Context) {
-      // DefinitelyTyped mocha types are a little wrong, so lets cast to the actual type
+      // DefinitelyTyped mocha types are a little wrong for `Func`, so lets cast to the actual type
       const castTestFn = testFn as (this: Context) => (PromiseLike<any> | void);
       const result = castTestFn.call(this);
 
       if (result && typeof result.then === 'function') {
         return result.then((value) => value, (error) => {
-          throw Failure.prepFailure(error);
+          return Promise.reject(Failure.prepFailure(error));
         });
       } else {
         return result;

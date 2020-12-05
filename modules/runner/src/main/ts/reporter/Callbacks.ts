@@ -1,48 +1,63 @@
-import { noop } from '../core/Utils';
-
-export type onSuccessCallback = (data: any) => void;
-export type onErrorCallback = (err: any) => void;
+import { Global } from '@ephox/bedrock-common';
+import Promise from '@ephox/wrap-promise-polyfill';
+import { HarnessResponse } from '../core/ServerTypes';
 
 export interface Callbacks {
-  readonly sendKeepAlive: (session: string, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
-  readonly sendTestStart: (session: string, totalTests: number, file: string, name: string, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
-  readonly sendTestResult: (session: string, file: string, name: string, passed: boolean, time: string, error: string | null, skipped: string | null, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
-  readonly sendDone: (session: string, onSuccess: onSuccessCallback, onError: onErrorCallback) => void;
+  readonly loadHarness: () => Promise<HarnessResponse>
+  readonly sendKeepAlive: (session: string) => Promise<void>;
+  readonly sendTestStart: (session: string, totalTests: number, file: string, name: string) => Promise<void>;
+  readonly sendTestResult: (session: string, file: string, name: string, passed: boolean, time: string, error: string | null, skipped: string | null) => Promise<void>;
+  readonly sendDone: (session: string) => Promise<void>;
 }
 
 declare const $: JQueryStatic;
 
-const Global: any = window;
-
-const sendJson = (url: string, data: any, onSuccess: onSuccessCallback = noop, onError: onErrorCallback = noop): void => {
-  $.ajax({
-    method: 'post',
-    url,
-    dataType: 'json',
-    success: onSuccess,
-    error: onError,
-    data: JSON.stringify(data),
+const sendJson = <T>(url: string, data: any): Promise<T> => {
+  return new Promise((onSuccess, onError) => {
+    $.ajax({
+      method: 'post',
+      url,
+      dataType: 'json',
+      success: onSuccess,
+      error: onError,
+      data: JSON.stringify(data),
+    });
   });
 };
 
+const getJson = <T>(url: string): Promise<T> => {
+  return new Promise(((onSuccess, onError) => {
+    $.ajax({
+      url,
+      dataType: 'json',
+      success: onSuccess,
+      error: onError,
+    });
+  }));
+};
+
 export const Callbacks = (): Callbacks => {
-  const sendKeepAlive = (session: string, onSuccess: onSuccessCallback, onError: onErrorCallback): void => {
-    sendJson('/tests/alive', {
-      session,
-    }, onSuccess, onError);
+  const loadHarness = (): Promise<HarnessResponse> => {
+    return getJson('harness');
   };
 
-  const sendTestStart = (session: string, totalTests: number, file: string, name: string, onSuccess: onSuccessCallback, onError: onErrorCallback): void => {
-    sendJson('/tests/start', {
+  const sendKeepAlive = (session: string): Promise<void> => {
+    return sendJson('/tests/alive', {
+      session,
+    });
+  };
+
+  const sendTestStart = (session: string, totalTests: number, file: string, name: string): Promise<void> => {
+    return sendJson('/tests/start', {
       totalTests,
       session,
       file,
       name,
-    }, onSuccess, onError);
+    });
   };
 
-  const sendTestResult = (session: string, file: string, name: string, passed: boolean, time: string, error: string | null, skipped: string | null, onSuccess: onSuccessCallback, onError: onErrorCallback): void => {
-    sendJson('/tests/result', {
+  const sendTestResult = (session: string, file: string, name: string, passed: boolean, time: string, error: string | null, skipped: string | null): Promise<void> => {
+    return sendJson('/tests/result', {
       session,
       file,
       name,
@@ -50,20 +65,21 @@ export const Callbacks = (): Callbacks => {
       skipped,
       time,
       error,
-    }, onSuccess, onError);
+    });
   };
 
-  const sendDone = (session: string, onSuccess: onSuccessCallback, onError: onErrorCallback): void => {
+  const sendDone = (session: string): Promise<void> => {
     // webpack makes this available
     const getCoverage = (): Record<string, any> => typeof Global.__coverage__ === 'undefined' ? {} : Global.__coverage__;
 
-    sendJson('/tests/done', {
+    return sendJson('/tests/done', {
       session,
       coverage: getCoverage(),
-    }, onSuccess, onError);
+    });
   };
 
   return {
+    loadHarness,
     sendKeepAlive,
     sendTestStart,
     sendTestResult,

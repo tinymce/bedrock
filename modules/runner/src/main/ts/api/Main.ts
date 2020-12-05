@@ -22,7 +22,7 @@ const run = () => {
   const reporter = Reporter(params, callbacks, ui);
 
   const runner = Runner(params, callbacks, reporter, ui);
-  runner.init((data) => {
+  runner.init().then((data) => {
     if (data.mode === 'auto') {
       // Try to ensure the page has focus
       window.focus();
