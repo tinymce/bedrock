@@ -21,8 +21,10 @@ const defaultOptions: Partial<MochaReporterOptions> = {
   onFailure: noop
 };
 
-const isTestEqual = (test1?: Test, test2?: Test) => {
-  if (test1 === undefined || test2 === undefined) {
+const isTestEqual = (test1: Test | undefined, test2: Test | undefined) => {
+  if (test1 === test2) {
+    return true;
+  } else if (test1 === undefined || test2 === undefined) {
     return false;
   } else {
     return test1.parent === test2.parent
@@ -74,7 +76,7 @@ export class BedrockMochaReporter extends Mocha.reporters.Base {
     });
 
     const onTestStart = (test: Test) => {
-      if (!isTestEqual(currentTest, test)) {
+      if (!isTestEqual(test, currentTest)) {
         currentTest = test;
         const testTitle = test.titlePath().slice(0, -1).join(' / ') + ' ' + test.title;
         report = reporter.test(test.file || 'Unknown', testTitle, opts.numTests);
@@ -97,7 +99,7 @@ export class BedrockMochaReporter extends Mocha.reporters.Base {
     runner.on('pending', (test) => {
       // If the current test isn't the skipped test, then it means the test was immediately skipped
       // and hooks won't be run, so we need to lock and report the skipped test
-      if (!isTestEqual(currentTest, test)) {
+      if (!isTestEqual(test, currentTest)) {
         lock.execute(() => {
           onTestStart(test);
           return report.start().then(() => processResult(test));

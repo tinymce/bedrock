@@ -4,7 +4,7 @@ import * as LoggedError from '../../../main/ts/api/LoggedError';
 import * as Reporter from '../../../main/ts/api/Reporter';
 import { HtmlDiffAssertionError } from '../../../main/ts/api/TestError';
 
-function htmlAssertion(): HtmlDiffAssertionError {
+const htmlAssertion = (): HtmlDiffAssertionError => {
   const e: any = new Error('message"');
   e.diff = {
     expected: 'abc"hello"',
@@ -14,7 +14,7 @@ function htmlAssertion(): HtmlDiffAssertionError {
   e.label = '"label"1';
   e.name = 'HtmlAssertion';
   return e;
-}
+};
 
 const cleanStack = (message: string): string =>
   message.replace(/Stack:(\n|.)*/, 'Stack:\n');
