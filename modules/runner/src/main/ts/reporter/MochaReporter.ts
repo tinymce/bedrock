@@ -46,6 +46,7 @@ export class BedrockMochaReporter extends Mocha.reporters.Base {
     let currentTest: Test | undefined;
     let lastError: LoggedError | undefined;
     let report: TestReporter;
+    let aborted = false;
 
     const processResult = (test?: Test): Promise<void> => {
       if (!test || test.isFailed()) {
@@ -105,7 +106,13 @@ export class BedrockMochaReporter extends Mocha.reporters.Base {
     });
 
     runner.on('end', () => {
-      locker.execute(reporter.done);
+      if (!aborted) {
+        locker.execute(reporter.done);
+      }
+    });
+
+    runner.on('abort', () => {
+      aborted = true;
     });
   }
 

@@ -81,6 +81,7 @@ export const Runner = (params: UrlParams, callbacks: Callbacks, reporter: Report
     const finishedTest = () => {
       // Reload the page if we've hit the chunking limit
       if (count++ >= chunk) {
+        runner.emit('abort');
         runner.abort();
         loadNextChunk(chunk);
       }
