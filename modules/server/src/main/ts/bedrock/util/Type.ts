@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-const typeOf = (x: any): string =>  {
+const typeOf = (x: any): string => {
   if (x === null) {
     return 'null';
   }

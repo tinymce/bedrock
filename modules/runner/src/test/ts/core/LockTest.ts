@@ -1,22 +1,22 @@
 import Promise from '@ephox/wrap-promise-polyfill';
 import { assert } from 'chai';
 import { describe, it } from 'mocha';
-import { ResourceLocker } from '../../../main/ts/core/ResourceLocker';
+import { Lock } from '../../../main/ts/core/Lock';
 
-describe('ResourceLocker.execute', () => {
-  let locker: ResourceLocker;
+describe('Lock.execute', () => {
+  let lock: Lock;
 
   beforeEach(() => {
-    locker = ResourceLocker();
+    lock = Lock();
   });
 
   it('should execute in order - sync', () => {
     const calls: string[] = [];
-    locker.execute(() => calls.push('1'));
-    locker.execute(() => calls.push('2'));
-    locker.execute(() => calls.push('3'));
+    lock.execute(() => calls.push('1'));
+    lock.execute(() => calls.push('2'));
+    lock.execute(() => calls.push('3'));
 
-    return locker.execute(() => {
+    return lock.execute(() => {
       assert.sameOrderedMembers(calls, [ '1', '2', '3' ]);
     });
   });
@@ -30,11 +30,11 @@ describe('ResourceLocker.execute', () => {
       }, timeout);
     });
 
-    locker.execute(() => delayedCall('1', 100));
-    locker.execute(() => delayedCall('2', 50));
-    locker.execute(() => delayedCall('3', 0));
+    lock.execute(() => delayedCall('1', 100));
+    lock.execute(() => delayedCall('2', 50));
+    lock.execute(() => delayedCall('3', 0));
 
-    return locker.execute(() => {
+    return lock.execute(() => {
       assert.sameOrderedMembers(calls, [ '1', '2', '3' ]);
     });
   }).slow(200);
@@ -48,12 +48,12 @@ describe('ResourceLocker.execute', () => {
       }, timeout);
     });
 
-    locker.execute(() => delayedCall('1', 50));
-    locker.execute(() => calls.push('2'));
-    locker.execute(() => delayedCall('3', 25));
-    locker.execute(() => calls.push('4'));
+    lock.execute(() => delayedCall('1', 50));
+    lock.execute(() => calls.push('2'));
+    lock.execute(() => delayedCall('3', 25));
+    lock.execute(() => calls.push('4'));
 
-    return locker.execute(() => {
+    return lock.execute(() => {
       assert.sameOrderedMembers(calls, [ '1', '2', '3', '4' ]);
     });
   }).slow(100);

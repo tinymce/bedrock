@@ -1,26 +1,38 @@
 module.exports = {
-  parser:  '@typescript-eslint/parser',
+  root: true,
+  parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint'],
-  extends:  [
+  extends: [
     'plugin:@typescript-eslint/recommended'
   ],
   parserOptions: {
     sourceType: 'module'
   },
   rules: {
-    'curly': ['error', 'multi-line'],
-    'object-curly-spacing': 'off',
-    'array-bracket-spacing': 'off',
-    'space-before-function-paren': 'off',
-    'no-trailing-spaces': 'off',
-    'indent': ['error', 2],
-    'max-len': 'off',
-    'no-prototype-builtins': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-unused-vars': [ 'warn', {
+      vars: 'all',
+      args: 'after-used',
+      ignoreRestSiblings: true,
+      argsIgnorePattern: '^_'
+    }],
+    '@typescript-eslint/no-use-before-define': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': [ 'error', { 'allowArgumentsExplicitlyTypedAsAny': true } ],
+
+    'arrow-spacing': 'error',
+    'no-multi-spaces': [ 'error', { ignoreEOLComments: true }],
+    'no-multiple-empty-lines': [ 'error', { 'max': 1 } ],
     'object-shorthand': 'error',
     'quotes': [ 'error', 'single', { 'allowTemplateLiterals': true } ],
-    'semi': 'error'
+    'space-before-function-paren': [ 'error', { anonymous: 'always', named: 'never' } ],
+    'semi': 'error',
+    'spaced-comment': 'error',
+    'space-infix-ops': 'error',
+    'space-unary-ops': 'error',
+    'space-before-blocks': 'error',
   },
   env: {
-    node: true
+    browser: true,
   }
 };

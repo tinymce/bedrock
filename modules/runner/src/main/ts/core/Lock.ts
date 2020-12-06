@@ -1,10 +1,10 @@
 import Promise from '@ephox/wrap-promise-polyfill';
 
-export interface ResourceLocker {
+export interface Lock {
   readonly execute: <T>(fn: () => PromiseLike<T> | T) => PromiseLike<T>;
 }
 
-export const ResourceLocker = (): ResourceLocker => {
+export const Lock = (): Lock => {
   const queue: Array<() => void> = [];
   let locked = false;
 

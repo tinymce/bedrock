@@ -53,7 +53,7 @@ export const create = (testfiles: string[], loglevel: 'simple' | 'advanced'): Hu
     return Promise.resolve();
   };
 
-  const basicUpdate = (data: ResultData) => {
+  const basicUpdate = (_data: ResultData) => {
     stream.write('.');
     return Promise.resolve();
   };

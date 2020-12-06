@@ -6,6 +6,7 @@ import { beforeEach, describe, it } from 'mocha';
 import { UrlParams } from '../../../main/ts/core/UrlParams';
 import { Callbacks } from '../../../main/ts/reporter/Callbacks';
 import { Reporter } from '../../../main/ts/reporter/Reporter';
+import { noop } from '../TestUtils';
 
 interface StartTestData {
   readonly session: string;
@@ -33,7 +34,6 @@ const params: UrlParams = {
   retry: 0
 };
 
-const noop = () => {};
 const ui = {
   test: () => ({
     start: noop,

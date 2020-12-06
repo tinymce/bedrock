@@ -2,15 +2,15 @@ import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { describe, it, Suite, Test } from 'mocha';
 import * as Utils from '../../../main/ts/runner/Utils';
-import { range } from '../TestUtils';
+import { noop, range } from '../TestUtils';
 
 const setupTestSuite = (numRoot: number, numChild1: number, numChild2: number) => {
   const root = new Suite('root');
   const child1 = new Suite('child 1');
   const child2 = new Suite('child 2');
-  const rootTests = range(numRoot, (i) => new Test(`test ${i}`, () => {}));
-  const child1Tests = range(numChild1, (i) => new Test(`child 1 test ${i}`, () => {}));
-  const child2Tests = range(numChild2, (i) => new Test(`child 2 test ${i}`, () => {}));
+  const rootTests = range(numRoot, (i) => new Test(`test ${i}`, noop));
+  const child1Tests = range(numChild1, (i) => new Test(`child 1 test ${i}`, noop));
+  const child2Tests = range(numChild2, (i) => new Test(`child 2 test ${i}`, noop));
 
   root.addSuite(child1);
   child1.addSuite(child2);
@@ -30,7 +30,7 @@ const setupTestSuite = (numRoot: number, numChild1: number, numChild2: number) =
 
 describe('Utils.isTest', () => {
   it('should be true for tests', () => {
-    const test = new Test('test', () => {});
+    const test = new Test('test', noop);
     assert.isTrue(Utils.isTest(test));
   });
 

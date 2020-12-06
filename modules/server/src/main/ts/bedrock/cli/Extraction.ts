@@ -37,8 +37,11 @@ export const any = <E, A> (name: string, value: A): Attempt<E, A> => {
 
 export const directory = (name: string, value: string): Attempt<string[], string> => {
   try {
-    if (! fs.lstatSync(value).isDirectory()) return Attempt.failed(['[' + value + '] is not a directory']);
-    return Attempt.passed(value);
+    if (!fs.lstatSync(value).isDirectory()) {
+      return Attempt.failed(['[' + value + '] is not a directory']);
+    } else {
+      return Attempt.passed(value);
+    }
   } catch (err) {
     return Attempt.failed(['[' + value + '] is not a directory']);
   }

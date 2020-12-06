@@ -33,7 +33,7 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
   // effects before driver.get has returned properly, it throws "UnsupportedOperationErrors"
   // This code is designed to allow the driver.get promise launched in bedrock-auto to
   // let the server known when it is able to use driver when responding to effect ajax calls.
-  const waitForDriverReady = <T>(attempts: number, f: () => Promise<void>): Promise<void> => {
+  const waitForDriverReady = (attempts: number, f: () => Promise<void>): Promise<void> => {
     if (pageHasLoaded && master !== null) return master.waitForIdle(f, 'effect');
     else if (attempts === 0) return Promise.reject('Driver never appeared to be ready');
     else {

@@ -62,7 +62,21 @@ const addTest = (testFilePath: string) => {
   }
 };
 
+const importErrorHandler = (event: any) => { 
+  ${useRequire ? 'const UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
+  UnitTest.test('Error', () => {
+    if (event.error) {
+      throw event.error;
+    } else {
+      throw new Error(event.message);
+    }
+  });
+  addTest(__currentTestFile);
+};
+
+window.addEventListener('error', importErrorHandler);
 ${imports}
+window.removeEventListener('error', importErrorHandler);
 
 export {};`;
 };
@@ -96,7 +110,21 @@ var addTest = function (testFilePath) {
   }
 };
 
+var importErrorHandler = function (event) {
+  ${useRequire ? 'var UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
+  UnitTest.test('Error', function () {
+    if (event.error) {
+      throw event.error;
+    } else {
+      throw new Error(event.message);
+    }
+  });
+  addTest(__currentTestFile);
+};
+
+window.addEventListener('error', importErrorHandler);
 ${imports}
+window.removeEventListener('error', importErrorHandler);
 
 export {};`;
 };

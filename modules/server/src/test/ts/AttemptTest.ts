@@ -117,10 +117,9 @@ describe('Attempt.concat', () => {
         return rest.concat(current);
       }, []);
 
-
       return Attempt.cata(result,
         (errs) => deepEqual(errs, failedErrors),
-        (v) => deepEqual([], failed));
+        () => deepEqual([], failed));
     }));
   });
 });

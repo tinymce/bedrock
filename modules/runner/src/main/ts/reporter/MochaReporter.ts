@@ -1,7 +1,7 @@
 import { LoggedError } from '@ephox/bedrock-common';
 import Promise from '@ephox/wrap-promise-polyfill';
 import { Context, MochaOptions, Runner as MochaRunner, Test } from 'mocha';
-import { ResourceLocker } from '../core/ResourceLocker';
+import { Lock } from '../core/Lock';
 import { noop } from '../core/Utils';
 import { Reporter, TestReporter } from './Reporter';
 
@@ -33,7 +33,7 @@ const isTestEqual = (test1?: Test, test2?: Test) => {
 };
 
 export class BedrockMochaReporter extends Mocha.reporters.Base {
-  constructor (runner: MochaRunner, options: MochaOptions) {
+  constructor(runner: MochaRunner, options: MochaOptions) {
     super(runner, options);
 
     const opts: MochaReporterOptions = {
@@ -42,7 +42,7 @@ export class BedrockMochaReporter extends Mocha.reporters.Base {
     };
     const reporter = opts.reporter;
 
-    const locker = ResourceLocker();
+    const lock = Lock();
     let currentTest: Test | undefined;
     let lastError: LoggedError | undefined;
     let report: TestReporter;
@@ -64,12 +64,12 @@ export class BedrockMochaReporter extends Mocha.reporters.Base {
 
     // Setup root hooks, as for the reporter we need the start/pass/fail to be async meaning we can't use events
     mocha.rootHooks({
-      beforeEach () {
-        return locker.execute(() => report.start());
+      beforeEach() {
+        return lock.execute(() => report.start());
       },
-      afterEach (this: Context) {
+      afterEach(this: Context) {
         const test = this.currentTest;
-        return locker.execute(() => processResult(test));
+        return lock.execute(() => processResult(test));
       }
     });
 
@@ -83,7 +83,7 @@ export class BedrockMochaReporter extends Mocha.reporters.Base {
 
     // Setup the various runner events to report on
     runner.on('test', (test) => {
-      locker.execute(() => onTestStart(test));
+      lock.execute(() => onTestStart(test));
     });
 
     // Listen to the failure event so that we can get the error
@@ -98,7 +98,7 @@ export class BedrockMochaReporter extends Mocha.reporters.Base {
       // If the current test isn't the skipped test, then it means the test was immediately skipped
       // and hooks won't be run, so we need to lock and report the skipped test
       if (!isTestEqual(currentTest, test)) {
-        locker.execute(() => {
+        lock.execute(() => {
           onTestStart(test);
           return report.start().then(() => processResult(test));
         });
@@ -107,7 +107,7 @@ export class BedrockMochaReporter extends Mocha.reporters.Base {
 
     runner.on('end', () => {
       if (!aborted) {
-        locker.execute(reporter.done);
+        lock.execute(reporter.done);
       }
     });
 
@@ -116,5 +116,7 @@ export class BedrockMochaReporter extends Mocha.reporters.Base {
     });
   }
 
-  public epilogue (): void {}
+  public epilogue(): void {
+    // Do nothing
+  }
 }
