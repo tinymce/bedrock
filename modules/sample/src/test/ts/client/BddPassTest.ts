@@ -1,6 +1,6 @@
 import { after, afterEach, assert, before, beforeEach, it } from '@ephox/bedrock-client';
 
-describe('BDD Sync Pass', () => {
+describe('BDD Pass', () => {
   describe('Test count', () => {
     let count = 0;
     let retryCount = 0;
@@ -38,12 +38,12 @@ describe('BDD Sync Pass', () => {
     }).retries(2);
 
     it.skip('should be skipped with outer call', () => {
-      assert.eq(-1, count);
+      throw new Error('This should never run');
     });
 
     it('should be skipped with inner call', function () {
       this.skip();
-      assert.eq(-1, count);
+      throw new Error('This should never run');
     });
   });
 });

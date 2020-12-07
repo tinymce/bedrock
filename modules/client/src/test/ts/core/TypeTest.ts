@@ -10,6 +10,12 @@ describe('Type.typeOf', () => {
     }));
   });
 
+  it('is "number" for numbers', () => {
+    fc.assert(fc.property(fc.float(), (num) => {
+      assert.equal(Type.typeOf(num), 'number');
+    }));
+  });
+
   it('is "array" for arrays', () => {
     fc.assert(fc.property(fc.array(fc.anything()), (arr) => {
       assert.equal(Type.typeOf(arr), 'array');
@@ -26,5 +32,13 @@ describe('Type.typeOf', () => {
     fc.assert(fc.property(fc.object(), (obj) => {
       assert.equal(Type.typeOf(obj), 'object');
     }));
+  });
+
+  it('is "null" for null', () => {
+    assert.equal(Type.typeOf(null), 'null');
+  });
+
+  it('is "undefined" for undefined', () => {
+    assert.equal(Type.typeOf(undefined), 'undefined');
   });
 });
