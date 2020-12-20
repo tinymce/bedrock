@@ -1,11 +1,11 @@
-import { Callbacks } from '../reporter/Callbacks';
-import { Reporter } from '../reporter/Reporter';
-import { BedrockMochaReporter } from '../reporter/MochaReporter';
-import { Actions } from '../ui/Actions';
-import { Ui } from '../ui/Ui';
 import { HarnessResponse } from '../core/ServerTypes';
 import { UrlParams } from '../core/UrlParams';
-import { getTests, filterOmittedTests } from './Utils';
+import { Callbacks } from '../reporter/Callbacks';
+import { BedrockMochaReporter } from '../reporter/MochaReporter';
+import { Reporter } from '../reporter/Reporter';
+import { Actions } from '../ui/Actions';
+import { Ui } from '../ui/Ui';
+import { filterOmittedTests, getSuites, getTests } from './Utils';
 
 export interface Runner {
   readonly init: () => Promise<HarnessResponse>;
@@ -96,6 +96,16 @@ export const Runner = (params: UrlParams, callbacks: Callbacks, reporter: Report
       onSkip: finishedTest
     });
 
+    // Loop over each suite and setup the bedrock timeout/bail settings
+    // Note: We can't use the "suite" start event, as the bail check is done in mocha before the event is fired
+    const rootSuite = mocha.suite;
+    const suites = [ rootSuite ].concat(getSuites(rootSuite));
+    suites.forEach((suite) => {
+      suite.bail(stopOnFailure);
+      // Disable timeouts for suites
+      suite.timeout(0);
+    });
+
     // Start running the tests
     // Note: The tests actually run in the next event loop
     const runner = mocha.run((failures) => {
@@ -105,12 +115,6 @@ export const Runner = (params: UrlParams, callbacks: Callbacks, reporter: Report
       }
     });
 
-    // Setup the bedrock settings for each suite
-    runner.on('suite', (suite) => {
-      suite.bail(stopOnFailure);
-      // Disable timeouts for suites
-      suite.timeout(0);
-    });
     // Setup the bedrock settings for each test
     runner.on('test', (test) => {
       // 2000 is a hardcoded value. See https://github.com/mochajs/mocha/blob/master/lib/runnable.js#L34

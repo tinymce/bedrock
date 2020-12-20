@@ -15,8 +15,8 @@ const setupTestSuite = (numRoot: number, numChild1: number, numChild2: number) =
   root.addSuite(child1);
   child1.addSuite(child2);
   rootTests.forEach((test) => root.addTest(test));
-  child2Tests.forEach((test) => child2.addTest(test));
   child1Tests.forEach((test) => child1.addTest(test));
+  child2Tests.forEach((test) => child2.addTest(test));
 
   return {
     root,
@@ -57,6 +57,24 @@ describe('Utils.getTests', () => {
       assert.lengthOf(result3, numChild2, 'number of tests from child suite 2');
       assert.sameOrderedMembers(result3, child2Tests, 'tests from child suite 2');
     }));
+  }).slow(150);
+});
+
+describe('Utils.getSuites', () => {
+  it('should find nested suites, while ensuring the run order is maintained', () => {
+    const { root, child1, child2 } = setupTestSuite(1, 1, 1);
+
+    const result1 = Utils.getSuites(root);
+    assert.lengthOf(result1, 2, 'number of suites from root suite');
+    assert.sameOrderedMembers(result1, [ child1, child2 ], 'suites from root suite');
+
+    const result2 = Utils.getSuites(child1);
+    assert.lengthOf(result2, 1, 'number of suites from child suite 1');
+    assert.sameOrderedMembers(result2, [ child2 ], 'suites from child suite 1');
+
+    const result3 = Utils.getSuites(child2);
+    assert.lengthOf(result3, 0, 'number of suites from child suite 2');
+    assert.sameOrderedMembers(result3, [], 'suites from child suite 2');
   }).slow(150);
 });
 

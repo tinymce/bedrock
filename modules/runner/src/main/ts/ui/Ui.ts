@@ -15,19 +15,21 @@ declare const $: JQueryStatic;
 
 export const Ui = (container: JQuery<HTMLElement>): Ui => {
   let stopOnFailure = false;
+  let ui: JQuery<HTMLElement>;
   let current: JQuery<HTMLElement>;
   let restartBtn: JQuery<HTMLElement>;
   let retryBtn: JQuery<HTMLElement>;
   let skipBtn: JQuery<HTMLElement>;
 
   const render = (offset: number, totalNumTests: number, onRestart: () => void, onRetry: () => void, onSkip: () => void) => {
+    ui = $('<div></div>');
     current = $('<span />').addClass('progress').text(offset);
     restartBtn = $('<button />').text('Restart').on('click', onRestart);
     retryBtn = $('<button />').text('Retry').on('click', onRetry).hide();
     skipBtn = $('<button />').text('Skip').on('click', onSkip).hide();
 
-    container
-      .append($('<div />')
+    ui.append(
+      $('<div />')
         .append($('<span />').text('Suite progress: '))
         .append(current)
         .append($('<span />').text('/'))
@@ -38,11 +40,12 @@ export const Ui = (container: JQuery<HTMLElement>): Ui => {
         .append(retryBtn)
         .append('&nbsp;&nbsp;&nbsp;')
         .append(skipBtn)
-      );
+    );
+    container.append(ui);
   };
 
   const done = (totalTime: string) => {
-    container.append('<div class="done">Test run completed in <span class="time">' + totalTime + '</span></div>');
+    ui.append('<div class="done">Test run completed in <span class="time">' + totalTime + '</span></div>');
     $('.passed.hidden,.skipped.hidden').removeClass('hidden');
   };
 
@@ -63,7 +66,7 @@ export const Ui = (container: JQuery<HTMLElement>): Ui => {
       time = $('<span />').addClass('time');
       output.append(marker, ' ', nameSpan, ' [', time, '] ', errorContainer, ' ', testfile);
       el.append(output);
-      container.append(el);
+      ui.append(el);
     };
 
     const pass = (testTime: string, currentCount: number) => {
@@ -108,7 +111,7 @@ export const Ui = (container: JQuery<HTMLElement>): Ui => {
   };
 
   const error = (e: any) => {
-    container.append('<div class="failed done">ajax error: ' + JSON.stringify(e) + '</div>');
+    ui.append('<div class="failed done">ajax error: ' + JSON.stringify(e) + '</div>');
   };
 
   const setStopOnFailure = (flag: boolean): void => {

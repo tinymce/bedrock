@@ -10,6 +10,12 @@ export const getTests = (suite: Suite): Test[] => {
   }, []));
 };
 
+export const getSuites = (suite: Suite): Suite[] => {
+  return suite.suites.concat(suite.suites.reduce<Suite[]>((acc, child) => {
+    return acc.concat(getSuites(child));
+  }, []));
+};
+
 export const filterOmittedTests = (testOrSuite: Test | Suite): void => {
   const parent = testOrSuite.parent;
   if (parent !== undefined) {
