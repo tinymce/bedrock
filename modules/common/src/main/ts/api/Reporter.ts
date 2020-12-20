@@ -58,37 +58,55 @@ HTML Diff: ${e.diff.comparison}`;
 const pprintAssertionErrorHtml = (e: PprintAssertionError): string => {
   const dh = Differ.diffPrettyHtml(e.diff.actual, e.diff.expected);
   return `Test failure: ${htmlentities(e.message)}
-Expected: 
+Expected:
 ${htmlentities(e.diff.expected)}
-Actual: 
+Actual:
 ${htmlentities(e.diff.actual)}
-Diff: 
+Diff:
 ${dh}`;
 };
 
 export const pprintAssertionText = (e: PprintAssertionError): string => {
   const dh = Differ.diffPrettyText(e.diff.actual, e.diff.expected);
   return `Test failure: ${e.message}
-Expected: 
+Expected:
 ${e.diff.expected}
-Actual: 
+Actual:
 ${e.diff.actual}
-Diff: 
+Diff:
 ${dh}`;
 };
 
 const assertionErrorHtml = (e: AssertionError) => {
-// TODO: make this look more like the PprintAssertionError
-  return 'Assertion error' + (e.message ? ' [' + htmlentities(e.message) + ']' : '') +
-    ': [' + htmlentities(JSON.stringify(e.expected)) + '] ' + e.operator +
-    ' [' + htmlentities(JSON.stringify(e.actual)) + ']';
+  const message = `Assertion error: ${e.message ? htmlentities(e.message) : ''}
+Expected:
+${htmlentities(e.expected)}
+Actual:
+${htmlentities(e.actual)}`;
+  if (e.showDiff) {
+    const dh = Differ.diffPrettyHtml(e.actual, e.expected);
+    return `${message}
+Diff:
+${dh}`;
+  } else {
+    return message;
+  }
 };
 
 const assertionErrorText = (e: AssertionError): string => {
-// TODO: make this look more like the PprintAssertionError
-  return 'Assertion error' + (e.message ? ' [' + e.message + ']' : '') +
-    ': [' + (JSON.stringify(e.expected)) + '] ' + e.operator +
-    ' [' + (JSON.stringify(e.actual)) + ']';
+  const message = `Assertion error: ${e.message ? e.message : ''}
+Expected:
+${e.expected}
+Actual:
+${e.actual}`;
+  if (e.showDiff) {
+    const dh = Differ.diffPrettyText(e.actual, e.expected);
+    return `${message}
+Diff:
+${dh}`;
+  } else {
+    return message;
+  }
 };
 
 const mkHtml = (e: TestError): string => {

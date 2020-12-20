@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import { describe, it } from 'mocha';
 import * as LoggedError from '../../../main/ts/api/LoggedError';
 import * as Reporter from '../../../main/ts/api/Reporter';
-import { HtmlDiffAssertionError } from '../../../main/ts/api/TestError';
+import { AssertionError, HtmlDiffAssertionError } from '../../../main/ts/api/TestError';
 
 const htmlAssertion = (): HtmlDiffAssertionError => {
   const e: any = new Error('message"');
@@ -13,6 +13,16 @@ const htmlAssertion = (): HtmlDiffAssertionError => {
   };
   e.label = '"label"1';
   e.name = 'HtmlAssertion';
+  return e;
+};
+
+const assertion = (): AssertionError => {
+  const e: any = new Error('message"');
+  e.expected = 'abc"hello"';
+  e.actual = 'ab"hello"';
+  e.showDiff = true;
+  e.label = '"label"1';
+  e.name = 'AssertionError';
   return e;
 };
 
@@ -93,4 +103,23 @@ describe('Reporter', () => {
     }
   });
 
+  it('Reports thrown AssertionError errors as html', () => {
+    try {
+      // noinspection ExceptionCaughtLocallyJS
+      throw assertion();
+    } catch (e) {
+      const actual = Reporter.html(LoggedError.loggedError(e, []));
+      const expected =
+        'Assertion error: message&quot;\n' +
+        'Expected:\n' +
+        'abc&quot;hello&quot;\n' +
+        'Actual:\n' +
+        'ab&quot;hello&quot;\n' +
+        'Diff:\n' +
+        '<del style="background:#ffe6e6;">ab&quot;hello&quot;</del><br /><ins style="background:#e6ffe6;">abc&quot;hello&quot;</ins><br />\n' +
+        '\n' +
+        'Stack:\n';
+      assert.deepEqual(cleanStack(actual), expected, 'Error message');
+    }
+  });
 });
