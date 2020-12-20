@@ -64,7 +64,7 @@ describe('Reporter', () => {
       const actual = Reporter.html(LoggedError.loggedError(e, []));
       // NOTE: the <ins> and <del> are supposed to remain
       const expected =
-        'Test failure: message"\n' +
+        'Test failure: message&quot;\n' +
         'Expected: abc&quot;hello&quot;\n' +
         'Actual: ab&quot;hello&quot;\n' +
         '\n' +

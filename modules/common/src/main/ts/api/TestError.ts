@@ -8,6 +8,7 @@ export interface AssertionError extends JsError {
   expected: string;
   actual: string;
   operator: string;
+  showDiff: boolean;
 }
 
 export interface HtmlDiffAssertionError extends JsError {
@@ -50,3 +51,4 @@ export const isHTMLDiffError = (err: TestError): err is HtmlDiffAssertionError =
 
 export const isAssertionError = (err: TestError): err is AssertionError =>
   err.name === 'AssertionError';
+

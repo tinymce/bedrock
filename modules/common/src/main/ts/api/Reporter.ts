@@ -38,7 +38,7 @@ const formatExtra = (e: LoggedError): string => {
 };
 
 const htmlDiffAssertionErrorHtml = (e: HtmlDiffAssertionError): string => {
-  return `Test failure: ${e.message}
+  return `Test failure: ${htmlentities(e.message)}
 Expected: ${htmlentities(e.diff.expected)}
 Actual: ${htmlentities(e.diff.actual)}
 
@@ -57,7 +57,7 @@ HTML Diff: ${e.diff.comparison}`;
 
 const pprintAssertionErrorHtml = (e: PprintAssertionError): string => {
   const dh = Differ.diffPrettyHtml(e.diff.actual, e.diff.expected);
-  return `Test failure: ${e.message}
+  return `Test failure: ${htmlentities(e.message)}
 Expected: 
 ${htmlentities(e.diff.expected)}
 Actual: 
@@ -79,7 +79,7 @@ ${dh}`;
 
 const assertionErrorHtml = (e: AssertionError) => {
 // TODO: make this look more like the PprintAssertionError
-  return 'Assertion error' + (e.message ? ' [' + e.message + ']' : '') +
+  return 'Assertion error' + (e.message ? ' [' + htmlentities(e.message) + ']' : '') +
     ': [' + htmlentities(JSON.stringify(e.expected)) + '] ' + e.operator +
     ' [' + htmlentities(JSON.stringify(e.actual)) + ']';
 };
