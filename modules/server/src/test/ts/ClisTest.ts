@@ -53,6 +53,7 @@ describe('cli', () => {
       version: false,
       chunk: 100,
       retries: 0,
+      polyfills: [ 'Symbol' ],
       useSandboxForHeadless: false,
       skipResetMousePosition: false,
       wipeBrowserCache: false
@@ -88,7 +89,8 @@ describe('cli', () => {
       overallTimeout: 600000,
       loglevel: 'advanced',
       version: false,
-      chunk: 100
+      chunk: 100,
+      polyfills: [ 'Symbol' ]
     }, Attempt.map(actual, exclude(['projectdir', 'basedir'])));
   });
 });

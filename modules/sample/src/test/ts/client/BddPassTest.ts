@@ -32,6 +32,13 @@ describe('BDD Pass', () => {
       setTimeout(done, 100);
     });
 
+    it('should work with async Promise function', async () => {
+      assert.eq(1, count);
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100);
+      });
+    });
+
     it('should work with retries', () => {
       retryCount++;
       assert.eq(3, retryCount);

@@ -11,7 +11,8 @@ interface PackageJson {
   readonly workspaces: string[];
 }
 
-export const generate = (mode: string, projectdir: string, basedir: string, configFile: string, bundler: 'webpack' | 'rollup', testfiles: string[], chunk: number, retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[]): Promise<Routes.Runner> => {
+export const generate = (mode: string, projectdir: string, basedir: string, configFile: string, bundler: 'webpack' | 'rollup', testfiles: string[], chunk: number,
+                         retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[], polyfills: string[]): Promise<Routes.Runner> => {
   const files = testfiles.map((filePath) => {
     return path.relative(projectdir, filePath);
   });
@@ -22,7 +23,8 @@ export const generate = (mode: string, projectdir: string, basedir: string, conf
     basedir,
     mode === 'auto',
     files,
-    coverage
+    coverage,
+    polyfills
   );
 
   // read the project json file to determine the project name to expose resources as `/project/${name}`

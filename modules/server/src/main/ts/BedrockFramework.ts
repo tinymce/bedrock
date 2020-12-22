@@ -30,7 +30,7 @@ export const go = (settings: BedrockFrameworkSettings): void => {
       master,
       runner,
       loglevel: settings.loglevel,
-      customRoutes: settings.customRoutes,
+      customRoutes: undefined,
       stickyFirstSession: true,
       overallTimeout: settings.overallTimeout,
       singleTimeout: settings.singleTimeout,

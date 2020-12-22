@@ -4,6 +4,7 @@ Version 10.0.0
 * Added support for retries and timeouts per test for mocha compatibility.
 * Added support for skipping tests.
 * Added support for "only" tests.
+* Added the `--polyfills` command line parameter which allows including core-js polyfills as part of the test run.
 
 Version 9.7.1
 

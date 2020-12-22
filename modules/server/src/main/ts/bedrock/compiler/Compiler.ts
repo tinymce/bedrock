@@ -5,7 +5,7 @@ export interface Compiler {
   readonly generate: () => Promise<Buffer | string>;
 }
 
-export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, files: string[], coverage: string[]): Compiler => {
+export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, files: string[], coverage: string[], polyfills: string[]): Compiler => {
   const getCompileFunc = () => {
     return Webpack.compile;
   };
@@ -18,7 +18,8 @@ export const compile = (tsConfigFile: string, scratchDir: string, basedir: strin
       basedir,
       exitOnCompileError,
       files,
-      coverage
+      coverage,
+      polyfills
     ).then((compiledJsFilePath) => fs.readFileSync(compiledJsFilePath));
   };
 
