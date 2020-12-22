@@ -78,7 +78,8 @@ export class BedrockMochaReporter extends Mocha.reporters.Base {
     const onTestStart = (test: Test) => {
       if (!isTestEqual(test, currentTest)) {
         currentTest = test;
-        const testTitle = test.titlePath().slice(0, -1).join(' / ') + ' - ' + test.title;
+        const parentTitle = test.titlePath().slice(0, -1).join(' / ');
+        const testTitle = parentTitle.length > 0 ? `${parentTitle} - ${test.title}` : test.title;
         report = reporter.test(test.file || 'Unknown', testTitle, opts.numTests);
       }
     };
