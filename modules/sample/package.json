@@ -5,11 +5,12 @@
   "license": "Apache-2.0",
   "scripts": {
     "test-samples-pass": "../server/bin/bedrock-auto.js -b phantomjs --config tsconfig.json --files src/test/ts/**/*PassTest.ts src/test/ts/**/*PassTest.tsx",
+    "test-samples-only": "../server/bin/bedrock-auto.js -b phantomjs --config tsconfig.json --files src/test/ts/**/*OnlyTest.ts",
     "test-samples-pass-js": "../server/bin/bedrock-auto.js -b phantomjs --files src/test/js/**/*PassTest.js",
     "test-samples-pass-manual": "../server/bin/bedrock.js --config tsconfig.json --files src/test/ts/**/*PassTest.ts src/test/ts/**/*PassTest.tsx",
     "test-samples-pass-manual-js": "../server/bin/bedrock.js --files src/test/js/**/*PassTest.js",
     "test-samples-fail": "../server/bin/bedrock-auto.js -b phantomjs --config tsconfig.json --files src/test/ts/**/*FailTest.ts",
-    "test": "yarn test-samples-pass && yarn test-samples-pass-js"
+    "test": "yarn test-samples-pass && yarn test-samples-only && yarn test-samples-pass-js"
   },
   "dependencies": {
     "@ephox/bedrock-client": "^9.6.1",

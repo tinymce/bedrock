@@ -22,12 +22,12 @@ addTest("${filePath}");`;
   };
 };
 
-const generatePolyfills = (useRequire: boolean): string[] => {
+const generatePolyfills = (useRequire: boolean): string => {
   // For IE support we need to load some polyfills
-  const loadPolyfill = `if (window['Symbol'] === undefined) {
+  const symbolPolyfill = `if (window['Symbol'] === undefined) {
   ${useRequire ? 'window.Symbol = require(\'core-js/es/symbol\');' : 'import \'core-js/es/symbol\';'}
 }`;
-  return [ loadPolyfill ];
+  return [ symbolPolyfill ].join('\n');
 };
 
 const generateImportsTs = (useRequire: boolean, scratchFile: string, srcFiles: string[]) => {
@@ -39,16 +39,16 @@ declare let require: any;
 declare let __tests: any;
 declare let console: any;
 let __lastTestIndex: number = -1;
-let __currentTestFile;
+let __currentTestFile: string;
 const addTest = (testFilePath: string) => {
   if (__tests && __tests[__tests.length - 1]) {
     const lastTest = __tests[__tests.length - 1];
-    if (!lastTest.filePath) {
+    if (!lastTest.file) {
       const tests = __tests.slice(__lastTestIndex + 1);
       tests.forEach((test: any) => {
-        test.filePath = testFilePath;
+        test.file = testFilePath;
       });
-    } else if (lastTest.filePath === testFilePath) {
+    } else if (lastTest.file === testFilePath) {
       // repeated test, duplicate the test entry
       __tests.push(__tests.slice(__lastTestIndex + 1));
     } else {
@@ -62,7 +62,7 @@ const addTest = (testFilePath: string) => {
   }
 };
 
-window.addEventListener('error', (event: any) => { 
+const importErrorHandler = (event: any) => { 
   ${useRequire ? 'const UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
   UnitTest.test('Error', () => {
     if (event.error) {
@@ -72,9 +72,11 @@ window.addEventListener('error', (event: any) => {
     }
   });
   addTest(__currentTestFile);
-});
+};
 
+window.addEventListener('error', importErrorHandler);
 ${imports}
+window.removeEventListener('error', importErrorHandler);
 
 export {};`;
 };
@@ -89,12 +91,12 @@ var __currentTestFile;
 var addTest = function (testFilePath) {
   if (__tests && __tests[__tests.length - 1]) {
     var lastTest = __tests[__tests.length - 1];
-    if (!lastTest.filePath) {
+    if (!lastTest.file) {
       var tests = __tests.slice(__lastTestIndex + 1);
       tests.forEach(function (test) {
-        test.filePath = testFilePath;
+        test.file = testFilePath;
       });
-    } else if (lastTest.filePath === testFilePath) {
+    } else if (lastTest.file === testFilePath) {
       // repeated test, duplicate the test entry
       __tests.push(__tests.slice(__lastTestIndex + 1));
     } else {
@@ -108,7 +110,7 @@ var addTest = function (testFilePath) {
   }
 };
 
-window.addEventListener('error', function (event) {
+var importErrorHandler = function (event) {
   ${useRequire ? 'var UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
   UnitTest.test('Error', function () {
     if (event.error) {
@@ -118,9 +120,11 @@ window.addEventListener('error', function (event) {
     }
   });
   addTest(__currentTestFile);
-});
+};
 
+window.addEventListener('error', importErrorHandler);
 ${imports}
+window.removeEventListener('error', importErrorHandler);
 
 export {};`;
 };

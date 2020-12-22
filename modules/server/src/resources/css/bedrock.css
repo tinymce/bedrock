@@ -94,29 +94,46 @@ div.failed {
     margin: 5px;
     clear:both;
 }
-div.passed.hidden {
+div.passed.hidden,
+div.skipped.hidden {
     display: none;
 }
 
-div.passed {
+div.passed,
+div.skipped {
     display: block;
     float: left;
-    border: 6px solid #AEF5AF;
-    background-color: #AEF5AF;
     margin: 10px 1px;
-    width: 0px;
-    height: 0px;
+    width: 0;
+    height: 0;
     overflow: hidden;
 }
-div.passed:hover .output {
+
+div.passed {
+    border: 6px solid #AEF5AF;
+    background-color: #AEF5AF;
+}
+div.skipped {
+    border: 6px solid #ffe89d;
+    background-color: #ffe89d;
+}
+
+div.passed:hover .output,
+div.skipped:hover .output {
     position: absolute;
     left: 0;
     width: 99vw;
     background: white;
-    border: 3px solid #AEF5AF;
     border-bottom-width: 15px;
     margin: 15px 5px;
     z-index: 99999999;
+}
+
+div.passed:hover .output {
+    border: 3px solid #AEF5AF;
+}
+div.skipped:hover .output {
+    border: 3px solid #ffe89d;
 }
 
 div.delayed {

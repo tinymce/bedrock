@@ -11,7 +11,8 @@
     ],
     "declaration": true,
     "outDir": "scratch/dist",
-    "sourceMap": true
+    "sourceMap": true,
+    "types": []
   },
   "include": [
     "src/test/ts"

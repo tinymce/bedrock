@@ -1,5 +1,5 @@
+import { TestLabel } from '@ephox/bedrock-common';
 import * as Compare from '../core/Compare';
-import { TestLabel } from './TestLabel';
 
 const eq = function (expected: any, actual: any, message?: TestLabel): void {
   const result = Compare.compare(expected, actual);

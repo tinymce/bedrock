@@ -19,5 +19,8 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
+  },
+  "dependencies": {
+    "diff": "^4.0.1"
   }
 }

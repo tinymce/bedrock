@@ -1,6 +1,5 @@
-import { Testable, Pprint } from '@ephox/dispute';
-import { TestLabel } from './TestLabel';
-import { TestError } from '@ephox/bedrock-common';
+import { TestError, TestLabel } from '@ephox/bedrock-common';
+import { Pprint, Testable } from '@ephox/dispute';
 
 const eq = function <T> (message: TestLabel, expected: T, actual: T, tt: Testable.Testable<T> = Testable.tAny): void {
   const result = tt.eq(expected, actual);

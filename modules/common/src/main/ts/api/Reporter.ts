@@ -18,13 +18,13 @@ const processQUnit = (html: string): string =>
     .replace(/&lt;ins&gt;/g, '<ins>')
     .replace(/&lt;\/ins&gt;/g, '</ins>'));
 
-const extractError = (err: LoggedError): TestError =>
-  err === undefined ? new Error('no error given') : err.error;
+const extractError = (err?: LoggedError): TestError =>
+  err === undefined ? new Error('no error given') : err;
 
 const formatExtra = (e: LoggedError): string => {
-  if (!e.logs) {
-    if (e.error && e.error.stack) {
-      const lines = e.error.stack.split('\n').filter((line) =>
+  if (!e.logs || e.logs.length === 0) {
+    if (e.stack) {
+      const lines = e.stack.split('\n').filter((line) =>
         line.indexOf('at') !== -1);
       return '\n\nStack:\n' + lines.join('\n');
     } else {
@@ -38,7 +38,7 @@ const formatExtra = (e: LoggedError): string => {
 };
 
 const htmlDiffAssertionErrorHtml = (e: HtmlDiffAssertionError): string => {
-  return `Test failure: ${e.message}
+  return `Test failure: ${htmlentities(e.message)}
 Expected: ${htmlentities(e.diff.expected)}
 Actual: ${htmlentities(e.diff.actual)}
 
@@ -57,38 +57,56 @@ HTML Diff: ${e.diff.comparison}`;
 
 const pprintAssertionErrorHtml = (e: PprintAssertionError): string => {
   const dh = Differ.diffPrettyHtml(e.diff.actual, e.diff.expected);
-  return `Test failure: ${e.message}
-Expected: 
+  return `Test failure: ${htmlentities(e.message)}
+Expected:
 ${htmlentities(e.diff.expected)}
-Actual: 
+Actual:
 ${htmlentities(e.diff.actual)}
-Diff: 
+Diff:
 ${dh}`;
 };
 
 export const pprintAssertionText = (e: PprintAssertionError): string => {
   const dh = Differ.diffPrettyText(e.diff.actual, e.diff.expected);
   return `Test failure: ${e.message}
-Expected: 
+Expected:
 ${e.diff.expected}
-Actual: 
+Actual:
 ${e.diff.actual}
-Diff: 
+Diff:
 ${dh}`;
 };
 
 const assertionErrorHtml = (e: AssertionError) => {
-// TODO: make this look more like the PprintAssertionError
-  return 'Assertion error' + (e.message ? ' [' + e.message + ']' : '') +
-    ': [' + htmlentities(JSON.stringify(e.expected)) + '] ' + e.operator +
-    ' [' + htmlentities(JSON.stringify(e.actual)) + ']';
+  const message = `Assertion error: ${e.message ? htmlentities(e.message) : ''}
+Expected:
+${htmlentities(e.expected)}
+Actual:
+${htmlentities(e.actual)}`;
+  if (e.showDiff) {
+    const dh = Differ.diffPrettyHtml(e.actual, e.expected);
+    return `${message}
+Diff:
+${dh}`;
+  } else {
+    return message;
+  }
 };
 
 const assertionErrorText = (e: AssertionError): string => {
-// TODO: make this look more like the PprintAssertionError
-  return 'Assertion error' + (e.message ? ' [' + e.message + ']' : '') +
-    ': [' + (JSON.stringify(e.expected)) + '] ' + e.operator +
-    ' [' + (JSON.stringify(e.actual)) + ']';
+  const message = `Assertion error: ${e.message ? e.message : ''}
+Expected:
+${e.expected}
+Actual:
+${e.actual}`;
+  if (e.showDiff) {
+    const dh = Differ.diffPrettyText(e.actual, e.expected);
+    return `${message}
+Diff:
+${dh}`;
+  } else {
+    return message;
+  }
 };
 
 const mkHtml = (e: TestError): string => {

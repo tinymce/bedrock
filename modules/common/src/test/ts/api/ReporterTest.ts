@@ -1,9 +1,10 @@
 import { assert } from 'chai';
 import { describe, it } from 'mocha';
-import * as Reporter from '../../../main/ts/api/Reporter';
 import * as LoggedError from '../../../main/ts/api/LoggedError';
+import * as Reporter from '../../../main/ts/api/Reporter';
+import { AssertionError, HtmlDiffAssertionError } from '../../../main/ts/api/TestError';
 
-function htmlAssertion() {
+const htmlAssertion = (): HtmlDiffAssertionError => {
   const e: any = new Error('message"');
   e.diff = {
     expected: 'abc"hello"',
@@ -13,7 +14,20 @@ function htmlAssertion() {
   e.label = '"label"1';
   e.name = 'HtmlAssertion';
   return e;
-}
+};
+
+const assertion = (): AssertionError => {
+  const e: any = new Error('message"');
+  e.expected = 'abc"hello"';
+  e.actual = 'ab"hello"';
+  e.showDiff = true;
+  e.label = '"label"1';
+  e.name = 'AssertionError';
+  return e;
+};
+
+const cleanStack = (message: string): string =>
+  message.replace(/Stack:(\n|.)*/, 'Stack:\n');
 
 describe('Reporter', () => {
   it('Reports thrown js errors as html', () => {
@@ -21,8 +35,8 @@ describe('Reporter', () => {
       // noinspection ExceptionCaughtLocallyJS
       throw new Error('blarg<span>');
     } catch (e) {
-      const actual = Reporter.html(LoggedError.loggedError(e, []));
-      const expected = 'Error: blarg&lt;span&gt;\n\nLogs:\n';
+      const actual = Reporter.html(LoggedError.loggedError(e, [ '  * Log Message' ]));
+      const expected = 'Error: blarg&lt;span&gt;\n\nLogs:\n  * Log Message';
       assert.deepEqual(actual, expected, 'Error message');
     }
   });
@@ -46,8 +60,8 @@ describe('Reporter', () => {
       // noinspection ExceptionCaughtLocallyJS
       throw new Error('blarg<span>');
     } catch (e) {
-      const actual = Reporter.text(LoggedError.loggedError(e, []));
-      const expected = 'Error: blarg<span>\n\nLogs:\n';
+      const actual = Reporter.text(LoggedError.loggedError(e, [ '  * Log Message' ]));
+      const expected = 'Error: blarg<span>\n\nLogs:\n  * Log Message';
       assert.deepEqual(actual, expected, 'Error message');
     }
   });
@@ -60,14 +74,14 @@ describe('Reporter', () => {
       const actual = Reporter.html(LoggedError.loggedError(e, []));
       // NOTE: the <ins> and <del> are supposed to remain
       const expected =
-        'Test failure: message"\n' +
+        'Test failure: message&quot;\n' +
         'Expected: abc&quot;hello&quot;\n' +
         'Actual: ab&quot;hello&quot;\n' +
         '\n' +
         'HTML Diff: <ins>blah</ins><del>hello</del>&quot;hello&quot;&lt;span&gt;\n' +
         '\n' +
-        'Logs:\n';
-      assert.deepEqual(actual, expected, 'Error message');
+        'Stack:\n';
+      assert.deepEqual(cleanStack(actual), expected, 'Error message');
     }
   });
 
@@ -84,9 +98,28 @@ describe('Reporter', () => {
         '\n' +
         'HTML Diff: <ins>blah</ins><del>hello</del>"hello"<span>\n' +
         '\n' +
-        'Logs:\n';
-      assert.deepEqual(actual, expected, 'Error message');
+        'Stack:\n';
+      assert.deepEqual(cleanStack(actual), expected, 'Error message');
     }
   });
 
+  it('Reports thrown AssertionError errors as html', () => {
+    try {
+      // noinspection ExceptionCaughtLocallyJS
+      throw assertion();
+    } catch (e) {
+      const actual = Reporter.html(LoggedError.loggedError(e, []));
+      const expected =
+        'Assertion error: message&quot;\n' +
+        'Expected:\n' +
+        'abc&quot;hello&quot;\n' +
+        'Actual:\n' +
+        'ab&quot;hello&quot;\n' +
+        'Diff:\n' +
+        '<del style="background:#ffe6e6;">ab&quot;hello&quot;</del><br /><ins style="background:#e6ffe6;">abc&quot;hello&quot;</ins><br />\n' +
+        '\n' +
+        'Stack:\n';
+      assert.deepEqual(cleanStack(actual), expected, 'Error message');
+    }
+  });
 });

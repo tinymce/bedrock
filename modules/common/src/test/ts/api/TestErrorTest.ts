@@ -7,11 +7,11 @@ describe('PprintAssertionError.toString()', () => {
     const actual = TestError.pprintAssertionError('message', 'b', 'a').toString();
     const expected =
       'Test failure: message\n' +
-      'Expected: \n' +
+      'Expected:\n' +
       'b\n' +
-      'Actual: \n' +
+      'Actual:\n' +
       'a\n' +
-      'Diff: \n' +
+      'Diff:\n' +
       '- | a\n' +
       '+ | b';
 

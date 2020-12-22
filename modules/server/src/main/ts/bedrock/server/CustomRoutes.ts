@@ -38,7 +38,6 @@ const readRequestBody = (request: IncomingMessage, done: (body: string) => void)
   });
 };
 
-
 const serializeJson = (json: any) => {
   return JSON.stringify(json, null, 2);
 };

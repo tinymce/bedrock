@@ -29,7 +29,6 @@ export const create = (): DriverMaster => {
     });
   };
 
-
   /*
    * DriverMaster is a very naive locking / unlocking system for access
    * to the webdriver. The goal of it is to overcome the situation where
