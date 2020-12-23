@@ -5,10 +5,10 @@ export interface JsError extends Error {
 }
 
 export interface AssertionError extends JsError {
-  expected: string;
-  actual: string;
+  expected: any;
+  actual: any;
   operator: string;
-  showDiff: boolean;
+  showDiff?: boolean;
 }
 
 export interface HtmlDiffAssertionError extends JsError {

@@ -1,7 +1,6 @@
-import { Global } from '@ephox/bedrock-common';
-import { MochaGlobals } from 'mocha';
+import { Global, TestGlobals } from '@ephox/bedrock-common';
 
-const mochaGlobals: MochaGlobals = Global;
+const globals: TestGlobals = Global;
 
 const {
   before,
@@ -18,7 +17,7 @@ const {
   xit,
   specify,
   xspecify
-} = mochaGlobals;
+} = globals;
 
 export {
   before,

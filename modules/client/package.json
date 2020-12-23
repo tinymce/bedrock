@@ -11,8 +11,7 @@
   },
   "dependencies": {
     "@ephox/bedrock-common": "^9.3.2",
-    "@ephox/dispute": "^1.0.3",
-    "@types/mocha": "^8.0.3"
+    "@ephox/dispute": "^1.0.3"
   },
   "main": "./lib/main/ts/api/Main.js",
   "module": "./lib/main/ts/api/Main.js",

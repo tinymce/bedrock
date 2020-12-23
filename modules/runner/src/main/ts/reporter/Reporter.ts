@@ -1,13 +1,17 @@
 import { LoggedError, Reporter as ErrorReporter } from '@ephox/bedrock-common';
+import Promise from '@ephox/wrap-promise-polyfill';
 import { Callbacks } from './Callbacks';
 import { UrlParams } from '../core/UrlParams';
 import { formatElapsedTime } from '../core/Utils';
 
+type LoggedError = LoggedError.LoggedError;
+
 export interface TestReporter {
   readonly start: () => Promise<void>;
+  readonly retry: () => Promise<void>;
   readonly pass: () => Promise<void>;
   readonly skip: (reason: string) => Promise<void>;
-  readonly fail: (e: LoggedError.LoggedError) => Promise<void>;
+  readonly fail: (e: LoggedError) => Promise<void>;
 }
 
 export interface Reporter {
@@ -21,7 +25,7 @@ export interface ReporterUi {
     readonly start: (file: string, name: string) => void;
     readonly pass: (testTime: string, currentCount: number) => void;
     readonly skip: (testTime: string, currentCount: number) => void;
-    readonly fail: (e: LoggedError.LoggedError, testTime: string, currentCount: number) => void;
+    readonly fail: (e: LoggedError, testTime: string, currentCount: number) => void;
   };
   readonly done: (totalTime: string) => void;
 }
@@ -49,16 +53,21 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     const testUi = ui.test();
 
     const start = (): Promise<void> => {
-      starttime = new Date();
       if (started) {
         return Promise.resolve();
       } else {
         started = true;
+        starttime = new Date();
         currentCount++;
 
         testUi.start(file, name);
         return callbacks.sendTestStart(params.session, totalNumTests, file, name);
       }
+    };
+
+    const retry = (): Promise<void> => {
+      starttime = new Date();
+      return Promise.resolve();
     };
 
     const pass = (): Promise<void> => {
@@ -87,7 +96,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
       }
     };
 
-    const fail = (e: LoggedError.LoggedError): Promise<void> => {
+    const fail = (e: LoggedError): Promise<void> => {
       if (reported) {
         return Promise.resolve();
       } else {
@@ -104,6 +113,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
 
     return {
       start,
+      retry,
       pass,
       skip,
       fail

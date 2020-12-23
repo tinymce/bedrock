@@ -1,5 +1,4 @@
-import { Failure, TestError, TestLogs, TestLabel } from '@ephox/bedrock-common';
-import { Context } from 'mocha';
+import { Context, Failure, TestError, TestLabel, TestLogs } from '@ephox/bedrock-common';
 import { it } from './Bdd';
 
 type TestLogs = TestLogs.TestLogs;
@@ -11,13 +10,12 @@ export type FailureCallback = (error: TestThrowable, logs?: TestLogs) => void;
 
 /** An asynchronous test with callbacks. */
 export const asyncTest = (name: string, test: (this: Context, success: SuccessCallback, failure: FailureCallback) => void): void => {
-  const mochaTest = it(name, function (done) {
+  it(name, function (done) {
     test.call(this, () => done(), ((err, logs) => {
       const r = Failure.prepFailure(err, logs);
       done(r);
     }));
   });
-  mochaTest.body = test.toString();
 };
 
 /** Migrate to asyncTest */

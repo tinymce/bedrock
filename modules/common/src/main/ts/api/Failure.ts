@@ -5,6 +5,7 @@ import * as TestLogs from './TestLogs';
 
 type TestLogs = TestLogs.TestLogs;
 type TestLogEntry = TestLogs.TestLogEntry;
+type AssertionError = TestError.AssertionError;
 type TestError = TestError.TestError;
 type LoggedError = LoggedError.LoggedError;
 
@@ -30,6 +31,17 @@ export const normalizeError = (err: TestThrowable): TestError => {
     return error;
   } else if (typeof err === 'function') {
     return normalizeError(err());
+  } else if (TestError.isAssertionError(err)) {
+    // Chai assertion errors are objects, but we want an actual error
+    // so it prints better in the console
+    const error = new Error(err.message) as AssertionError;
+    error.name = err.name;
+    error.stack = err.stack;
+    const keys = Object.keys(err) as (keyof AssertionError)[];
+    keys.forEach((key) => {
+      (error as any)[key] = err[key];
+    });
+    return error;
   } else {
     return err;
   }

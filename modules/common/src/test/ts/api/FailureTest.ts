@@ -25,6 +25,19 @@ describe('Failure.prepFailure', () => {
     }));
   });
 
+  it('should convert an AssertionError object to an actual Error', () => {
+    try {
+      assert.fail('Test failure');
+    } catch (e) {
+      const err = Failure.prepFailure(e);
+      assert.typeOf(err, 'Error');
+      assert.equal(err.name, 'AssertionError');
+      assert.equal(err.message, e.message);
+      assert.equal(err.stack, e.stack);
+      assert.lengthOf(err.logs, 0);
+    }
+  });
+
   it('should format logs', () => {
     fc.assert(fc.property(fc.string(), fc.string(), fc.string(), fc.string(), (str, logMessage1, logMessage2, logMessage3) => {
       const log1 = TestLogs.createLogEntry(logMessage1);

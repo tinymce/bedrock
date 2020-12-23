@@ -85,14 +85,14 @@ export const write = (settings: ReporterSettings) => {
           if (res.skipped) {
             elem.startElement('skipped')
               .writeAttribute('message', res.skipped);
+            elem.endElement();
           } else {
             elem.startElement('failure')
               .writeAttribute('Test FAILED: some failed assert')
               .writeAttribute('type', 'failure');
             const cdatas = splitCdatas(res.error);
             cdatas.forEach((c) => elem.writeCData(c));
-            elem
-              .endElement();
+            elem.endElement();
           }
         }
         elem.endElement();

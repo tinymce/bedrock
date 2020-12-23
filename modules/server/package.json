@@ -33,7 +33,6 @@
     "istanbul-instrumenter-loader": "^3.0.1",
     "jquery": "^3.4.1",
     "mkdirp": "^1.0.0",
-    "mocha": "^8.2.1",
     "node-glob": "^1.2.0",
     "portfinder": "^1.0.25",
     "raw-loader": "^4.0.0",

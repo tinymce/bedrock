@@ -10,6 +10,16 @@ type PprintAssertionError = TestError.PprintAssertionError;
 type HtmlDiffAssertionError = TestError.HtmlDiffAssertionError;
 type AssertionError = TestError.AssertionError;
 
+const stringify = (e: any) => {
+  if (e === undefined) {
+    return 'undefined';
+  } else if (typeof e === 'string') {
+    return e;
+  } else {
+    return JSON.stringify(e);
+  }
+};
+
 /* Required to make <del> and <ins> stay as tags.*/
 const processQUnit = (html: string): string =>
   (html
@@ -78,14 +88,16 @@ ${dh}`;
 };
 
 const assertionErrorHtml = (e: AssertionError) => {
-  const message = `Assertion error: ${e.message ? htmlentities(e.message) : ''}
-Expected:
-${htmlentities(e.expected)}
-Actual:
-${htmlentities(e.actual)}`;
-  if (e.showDiff) {
-    const dh = Differ.diffPrettyHtml(e.actual, e.expected);
+  const actual = stringify(e.actual);
+  const expected = stringify(e.expected);
+  const message = `Assertion error: ${e.message ? htmlentities(e.message) : ''}`;
+  if (e.showDiff !== false) {
+    const dh = Differ.diffPrettyHtml(actual, expected);
     return `${message}
+Expected:
+${htmlentities(expected)}
+Actual:
+${htmlentities(actual)}
 Diff:
 ${dh}`;
   } else {
@@ -94,14 +106,16 @@ ${dh}`;
 };
 
 const assertionErrorText = (e: AssertionError): string => {
-  const message = `Assertion error: ${e.message ? e.message : ''}
-Expected:
-${e.expected}
-Actual:
-${e.actual}`;
-  if (e.showDiff) {
-    const dh = Differ.diffPrettyText(e.actual, e.expected);
+  const actual = stringify(e.actual);
+  const expected = stringify(e.expected);
+  const message = `Assertion error: ${e.message ? e.message : ''}`;
+  if (e.showDiff !== false) {
+    const dh = Differ.diffPrettyText(actual, expected);
     return `${message}
+Expected:
+${expected}
+Actual:
+${actual}
 Diff:
 ${dh}`;
   } else {

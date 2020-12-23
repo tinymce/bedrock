@@ -1,7 +1,19 @@
-import { Suite, Test } from 'mocha';
+import { Suite, Test } from '@ephox/bedrock-common';
+import Promise from '@ephox/wrap-promise-polyfill';
 
-export const isTest = (testOrSuite: Test | Suite): testOrSuite is Test => {
-  return Object.prototype.hasOwnProperty.call(testOrSuite, 'type') && (testOrSuite as Test).type === 'test';
+export const countTests = (suite: Suite): number =>
+  suite.tests.length + suite.suites.reduce((acc, suite) => acc + countTests(suite), 0);
+
+export const loop = <T>(items: T[], fn: (item: T) => Promise<void>, index = 0): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (index < items.length) {
+      fn(items[index])
+        .then(() => loop(items, fn, index + 1))
+        .then(resolve, reject);
+    } else {
+      resolve();
+    }
+  });
 };
 
 export const getTests = (suite: Suite): Test[] => {
@@ -16,17 +28,26 @@ export const getSuites = (suite: Suite): Suite[] => {
   }, []));
 };
 
-export const filterOmittedTests = (testOrSuite: Test | Suite): void => {
-  const parent = testOrSuite.parent;
-  if (parent !== undefined) {
-    if (isTest(testOrSuite)) {
-      parent.tests = parent.tests.filter((test) => test !== testOrSuite);
-    } else {
-      parent.suites = parent.suites.filter((suite) => suite !== testOrSuite);
-    }
+const hasOnly = (suite: Suite): boolean => {
+  const onlyTests = suite.tests.filter((test) => test._only);
+  const onlySuites = suite.suites.filter((suite) => suite._only);
+  if (onlyTests.length > 0 || onlySuites.length > 0) {
+    return true;
+  } else {
+    // Check all the nested child suites
+    return suite.suites.some(hasOnly);
+  }
+};
 
-    if (parent.tests.length === 0 && parent.suites.length === 0) {
-      filterOmittedTests(parent);
-    }
+export const filterOnly = (suite: Suite): void => {
+  const onlyTests = suite.tests.filter((test) => test._only);
+  const onlySuites = suite.suites.filter((child) => child._only || hasOnly(child));
+  if (onlyTests.length > 0) {
+    suite.tests = onlyTests;
+    suite.suites = [];
+  } else if (onlySuites.length > 0) {
+    suite.tests = [];
+    suite.suites.forEach(filterOnly);
+    suite.suites = onlySuites;
   }
 };

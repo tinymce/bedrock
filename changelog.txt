@@ -1,8 +1,9 @@
 Version 10.0.0
 
-* Added new `Bdd` module for using mocha BDD style tests.
+* Added new `Bdd` module for using mocha compatible BDD style tests.
+* Added support for retries and timeouts per test for mocha compatibility.
 * Added support for skipping tests.
-* Changed to use mocha for registering and running tests in the browser.
+* Added support for "only" tests.
 
 Version 9.7.1
 
