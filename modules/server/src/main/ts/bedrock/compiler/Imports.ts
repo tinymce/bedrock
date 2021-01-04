@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { hasTs } from './TsUtils';
 
-const convertPolyfillNameToPath = (name: string) => {
+export const convertPolyfillNameToPath = (name: string): string => {
   const path = name.slice(0, 1).toLowerCase() +
                name.slice(1).replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
   return `core-js/es/${path}`;
@@ -148,9 +148,6 @@ export const generateImports = (useRequire: boolean, scratchFile: string, srcFil
     polyfillPaths[name] = convertPolyfillNameToPath(name);
   });
 
-  if (hasTs(srcFiles)) {
-    return generateImportsTs(useRequire, scratchFile, srcFiles, polyfillPaths);
-  } else {
-    return generateImportsJs(useRequire, scratchFile, srcFiles, polyfillPaths);
-  }
+  const f = hasTs(srcFiles) ? generateImportsTs : generateImportsJs;
+  return f(useRequire, scratchFile, srcFiles, polyfillPaths);
 };

@@ -23,17 +23,13 @@ export const go = (settings: BedrockFrameworkSettings): void => {
   }).then((driver) => {
     const webdriver = driver.webdriver;
     const serveSettings: Serve.ServeSettings = {
-      projectdir: settings.projectdir,
-      basedir: settings.basedir,
+      ...settings,
       driver: Attempt.passed(webdriver),
       testfiles: [],
       master,
       runner,
-      loglevel: settings.loglevel,
       customRoutes: undefined,
       stickyFirstSession: true,
-      overallTimeout: settings.overallTimeout,
-      singleTimeout: settings.singleTimeout,
       skipResetMousePosition: false
     };
 

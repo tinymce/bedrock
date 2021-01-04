@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { describe, it } from 'mocha';
-import { generateImports } from '../../../main/ts/bedrock/compiler/Imports';
+import { convertPolyfillNameToPath, generateImports } from '../../../main/ts/bedrock/compiler/Imports';
 
 const validPolyfills = [ 'ArrayBuffer', 'Map', 'Object', 'Promise', 'Set', 'Symbol', 'TypedArray', 'WeakMap', 'WeakSet' ];
 
@@ -94,6 +94,29 @@ addTest("/${filename}.js");`
       polyfills.forEach((polyfill) => {
         assert.include(imports, `import 'core-js/es/${convertPolyfillName(polyfill)}';`);
       });
+    }));
+  });
+});
+
+describe('Imports.convertPolyfillNameToPath', () => {
+  it('should convert polyfill names to import paths', () => {
+    assert.equal(convertPolyfillNameToPath('ArrayBuffer'), 'core-js/es/array-buffer');
+    assert.equal(convertPolyfillNameToPath('Object'), 'core-js/es/object');
+    assert.equal(convertPolyfillNameToPath('Promise'), 'core-js/es/promise');
+    assert.equal(convertPolyfillNameToPath('Symbol'), 'core-js/es/symbol');
+    assert.equal(convertPolyfillNameToPath('WeakMap'), 'core-js/es/weak-map');
+    assert.equal(convertPolyfillNameToPath('WeakSet'), 'core-js/es/weak-set');
+  });
+
+  it('should convert PascalCase names to hyphen case and prefix `core-js/es/`', () => {
+    fc.assert(fc.property(fc.char().filter((c) => /[a-zA-Z]/.test(c)), fc.string(), fc.string(), (char, word1, word2) => {
+      const singleWord = char.toUpperCase() + word1.toLowerCase();
+      const multiWord = char.toUpperCase() + word2.toLowerCase() + singleWord;
+
+      const expectedSinglePath = char.toLowerCase() + word1.toLowerCase();
+      assert.equal(convertPolyfillNameToPath(singleWord), `core-js/es/${expectedSinglePath}`, 'single word path');
+      const expectedMultiPath = char.toLowerCase() + word2.toLowerCase() + '-' + expectedSinglePath;
+      assert.equal(convertPolyfillNameToPath(multiWord), `core-js/es/${expectedMultiPath}`, 'multiple word path');
     }));
   });
 });

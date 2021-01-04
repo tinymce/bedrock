@@ -13,20 +13,11 @@ export const go = (settings: BedrockManualSettings): void => {
 
   routes.then((runner) => {
     const serveSettings: Webpack.WebpackServeSettings = {
-      projectdir: settings.projectdir,
-      basedir: settings.basedir,
-      testfiles: settings.testfiles,
+      ...settings,
       // There is no driver for manual mode.
       driver: Attempt.failed('There is no webdriver for manual mode'),
       master: null, // there is no need for master,
       runner,
-      loglevel: settings.loglevel,
-      customRoutes: settings.customRoutes,
-      config: settings.config,
-      coverage: settings.coverage,
-      overallTimeout: settings.overallTimeout,
-      singleTimeout: settings.singleTimeout,
-      polyfills: settings.polyfills,
       // sticky session is used by auto mode only
       stickyFirstSession: false,
       // reset mouse position will never work on manual
