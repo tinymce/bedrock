@@ -38,7 +38,7 @@ export const pprintAssertionError = (message: string, expected: string, actual: 
     expected
   };
   e.toString = (): string => {
-    return Reporter.pprintAssertionText(e as PprintAssertionError);
+    return Reporter.pprintAssertionErrorText(e as PprintAssertionError);
   };
   return e as PprintAssertionError;
 };
