@@ -1,3 +1,5 @@
+import { Suite, Test } from '@ephox/bedrock-common';
+
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export const noop = (): void => {};
 
@@ -25,6 +27,15 @@ export const formatElapsedTime = (start: Date, end: Date): string => {
       point < 100 ? '0' + point :
         '' + point;
   return seconds + '.' + printable + 's';
+};
+
+export const getFullTitle = (suiteOrTest: Suite | Test, separator: string): string => {
+  const parentTitle = suiteOrTest.parent?.fullTitle();
+  if (parentTitle !== undefined && parentTitle.length > 0) {
+    return `${parentTitle} ${separator} ${suiteOrTest.title}`;
+  } else {
+    return suiteOrTest.title;
+  }
 };
 
 export const makeSessionId = (): string => '' + Math.ceil((Math.random() * 100000000));

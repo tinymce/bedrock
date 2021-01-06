@@ -36,12 +36,12 @@ const generateImportsTs = (useRequire: boolean, scratchFile: string, srcFiles: s
   return `${generatePolyfills(useRequire)}
 
 declare let require: any;
-declare let __tests: any;
+declare let __tests: any[];
 declare let console: any;
 let __lastTestIndex: number = -1;
 let __currentTestFile: string;
 const addTest = (testFilePath: string) => {
-  if (__tests && __tests[__tests.length - 1]) {
+  if (typeof __tests !== 'undefined' && __tests[__tests.length - 1]) {
     const lastTest = __tests[__tests.length - 1];
     if (!lastTest.file) {
       const tests = __tests.slice(__lastTestIndex + 1);
@@ -89,7 +89,7 @@ const generateImportsJs = (useRequire: boolean, scratchFile: string, srcFiles: s
 var __lastTestIndex = -1;
 var __currentTestFile;
 var addTest = function (testFilePath) {
-  if (__tests && __tests[__tests.length - 1]) {
+  if (typeof __tests !== 'undefined' && __tests[__tests.length - 1]) {
     var lastTest = __tests[__tests.length - 1];
     if (!lastTest.file) {
       var tests = __tests.slice(__lastTestIndex + 1);

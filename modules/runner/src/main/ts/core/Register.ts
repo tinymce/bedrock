@@ -1,12 +1,11 @@
-import { Test } from 'mocha';
-import { Global } from '@ephox/bedrock-common';
+import { Global, Test } from '@ephox/bedrock-common';
 
 const isMarked = (test: Test): boolean => {
-  return (test as any).__bedrock === true;
+  return (test as any).__registered === true;
 };
 
 const mark = (test: Test): void => {
-  (test as any).__bedrock = true;
+  (test as any).__registered = true;
 };
 
 export const test = (test: Test): void => {

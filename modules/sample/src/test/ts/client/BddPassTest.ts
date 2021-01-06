@@ -1,4 +1,4 @@
-import { after, afterEach, assert, before, beforeEach, it } from '@ephox/bedrock-client';
+import { after, afterEach, assert, before, beforeEach, describe, it, xit } from '@ephox/bedrock-client';
 
 describe('BDD Pass', () => {
   describe('Test count', () => {
@@ -43,6 +43,44 @@ describe('BDD Pass', () => {
 
     it('should be skipped with inner call', function () {
       this.skip();
+      throw new Error('This should never run');
+    });
+
+    xit('should be skipped with xit', () => {
+      throw new Error('This should never run');
+    });
+  });
+
+  describe('skip via beforeEach hooks', () => {
+    beforeEach(function () {
+      this.skip();
+    });
+
+    it('should be skipped', () => {
+      throw new Error('This should never run');
+    });
+  });
+
+  describe('skip via before hooks', () => {
+    before(function () {
+      this.skip();
+    });
+
+    it('should be skipped', () => {
+      throw new Error('This should never run');
+    });
+  });
+
+  describe.skip('skip via describe', () => {
+    before(() => {
+      throw new Error('This should never run');
+    });
+
+    beforeEach(() => {
+      throw new Error('This should never run');
+    });
+
+    it('should be skipped', () => {
       throw new Error('This should never run');
     });
   });

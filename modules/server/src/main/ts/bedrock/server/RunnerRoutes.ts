@@ -62,7 +62,6 @@ export const generate = (mode: string, projectdir: string, basedir: string, conf
         // bedrock resources
         Routes.routing('GET', '/runner', path.join(require.resolve('@ephox/bedrock-runner'), '../../../../../dist')),
         Routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery'))),
-        Routes.routing('GET', '/lib/mocha', path.dirname(require.resolve('mocha'))),
         Routes.routing('GET', '/lib/core-js-bundle', path.dirname(require.resolve('core-js-bundle'))),
         Routes.routing('GET', '/css', path.join(basedir, 'src/resources/css')),
 

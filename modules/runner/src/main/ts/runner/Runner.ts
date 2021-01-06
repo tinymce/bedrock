@@ -1,11 +1,13 @@
+import { Suite } from '@ephox/bedrock-common';
 import { HarnessResponse } from '../core/ServerTypes';
 import { UrlParams } from '../core/UrlParams';
+import { noop } from '../core/Utils';
 import { Callbacks } from '../reporter/Callbacks';
-import { BedrockMochaReporter } from '../reporter/MochaReporter';
 import { Reporter } from '../reporter/Reporter';
 import { Actions } from '../ui/Actions';
 import { Ui } from '../ui/Ui';
-import { filterOmittedTests, getSuites, getTests } from './Utils';
+import { RunActions, RunState, runSuite } from './TestRun';
+import { countTests, filterOnly } from './Utils';
 
 export interface Runner {
   readonly init: () => Promise<HarnessResponse>;
@@ -17,7 +19,7 @@ export interface Runner {
 //       See `Controller.ts` in the server.
 const KEEP_ALIVE_INTERVAL = 5000;
 
-export const Runner = (params: UrlParams, callbacks: Callbacks, reporter: Reporter, ui: Ui): Runner => {
+export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks, reporter: Reporter, ui: Ui): Runner => {
   const actions = Actions(params.session);
   let numTests = 0;
 
@@ -26,19 +28,26 @@ export const Runner = (params: UrlParams, callbacks: Callbacks, reporter: Report
     action(sum.offset + offset, sum.failed + failedOffset, sum.skipped + skippedOffset, retry);
   };
 
-  const loadNextChunk = (chunk: number): void => {
-    if (numTests > (params.offset + chunk)) {
-      const sum = reporter.summary();
-      actions.reloadPage(params.offset + chunk, sum.failed, sum.skipped);
-    }
+  const runNextChunk = (offset: number) => {
+    const sum = reporter.summary();
+    actions.reloadPage(offset, sum.failed, sum.skipped);
   };
 
   const retryTest = withSum(actions.retryTest);
   const loadNextTest = withSum(actions.nextTest);
   const stopTest = withSum(actions.updateHistory, 0, -1);
 
-  const afterFail = (retries: number, stopOnFailure: boolean): void => {
+  const onTestPass = () => {
+    const sum = reporter.summary();
+    if (params.retry > 0) {
+      params.retry = 0;
+      actions.updateHistory(params.offset, params.retry, sum.skipped);
+    }
+  };
+
+  const onTestFailure = (retries: number, stopOnFailure: boolean): void => {
     if (stopOnFailure) {
+      reporter.done();
       // make it easy to restart at this test
       stopTest();
     } else if (params.retry < retries) {
@@ -50,18 +59,11 @@ export const Runner = (params: UrlParams, callbacks: Callbacks, reporter: Report
 
   const init = (): Promise<HarnessResponse> => {
     // Filter the tests to ensure we have an accurate total test count
-    const rootSuite = mocha.suite;
-    if (rootSuite.hasOnly()) {
-      rootSuite.filterOnly();
-    }
-    numTests = rootSuite.total();
+    filterOnly(rootSuite);
+    numTests = countTests(rootSuite);
 
     // Render the initial UI
     ui.render(params.offset, numTests, actions.restartTests, retryTest, loadNextTest);
-
-    // Ensure only tests in the offset range run
-    const allTests = getTests(rootSuite);
-    allTests.slice(0, params.offset).forEach(filterOmittedTests);
 
     // delay this ajax call until after the reporter status elements are in the page
     const keepAliveTimer = setInterval(() => {
@@ -75,53 +77,37 @@ export const Runner = (params: UrlParams, callbacks: Callbacks, reporter: Report
   };
 
   const run = (chunk: number, retries: number, timeout: number, stopOnFailure: boolean): void => {
-    ui.setStopOnFailure(stopOnFailure);
-    let count = 0;
-
-    const finishedTest = () => {
-      // Reload the page if we've hit the chunking limit
-      if (count++ >= chunk) {
-        runner.emit('abort');
-        runner.abort();
-        loadNextChunk(chunk);
-      }
+    const runState: RunState = {
+      totalTests: numTests,
+      offset: params.offset,
+      chunk,
+      timeout,
+      testCount: 0
     };
 
-    // Setup the custom bedrock reporter
-    mocha.reporter(BedrockMochaReporter, {
-      reporter,
-      numTests,
-      onFailure: () => afterFail(retries, stopOnFailure),
-      onPass: finishedTest,
-      onSkip: finishedTest
-    });
+    const runActions: RunActions = {
+      onFailure: () => onTestFailure(retries, stopOnFailure),
+      onPass: onTestPass,
+      onSkip: onTestPass,
+      onStart: noop,
+      runNextChunk
+    };
 
-    // Loop over each suite and setup the bedrock timeout/bail settings
-    // Note: We can't use the "suite" start event, as the bail check is done in mocha before the event is fired
-    const rootSuite = mocha.suite;
-    const suites = [ rootSuite ].concat(getSuites(rootSuite));
-    suites.forEach((suite) => {
-      suite.bail(stopOnFailure);
-      // Disable timeouts for suites
-      suite.timeout(0);
-    });
-
-    // Start running the tests
-    // Note: The tests actually run in the next event loop
-    const runner = mocha.run((failures) => {
-      // for easy rerun reset the URL
-      if (failures === 0) {
+    ui.setStopOnFailure(stopOnFailure);
+    runSuite(rootSuite, runState, runActions, reporter)
+      .then(() => {
+        reporter.done();
+        // for easy rerun reset the URL
         actions.updateHistory(0, 0, 0);
-      }
-    });
-
-    // Setup the bedrock settings for each test
-    runner.on('test', (test) => {
-      // 2000 is a hardcoded value. See https://github.com/mochajs/mocha/blob/master/lib/runnable.js#L34
-      if (test.timeout() === 2000) {
-        test.timeout(timeout);
-      }
-    });
+      }, (e) => {
+        // An error handled by the test runner won't return an error object and will just reject.
+        // So if we have an error, it means an unexpected/unhandled error occurred in the promise
+        // chain, so ensure we log it and report we've stopped running.
+        if (e !== undefined) {
+          console.error('Unexpected error occurred', e);
+          reporter.done();
+        }
+      });
   };
 
   return {

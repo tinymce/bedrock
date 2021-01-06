@@ -5,10 +5,10 @@ export interface JsError extends Error {
 }
 
 export interface AssertionError extends JsError {
-  expected: string;
-  actual: string;
+  expected: any;
+  actual: any;
   operator: string;
-  showDiff: boolean;
+  showDiff?: boolean;
 }
 
 export interface HtmlDiffAssertionError extends JsError {
@@ -38,7 +38,7 @@ export const pprintAssertionError = (message: string, expected: string, actual: 
     expected
   };
   e.toString = (): string => {
-    return Reporter.pprintAssertionText(e as PprintAssertionError);
+    return Reporter.pprintAssertionErrorText(e as PprintAssertionError);
   };
   return e as PprintAssertionError;
 };

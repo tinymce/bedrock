@@ -1,5 +1,5 @@
 import { Global } from '@ephox/bedrock-common';
-import * as Patches from '../core/Patches';
+import * as Globals from '../core/Globals';
 import { UrlParams } from '../core/UrlParams';
 import { makeSessionId } from '../core/Utils';
 import { Callbacks } from '../reporter/Callbacks';
@@ -9,11 +9,8 @@ import { Ui } from '../ui/Ui';
 
 declare const $: JQueryStatic;
 
-// Setup mocha, which will bind the various global test functions
-mocha.setup('bdd');
-
-// Apply patches immediately, so that any calls to the globals use the patched version
-Patches.patchMocha();
+// Setup the globals
+Globals.setup();
 
 const run = () => {
   const params = UrlParams.parse(window.location.search, makeSessionId);
@@ -21,7 +18,7 @@ const run = () => {
   const callbacks = Callbacks();
   const reporter = Reporter(params, callbacks, ui);
 
-  const runner = Runner(params, callbacks, reporter, ui);
+  const runner = Runner(Globals.rootSuite(), params, callbacks, reporter, ui);
   runner.init().then((data) => {
     if (data.mode === 'auto') {
       // Try to ensure the page has focus
@@ -32,5 +29,6 @@ const run = () => {
 };
 
 Global.bedrock = {
-  run
+  run,
+  rootSuite: Globals.rootSuite()
 };
