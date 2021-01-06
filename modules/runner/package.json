@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@ephox/bedrock-common": "^9.3.2",
-    "diff": "^4.0.1",
+    "@ephox/wrap-promise-polyfill": "^2.2.0",
     "jquery": "^3.4.1",
     "querystringify": "^2.1.1"
   },

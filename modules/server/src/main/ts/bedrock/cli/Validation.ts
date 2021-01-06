@@ -44,7 +44,7 @@ export const scan = (definitions: ClOption[], settings: CommandLineOptions): Att
 
       return Attempt.passed({
         ...result,
-        [output]: defn.flatten === true ? Arr.flatten(v): v
+        [output]: defn.flatten === true ? Arr.flatten(v) : v
       });
     });
   }, Attempt.passed({}) as Attempt<string[], CommandLineOptions>);

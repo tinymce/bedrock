@@ -1,17 +1,21 @@
+import { Suite, Test } from '@ephox/bedrock-common';
+
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 export const noop = (): void => {};
 
-export const makeQueryParams = (session: string, offset: number, failed: number, retry: number): string => {
-  if (offset > 0 || retry > 0) {
+export const makeQueryParams = (session: string, offset: number, failed: number, skipped: number, retry: number): string => {
+  if (offset > 0 || retry > 0 || skipped > 0) {
     const rt = (retry > 0 ? '&retry=' + retry : '');
-    return '?session=' + session + '&offset=' + offset + '&failed=' + failed + rt;
+    const sk = (skipped > 0 ? '&skipped=' + skipped : '');
+    return '?session=' + session + '&offset=' + offset + '&failed=' + failed + sk + rt;
   } else {
     return '';
   }
 };
 
-export const makeUrl = (session: string, offset: number, failed: number, retry: number): string => {
+export const makeUrl = (session: string, offset: number, failed: number, skipped: number, retry: number): string => {
   const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
-  return baseUrl + makeQueryParams(session, offset, failed, retry);
+  return baseUrl + makeQueryParams(session, offset, failed, skipped, retry);
 };
 
 export const formatElapsedTime = (start: Date, end: Date): string => {
@@ -23,6 +27,15 @@ export const formatElapsedTime = (start: Date, end: Date): string => {
       point < 100 ? '0' + point :
         '' + point;
   return seconds + '.' + printable + 's';
+};
+
+export const getFullTitle = (suiteOrTest: Suite | Test, separator: string): string => {
+  const parentTitle = suiteOrTest.parent?.fullTitle();
+  if (parentTitle !== undefined && parentTitle.length > 0) {
+    return `${parentTitle} ${separator} ${suiteOrTest.title}`;
+  } else {
+    return suiteOrTest.title;
+  }
 };
 
 export const makeSessionId = (): string => '' + Math.ceil((Math.random() * 100000000));

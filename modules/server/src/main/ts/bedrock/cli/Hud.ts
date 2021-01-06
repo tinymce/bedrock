@@ -4,6 +4,7 @@ interface ResultData {
   readonly done: boolean;
   readonly id: string;
   readonly numFailed: number;
+  readonly numSkipped: number;
   readonly numPassed: number;
   readonly test?: string;
   readonly totalFiles?: number;
@@ -22,12 +23,12 @@ export const create = (testfiles: string[], loglevel: 'simple' | 'advanced'): Hu
 
   const numFiles = testfiles.length > 0 ? testfiles.length : '?';
 
-  const writeProgress = (id: string, stopped: boolean, numPassed: number, numFailed: number, total: number | '?') => {
-    const numRun = numPassed + numFailed;
+  const writeProgress = (id: string, stopped: boolean, numPassed: number, numSkipped: number, numFailed: number, total: number | '?') => {
+    const numRun = numPassed + numFailed + numSkipped;
     const status = stopped ? (numRun < total ? 'STOPPED' : 'COMPLETE') : 'RUNNING';
     stream.write(
       'Session: ' + id + ', Status: ' + status + ', Progress: ' + numRun + '/' + total +
-      ', Failed: ' + numFailed + ' ... ' + '\n'
+      ', Failed: ' + numFailed + ', Skipped: ' + numSkipped + ' ... ' + '\n'
     );
     readline.clearLine(stream, 1);
     return Promise.resolve();
@@ -45,14 +46,14 @@ export const create = (testfiles: string[], loglevel: 'simple' | 'advanced'): Hu
     stream.write('Current test: ' + (data.test !== undefined ? data.test.substring(0, 60) : 'Unknown') + '\n');
     const totalFiles = data.totalFiles !== undefined ? data.totalFiles : numFiles;
     const totalTests = data.totalTests !== undefined ? data.totalTests : totalFiles;
-    return writeProgress(data.id, data.done, data.numPassed, data.numFailed, totalTests);
+    return writeProgress(data.id, data.done, data.numPassed, data.numSkipped, data.numFailed, totalTests);
   };
 
   const complete = () => {
     return Promise.resolve();
   };
 
-  const basicUpdate = (data: ResultData) => {
+  const basicUpdate = (_data: ResultData) => {
     stream.write('.');
     return Promise.resolve();
   };

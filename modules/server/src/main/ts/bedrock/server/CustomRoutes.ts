@@ -38,7 +38,6 @@ const readRequestBody = (request: IncomingMessage, done: (body: string) => void)
   });
 };
 
-
 const serializeJson = (json: any) => {
   return JSON.stringify(json, null, 2);
 };
@@ -110,7 +109,7 @@ const jsonToRouters = (data: CustomRouteSpec[], configPath: string) => {
   });
 };
 
-const fallbackGo = (filePath: string): Routes.RouteGoFunc => {
+const fallbackGo = (filePath: string | undefined): Routes.RouteGoFunc => {
   return (request, response, done) => {
     response.writeHead(404, {'content-type': 'text/plain'});
     response.end([
@@ -124,7 +123,7 @@ const fallbackGo = (filePath: string): Routes.RouteGoFunc => {
   };
 };
 
-const go = (filePath: string): Routes.RouteGoFunc => {
+const go = (filePath: string | undefined): Routes.RouteGoFunc => {
   const fallback: Routes.Route = { matches: [], go: fallbackGo(filePath) };
   return (request, response, done) => {
     const routers = filePath ? jsonToRouters(FileUtils.readFileAsJson(filePath), filePath) : [];
@@ -135,7 +134,7 @@ const go = (filePath: string): Routes.RouteGoFunc => {
   };
 };
 
-const routers = (filePath: string) => {
+const routers = (filePath: string | undefined) => {
   return [
     {
       matches: [Matchers.prefixMatch('/custom')],
@@ -144,7 +143,7 @@ const routers = (filePath: string) => {
   ];
 };
 
-export const create = (filePath: string): { routers: Routes.Route[] } => {
+export const create = (filePath: string | undefined): { routers: Routes.Route[] } => {
   return {
     routers: routers(filePath)
   };

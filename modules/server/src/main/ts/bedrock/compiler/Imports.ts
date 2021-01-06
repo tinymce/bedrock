@@ -1,6 +1,12 @@
 import * as path from 'path';
 import { hasTs } from './TsUtils';
 
+export const convertPolyfillNameToPath = (name: string): string => {
+  const path = name.slice(0, 1).toLowerCase() +
+               name.slice(1).replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+  return `core-js/es/${path}`;
+};
+
 const filePathToImport = (useRequire: boolean, scratchFile: string) => {
   return (filePath: string) => {
     const importFilePath = path.join(path.dirname(filePath), path.basename(filePath, path.extname(filePath)));
@@ -22,33 +28,40 @@ addTest("${filePath}");`;
   };
 };
 
-const generatePolyfills = (useRequire: boolean): string[] => {
-  // For IE support we need to load some polyfills
-  const loadPolyfill = `if (window['Symbol'] === undefined) {
-  ${useRequire ? 'window.Symbol = require(\'core-js/es/symbol\');' : 'import \'core-js/es/symbol\';'}
-}`;
-  return [ loadPolyfill ];
+const generatePolyfillImport = (useRequire: boolean, importPath: string) => {
+  return useRequire ? `require('${importPath}');` : `import '${importPath}';`;
 };
 
-const generateImportsTs = (useRequire: boolean, scratchFile: string, srcFiles: string[]) => {
+const generatePolyfills = (useRequire: boolean, polyfills: Record<string, string>): string => {
+  const polyfillImports: string[] = [];
+  Object.keys(polyfills).forEach((name) => {
+    const path = polyfills[name];
+    polyfillImports.push(`if (window['${name}'] === undefined) {
+  ${generatePolyfillImport(useRequire, path)}
+}`);
+  });
+  return polyfillImports.join('\n');
+};
+
+const generateImportsTs = (useRequire: boolean, scratchFile: string, srcFiles: string[], polyfills: Record<string, string>) => {
   const imports = srcFiles.map(filePathToImport(useRequire, scratchFile)).join('\n');
   // header code for tests.ts
-  return `${generatePolyfills(useRequire)}
+  return `${generatePolyfills(useRequire, polyfills)}
 
 declare let require: any;
-declare let __tests: any;
+declare let __tests: any[];
 declare let console: any;
 let __lastTestIndex: number = -1;
-let __currentTestFile;
+let __currentTestFile: string;
 const addTest = (testFilePath: string) => {
-  if (__tests && __tests[__tests.length - 1]) {
+  if (typeof __tests !== 'undefined' && __tests[__tests.length - 1]) {
     const lastTest = __tests[__tests.length - 1];
-    if (!lastTest.filePath) {
+    if (!lastTest.file) {
       const tests = __tests.slice(__lastTestIndex + 1);
       tests.forEach((test: any) => {
-        test.filePath = testFilePath;
+        test.file = testFilePath;
       });
-    } else if (lastTest.filePath === testFilePath) {
+    } else if (lastTest.file === testFilePath) {
       // repeated test, duplicate the test entry
       __tests.push(__tests.slice(__lastTestIndex + 1));
     } else {
@@ -62,7 +75,7 @@ const addTest = (testFilePath: string) => {
   }
 };
 
-window.addEventListener('error', (event: any) => { 
+const importErrorHandler = (event: any) => { 
   ${useRequire ? 'const UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
   UnitTest.test('Error', () => {
     if (event.error) {
@@ -72,29 +85,31 @@ window.addEventListener('error', (event: any) => {
     }
   });
   addTest(__currentTestFile);
-});
+};
 
+window.addEventListener('error', importErrorHandler);
 ${imports}
+window.removeEventListener('error', importErrorHandler);
 
 export {};`;
 };
 
-const generateImportsJs = (useRequire: boolean, scratchFile: string, srcFiles: string[]) => {
+const generateImportsJs = (useRequire: boolean, scratchFile: string, srcFiles: string[], polyfills: Record<string, string>) => {
   const imports = srcFiles.map(filePathToImport(useRequire, scratchFile)).join('\n');
   // header code for tests-imports.js
-  return `${generatePolyfills(useRequire)}
+  return `${generatePolyfills(useRequire, polyfills)}
 
 var __lastTestIndex = -1;
 var __currentTestFile;
 var addTest = function (testFilePath) {
-  if (__tests && __tests[__tests.length - 1]) {
+  if (typeof __tests !== 'undefined' && __tests[__tests.length - 1]) {
     var lastTest = __tests[__tests.length - 1];
-    if (!lastTest.filePath) {
+    if (!lastTest.file) {
       var tests = __tests.slice(__lastTestIndex + 1);
       tests.forEach(function (test) {
-        test.filePath = testFilePath;
+        test.file = testFilePath;
       });
-    } else if (lastTest.filePath === testFilePath) {
+    } else if (lastTest.file === testFilePath) {
       // repeated test, duplicate the test entry
       __tests.push(__tests.slice(__lastTestIndex + 1));
     } else {
@@ -108,7 +123,7 @@ var addTest = function (testFilePath) {
   }
 };
 
-window.addEventListener('error', function (event) {
+var importErrorHandler = function (event) {
   ${useRequire ? 'var UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
   UnitTest.test('Error', function () {
     if (event.error) {
@@ -118,17 +133,21 @@ window.addEventListener('error', function (event) {
     }
   });
   addTest(__currentTestFile);
-});
+};
 
+window.addEventListener('error', importErrorHandler);
 ${imports}
+window.removeEventListener('error', importErrorHandler);
 
 export {};`;
 };
 
-export const generateImports = (useRequire: boolean, scratchFile: string, srcFiles: string[]): string => {
-  if (hasTs(srcFiles)) {
-    return generateImportsTs(useRequire, scratchFile, srcFiles);
-  } else {
-    return generateImportsJs(useRequire, scratchFile, srcFiles);
-  }
+export const generateImports = (useRequire: boolean, scratchFile: string, srcFiles: string[], polyfills: string[]): string => {
+  const polyfillPaths: Record<string, string> = {};
+  polyfills.forEach((name) => {
+    polyfillPaths[name] = convertPolyfillNameToPath(name);
+  });
+
+  const f = hasTs(srcFiles) ? generateImportsTs : generateImportsJs;
+  return f(useRequire, scratchFile, srcFiles, polyfillPaths);
 };

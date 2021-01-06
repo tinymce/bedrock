@@ -10,6 +10,18 @@ type PprintAssertionError = TestError.PprintAssertionError;
 type HtmlDiffAssertionError = TestError.HtmlDiffAssertionError;
 type AssertionError = TestError.AssertionError;
 
+const identity = <T>(val: T): T => val;
+
+const stringify = (e: any) => {
+  if (e === undefined) {
+    return 'undefined';
+  } else if (typeof e === 'string') {
+    return e;
+  } else {
+    return JSON.stringify(e);
+  }
+};
+
 /* Required to make <del> and <ins> stay as tags.*/
 const processQUnit = (html: string): string =>
   (html
@@ -18,13 +30,13 @@ const processQUnit = (html: string): string =>
     .replace(/&lt;ins&gt;/g, '<ins>')
     .replace(/&lt;\/ins&gt;/g, '</ins>'));
 
-const extractError = (err: LoggedError): TestError =>
-  err === undefined ? new Error('no error given') : err.error;
+const extractError = (err?: LoggedError): TestError =>
+  err === undefined ? new Error('no error given') : err;
 
 const formatExtra = (e: LoggedError): string => {
-  if (!e.logs) {
-    if (e.error && e.error.stack) {
-      const lines = e.error.stack.split('\n').filter((line) =>
+  if (!e.logs || e.logs.length === 0) {
+    if (e.stack) {
+      const lines = e.stack.split('\n').filter((line) =>
         line.indexOf('at') !== -1);
       return '\n\nStack:\n' + lines.join('\n');
     } else {
@@ -37,59 +49,53 @@ const formatExtra = (e: LoggedError): string => {
   }
 };
 
-const htmlDiffAssertionErrorHtml = (e: HtmlDiffAssertionError): string => {
-  return `Test failure: ${e.message}
-Expected: ${htmlentities(e.diff.expected)}
-Actual: ${htmlentities(e.diff.actual)}
-
-HTML Diff: ${processQUnit(htmlentities(e.diff.comparison))}`;
-};
-
-const htmlDiffAssertionErrorText = (e: HtmlDiffAssertionError): string => {
+const htmlDiffAssertionError = (e: HtmlDiffAssertionError, escape: (value: string) => string, process: (value: string) => string): string => {
   // TODO: make this look more like the PprintAssertionError
-  // TODO: get rid of the <ins> and <del> in the text output. Probably need to change the code that throws this.
-  return `Test failure: ${e.message}
-Expected: ${e.diff.expected}
-Actual: ${e.diff.actual}
+  return `Test failure: ${escape(e.message)}
+Expected: ${escape(e.diff.expected)}
+Actual: ${escape(e.diff.actual)}
 
-HTML Diff: ${e.diff.comparison}`;
+HTML Diff: ${process(escape(e.diff.comparison))}`;
 };
 
-const pprintAssertionErrorHtml = (e: PprintAssertionError): string => {
-  const dh = Differ.diffPrettyHtml(e.diff.actual, e.diff.expected);
-  return `Test failure: ${e.message}
-Expected: 
-${htmlentities(e.diff.expected)}
-Actual: 
-${htmlentities(e.diff.actual)}
-Diff: 
+const htmlDiffAssertionErrorHtml = (e: HtmlDiffAssertionError): string => htmlDiffAssertionError(e, htmlentities, processQUnit);
+// TODO: get rid of the <ins> and <del> in the text output. Probably need to change the code that throws this.
+const htmlDiffAssertionErrorText = (e: HtmlDiffAssertionError): string => htmlDiffAssertionError(e, identity, identity);
+
+const pprintAssertionError = (e: PprintAssertionError, escape: (value: string) => string, diff: (actual: string, expected: string) => string): string => {
+  const dh = diff(e.diff.actual, e.diff.expected);
+  return `Test failure: ${escape(e.message)}
+Expected:
+${escape(e.diff.expected)}
+Actual:
+${escape(e.diff.actual)}
+Diff:
 ${dh}`;
 };
 
-export const pprintAssertionText = (e: PprintAssertionError): string => {
-  const dh = Differ.diffPrettyText(e.diff.actual, e.diff.expected);
-  return `Test failure: ${e.message}
-Expected: 
-${e.diff.expected}
-Actual: 
-${e.diff.actual}
-Diff: 
+export const pprintAssertionErrorHtml = (e: PprintAssertionError): string => pprintAssertionError(e, htmlentities, Differ.diffPrettyHtml);
+export const pprintAssertionErrorText = (e: PprintAssertionError): string => pprintAssertionError(e, identity, Differ.diffPrettyText);
+
+const assertionError = (e: AssertionError, escape: (value: string) => string, diff: (actual: string, expected: string) => string): string => {
+  const actual = stringify(e.actual);
+  const expected = stringify(e.expected);
+  const message = `Assertion error: ${e.message ? escape(e.message) : ''}`;
+  if (e.showDiff !== false) {
+    const dh = diff(actual, expected);
+    return `${message}
+Expected:
+${escape(expected)}
+Actual:
+${escape(actual)}
+Diff:
 ${dh}`;
+  } else {
+    return message;
+  }
 };
 
-const assertionErrorHtml = (e: AssertionError) => {
-// TODO: make this look more like the PprintAssertionError
-  return 'Assertion error' + (e.message ? ' [' + e.message + ']' : '') +
-    ': [' + htmlentities(JSON.stringify(e.expected)) + '] ' + e.operator +
-    ' [' + htmlentities(JSON.stringify(e.actual)) + ']';
-};
-
-const assertionErrorText = (e: AssertionError): string => {
-// TODO: make this look more like the PprintAssertionError
-  return 'Assertion error' + (e.message ? ' [' + e.message + ']' : '') +
-    ': [' + (JSON.stringify(e.expected)) + '] ' + e.operator +
-    ' [' + (JSON.stringify(e.actual)) + ']';
-};
+const assertionErrorHtml = (e: AssertionError): string => assertionError(e, htmlentities, Differ.diffPrettyHtml);
+const assertionErrorText = (e: AssertionError): string => assertionError(e, identity, Differ.diffPrettyText);
 
 const mkHtml = (e: TestError): string => {
   if (TestError.isHTMLDiffError(e)) {
@@ -111,7 +117,7 @@ const mkText = (e: TestError): string => {
   if (TestError.isHTMLDiffError(e)) {
     return htmlDiffAssertionErrorText(e);
   } else if (TestError.isPprintAssertionError(e)) {
-    return pprintAssertionText(e);
+    return pprintAssertionErrorText(e);
   } else if (TestError.isAssertionError(e)) {
     return assertionErrorText(e);
   } else if (e.name && e.message) {

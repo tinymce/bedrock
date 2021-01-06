@@ -16,7 +16,7 @@ interface Server {
 
 export interface ServeSettings {
   readonly basedir: string;
-  readonly customRoutes: string;
+  readonly customRoutes: string | undefined;
   readonly driver: Attempt<string, BrowserObject>;
   readonly loglevel: 'simple' | 'advanced';
   readonly master: DriverMaster | null;

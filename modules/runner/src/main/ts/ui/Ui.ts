@@ -15,37 +15,38 @@ declare const $: JQueryStatic;
 
 export const Ui = (container: JQuery<HTMLElement>): Ui => {
   let stopOnFailure = false;
+  let ui: JQuery<HTMLElement>;
   let current: JQuery<HTMLElement>;
   let restartBtn: JQuery<HTMLElement>;
   let retryBtn: JQuery<HTMLElement>;
   let skipBtn: JQuery<HTMLElement>;
 
   const render = (offset: number, totalNumTests: number, onRestart: () => void, onRetry: () => void, onSkip: () => void) => {
+    ui = $('<div></div>');
     current = $('<span />').addClass('progress').text(offset);
     restartBtn = $('<button />').text('Restart').on('click', onRestart);
     retryBtn = $('<button />').text('Retry').on('click', onRetry).hide();
     skipBtn = $('<button />').text('Skip').on('click', onSkip).hide();
 
-    $(() => {
-      container
-        .append($('<div />')
-          .append($('<span />').text('Suite progress: '))
-          .append(current)
-          .append($('<span />').text('/'))
-          .append($('<span />').text(totalNumTests))
-          .append('&nbsp;&nbsp;&nbsp;')
-          .append(restartBtn)
-          .append('&nbsp;&nbsp;&nbsp;')
-          .append(retryBtn)
-          .append('&nbsp;&nbsp;&nbsp;')
-          .append(skipBtn)
-        );
-    });
+    ui.append(
+      $('<div />')
+        .append($('<span />').text('Suite progress: '))
+        .append(current)
+        .append($('<span />').text('/'))
+        .append($('<span />').text(totalNumTests))
+        .append('&nbsp;&nbsp;&nbsp;')
+        .append(restartBtn)
+        .append('&nbsp;&nbsp;&nbsp;')
+        .append(retryBtn)
+        .append('&nbsp;&nbsp;&nbsp;')
+        .append(skipBtn)
+    );
+    container.append(ui);
   };
 
   const done = (totalTime: string) => {
-    container.append('<div class="done">Test run completed in <span class="time">' + totalTime + '</span></div>');
-    $('.passed.hidden').removeClass('hidden');
+    ui.append('<div class="done">Test run completed in <span class="time">' + totalTime + '</span></div>');
+    $('.passed.hidden,.skipped.hidden').removeClass('hidden');
   };
 
   const test = () => {
@@ -65,12 +66,19 @@ export const Ui = (container: JQuery<HTMLElement>): Ui => {
       time = $('<span />').addClass('time');
       output.append(marker, ' ', nameSpan, ' [', time, '] ', errorContainer, ' ', testfile);
       el.append(output);
-      container.append(el);
+      ui.append(el);
     };
 
     const pass = (testTime: string, currentCount: number) => {
       el.removeClass('running').addClass('passed').addClass('hidden');
       marker.text('[passed]').addClass('passed');
+      time.text(testTime);
+      current.text(currentCount);
+    };
+
+    const skip = (testTime: string, currentCount: number) => {
+      el.removeClass('running').addClass('skipped').addClass('hidden');
+      marker.text('[skipped]').addClass('skipped');
       time.text(testTime);
       current.text(currentCount);
     };
@@ -97,12 +105,13 @@ export const Ui = (container: JQuery<HTMLElement>): Ui => {
     return {
       start,
       pass,
+      skip,
       fail
     };
   };
 
   const error = (e: any) => {
-    container.append('<div class="failed done">ajax error: ' + JSON.stringify(e) + '</div>');
+    ui.append('<div class="failed done">ajax error: ' + JSON.stringify(e) + '</div>');
   };
 
   const setStopOnFailure = (flag: boolean): void => {

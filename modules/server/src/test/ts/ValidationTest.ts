@@ -124,7 +124,6 @@ describe('Validation', () => {
     }
   );
 
-
   checkResult(
     'Testing more than one definition, all should pass',
     {

@@ -10,14 +10,15 @@ import * as Imports from './Imports';
 import { hasTs } from './TsUtils';
 
 export interface WebpackServeSettings extends Serve.ServeSettings {
-  config: string;
-  coverage: string[];
+  readonly config: string;
+  readonly coverage: string[];
+  readonly polyfills: string[];
 }
 
 interface CompileInfo {
-  scratchFile: string;
-  dest: string;
-  config: webpack.Configuration;
+  readonly scratchFile: string;
+  readonly dest: string;
+  readonly config: webpack.Configuration;
 }
 
 const moduleAvailable = (name: string) => {
@@ -193,12 +194,12 @@ const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[
   };
 };
 
-const compileTests = (compileInfo: CompileInfo, exitOnCompileError: boolean, srcFiles: string[]): Promise<string> => {
+const compileTests = (compileInfo: CompileInfo, exitOnCompileError: boolean, srcFiles: string[], polyfills: string[]): Promise<string> => {
   return new Promise((resolve) => {
     console.log(`Compiling ${srcFiles.length} tests...`);
 
     mkdirp.sync(path.dirname(compileInfo.scratchFile));
-    fs.writeFileSync(compileInfo.scratchFile, Imports.generateImports(true, compileInfo.scratchFile, srcFiles));
+    fs.writeFileSync(compileInfo.scratchFile, Imports.generateImports(true, compileInfo.scratchFile, srcFiles, polyfills));
 
     webpack(compileInfo.config, (err, stats) => {
       if (err || stats.hasErrors()) {
@@ -252,9 +253,9 @@ const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: strin
   }
 };
 
-export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], coverage: string[]): Promise<string> => {
+export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], coverage: string[], polyfills: string[]): Promise<string> => {
   return getCompileInfo(tsConfigFile, scratchDir, basedir, false, srcFiles, coverage)
-    .then((compileInfo) => compileTests(compileInfo, exitOnCompileError, srcFiles));
+    .then((compileInfo) => compileTests(compileInfo, exitOnCompileError, srcFiles, polyfills));
 };
 
 const isCompiledRequest = (request: { url: string }) => request.url.startsWith('/compiled/');
@@ -270,7 +271,7 @@ export const devserver = (settings: WebpackServeSettings): Promise<Serve.ServeSe
         console.log(`Loading ${settings.testfiles.length} tests...`);
 
         mkdirp.sync(path.dirname(scratchFile));
-        fs.writeFileSync(scratchFile, Imports.generateImports(true, scratchFile, settings.testfiles));
+        fs.writeFileSync(scratchFile, Imports.generateImports(true, scratchFile, settings.testfiles, settings.polyfills));
 
         const compiler = webpack(compileInfo.config);
 
