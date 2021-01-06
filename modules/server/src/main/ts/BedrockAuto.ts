@@ -17,7 +17,7 @@ export const go = (settings: BedrockAutoSettings): void => {
   const isPhantom = settings.browser === 'phantomjs';
 
   const basePage = 'src/resources/html/' + (isPhantom ? 'bedrock-phantom.html' : 'bedrock.html');
-  const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage);
+  const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
   console.log('bedrock-auto ' + Version.get() + ' starting...');
 
@@ -31,18 +31,11 @@ export const go = (settings: BedrockAutoSettings): void => {
     }).then((driver) => {
       const webdriver = driver.webdriver;
       const serveSettings: Serve.ServeSettings = {
-        projectdir: settings.projectdir,
-        basedir: settings.basedir,
-        testfiles: settings.testfiles,
+        ...settings,
         driver: Attempt.passed(webdriver),
         master,
         runner,
-        loglevel: settings.loglevel,
-        customRoutes: settings.customRoutes,
-        stickyFirstSession: true,
-        overallTimeout: settings.overallTimeout,
-        singleTimeout: settings.singleTimeout,
-        skipResetMousePosition: settings.skipResetMousePosition
+        stickyFirstSession: true
       };
 
       return Serve.start(serveSettings).then((service) => {

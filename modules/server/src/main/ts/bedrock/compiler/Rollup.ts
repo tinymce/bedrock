@@ -7,7 +7,7 @@ import * as Imports from './Imports';
 import {ExitCodes} from '../util/ExitCodes';
 import * as FileUtils from '../util/FileUtils';
 
-export const compile = (tsConfigFile: string, scratchDir: string, exitOnCompileError: boolean, srcFiles: string[], success: (dest: string) => void): void => {
+export const compile = (tsConfigFile: string, scratchDir: string, exitOnCompileError: boolean, srcFiles: string[], polyfills: string[]): Promise<string> => {
   const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   const dest = path.join(scratchDir, 'compiled/tests.js');
 
@@ -22,13 +22,13 @@ export const compile = (tsConfigFile: string, scratchDir: string, exitOnCompileE
   const include = tsConfig.include ? tsConfig.include : [];
 
   mkdirp.sync(path.dirname(scratchFile));
-  fs.writeFileSync(scratchFile, Imports.generateImports(false, scratchFile, srcFiles));
+  fs.writeFileSync(scratchFile, Imports.generateImports(false, scratchFile, srcFiles, polyfills));
 
   const typescript = require('rollup-plugin-typescript2');
   const resolve = require('rollup-plugin-node-resolve');
   const sourcemaps = require('rollup-plugin-sourcemaps');
 
-  rollup.rollup({
+  return rollup.rollup({
     input: scratchFile,
     treeshake: false,
     plugins: [
@@ -55,17 +55,16 @@ export const compile = (tsConfigFile: string, scratchDir: string, exitOnCompileE
       }),
       sourcemaps()
     ]
-  }).then((bundle) => {
-    return bundle.write(outputOptions);
-  }).then(() => {
-    success(dest);
-  }).catch((err) => {
+  })
+  .then((bundle) => bundle.write(outputOptions))
+  .then(() => dest)
+  .catch((err) => {
     console.log(err);
 
     if (exitOnCompileError) {
       process.exit(ExitCodes.failures.error);
     }
 
-    success(dest);
+    return dest;
   });
 };

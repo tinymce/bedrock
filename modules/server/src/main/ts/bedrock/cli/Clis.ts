@@ -2,7 +2,7 @@ import * as cli from './Cli';
 import * as ClOptions from './ClOptions';
 import { ExitCodes } from '../util/ExitCodes';
 import { Attempt } from '../core/Attempt';
-import { BedrockAutoSettings, BedrockFrameworkSettings, BedrockSettings } from '../core/Settings';
+import { BedrockAutoSettings, BedrockFrameworkSettings, BedrockManualSettings } from '../core/Settings';
 
 export interface Directories {
   current: string;
@@ -40,11 +40,12 @@ export const forAuto = (directories: Directories, argv: string[] = process.argv)
     ClOptions.useSandboxForHeadless,
     ClOptions.skipResetMousePosition,
     ClOptions.coverage,
-    ClOptions.wipeBrowserCache
+    ClOptions.wipeBrowserCache,
+    ClOptions.polyfills
   ]), argv) as Attempt<cli.CliError, BedrockAutoSettings>;
 };
 
-export const forManual = (directories: Directories, argv: string[] = process.argv): Attempt<cli.CliError, BedrockSettings> => {
+export const forManual = (directories: Directories, argv: string[] = process.argv): Attempt<cli.CliError, BedrockManualSettings> => {
   return cli.extract('bedrock', 'Launch a testing process on a localhost port and allow the user to navigate to it in any browser', commonOptions(directories).concat([
     ClOptions.stopOnFailure__hidden,
     ClOptions.config,
@@ -52,8 +53,9 @@ export const forManual = (directories: Directories, argv: string[] = process.arg
     ClOptions.testdir,
     ClOptions.testdirs,
     ClOptions.customRoutes,
-    ClOptions.coverage
-  ]), argv) as Attempt<cli.CliError, BedrockSettings>;
+    ClOptions.coverage,
+    ClOptions.polyfills
+  ]), argv) as Attempt<cli.CliError, BedrockManualSettings>;
 };
 
 export const forFramework = (directories: Directories, argv: string[] = process.argv): Attempt<cli.CliError, BedrockFrameworkSettings> => {

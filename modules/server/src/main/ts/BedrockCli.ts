@@ -1,9 +1,10 @@
+import { CliError } from './bedrock/cli/Cli';
 import { Attempt } from './bedrock/core/Attempt';
 import * as Clis from './bedrock/cli/Clis';
 import { BedrockSettings } from './bedrock/core/Settings';
 
 type Program = {
-  go: (settings: BedrockSettings, directories: { current: string; bin: string }) => void;
+  go: <T extends BedrockSettings>(settings: T, directories: { current: string; bin: string }) => void;
   mode: 'forAuto' | 'forManual' | 'forFramework';
 }
 
@@ -12,8 +13,8 @@ export const run = (program: Program, directories: { current: string; bin: strin
     throw new Error('Bedrock mode not known: ' + program.mode);
   }
 
-  const maybeSettings = Clis[program.mode](directories);
-  Attempt.cata(maybeSettings, Clis.logAndExit, (settings: BedrockSettings) => {
+  const maybeSettings: Attempt<CliError, BedrockSettings> = Clis[program.mode](directories);
+  Attempt.cata(maybeSettings, Clis.logAndExit, (settings) => {
     program.go(settings, directories);
   });
 };

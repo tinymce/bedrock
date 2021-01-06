@@ -311,3 +311,13 @@ export const skipResetMousePosition: ClOption = {
   validate: Extraction.any,
   uncommon: true
 };
+
+export const polyfills: ClOption = {
+  name: 'polyfills',
+  type: String,
+  multiple: true,
+  defaultValue: [ 'Symbol' ],
+  description: 'CoreJS polyfills to apply when running tests',
+  validate: Extraction.inSet([ 'ArrayBuffer', 'Map', 'Object', 'Promise', 'Set', 'Symbol', 'TypedArray', 'WeakMap', 'WeakSet' ]),
+  uncommon: true
+};
