@@ -28,8 +28,10 @@ export const go = (settings: BedrockFrameworkSettings): void => {
       testfiles: [],
       master,
       runner,
+      // Framework mode doesn't support the --customRoutes argument, so just pass undefined
       customRoutes: undefined,
       stickyFirstSession: true,
+      // Framework mode doesn't support the --skipResetMousePosition argument, so never skip
       skipResetMousePosition: false
     };
 
