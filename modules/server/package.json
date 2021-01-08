@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock-server",
-  "version": "10.0.0",
+  "version": "10.0.1",
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
   "bin": {
@@ -17,7 +17,7 @@
   "dependencies": {
     "@ephox/bedrock-client": "^10.0.0",
     "@ephox/bedrock-common": "^10.0.0",
-    "@ephox/bedrock-runner": "^10.0.0",
+    "@ephox/bedrock-runner": "^10.0.1",
     "async": "^3.0.0",
     "command-line-args": "^5.0.0",
     "command-line-usage": "^6.0.0",
