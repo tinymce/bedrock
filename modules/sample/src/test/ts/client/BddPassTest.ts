@@ -44,6 +44,10 @@ describe('BDD Pass', () => {
       assert.eq(3, retryCount);
     }).retries(2);
 
+    it('should work with tests that contain ?? in the title', () => {
+      assert.eq(true, true);
+    });
+
     it.skip('should be skipped with outer call', () => {
       throw new Error('This should never run');
     });
