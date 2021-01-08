@@ -17,9 +17,12 @@ const sendJson = <T>(url: string, data: any): Promise<T> => {
     $.ajax({
       method: 'post',
       url,
+      contentType: 'application/json; charset=UTF-8',
       dataType: 'json',
       success: onSuccess,
-      error: onError,
+      error: (xhr, statusText, e) => {
+        onError(e);
+      },
       data: JSON.stringify(data),
     });
   });
@@ -31,7 +34,9 @@ const getJson = <T>(url: string): Promise<T> => {
       url,
       dataType: 'json',
       success: onSuccess,
-      error: onError,
+      error: (xhr, statusText, e) => {
+        onError(e);
+      }
     });
   }));
 };

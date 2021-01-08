@@ -1,3 +1,7 @@
+Version 10.0.1
+
+* Fixed tests failing if the title contained "??" in the title.
+
 Version 10.0.0
 
 * Added new `Bdd` module for using mocha compatible BDD style tests.
