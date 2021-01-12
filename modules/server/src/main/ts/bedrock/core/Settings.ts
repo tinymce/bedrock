@@ -8,9 +8,6 @@ export interface BedrockSettings {
   readonly projectdir: string;
   readonly singleTimeout: number;
   readonly stopOnFailure: boolean;
-}
-
-export interface BedrockManualSettings extends BedrockSettings {
   readonly config: string;
   readonly coverage: string[];
   readonly customRoutes: string;
@@ -18,19 +15,16 @@ export interface BedrockManualSettings extends BedrockSettings {
   readonly testfiles: string[];
 }
 
+export type BedrockManualSettings = BedrockSettings;
+
 export interface BedrockAutoSettings extends BedrockSettings {
   readonly browser: string;
-  readonly config: string;
-  readonly coverage: string[];
-  readonly customRoutes: string;
   readonly debuggingPort: number;
   readonly delayExit: boolean;
   readonly name: string;
   readonly output: string;
-  readonly polyfills: string[];
   readonly retries: number;
   readonly skipResetMousePosition: boolean;
-  readonly testfiles: string[];
   readonly useSandboxForHeadless: boolean;
   readonly wipeBrowserCache: boolean;
 }
