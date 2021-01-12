@@ -35,7 +35,7 @@ A local install will not put the bedrock commands automatically on your path. Af
 
 # Usage
 
-`bedrock` has three main modes: test, server, and framework. These are available through three commands: `bedrock-auto`, `bedrock`, and `bedrock-framework`.
+Bedrock has two main modes: test and server. These are available through the commands `bedrock-auto` and `bedrock`.
 
 ## Test mode (bedrock-auto)
 
