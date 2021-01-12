@@ -1,7 +1,7 @@
 export interface ResolvingSettings {
-  bucket: number;
-  buckets: number;
-  testfiles: string[];
+  readonly bucket: number;
+  readonly buckets: number;
+  readonly testfiles: string[];
 }
 
 export const filterBuckets = (bucket: number, buckets: number, testfiles: string[]): string[] =>
