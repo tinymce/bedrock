@@ -1,3 +1,7 @@
+Version 10.0.2
+
+* Added ability to use `--bucket` and `--bucket` params in bedrock and bedrock-auto commands.
+
 Version 10.0.1
 
 * Fixed tests failing if the title contained "??" in the title.
