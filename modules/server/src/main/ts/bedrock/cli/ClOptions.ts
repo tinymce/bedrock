@@ -156,7 +156,7 @@ export const bucket: ClOption = {
   name: 'bucket',
   type: Number,
   description: 'Which "bucket" of tests to run, if you split the test runs with "buckets" setting. 1-based.',
-  validate: Extraction.nat,
+  validate: Extraction.positiveInteger,
   defaultValue: 1,
   uncommon: true
 };
@@ -165,7 +165,7 @@ export const buckets: ClOption = {
   name: 'buckets',
   type: Number,
   description: 'Number of "buckets" to split tests into. You can specify which bucket number to run, using the "bucket" setting. Useful for parallelizing tests over multiple build nodes.',
-  validate: Extraction.nat,
+  validate: Extraction.positiveInteger,
   defaultValue: 1,
   uncommon: true
 };

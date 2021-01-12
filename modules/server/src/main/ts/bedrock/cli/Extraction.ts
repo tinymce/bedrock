@@ -35,8 +35,8 @@ export const any = <E, A> (name: string, value: A): Attempt<E, A> => {
   return Attempt.passed(value);
 };
 
-export const nat = (name: string, value: string): Attempt<string[], number> => {
-  const failed = Attempt.failed<string[], number>(['Invalid value for property: ' + name + ': [' + value + '] is not a natural number']);
+export const positiveInteger = (name: string, value: string): Attempt<string[], number> => {
+  const failed = Attempt.failed<string[], number>(['Invalid value for property: ' + name + ': [' + value + '] is not a positive integer']);
   if (!Number.isInteger(value)) {
     return failed;
   }
