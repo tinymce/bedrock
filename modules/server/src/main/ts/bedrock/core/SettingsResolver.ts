@@ -24,7 +24,6 @@ export const log = <T extends ResolvingSettings> (t: T): void => {
 
 export const resolveAndLog = <T extends ResolvingSettings> (input: T): T => {
   const output = resolve(input);
-  console.log(input, output);
   log(output);
   return output;
 };
