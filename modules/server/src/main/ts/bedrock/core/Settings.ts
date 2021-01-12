@@ -1,3 +1,5 @@
+// Keep this file consistent with Clis.ts
+
 export interface BedrockSettings {
   readonly basedir: string;
   readonly bundler: 'webpack' | 'rollup';

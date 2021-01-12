@@ -9,6 +9,8 @@ export interface Directories {
   bin: string;
 }
 
+// Keep this file consistent with Settings.ts
+
 const commonOptions = (directories: Directories) => {
   return [
     ClOptions.projectdir(directories.current),
@@ -19,17 +21,19 @@ const commonOptions = (directories: Directories) => {
     ClOptions.help,
     ClOptions.logging,
     ClOptions.version,
-    ClOptions.bundler
+    ClOptions.bundler,
+    ClOptions.config,
+    ClOptions.files,
+    ClOptions.testdir,
+    ClOptions.testdirs,
+    ClOptions.coverage,
+    ClOptions.polyfills
   ];
 };
 
 export const forAuto = (directories: Directories, argv: string[] = process.argv): Attempt<cli.CliError, BedrockAutoSettings> => {
   return cli.extract('bedrock-auto', 'Use a Webdriver to launch a browser and run tests against it', commonOptions(directories).concat([
     ClOptions.browser,
-    ClOptions.config,
-    ClOptions.files,
-    ClOptions.testdir,
-    ClOptions.testdirs,
     ClOptions.name,
     ClOptions.output,
     ClOptions.debuggingPort,
@@ -39,23 +43,13 @@ export const forAuto = (directories: Directories, argv: string[] = process.argv)
     ClOptions.delayExiting,
     ClOptions.useSandboxForHeadless,
     ClOptions.skipResetMousePosition,
-    ClOptions.coverage,
-    ClOptions.wipeBrowserCache,
-    ClOptions.polyfills
+    ClOptions.wipeBrowserCache
   ]), argv) as Attempt<cli.CliError, BedrockAutoSettings>;
 };
 
 export const forManual = (directories: Directories, argv: string[] = process.argv): Attempt<cli.CliError, BedrockManualSettings> => {
-  return cli.extract('bedrock', 'Launch a testing process on a localhost port and allow the user to navigate to it in any browser', commonOptions(directories).concat([
-    ClOptions.stopOnFailure__hidden,
-    ClOptions.config,
-    ClOptions.files,
-    ClOptions.testdir,
-    ClOptions.testdirs,
-    ClOptions.customRoutes,
-    ClOptions.coverage,
-    ClOptions.polyfills
-  ]), argv) as Attempt<cli.CliError, BedrockManualSettings>;
+  return cli.extract('bedrock', 'Launch a testing process on a localhost port and allow the user to navigate to it in any browser',
+    commonOptions(directories), argv) as Attempt<cli.CliError, BedrockManualSettings>;
 };
 
 export const logAndExit = (errs: cli.CliError): void => {

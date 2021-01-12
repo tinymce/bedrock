@@ -239,16 +239,6 @@ export const wipeBrowserCache: ClOption = {
   validate: Extraction.any
 };
 
-// TODO: what is this setting?
-export const stopOnFailure__hidden: ClOption = {
-  name: 'stopOnFailure',
-  description: 'Stop on failure',
-  type: Boolean,
-  defaultValue: false,
-  validate: Extraction.any,
-  hidden: true
-};
-
 export const customRoutes: ClOption = {
   name: 'customRoutes',
   type: String,
