@@ -14,12 +14,10 @@ import * as SettingsResolver from './bedrock/core/SettingsResolver';
 
 export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
   console.log('bedrock-auto ' + Version.get() + ' starting...');
+
   const settings = SettingsResolver.resolveAndLog(bedrockAutoSettings);
-
   const master = DriverMaster.create();
-
   const isPhantom = settings.browser === 'phantomjs';
-
   const basePage = 'src/resources/html/' + (isPhantom ? 'bedrock-phantom.html' : 'bedrock.html');
   const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
