@@ -35,6 +35,19 @@ export const any = <E, A> (name: string, value: A): Attempt<E, A> => {
   return Attempt.passed(value);
 };
 
+export const nat = (name: string, value: string): Attempt<string[], number> => {
+  const failed = Attempt.failed<string[], number>(['Invalid value for property: ' + name + ': [' + value + '] is not a natural number']);
+  if (!Number.isInteger(value)) {
+    return failed;
+  }
+  const n = Number(value);
+  if (n <= 0) {
+    return failed;
+  } else {
+    return Attempt.passed(n);
+  }
+};
+
 export const directory = (name: string, value: string): Attempt<string[], string> => {
   try {
     if (!fs.lstatSync(value).isDirectory()) {

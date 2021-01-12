@@ -19,6 +19,7 @@ module.exports = {
     }],
     '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/explicit-module-boundary-types': [ 'error', { 'allowArgumentsExplicitlyTypedAsAny': true } ],
+    '@typescript-eslint/no-inferrable-types': 'off',
 
     'arrow-spacing': 'error',
     'no-multi-spaces': [ 'error', { ignoreEOLComments: true }],
