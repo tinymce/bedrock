@@ -33,7 +33,6 @@ A local install will not put the bedrock commands automatically on your path. Af
 
 `$ npm install .`
 
-
 # Usage
 
 `bedrock` has three main modes: test, server, and framework. These are available through three commands: `bedrock-auto`, `bedrock`, and `bedrock-framework`.
@@ -57,16 +56,6 @@ Use `bedrock-auto --help` to see all arguments possible.
 `bedrock --files src/test/js/browser/TwoTest.ts`
 
 Use `bedrock --help` to see all arguments possible.
-
-## Framework mode (bedrock-framework)
-
-*Framework* mode allows bedrock to run using an existing framework. The only currently supported testing framework is `qunit`. Bedrock assumes that a single page is responsible for running all the tests, so a `page` and `browser` are the only things required. Another parameter `framework` is also possible, but its only possible value currently is `qunit`.
-
-e.g. Run existing tests on a qunit page using phantom
-
-`bedrock-framework --page tests/index.html --browser phantomjs`
-
-Use `bedrock-framework --help` to see all arguments possible.
 
 # Tests
 

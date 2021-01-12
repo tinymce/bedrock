@@ -34,12 +34,3 @@ export interface BedrockAutoSettings extends BedrockSettings {
   readonly useSandboxForHeadless: boolean;
   readonly wipeBrowserCache: boolean;
 }
-
-export interface BedrockFrameworkSettings extends BedrockSettings {
-  readonly browser: string;
-  readonly debuggingPort: number;
-  readonly framework: string;
-  readonly name: string;
-  readonly output: string;
-  readonly page: string;
-}

@@ -1,3 +1,7 @@
+Version 11.0.0
+
+* Removed "framework" mode, which was used for running QUnit tests.
+
 Version 10.0.1
 
 * Fixed tests failing if the title contained "??" in the title.

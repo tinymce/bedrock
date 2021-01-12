@@ -5,7 +5,6 @@
   "license": "Apache-2.0",
   "bin": {
     "bedrock-auto": "./bin/bedrock-auto.js",
-    "bedrock-framework": "./bin/bedrock-framework.js",
     "bedrock": "./bin/bedrock.js"
   },
   "scripts": {

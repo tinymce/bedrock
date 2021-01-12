@@ -2,7 +2,7 @@ import * as cli from './Cli';
 import * as ClOptions from './ClOptions';
 import { ExitCodes } from '../util/ExitCodes';
 import { Attempt } from '../core/Attempt';
-import { BedrockAutoSettings, BedrockFrameworkSettings, BedrockManualSettings } from '../core/Settings';
+import { BedrockAutoSettings, BedrockManualSettings } from '../core/Settings';
 
 export interface Directories {
   current: string;
@@ -56,18 +56,6 @@ export const forManual = (directories: Directories, argv: string[] = process.arg
     ClOptions.coverage,
     ClOptions.polyfills
   ]), argv) as Attempt<cli.CliError, BedrockManualSettings>;
-};
-
-export const forFramework = (directories: Directories, argv: string[] = process.argv): Attempt<cli.CliError, BedrockFrameworkSettings> => {
-  return cli.extract('bedrock-framework', 'Load bedrock against a specific page using a framework', commonOptions(directories).concat([
-    ClOptions.stopOnFailure,
-    ClOptions.name,
-    ClOptions.page,
-    ClOptions.browser,
-    ClOptions.output,
-    ClOptions.framework,
-    ClOptions.debuggingPort
-  ]), argv) as Attempt<cli.CliError, BedrockFrameworkSettings>;
 };
 
 export const logAndExit = (errs: cli.CliError): void => {

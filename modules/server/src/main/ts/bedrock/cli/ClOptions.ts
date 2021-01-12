@@ -111,15 +111,6 @@ export const testdirs: ClOption = {
   validate: Extraction.files(['Test.js', 'Test.bs.js', 'Test.ts', 'Test.tsx'])
 };
 
-export const page: ClOption = {
-  name: 'page',
-  output: 'page',
-  required: true,
-  type: String,
-  description: 'The page to load into the browser',
-  validate: Extraction.file
-};
-
 export const projectdir = (currentDir: string): ClOption => {
   return {
     name: 'projectdir',
@@ -187,15 +178,6 @@ export const singleTimeout: ClOption = {
   validate: Extraction.any,
   defaultValue: 30 * 1000,
   uncommon: true
-};
-
-export const framework: ClOption = {
-  name: 'framework',
-  type: String,
-  defaultValue: 'qunit',
-  description: 'The testing framework being used',
-  validate: Extraction.inSet(['qunit']),
-  required: true
 };
 
 export const help: ClOption = {
