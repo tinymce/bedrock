@@ -26,8 +26,8 @@ const cleanResult = <T>(result: Attempt<CliError, T>) =>
   Attempt.cata(result, Attempt.failed, (v) =>
     Attempt.passed(exclude(['projectdir', 'basedir'])(v)));
 
-describe('cli', () => {
-  it('Minimal specification of bedrock-auto', () => {
+describe('Clis.forAuto', () => {
+  it('parses minimal specification', () => {
     const args = [
       '--browser', 'MicrosoftEdge',
       '--files', 'src/test/resources/test.file1',
@@ -54,13 +54,52 @@ describe('cli', () => {
       chunk: 100,
       retries: 0,
       polyfills: [ 'Symbol' ],
+      bucket: 1,
+      buckets: 1,
       useSandboxForHeadless: false,
       skipResetMousePosition: false,
       wipeBrowserCache: false
     }, cleanResult(actual));
   });
 
-  it('Specification of bedrock-auto missing required field: browser', () => {
+  it('parses bucket arguments', () => {
+    const args = [
+      '--browser', 'MicrosoftEdge',
+      '--files', 'src/test/resources/test.file1',
+      '--config', 'src/test/resources/tsconfig.sample.json',
+      '--bucket', '3',
+      '--buckets', '7'
+    ];
+    const actual = Clis.forAuto(directories, args);
+    AttemptUtils.assertResult({
+      browser: 'MicrosoftEdge',
+      bundler: 'webpack',
+      config: 'src/test/resources/tsconfig.sample.json',
+      name: 'bedrock-run',
+      output: 'scratch',
+      help: false,
+      testfiles: [
+        'src/test/resources/test.file1'
+      ],
+      debuggingPort: 9000,
+      delayExit: false,
+      singleTimeout: 30000,
+      stopOnFailure: false,
+      overallTimeout: 600000,
+      loglevel: 'advanced',
+      version: false,
+      chunk: 100,
+      retries: 0,
+      polyfills: [ 'Symbol' ],
+      bucket: 3,
+      buckets: 7,
+      useSandboxForHeadless: false,
+      skipResetMousePosition: false,
+      wipeBrowserCache: false
+    }, cleanResult(actual));
+  });
+
+  it('fails when browser argument missing', () => {
     const args = [
       '--files', 'src/test/resources/test.file1',
       '--config', 'src/test/resources/tsconfig.sample.json'
@@ -70,7 +109,9 @@ describe('cli', () => {
       'The *required* output property [browser] from [browser] must be specified'
     ], cleanError(actual));
   });
+});
 
+describe('Clis.forManual', () => {
   it('Minimal specification of bedrock-manual', () => {
     const args = [
       '--files', 'src/test/resources/test.file1',
@@ -90,7 +131,36 @@ describe('cli', () => {
       loglevel: 'advanced',
       version: false,
       chunk: 100,
-      polyfills: [ 'Symbol' ]
+      polyfills: [ 'Symbol' ],
+      bucket: 1,
+      buckets: 1
+    }, Attempt.map(actual, exclude(['projectdir', 'basedir'])));
+  });
+
+  it('parses bucket arguments', () => {
+    const args = [
+      '--files', 'src/test/resources/test.file1',
+      '--config', 'src/test/resources/tsconfig.sample.json',
+      '--bucket', '4',
+      '--buckets', '15'
+    ];
+    const actual = Clis.forManual(directories, args);
+    AttemptUtils.assertResult( {
+      config: 'src/test/resources/tsconfig.sample.json',
+      testfiles: [
+        'src/test/resources/test.file1'
+      ],
+      help: false,
+      bundler: 'webpack',
+      singleTimeout: 30000,
+      stopOnFailure: false,
+      overallTimeout: 600000,
+      loglevel: 'advanced',
+      version: false,
+      chunk: 100,
+      polyfills: [ 'Symbol' ],
+      bucket: 4,
+      buckets: 15
     }, Attempt.map(actual, exclude(['projectdir', 'basedir'])));
   });
 });

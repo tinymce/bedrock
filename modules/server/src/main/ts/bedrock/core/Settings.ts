@@ -15,6 +15,8 @@ export interface BedrockManualSettings extends BedrockSettings {
   readonly coverage: string[];
   readonly customRoutes: string;
   readonly polyfills: string[];
+  readonly bucket: number;
+  readonly buckets: number;
   readonly testfiles: string[];
 }
 
@@ -28,6 +30,8 @@ export interface BedrockAutoSettings extends BedrockSettings {
   readonly name: string;
   readonly output: string;
   readonly polyfills: string[];
+  readonly bucket: number;
+  readonly buckets: number;
   readonly retries: number;
   readonly skipResetMousePosition: boolean;
   readonly testfiles: string[];

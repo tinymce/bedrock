@@ -41,7 +41,9 @@ export const forAuto = (directories: Directories, argv: string[] = process.argv)
     ClOptions.skipResetMousePosition,
     ClOptions.coverage,
     ClOptions.wipeBrowserCache,
-    ClOptions.polyfills
+    ClOptions.polyfills,
+    ClOptions.bucket,
+    ClOptions.buckets
   ]), argv) as Attempt<cli.CliError, BedrockAutoSettings>;
 };
 
@@ -54,7 +56,9 @@ export const forManual = (directories: Directories, argv: string[] = process.arg
     ClOptions.testdirs,
     ClOptions.customRoutes,
     ClOptions.coverage,
-    ClOptions.polyfills
+    ClOptions.polyfills,
+    ClOptions.bucket,
+    ClOptions.buckets
   ]), argv) as Attempt<cli.CliError, BedrockManualSettings>;
 };
 
