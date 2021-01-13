@@ -55,15 +55,15 @@ describe('Hooks.runHooks', () => {
     RunnerTestUtils.populateHooks(nested, 2, (idx) => callStack.push('nested' + idx));
   });
 
-  it('runs beforeEach hooks from bottom up', () => {
+  it('runs beforeEach hooks from top down', () => {
     return Hooks.runHooks(nested, HookType.BeforeEach, true).then(() => {
-      assert.deepEqual(callStack, [ 'nested0', 'nested1', 'root0', 'root1' ]);
+      assert.deepEqual(callStack, [ 'root0', 'root1', 'nested0', 'nested1' ]);
     });
   });
 
-  it('runs afterEach hooks from top down', () => {
+  it('runs afterEach hooks from bottom up', () => {
     return Hooks.runHooks(nested, HookType.AfterEach, true).then(() => {
-      assert.deepEqual(callStack, [ 'root1', 'root0', 'nested1', 'nested0' ]);
+      assert.deepEqual(callStack, [ 'nested0', 'nested1', 'root0', 'root1' ]);
     });
   });
 

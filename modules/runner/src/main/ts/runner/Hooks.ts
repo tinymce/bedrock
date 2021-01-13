@@ -13,8 +13,13 @@ export const getHooks = (suite: Suite, type: HookType, includeParents: boolean):
   } else {
     const hooks = suite.hooks[type];
     if (includeParents && suite.parent !== undefined) {
-      const allHooks = hooks.concat(getHooks(suite.parent, type, includeParents));
-      return type === HookType.AfterEach || type === HookType.After ? allHooks.reverse() : allHooks;
+      const parentHooks = getHooks(suite.parent, type, includeParents);
+      // Reverse the suite hook order for after hooks so it gets the suite hooks bottom up
+      if (type === HookType.After || type === HookType.AfterEach) {
+        return hooks.concat(parentHooks);
+      } else {
+        return parentHooks.concat(hooks);
+      }
     } else {
       return hooks;
     }
