@@ -27,7 +27,10 @@ const commonOptions = (directories: Directories) => {
     ClOptions.testdir,
     ClOptions.testdirs,
     ClOptions.coverage,
-    ClOptions.polyfills
+    ClOptions.polyfills,
+    ClOptions.bucket,
+    ClOptions.buckets,
+    ClOptions.stopOnFailure
   ];
 };
 
@@ -38,7 +41,6 @@ export const forAuto = (directories: Directories, argv: string[] = process.argv)
     ClOptions.output,
     ClOptions.debuggingPort,
     ClOptions.customRoutes,
-    ClOptions.stopOnFailure,
     ClOptions.retries,
     ClOptions.delayExiting,
     ClOptions.useSandboxForHeadless,

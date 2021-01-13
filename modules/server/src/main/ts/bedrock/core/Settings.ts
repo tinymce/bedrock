@@ -14,6 +14,8 @@ export interface BedrockSettings {
   readonly coverage: string[];
   readonly customRoutes: string;
   readonly polyfills: string[];
+  readonly bucket: number;
+  readonly buckets: number;
   readonly testfiles: string[];
 }
 

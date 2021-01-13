@@ -10,7 +10,7 @@
   "scripts": {
     "prepublishOnly": "tsc -b",
     "build": "yarn prepublishOnly",
-    "test": "mocha -r esm lib/test/ts/**/*Test.js",
+    "test": "mocha -r esm 'lib/test/ts/**/*Test.js'",
     "buildAndTest": "yarn prepublishOnly && yarn test"
   },
   "dependencies": {

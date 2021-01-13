@@ -10,16 +10,16 @@ import { BedrockAutoSettings } from './bedrock/core/Settings';
 import { ExitCodes } from './bedrock/util/ExitCodes';
 import * as ConsoleReporter from './bedrock/core/ConsoleReporter';
 import { TestResults } from './bedrock/server/Controller';
+import * as SettingsResolver from './bedrock/core/SettingsResolver';
 
-export const go = (settings: BedrockAutoSettings): void => {
+export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
+  console.log('bedrock-auto ' + Version.get() + ' starting...');
+
+  const settings = SettingsResolver.resolveAndLog(bedrockAutoSettings);
   const master = DriverMaster.create();
-
   const isPhantom = settings.browser === 'phantomjs';
-
   const basePage = 'src/resources/html/' + (isPhantom ? 'bedrock-phantom.html' : 'bedrock.html');
   const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
-
-  console.log('bedrock-auto ' + Version.get() + ' starting...');
 
   routes.then((runner) => {
     Driver.create({

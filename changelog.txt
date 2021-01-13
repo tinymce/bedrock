@@ -2,6 +2,10 @@ Version 11.0.0
 
 * Removed "framework" mode, which was used for running QUnit tests.
 
+Version 10.1.0
+
+* Added ability to use `--bucket` and `--buckets` params in bedrock and bedrock-auto commands.
+
 Version 10.0.2
 
 * Fixed beforeEach and afterEach hooks running in the wrong order.
