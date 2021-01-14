@@ -111,15 +111,6 @@ export const testdirs: ClOption = {
   validate: Extraction.files(['Test.js', 'Test.bs.js', 'Test.ts', 'Test.tsx'])
 };
 
-export const page: ClOption = {
-  name: 'page',
-  output: 'page',
-  required: true,
-  type: String,
-  description: 'The page to load into the browser',
-  validate: Extraction.file
-};
-
 export const projectdir = (currentDir: string): ClOption => {
   return {
     name: 'projectdir',
@@ -189,15 +180,6 @@ export const singleTimeout: ClOption = {
   uncommon: true
 };
 
-export const framework: ClOption = {
-  name: 'framework',
-  type: String,
-  defaultValue: 'qunit',
-  description: 'The testing framework being used',
-  validate: Extraction.inSet(['qunit']),
-  required: true
-};
-
 export const help: ClOption = {
   name: 'help',
   alias: 'h',
@@ -255,16 +237,6 @@ export const wipeBrowserCache: ClOption = {
   defaultValue: false,
   description: 'Wipe the browsers cache when starting the webdriver session (IE only)',
   validate: Extraction.any
-};
-
-// TODO: what is this setting?
-export const stopOnFailure__hidden: ClOption = {
-  name: 'stopOnFailure',
-  description: 'Stop on failure',
-  type: Boolean,
-  defaultValue: false,
-  validate: Extraction.any,
-  hidden: true
 };
 
 export const customRoutes: ClOption = {

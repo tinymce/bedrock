@@ -5,7 +5,7 @@ import { BedrockSettings } from './bedrock/core/Settings';
 
 type Program = {
   go: <T extends BedrockSettings>(settings: T, directories: { current: string; bin: string }) => void;
-  mode: 'forAuto' | 'forManual' | 'forFramework';
+  mode: 'forAuto' | 'forManual';
 }
 
 export const run = (program: Program, directories: { current: string; bin: string }): void => {
