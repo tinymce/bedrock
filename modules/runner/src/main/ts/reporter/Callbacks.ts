@@ -7,7 +7,7 @@ export interface Callbacks {
   readonly sendKeepAlive: (session: string) => Promise<void>;
   readonly sendTestStart: (session: string, totalTests: number, file: string, name: string) => Promise<void>;
   readonly sendTestResult: (session: string, file: string, name: string, passed: boolean, time: string, error: string | null, skipped: string | null) => Promise<void>;
-  readonly sendDone: (session: string) => Promise<void>;
+  readonly sendDone: (session: string, error?: string) => Promise<void>;
 }
 
 declare const $: JQueryStatic;
@@ -73,12 +73,13 @@ export const Callbacks = (): Callbacks => {
     });
   };
 
-  const sendDone = (session: string): Promise<void> => {
+  const sendDone = (session: string, error?: string): Promise<void> => {
     // webpack makes this available
     const getCoverage = (): Record<string, any> => typeof Global.__coverage__ === 'undefined' ? {} : Global.__coverage__;
 
     return sendJson('/tests/done', {
       session,
+      error,
       coverage: getCoverage(),
     });
   };

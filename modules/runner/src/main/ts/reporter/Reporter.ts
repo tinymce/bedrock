@@ -17,7 +17,7 @@ export interface TestReporter {
 export interface Reporter {
   readonly summary: () => { offset: number; passed: number; failed: number; skipped: number };
   readonly test: (file: string, name: string, totalNumTests: number) => TestReporter;
-  readonly done: () => void;
+  readonly done: (error?: LoggedError) => void;
 }
 
 export interface ReporterUi {
@@ -120,13 +120,14 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     };
   };
 
-  const done = (): void => {
+  const done = (error?: LoggedError): void => {
     const setAsDone = (): void => {
       const totalTime = elapsed(initial);
       ui.done(totalTime);
     };
 
-    callbacks.sendDone(params.session).then(setAsDone, setAsDone);
+    const textError = error !== undefined ? ErrorReporter.text(error) : undefined;
+    callbacks.sendDone(params.session, textError).then(setAsDone, setAsDone);
   };
 
   return {

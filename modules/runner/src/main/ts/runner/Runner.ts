@@ -1,4 +1,4 @@
-import { Suite } from '@ephox/bedrock-common';
+import { Failure, Suite } from '@ephox/bedrock-common';
 import { HarnessResponse } from '../core/ServerTypes';
 import { UrlParams } from '../core/UrlParams';
 import { noop } from '../core/Utils';
@@ -105,7 +105,7 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
         // chain, so ensure we log it and report we've stopped running.
         if (e !== undefined) {
           console.error('Unexpected error occurred', e);
-          reporter.done();
+          reporter.done(Failure.prepFailure(e));
         }
       });
   };

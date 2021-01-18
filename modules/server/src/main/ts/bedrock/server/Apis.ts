@@ -19,6 +19,23 @@ export interface Apis {
   readonly awaitDone: () => Promise<Controller.TestResults>;
 }
 
+interface StartData {
+  readonly session: string;
+  readonly name: string;
+  readonly file: string;
+  readonly totalTests: number;
+}
+
+interface ResultData extends Controller.TestResult {
+  readonly session: string;
+}
+
+interface DoneData {
+  readonly session: string;
+  readonly coverage: Record<string, any>;
+  readonly error?: string;
+}
+
 // This is how long to wait before checking if the driver is ready again
 const pollRate = 200;
 // This is how many times to fail the driver check before the process fails
@@ -90,7 +107,7 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
       c.recordAlive(data.session);
       return Promise.resolve();
     }),
-    Routes.effect('POST', '/tests/start', (data: { session: string; name: string; file: string; totalTests: number }) => {
+    Routes.effect('POST', '/tests/start', (data: StartData) => {
       c.recordTestStart(data.session, data.name, data.file, data.totalTests);
       if (resetMousePosition) {
         return Attempt.cata(maybeDriver, () => {
@@ -102,13 +119,13 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
         return Promise.resolve();
       }
     }),
-    Routes.effect('POST', '/tests/result', (data: Controller.TestResult & { session: string }) => {
+    Routes.effect('POST', '/tests/result', (data: ResultData) => {
       c.recordTestResult(data.session, data.name, data.file, data.passed, data.time, data.error, data.skipped);
       return Promise.resolve();
     }),
-    Routes.effect('POST', '/tests/done', (data: { session: string; coverage: Record<string, any> }) => {
+    Routes.effect('POST', '/tests/done', (data: DoneData) => {
       Coverage.writeCoverageData(data.coverage);
-      c.recordDone(data.session);
+      c.recordDone(data.session, data.error);
       return Promise.resolve();
     }),
     // This does not need the webdriver.

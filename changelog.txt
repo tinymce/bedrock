@@ -1,3 +1,7 @@
+Version 11.0.1
+
+* Fixed bedrock not returning a non-zero error code when tests unexpectedly stopped.
+
 Version 11.0.0
 
 * Removed "framework" mode, which was used for running QUnit tests.
