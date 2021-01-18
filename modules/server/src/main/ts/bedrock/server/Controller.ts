@@ -1,4 +1,5 @@
 import * as Hud from '../cli/Hud';
+import * as Type from '../util/Type';
 
 export interface TestResult {
   readonly name: string;
@@ -35,6 +36,7 @@ interface TestSession {
   inflight: InflightTest | null;
   previous: PreviousTest | null;
   done: boolean;
+  error?: string;
   totalTests: number;
 }
 
@@ -43,7 +45,7 @@ export interface Controller {
   readonly recordAlive: (sessionId: string) => void;
   readonly recordTestStart: (id: string, name: string, file: string, totalTests: number) => void;
   readonly recordTestResult: (id: string, name: string, file: string, passed: boolean, time: string, error: string, skipped: string) => void;
-  readonly recordDone: (id: string) => void;
+  readonly recordDone: (id: string, error?: string) => void;
   readonly awaitDone: () => Promise<TestResults>;
 }
 
@@ -151,9 +153,10 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     updateHud(session);
   };
 
-  const recordDone = (id: string) => {
+  const recordDone = (id: string, error?: string) => {
     const session = getSession(id);
     session.done = true;
+    session.error = error;
     session.updated = Date.now();
     updateHud(session);
   };
@@ -186,7 +189,12 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
           const session = sessions[stickyId];
           const results = session.results;
           if (session.done) {
-            resolve({results, start, now});
+            if (Type.isString(session.error)) {
+              const message = `Unexpected runner error: ${session.error}`;
+              reject({ message, results, start, now });
+            } else {
+              resolve({ results, start, now });
+            }
             clearInterval(poller);
           } else {
             if (session.inflight !== null && (now - session.inflight.start) > (singleTimeout + timeoutGrace)) {

@@ -1,4 +1,4 @@
-import { LoggedError } from '@ephox/bedrock-common';
+import { Failure, LoggedError } from '@ephox/bedrock-common';
 import Promise from '@ephox/wrap-promise-polyfill';
 import { assert } from 'chai';
 import * as fc from 'fast-check';
@@ -46,7 +46,7 @@ const ui = {
 
 describe('Reporter.test', () => {
   let reporter: Reporter, startTestData: StartTestData[], endTestData: EndTestData[];
-  let doneCalled: boolean, offset: number;
+  let doneCalled: boolean, doneError: string | undefined, offset: number;
   const callbacks: Callbacks = {
     loadHarness: () => Promise.resolve({ retries: 0, chunk: 100, stopOnFailure: true, mode: 'manual', timeout: 10000 }),
     sendKeepAlive: () => Promise.resolve(),
@@ -58,8 +58,9 @@ describe('Reporter.test', () => {
       endTestData.push({ session, file, name, passed, time, error, skipped });
       return Promise.resolve();
     },
-    sendDone: () => {
+    sendDone: (session, error) => {
       doneCalled = true;
+      doneError = error;
       return Promise.resolve();
     }
   };
@@ -70,6 +71,7 @@ describe('Reporter.test', () => {
     startTestData = [];
     endTestData = [];
     doneCalled = false;
+    doneError = undefined;
   };
 
   beforeEach(reset);
@@ -192,5 +194,12 @@ describe('Reporter.test', () => {
   it('should report done', () => {
     reporter.done();
     assert.isTrue(doneCalled);
+    assert.isUndefined(doneError);
+  });
+
+  it('should report done with an error', () => {
+    reporter.done(Failure.prepFailure('Unexpected error occurred'));
+    assert.isTrue(doneCalled);
+    assert.include(doneError, 'Unexpected error occurred');
   });
 });
