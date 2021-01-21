@@ -112,28 +112,49 @@ describe('Clis.forAuto', () => {
 });
 
 describe('Clis.forManual', () => {
+  const defaultCliOptions = {
+    config: 'tsconfig.json',
+    testfiles: [],
+    help: false,
+    bundler: 'webpack',
+    singleTimeout: 30000,
+    stopOnFailure: false,
+    overallTimeout: 600000,
+    loglevel: 'advanced',
+    version: false,
+    chunk: 100,
+    polyfills: [ 'Symbol' ],
+    bucket: 1,
+    buckets: 1
+  };
+
   it('Minimal specification of bedrock-manual', () => {
     const args = [
       '--files', 'src/test/resources/test.file1',
       '--config', 'src/test/resources/tsconfig.sample.json'
     ];
     const actual = Clis.forManual(directories, args);
-    AttemptUtils.assertResult( {
+    AttemptUtils.assertResult({
+      ...defaultCliOptions,
       config: 'src/test/resources/tsconfig.sample.json',
       testfiles: [
         'src/test/resources/test.file1'
+      ]
+    }, Attempt.map(actual, exclude(['projectdir', 'basedir'])));
+  });
+
+  it('allows custom routes to be used', () => {
+    const args = [
+      '--files', 'src/test/resources/test.file1',
+      '--customRoutes', 'src/test/resources/routes.json'
+    ];
+    const actual = Clis.forManual(directories, args);
+    AttemptUtils.assertResult({
+      ...defaultCliOptions,
+      testfiles: [
+        'src/test/resources/test.file1'
       ],
-      help: false,
-      bundler: 'webpack',
-      singleTimeout: 30000,
-      stopOnFailure: false,
-      overallTimeout: 600000,
-      loglevel: 'advanced',
-      version: false,
-      chunk: 100,
-      polyfills: [ 'Symbol' ],
-      bucket: 1,
-      buckets: 1
+      customRoutes: 'src/test/resources/routes.json'
     }, Attempt.map(actual, exclude(['projectdir', 'basedir'])));
   });
 
@@ -145,20 +166,12 @@ describe('Clis.forManual', () => {
       '--buckets', '15'
     ];
     const actual = Clis.forManual(directories, args);
-    AttemptUtils.assertResult( {
+    AttemptUtils.assertResult({
+      ...defaultCliOptions,
       config: 'src/test/resources/tsconfig.sample.json',
       testfiles: [
         'src/test/resources/test.file1'
       ],
-      help: false,
-      bundler: 'webpack',
-      singleTimeout: 30000,
-      stopOnFailure: false,
-      overallTimeout: 600000,
-      loglevel: 'advanced',
-      version: false,
-      chunk: 100,
-      polyfills: [ 'Symbol' ],
       bucket: 4,
       buckets: 15
     }, Attempt.map(actual, exclude(['projectdir', 'basedir'])));
