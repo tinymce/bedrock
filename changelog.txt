@@ -1,3 +1,7 @@
+Version 11.0.2
+
+* Fixed a regression introduced in 11.0.0 whereby --customRoutes couldn't be used in manual mode.
+
 Version 11.0.1
 
 * Fixed bedrock not returning a non-zero error code when tests unexpectedly stopped.
