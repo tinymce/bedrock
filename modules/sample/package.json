@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock-sample",
-  "version": "11.0.1",
+  "version": "11.0.2",
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
   "scripts": {
@@ -17,7 +17,7 @@
     "@ephox/wrap-promise-polyfill": "^2.2.0"
   },
   "devDependencies": {
-    "@ephox/bedrock-server": "^11.0.1"
+    "@ephox/bedrock-server": "^11.0.2"
   },
   "files": [],
   "private": true,
