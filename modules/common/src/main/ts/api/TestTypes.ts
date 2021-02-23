@@ -76,6 +76,7 @@ export interface Runnable extends Common<Runnable> {
   readonly isFailed: () => boolean;
   readonly isPassed: () => boolean;
   readonly setResult: (state: RunnableState, e?: Error) => void;
+  readonly _onChange: (type: 'retries' | 'slow' | 'timeout', callback: (value: number) => void) => () => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

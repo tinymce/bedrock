@@ -2,6 +2,7 @@ import { Context, ExecuteFn, Failure, Runnable, RunnableState, TestThrowable } f
 import Promise from '@ephox/wrap-promise-polyfill';
 import { isInternalError, MultipleDone, SkipError } from '../core/Errors';
 import { ErrorCatcher } from './ErrorCatcher';
+import { Timer } from './Timer';
 
 const isPromiseLike = (value: unknown | undefined): value is PromiseLike<any> =>
   value !== undefined && (value as PromiseLike<any>).then !== undefined;
@@ -93,19 +94,25 @@ export const runWithTimeout = (runnable: Runnable, context: Context, defaultTime
     return run(runnable, context);
   } else {
     return new Promise((resolve, reject) => {
-      let timedOut = false;
-      const timer = setTimeout(() => {
-        timedOut = true;
-        reject(Failure.prepFailure(new Error(`Test ran too long - timeout of ${timeout}ms exceeded`)));
-      }, timeout);
+      const timer = Timer(() => {
+        cleanup();
+        reject(Failure.prepFailure(new Error(`Test ran too long - timeout of ${runnable.timeout()}ms exceeded`)));
+      });
+      // If the runnable sets a timeout while running then we need to restart the timer
+      const unbind = runnable._onChange('timeout', timer.restart);
+      const cleanup = () => {
+        timer.stop();
+        unbind();
+      };
 
+      timer.start(timeout);
       run(runnable, context).then(() => {
-        clearTimeout(timer);
-        if (!timedOut) {
+        cleanup();
+        if (!timer.hasTimedOut()) {
           resolve();
         }
       }, (e) => {
-        clearTimeout(timer);
+        cleanup();
         reject(e);
       });
     });

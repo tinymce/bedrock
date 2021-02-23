@@ -100,4 +100,19 @@ describe('Hooks.runHooks', () => {
       assert.deepEqual(callStack, [ ]);
     });
   });
+
+  it('should handle a timeout being adjusted during execution', () => {
+    root.hooks.before.push(createHook(HookType.Before, function (this: Context, done) {
+      // Default timeout is 2000
+      this.timeout(2500);
+      setTimeout(done, 2250);
+    }));
+    const test = createTest('test', noop, root);
+    root.tests.push(test);
+    return Hooks.runBefore(root, test).then(() => {
+      assert.isFalse(test.isFailed());
+      assert.isFalse(test.isSkipped());
+      assert.deepEqual(callStack, [ 'root0', 'root1' ]);
+    });
+  }).timeout(4000);
 });

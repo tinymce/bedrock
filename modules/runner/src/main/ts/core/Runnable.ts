@@ -6,6 +6,15 @@ export const createRunnable = (title: string, fn: ExecuteFn | undefined): Runnab
   let timeout = -1;
   let slow = 75;
   let state = RunnableState.NotRun;
+  const listeners: Record<string, Set<(value: number) => void>> = {};
+
+  const fireChange = (type: string, value: number) => {
+    if (listeners.hasOwnProperty(type)) {
+      listeners[type].forEach((listener) => {
+        listener(value);
+      });
+    }
+  };
 
   const runnable: Runnable = {
     fn,
@@ -23,6 +32,7 @@ export const createRunnable = (title: string, fn: ExecuteFn | undefined): Runnab
     },
     retries: (retry?: number): any => {
       if (retry !== undefined) {
+        fireChange('retries', retry);
         retries = retry;
         return runnable;
       } else {
@@ -31,6 +41,7 @@ export const createRunnable = (title: string, fn: ExecuteFn | undefined): Runnab
     },
     slow: (ms?: number): any => {
       if (ms !== undefined) {
+        fireChange('slow', ms);
         slow = ms;
         return runnable;
       } else {
@@ -39,11 +50,21 @@ export const createRunnable = (title: string, fn: ExecuteFn | undefined): Runnab
     },
     timeout: (ms?: number): any => {
       if (ms !== undefined) {
+        fireChange('timeout', ms);
         timeout = ms;
         return runnable;
       } else {
         return timeout;
       }
+    },
+    _onChange: (type, callback) => {
+      if (!listeners.hasOwnProperty(type)) {
+        listeners[type] = new Set();
+      }
+      listeners[type].add(callback);
+      return () => {
+        listeners[type].delete(callback);
+      };
     }
   };
   return runnable;
