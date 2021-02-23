@@ -70,6 +70,7 @@ addTest("/${filename}.js");`
       });
     });
   });
+
   context('ESM', () => {
     it('should include the specified test files (require)', () => {
       withGenerateFilenames(true, 'mjs', (imports, filenames) => {
