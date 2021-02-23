@@ -25,7 +25,7 @@ describe('Imports.generateImports', () => {
         filenames.forEach((filename) => {
           assert.include(imports, `
 __currentTestFile = "/${filename}.ts";
-require("${filename}");
+require("${filename}.ts");
 addTest("/${filename}.ts");`
           );
         });
@@ -37,7 +37,7 @@ addTest("/${filename}.ts");`
         filenames.forEach((filename) => {
           assert.include(imports, `
 __currentTestFile = "/${filename}.ts";
-import "${filename}";
+import "${filename}.ts";
 addTest("/${filename}.ts");`
           );
         });
@@ -51,7 +51,7 @@ addTest("/${filename}.ts");`
         filenames.forEach((filename) => {
           assert.include(imports, `
 __currentTestFile = "/${filename}.js";
-require("${filename}");
+require("${filename}.js");
 addTest("/${filename}.js");`
           );
         });
@@ -63,8 +63,33 @@ addTest("/${filename}.js");`
         filenames.forEach((filename) => {
           assert.include(imports, `
 __currentTestFile = "/${filename}.js";
-import "${filename}";
+import "${filename}.js";
 addTest("/${filename}.js");`
+          );
+        });
+      });
+    });
+  });
+  context('ESM', () => {
+    it('should include the specified test files (require)', () => {
+      withGenerateFilenames(true, 'mjs', (imports, filenames) => {
+        filenames.forEach((filename) => {
+          assert.include(imports, `
+__currentTestFile = "/${filename}.mjs";
+require("${filename}.mjs");
+addTest("/${filename}.mjs");`
+          );
+        });
+      });
+    });
+
+    it('should include the specified test files (import)', () => {
+      withGenerateFilenames(false, 'mjs', (imports, filenames) => {
+        filenames.forEach((filename) => {
+          assert.include(imports, `
+__currentTestFile = "/${filename}.mjs";
+import "${filename}.mjs";
+addTest("/${filename}.mjs");`
           );
         });
       });

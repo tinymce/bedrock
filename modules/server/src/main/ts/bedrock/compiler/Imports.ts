@@ -9,8 +9,7 @@ export const convertPolyfillNameToPath = (name: string): string => {
 
 const filePathToImport = (useRequire: boolean, scratchFile: string) => {
   return (filePath: string) => {
-    const importFilePath = path.join(path.dirname(filePath), path.basename(filePath, path.extname(filePath)));
-    let relativePath = path.relative(path.dirname(scratchFile), importFilePath);
+    let relativePath = path.relative(path.dirname(scratchFile), filePath);
 
     // make sure slashes are escaped for windows
     relativePath = relativePath.replace(/\\/g, '\\\\');
