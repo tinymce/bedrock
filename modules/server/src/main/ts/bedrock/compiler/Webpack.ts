@@ -32,7 +32,7 @@ const moduleAvailable = (name: string) => {
 
 const webpackRemap: Array<Record<string, any>> = moduleAvailable('@ephox/swag') ? [
   {
-    test: /\.js|\.mjs|\.tsx?$/,
+    test: /\.(js|mjs|tsx?)$/,
     use: [ '@ephox/swag/webpack/remapper' ]
   }
 ] : [];
