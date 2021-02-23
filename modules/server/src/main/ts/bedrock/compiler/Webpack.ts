@@ -39,16 +39,15 @@ const webpackRemap: Array<Record<string, any>> = moduleAvailable('@ephox/swag') 
 
 const webpackSharedRules = webpackRemap.concat([
   {
-    test: /\.mjs$/,
+    test: /\.(mjs)$/,
     type: 'javascript/auto',
     use: []
   },
   {
-    test: /\.js|\.mjs$/,
+    test: /\.(js|mjs)$/,
     use: [ 'source-map-loader' ],
     enforce: 'pre'
   },
-
   {
     test: /\.(html|htm|css|bower|hex|rtf|xml|yml)$/,
     use: [ 'raw-loader' ]
@@ -92,7 +91,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
     module: {
       rules: webpackSharedRules.concat([
         {
-          test: /\.tsx?$/,
+          test: /\.(tsx?)$/,
           use: [
             {
               loader: 'ts-loader',
@@ -114,7 +113,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
       ]).concat(
         coverage ? [
           {
-            test: /\.tsx?$/,
+            test: /\.(tsx?)$/,
             enforce: 'post',
             loader: 'istanbul-instrumenter-loader',
             include: coverage.map((p) => path.resolve(p)),
@@ -173,7 +172,7 @@ const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[
       rules: webpackSharedRules.concat(
         coverage ? [
           {
-            test: /\.js|\.mjs?$/,
+            test: /\.(js|mjs)$/,
             enforce: 'post',
             loader: 'istanbul-instrumenter-loader',
             include: coverage.map((p) => path.resolve(p)),
