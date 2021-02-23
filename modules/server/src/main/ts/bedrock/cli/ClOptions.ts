@@ -97,7 +97,7 @@ export const testdir: ClOption = {
   alias: 'd',
   type: String,
   description: 'The directory containing all the files to test',
-  validate: Extraction.files(['Test.js', 'Test.bs.js', 'Test.ts', 'Test.tsx'])
+  validate: Extraction.files(['Test.js', 'Test.ts', 'Test.tsx', 'Test.mjs', 'Test.bs.js'])
 };
 
 export const testdirs: ClOption = {
@@ -108,7 +108,7 @@ export const testdirs: ClOption = {
   multiple: true,
   flatten: true,
   description: 'The directories (plural) containing all the files to test',
-  validate: Extraction.files(['Test.js', 'Test.bs.js', 'Test.ts', 'Test.tsx'])
+  validate: Extraction.files(['Test.js', 'Test.ts', 'Test.tsx', 'Test.mjs', 'Test.bs.js'])
 };
 
 export const projectdir = (currentDir: string): ClOption => {

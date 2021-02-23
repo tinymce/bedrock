@@ -1,3 +1,7 @@
+Version 11.1.0
+
+* Added support for `.mjs` test files, overridden to load with webpack's `javascript/auto` type instead of `javascript/esm`
+
 Version 11.0.2
 
 * Fixed a regression introduced in 11.0.0 whereby --customRoutes couldn't be used in manual mode.

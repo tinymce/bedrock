@@ -32,10 +32,27 @@ const moduleAvailable = (name: string) => {
 
 const webpackRemap: Array<Record<string, any>> = moduleAvailable('@ephox/swag') ? [
   {
-    test: /\.js|\.tsx?$/,
+    test: /\.(js|mjs|tsx?)$/,
     use: [ '@ephox/swag/webpack/remapper' ]
   }
 ] : [];
+
+const webpackSharedRules = webpackRemap.concat([
+  {
+    test: /\.(mjs)$/,
+    type: 'javascript/auto',
+    use: []
+  },
+  {
+    test: /\.(js|mjs)$/,
+    use: [ 'source-map-loader' ],
+    enforce: 'pre'
+  },
+  {
+    test: /\.(html|htm|css|bower|hex|rtf|xml|yml)$/,
+    use: [ 'raw-loader' ]
+  }
+]);
 
 const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, coverage: string[], manualMode: boolean, basedir: string): webpack.Configuration => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -51,13 +68,13 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
     },
 
     resolve: {
-      extensions: [ '.ts', '.tsx', '.js' ],
+      extensions: [ '.ts', '.tsx', '.js', '.mjs' ],
       plugins: [
         new TsConfigPathsPlugin({
           configFile: tsConfigFile,
           // awesome-typescript-loader could read this from above, but the new plugin can't?
           // lol whatever
-          extensions: [ '.ts', '.tsx', '.js' ]
+          extensions: [ '.ts', '.tsx', '.js', '.mjs' ]
         })
       ]
     },
@@ -72,15 +89,9 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
     },
 
     module: {
-      rules: webpackRemap.concat([
+      rules: webpackSharedRules.concat([
         {
-          test: /\.js$/,
-          use: [ 'source-map-loader' ],
-          enforce: 'pre'
-        },
-
-        {
-          test: /\.tsx?$/,
+          test: /\.(tsx?)$/,
           use: [
             {
               loader: 'ts-loader',
@@ -98,16 +109,11 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
               }
             }
           ]
-        },
-
-        {
-          test: /\.(html|htm|css|bower|hex|rtf|xml|yml)$/,
-          use: [ 'raw-loader' ]
         }
       ]).concat(
         coverage ? [
           {
-            test: /\.tsx?$/,
+            test: /\.(tsx?)$/,
             enforce: 'post',
             loader: 'istanbul-instrumenter-loader',
             include: coverage.map((p) => path.resolve(p)),
@@ -150,7 +156,7 @@ const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[
     },
 
     resolve: {
-      extensions: [ '.js' ]
+      extensions: [ '.js', '.mjs' ]
     },
 
     // Webpack by default only resolves from the ./node_modules directory which will cause issues if the project that uses bedrock
@@ -163,20 +169,10 @@ const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[
     },
 
     module: {
-      rules: webpackRemap.concat([
-        {
-          test: /\.js$/,
-          use: [ 'source-map-loader' ],
-          enforce: 'pre'
-        },
-        {
-          test: /\.(html|htm|css|bower|hex|rtf|xml|yml)$/,
-          use: [ 'raw-loader' ]
-        }
-      ]).concat(
+      rules: webpackSharedRules.concat(
         coverage ? [
           {
-            test: /\.js?$/,
+            test: /\.(js|mjs)$/,
             enforce: 'post',
             loader: 'istanbul-instrumenter-loader',
             include: coverage.map((p) => path.resolve(p)),
