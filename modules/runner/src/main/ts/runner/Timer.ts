@@ -1,22 +1,26 @@
+import { noop } from '../core/Utils';
+
 export interface Timer {
-  readonly start: (ms: number) => void;
+  readonly start: (ms: number, timedOutCallback: () => void) => void;
   readonly restart: (ms: number) => void;
   readonly stop: () => void;
   readonly hasTimedOut: () => boolean;
 }
 
-export const Timer = (callback: () => void): Timer => {
+export const Timer = (): Timer => {
   let timer: number | undefined;
   let timedOut = false;
+  let callback: () => void = noop;
 
-  const start = (ms: number) => {
+  const startTimer = (ms: number) => {
+    timedOut = false;
     timer = setTimeout(() => {
       timedOut = true;
       callback();
     }, ms);
   };
 
-  const stop = () => {
+  const stopTimer = () => {
     if (timer !== undefined) {
       clearTimeout(timer);
       timer = undefined;
@@ -24,12 +28,18 @@ export const Timer = (callback: () => void): Timer => {
   };
 
   return {
-    start,
-    restart: (ms) => {
-      stop();
-      start(ms);
+    start: (ms: number, timedOutCallback: () => void) => {
+      callback = timedOutCallback;
+      startTimer(ms);
     },
-    stop,
+    restart: (ms) => {
+      stopTimer();
+      startTimer(ms);
+    },
+    stop: () => {
+      stopTimer();
+      callback = noop;
+    },
     hasTimedOut: () => timedOut
   };
 };
