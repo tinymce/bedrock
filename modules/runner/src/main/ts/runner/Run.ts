@@ -87,6 +87,12 @@ export const run = (runnable: Runnable, context: Context): Promise<void> => {
   }
 };
 
+const runWithCleanup = (runnable: Runnable, context: Context, cleanup: () => void): Promise<void> =>
+  run(runnable, context).then(cleanup, (e) => {
+    cleanup();
+    return Promise.reject(e);
+  });
+
 export const runWithTimeout = (runnable: Runnable, context: Context, defaultTimeout: number): Promise<void> => {
   // Run the execute function with a timeout if required
   const timeout = runnable.timeout() === -1 ? defaultTimeout : runnable.timeout();
@@ -94,27 +100,28 @@ export const runWithTimeout = (runnable: Runnable, context: Context, defaultTime
     return run(runnable, context);
   } else {
     return new Promise((resolve, reject) => {
-      const timer = Timer(() => {
-        cleanup();
-        reject(Failure.prepFailure(new Error(`Test ran too long - timeout of ${runnable.timeout()}ms exceeded`)));
-      });
-      // If the runnable sets a timeout while running then we need to restart the timer
-      const unbind = runnable._onChange('timeout', timer.restart);
-      const cleanup = () => {
-        timer.stop();
-        unbind();
-      };
+      const timer = Timer();
 
-      timer.start(timeout);
-      run(runnable, context).then(() => {
-        cleanup();
+      const resolveIfNotTimedOut = () => {
         if (!timer.hasTimedOut()) {
           resolve();
         }
-      }, (e) => {
-        cleanup();
-        reject(e);
+      };
+
+      // If the runnable sets a timeout while running then we need to restart the timer
+      const unbind = runnable._onChange('timeout', timer.restart);
+
+      // Start the timer
+      timer.start(timeout, () => {
+        unbind();
+        reject(Failure.prepFailure(new Error(`Test ran too long - timeout of ${runnable.timeout()}ms exceeded`)));
       });
+
+      // Run the execute function and clean up after it's completed
+      runWithCleanup(runnable, context, () => {
+        timer.stop();
+        unbind();
+      }).then(resolveIfNotTimedOut, reject);
     });
   }
 };
