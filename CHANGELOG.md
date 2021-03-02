@@ -460,7 +460,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - updated key effects and mouse effects to handle dispatching within iframes
 - changed click from an ActionSequence to a WebElement action because Edge supports it
 
-
 ## 1.4.0 - 2016-12-09
 
 ### Added
@@ -473,8 +472,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Improved
 - improves test report format
 - improves experimental SauceLabs integration
-
-
-
-
-
