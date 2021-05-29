@@ -5,15 +5,11 @@ export const countTests = (suite: Suite): number =>
   suite.tests.length + suite.suites.reduce((acc, suite) => acc + countTests(suite), 0);
 
 export const loop = <T>(items: T[], fn: (item: T) => Promise<void>, index = 0): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    if (index < items.length) {
-      fn(items[index])
-        .then(() => loop(items, fn, index + 1))
-        .then(resolve, reject);
-    } else {
-      resolve();
-    }
-  });
+  if (index < items.length) {
+    return fn(items[index]).then(() => loop(items, fn, index + 1));
+  } else {
+    return Promise.resolve();
+  }
 };
 
 export const getTests = (suite: Suite): Test[] => {
