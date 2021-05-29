@@ -1,3 +1,4 @@
+import { ErrorData } from './ErrorExtractor';
 import * as Failure from './Failure';
 import { Global } from './Global';
 import * as LoggedError from './LoggedError';
@@ -14,6 +15,7 @@ export {
   Global,
   TestError,
   LoggedError,
+  ErrorData,
   Reporter,
   TestLabel,
   TestLogs,
