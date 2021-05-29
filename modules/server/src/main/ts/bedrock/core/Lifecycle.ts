@@ -1,3 +1,4 @@
+import * as chalk from 'chalk';
 import { BrowserObject } from 'webdriverio';
 import { TestResult } from '../server/Controller';
 import { ExitCodes } from '../util/ExitCodes';
@@ -20,16 +21,16 @@ export const shutdown = (promise: Promise<Attempt<string[], TestResult[]>>, driv
 
     return delay.then(() => {
       return Attempt.cata(res, (errs) => {
-        console.log(errs.join('\n'));
+        console.log(chalk.red(errs.join('\n')));
         return done().then(exit(ExitCodes.failures.tests));
       }, () => {
-        console.log('All tests passed.');
+        console.log(chalk.green('All tests passed.'));
         return done().then(exit(ExitCodes.success));
       });
     });
   }).catch((err) => {
     return exitDelay().then(() => {
-      console.error('********** Unexpected Bedrock Error -> Server Quitting **********');
+      console.error(chalk.red('********** Unexpected Bedrock Error -> Server Quitting **********'));
       console.error(err);
       return done().then(exit(ExitCodes.failures.unexpected));
     });

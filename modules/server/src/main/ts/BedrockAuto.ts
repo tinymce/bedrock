@@ -1,3 +1,4 @@
+import * as chalk from 'chalk';
 import * as Serve from './bedrock/server/Serve';
 import { Attempt } from './bedrock/core/Attempt';
 import * as Version from './bedrock/core/Version';
@@ -66,9 +67,12 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
         return Lifecycle.shutdown(result, webdriver, done, gruntDone, delayExit);
       });
     }).catch((err) => {
-      console.error(err);
-      if (settings.gruntDone !== undefined) settings.gruntDone(false);
-      else process.exit(ExitCodes.failures.unexpected);
+      console.error(chalk.red(err));
+      if (settings.gruntDone !== undefined) {
+        settings.gruntDone(false);
+      } else {
+        process.exit(ExitCodes.failures.unexpected);
+      }
     });
   });
 };

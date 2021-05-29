@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Improved
+- The error messages printed to the terminal will now be coloured and syntax highlighted.
+
 ### Changed
 - The legacy assertion module now throws an `AssertionError` instead of a generic `Error`.
 
