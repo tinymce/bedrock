@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+- The legacy assertion module now throws an `AssertionError` instead of a generic `Error`.
+
+### Deprecated
+- Formally deprecated the legacy assertion module.
+
 ## 11.2.1 - 2021-05-31
 
 ### Fixed

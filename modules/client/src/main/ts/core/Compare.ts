@@ -13,13 +13,14 @@ const Obj = {
 export interface Comparison {
   eq: boolean;
   why: () => string;
+  message: () => string;
 }
 
 const pass = (): Comparison =>
-  ({ eq: true, why: () => '' });
+  ({ eq: true, why: () => '', message: () => '' });
 
 const fail = (why: () => string): Comparison =>
-  ({ eq: false, why });
+  ({ eq: false, why, message: why });
 
 const failCompare = (x: any, y: any, prefix?: string): Comparison => {
   return fail(() => (prefix || 'Values were different') + ': [' + String(x) + '] vs [' + String(y) + ']');
@@ -110,6 +111,7 @@ export const compare = (x: any, y: any): Comparison => {
 
   return {
     eq: result.eq,
-    why: () => result.why() + '\n' + bar + '\n' + JSON.stringify(x) + '\n' + bar + '\n' + JSON.stringify(y) + '\n' + bar + '\n'
+    why: () => result.why() + '\n' + bar + '\n' + JSON.stringify(x) + '\n' + bar + '\n' + JSON.stringify(y) + '\n' + bar + '\n',
+    message: result.why
   };
 };
