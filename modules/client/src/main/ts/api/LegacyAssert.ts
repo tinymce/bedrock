@@ -1,13 +1,19 @@
 import { TestLabel } from '@ephox/bedrock-common';
 import * as Compare from '../core/Compare';
 
+/** @deprecated Use chai assertions or the Assert module instead */
 const eq = function (expected: any, actual: any, message?: TestLabel): void {
   const result = Compare.compare(expected, actual);
   if (!result.eq) {
-    throw new Error(TestLabel.asStringOr(message, result.why));
+    const error: any = new Error(TestLabel.asStringOr(message, result.message));
+    error.name = 'AssertionError';
+    error.actual = actual;
+    error.expected = expected;
+    throw error;
   }
 };
 
+/** @deprecated Use chai assertions or the Assert module instead */
 const throws = function (f: () => void, expected?: string, message?: TestLabel): void {
   const token = {};
 
@@ -25,6 +31,7 @@ const throws = function (f: () => void, expected?: string, message?: TestLabel):
   }
 };
 
+/** @deprecated Use chai assertions or the Assert module instead */
 const throwsError = function (f: () => void, expected?: string, message?: TestLabel): void {
   const token = {};
 
@@ -42,6 +49,7 @@ const throwsError = function (f: () => void, expected?: string, message?: TestLa
   }
 };
 
+/** @deprecated Use chai assertions or the Assert module instead */
 const succeeds = function (f: () => void, message?: TestLabel): void {
   try {
     f();
@@ -50,6 +58,7 @@ const succeeds = function (f: () => void, message?: TestLabel): void {
   }
 };
 
+/** @deprecated Use chai assertions or the Assert module instead */
 const fail = function (message?: TestLabel): void {
   throw new Error(TestLabel.asStringOr(message, () => 'Test failed'));
 };
