@@ -1,12 +1,17 @@
-import { Global } from '@ephox/bedrock-common';
+import { ErrorData, Global } from '@ephox/bedrock-common';
 import Promise from '@ephox/wrap-promise-polyfill';
 import { HarnessResponse } from '../core/ServerTypes';
+
+export interface TestErrorData {
+  readonly data: ErrorData;
+  readonly text: string;
+}
 
 export interface Callbacks {
   readonly loadHarness: () => Promise<HarnessResponse>
   readonly sendKeepAlive: (session: string) => Promise<void>;
   readonly sendTestStart: (session: string, totalTests: number, file: string, name: string) => Promise<void>;
-  readonly sendTestResult: (session: string, file: string, name: string, passed: boolean, time: string, error: string | null, skipped: string | null) => Promise<void>;
+  readonly sendTestResult: (session: string, file: string, name: string, passed: boolean, time: string, error: TestErrorData | null, skipped: string | null) => Promise<void>;
   readonly sendDone: (session: string, error?: string) => Promise<void>;
 }
 
@@ -61,7 +66,7 @@ export const Callbacks = (): Callbacks => {
     });
   };
 
-  const sendTestResult = (session: string, file: string, name: string, passed: boolean, time: string, error: string | null, skipped: string | null): Promise<void> => {
+  const sendTestResult = (session: string, file: string, name: string, passed: boolean, time: string, error: TestErrorData | null, skipped: string | null): Promise<void> => {
     return sendJson('/tests/result', {
       session,
       file,

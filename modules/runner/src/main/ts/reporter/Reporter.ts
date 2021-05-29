@@ -103,11 +103,15 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
         reported = true;
         failCount++;
 
-        const textError = ErrorReporter.text(e);
+        const errorData = ErrorReporter.data(e);
+        const error = {
+          data: errorData,
+          text: ErrorReporter.dataText(errorData)
+        };
         const testTime = elapsed(starttime);
 
         testUi.fail(e, testTime, currentCount);
-        return callbacks.sendTestResult(params.session, file, name, false, testTime, textError, null);
+        return callbacks.sendTestResult(params.session, file, name, false, testTime, error, null);
       }
     };
 

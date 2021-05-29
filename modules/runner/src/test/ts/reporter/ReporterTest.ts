@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { beforeEach, describe, it } from 'mocha';
 import { UrlParams } from '../../../main/ts/core/UrlParams';
-import { Callbacks } from '../../../main/ts/reporter/Callbacks';
+import { Callbacks, TestErrorData } from '../../../main/ts/reporter/Callbacks';
 import { Reporter } from '../../../main/ts/reporter/Reporter';
 import { noop } from '../TestUtils';
 
@@ -21,7 +21,7 @@ interface EndTestData {
   readonly name: string;
   readonly passed: boolean;
   readonly time: string;
-  readonly error: string | null;
+  readonly error: TestErrorData | null;
   readonly skipped: string | null;
 }
 
@@ -177,7 +177,7 @@ describe('Reporter.test', () => {
           assert.isFalse(data.passed);
           assert.isNull(data.skipped);
           assert.isString(data.time);
-          assert.equal(data.error, 'Error: Failed\n\nLogs:\nLog Message');
+          assert.equal(data.error?.text, 'Error: Failed\n\nLogs:\nLog Message');
 
           assert.deepEqual(reporter.summary(), {
             offset,
