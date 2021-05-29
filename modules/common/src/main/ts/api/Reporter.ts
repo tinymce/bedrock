@@ -1,26 +1,18 @@
 import * as TestError from './TestError';
+import * as ErrorExtractor from './ErrorExtractor';
 import * as LoggedError from './LoggedError';
 import * as Differ from './Differ';
 import { htmlentities } from './StringUtils';
 
 type LoggedError = LoggedError.LoggedError;
 
-type TestError = TestError.TestError;
 type PprintAssertionError = TestError.PprintAssertionError;
-type HtmlDiffAssertionError = TestError.HtmlDiffAssertionError;
-type AssertionError = TestError.AssertionError;
+type BasicErrorData = ErrorExtractor.BasicErrorData;
+type ErrorData = ErrorExtractor.ErrorData;
+
+type DifferFn = (actual: string, expected: string, comparison?: string) => string;
 
 const identity = <T>(val: T): T => val;
-
-const stringify = (e: any) => {
-  if (e === undefined) {
-    return 'undefined';
-  } else if (typeof e === 'string') {
-    return e;
-  } else {
-    return JSON.stringify(e);
-  }
-};
 
 /* Required to make <del> and <ins> stay as tags.*/
 const processQUnit = (html: string): string =>
@@ -30,111 +22,72 @@ const processQUnit = (html: string): string =>
     .replace(/&lt;ins&gt;/g, '<ins>')
     .replace(/&lt;\/ins&gt;/g, '</ins>'));
 
-const extractError = (err?: LoggedError): TestError =>
-  err === undefined ? new Error('no error given') : err;
-
-const formatExtra = (e: LoggedError): string => {
-  if (!e.logs || e.logs.length === 0) {
-    if (e.stack) {
-      const lines = e.stack.split('\n').filter((line) =>
-        line.indexOf('at') !== -1);
-      return '\n\nStack:\n' + lines.join('\n');
-    } else {
-      return '';
-    }
+const pprintExtra = (e: ErrorData): string => {
+  if (e.logs !== undefined && e.logs.length > 0) {
+    return `\n\nLogs:\n${e.logs}`;
+  } else if (e.stack !== undefined && e.stack.length > 0) {
+    return `\n\nStack:\n${e.stack}`;
   } else {
-    const lines = e.logs.map((log) =>
-      log.replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
-    return '\n\nLogs:\n' + lines.join('\n');
+    return '';
   }
 };
 
-const htmlDiffAssertionError = (e: HtmlDiffAssertionError, escape: (value: string) => string, process: (value: string) => string): string => {
-  // TODO: make this look more like the PprintAssertionError
-  return `Test failure: ${escape(e.message)}
-Expected: ${escape(e.diff.expected)}
-Actual: ${escape(e.diff.actual)}
-
-HTML Diff: ${process(escape(e.diff.comparison))}`;
-};
-
-const htmlDiffAssertionErrorHtml = (e: HtmlDiffAssertionError): string => htmlDiffAssertionError(e, htmlentities, processQUnit);
-// TODO: get rid of the <ins> and <del> in the text output. Probably need to change the code that throws this.
-const htmlDiffAssertionErrorText = (e: HtmlDiffAssertionError): string => htmlDiffAssertionError(e, identity, identity);
-
-const pprintAssertionError = (e: PprintAssertionError, escape: (value: string) => string, diff: (actual: string, expected: string) => string): string => {
-  const dh = diff(e.diff.actual, e.diff.expected);
-  return `Test failure: ${escape(e.message)}
-Expected:
+const pprintDiff = (e: BasicErrorData, escape: (value: string) => string, diff: DifferFn) => {
+  if (e.diff) {
+    const comparison = e.type === 'HtmlAssertion' ? escape(e.diff.comparison) : undefined;
+    const dh = diff(e.diff.actual, e.diff.expected, comparison);
+    return `Expected:
 ${escape(e.diff.expected)}
 Actual:
 ${escape(e.diff.actual)}
 Diff:
 ${dh}`;
+  } else {
+    return '';
+  }
 };
 
-export const pprintAssertionErrorHtml = (e: PprintAssertionError): string => pprintAssertionError(e, htmlentities, Differ.diffPrettyHtml);
-export const pprintAssertionErrorText = (e: PprintAssertionError): string => pprintAssertionError(e, identity, Differ.diffPrettyText);
-
-const assertionError = (e: AssertionError, escape: (value: string) => string, diff: (actual: string, expected: string) => string): string => {
-  const actual = stringify(e.actual);
-  const expected = stringify(e.expected);
-  const message = `Assertion error: ${e.message ? escape(e.message) : ''}`;
-  if (e.showDiff !== false) {
-    const dh = diff(actual, expected);
-    return `${message}
-Expected:
-${escape(expected)}
-Actual:
-${escape(actual)}
-Diff:
-${dh}`;
+const pprintBasicError = (e: BasicErrorData, escape: (value: string) => string, diff: DifferFn): string => {
+  const message = escape(e.message);
+  const diffMessage = pprintDiff(e, escape, diff);
+  if (diffMessage.length > 0) {
+    return `${message}\n${diffMessage}`;
   } else {
     return message;
   }
 };
 
-const assertionErrorHtml = (e: AssertionError): string => assertionError(e, htmlentities, Differ.diffPrettyHtml);
-const assertionErrorText = (e: AssertionError): string => assertionError(e, identity, Differ.diffPrettyText);
-
-const mkHtml = (e: TestError): string => {
-  if (TestError.isHTMLDiffError(e)) {
-    return htmlDiffAssertionErrorHtml(e);
-  } else if (TestError.isPprintAssertionError(e)) {
-    return pprintAssertionErrorHtml(e);
-  } else if (TestError.isAssertionError(e)) {
-    return assertionErrorHtml(e);
-  } else if (e.name && e.message) {
-    return htmlentities(e.name + ': ' + e.message);
-  } else if (e.toString !== undefined) {
-    return htmlentities(String(e));
-  } else {
-    return htmlentities(JSON.stringify(e));
-  }
+const pprintError = (e: ErrorData, escape: (value: string) => string, diff: DifferFn): string => {
+  const message = pprintBasicError(e, escape, diff);
+  const extras = escape(pprintExtra(e));
+  return `${message}${extras}`;
 };
 
-const mkText = (e: TestError): string => {
-  if (TestError.isHTMLDiffError(e)) {
-    return htmlDiffAssertionErrorText(e);
-  } else if (TestError.isPprintAssertionError(e)) {
-    return pprintAssertionErrorText(e);
-  } else if (TestError.isAssertionError(e)) {
-    return assertionErrorText(e);
-  } else if (e.name && e.message) {
-    return (e.name + ': ' + e.message);
-  } else if (e.toString !== undefined) {
-    return String(e);
-  } else {
-    return JSON.stringify(e);
-  }
+export const pprintAssertionError = (e: PprintAssertionError): string => {
+  const err = ErrorExtractor.getBasicErrorData(e);
+  return pprintBasicError(err, identity, Differ.diffPrettyText);
 };
+
+export const data = (err: LoggedError): ErrorData =>
+  ErrorExtractor.getErrorData(err);
+
+export const dataHtml = (err: ErrorData): string =>
+  pprintError(err, htmlentities, (actual, expected, comparison) => {
+    return comparison !== undefined ? processQUnit(comparison) : Differ.diffPrettyHtml(actual, expected);
+  });
+
+export const dataText = (err: ErrorData): string =>
+  pprintError(err, identity, (actual, expected, comparison) => {
+    // TODO: get rid of the <ins> and <del> in the comparison. Probably need to change the code that throws HtmlAssertionError.
+    return comparison !== undefined ? comparison : Differ.diffPrettyText(actual, expected);
+  });
 
 export const html = (err: LoggedError): string => {
-  const e = extractError(err);
-  return mkHtml(e) + htmlentities(formatExtra(err));
+  const e = ErrorExtractor.getErrorData(err);
+  return dataHtml(e);
 };
 
 export const text = (err: LoggedError): string => {
-  const e = extractError(err);
-  return mkText(e) + formatExtra(err);
+  const e = ErrorExtractor.getErrorData(err);
+  return dataText(e);
 };

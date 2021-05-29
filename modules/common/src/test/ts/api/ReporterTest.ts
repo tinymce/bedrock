@@ -75,10 +75,12 @@ describe('Reporter', () => {
       // NOTE: the <ins> and <del> are supposed to remain
       const expected =
         'Test failure: message&quot;\n' +
-        'Expected: abc&quot;hello&quot;\n' +
-        'Actual: ab&quot;hello&quot;\n' +
-        '\n' +
-        'HTML Diff: <ins>blah</ins><del>hello</del>&quot;hello&quot;&lt;span&gt;\n' +
+        'Expected:\n' +
+        'abc&quot;hello&quot;\n' +
+        'Actual:\n' +
+        'ab&quot;hello&quot;\n' +
+        'Diff:\n' +
+        '<ins>blah</ins><del>hello</del>&quot;hello&quot;&lt;span&gt;\n' +
         '\n' +
         'Stack:\n';
       assert.deepEqual(cleanStack(actual), expected, 'Error message');
@@ -93,10 +95,12 @@ describe('Reporter', () => {
       const actual = Reporter.text(LoggedError.loggedError(e, []));
       const expected =
         'Test failure: message"\n' +
-        'Expected: abc"hello"\n' +
-        'Actual: ab"hello"\n' +
-        '\n' +
-        'HTML Diff: <ins>blah</ins><del>hello</del>"hello"<span>\n' +
+        'Expected:\n' +
+        'abc"hello"\n' +
+        'Actual:\n' +
+        'ab"hello"\n' +
+        'Diff:\n' +
+        '<ins>blah</ins><del>hello</del>"hello"<span>\n' +
         '\n' +
         'Stack:\n';
       assert.deepEqual(cleanStack(actual), expected, 'Error message');
@@ -117,6 +121,27 @@ describe('Reporter', () => {
         'ab&quot;hello&quot;\n' +
         'Diff:\n' +
         '<del style="background:#ffe6e6;">ab&quot;hello&quot;</del><br /><ins style="background:#e6ffe6;">abc&quot;hello&quot;</ins><br />\n' +
+        '\n' +
+        'Stack:\n';
+      assert.deepEqual(cleanStack(actual), expected, 'Error message');
+    }
+  });
+
+  it('Reports thrown AssertionError errors as text', () => {
+    try {
+      // noinspection ExceptionCaughtLocallyJS
+      throw assertion();
+    } catch (e) {
+      const actual = Reporter.text(LoggedError.loggedError(e, []));
+      const expected =
+        'Assertion error: message"\n' +
+        'Expected:\n' +
+        'abc"hello"\n' +
+        'Actual:\n' +
+        'ab"hello"\n' +
+        'Diff:\n' +
+        '- | ab"hello"\n' +
+        '+ | abc"hello"\n' +
         '\n' +
         'Stack:\n';
       assert.deepEqual(cleanStack(actual), expected, 'Error message');
