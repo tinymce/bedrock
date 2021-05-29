@@ -1,3 +1,4 @@
+import * as chalk from 'chalk';
 import * as cli from './Cli';
 import * as ClOptions from './ClOptions';
 import { ExitCodes } from '../util/ExitCodes';
@@ -55,9 +56,9 @@ export const forManual = (directories: Directories, argv: string[] = process.arg
 };
 
 export const logAndExit = (errs: cli.CliError): void => {
-  console.error('\n****\nError while processing command line for ' + errs.command);
+  console.error(chalk.red('\n****\nError while processing command line for ' + errs.command));
   const messages = errs.errors.join('\n');
-  console.error(messages);
-  console.error('Use ' + errs.command + ' --help to print usage\n****\n');
+  console.error(chalk.red(messages));
+  console.error(chalk.red('Use ' + errs.command + ' --help to print usage\n****\n'));
   process.exit(ExitCodes.failures.cli);
 };

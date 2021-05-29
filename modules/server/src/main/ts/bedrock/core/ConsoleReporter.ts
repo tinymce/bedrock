@@ -1,12 +1,41 @@
+import * as chalk from 'chalk';
+import { highlight } from 'cli-highlight';
 import { TestErrorData, TestResults } from '../server/Controller';
 
 const numberOfErrorsToPrint = 5;
+
+const highlightDiff = (diff: string) =>
+  highlight(diff, { language: 'diff' });
+
+const formatExtra = (err: TestErrorData): string => {
+  const e = err.data;
+  if (e.logs !== undefined && e.logs.length > 0) {
+    return '\n\nLogs:\n' + chalk.gray(e.logs);
+  } else if (e.stack !== undefined && e.stack.length > 0) {
+    return '\n\nStack:\n' + chalk.gray(e.stack);
+  } else {
+    return '';
+  }
+};
+
+const formatDiff = (actual: string, expected: string, comparison: string) => {
+  return `Expected:
+${expected}
+Actual:
+${actual}
+Diff:
+${highlightDiff(comparison)}`;
+};
 
 const formatError = (err: TestErrorData | null) => {
   if (err === null) {
     return '';
   } else {
-    return err.text;
+    const data = err.data;
+    const message = chalk.red(data.message);
+    const diff = data.diff ? '\n' + formatDiff(data.diff.actual, data.diff.expected, data.diff.comparison) : '';
+    const extra = formatExtra(err);
+    return `${message}${diff}${extra}`;
   }
 };
 

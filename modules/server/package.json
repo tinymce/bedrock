@@ -18,6 +18,8 @@
     "@ephox/bedrock-common": "^11.2.1",
     "@ephox/bedrock-runner": "^11.2.1",
     "async": "^3.0.0",
+    "chalk": "^4.1.1",
+    "cli-highlight": "^2.1.11",
     "command-line-args": "^5.0.0",
     "command-line-usage": "^6.0.0",
     "core-js": "^3.6.4",
