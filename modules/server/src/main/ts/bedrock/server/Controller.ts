@@ -1,5 +1,11 @@
+import { ErrorData } from '@ephox/bedrock-common';
 import * as Hud from '../cli/Hud';
 import * as Type from '../util/Type';
+
+export interface TestErrorData {
+  readonly data: ErrorData;
+  readonly text: string;
+}
 
 export interface TestResult {
   readonly name: string;
@@ -7,7 +13,7 @@ export interface TestResult {
   readonly passed: boolean;
   readonly time: string;
   readonly skipped: string;
-  readonly error: string;
+  readonly error: TestErrorData | null;
 }
 
 export interface TestResults {
@@ -44,7 +50,7 @@ export interface Controller {
   readonly enableHud: () => void;
   readonly recordAlive: (sessionId: string) => void;
   readonly recordTestStart: (id: string, name: string, file: string, totalTests: number) => void;
-  readonly recordTestResult: (id: string, name: string, file: string, passed: boolean, time: string, error: string, skipped: string) => void;
+  readonly recordTestResult: (id: string, name: string, file: string, passed: boolean, time: string, error: TestErrorData | null, skipped: string) => void;
   readonly recordDone: (id: string, error?: string) => void;
   readonly awaitDone: () => Promise<TestResults>;
 }
@@ -127,7 +133,7 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     updateHud(session);
   };
 
-  const recordTestResult = (id: string, name: string, file: string, passed: boolean, time: string, error: string, skipped: string) => {
+  const recordTestResult = (id: string, name: string, file: string, passed: boolean, time: string, error: TestErrorData | null, skipped: string) => {
     const now = Date.now();
     const session = getSession(id);
     const record = { name, file, passed, time, error, skipped };

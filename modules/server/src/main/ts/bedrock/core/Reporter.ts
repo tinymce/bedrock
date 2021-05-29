@@ -19,17 +19,16 @@ const outputTime = (runnerTime: string) => {
  * in the middle of this token. Jenkins seems fine with multiple CDATA sections within a <failure> tag.
  * @param s
  */
-export const splitCdatas =
-  (s: string): string[] => {
-    const raw = s.split(/]]>/g);
-    return raw.map((x, i) => {
-      let r = '';
-      if (i > 0) r = '>' + r;
-      r = r + x;
-      if (i < raw.length - 1) r = r + ']]';
-      return r;
-    });
-  };
+export const splitCdatas = (s: string): string[] => {
+  const raw = s.split(/]]>/g);
+  return raw.map((x, i) => {
+    let r = '';
+    if (i > 0) r = '>' + r;
+    r = r + x;
+    if (i < raw.length - 1) r = r + ']]';
+    return r;
+  });
+};
 
 export const write = (settings: ReporterSettings) => {
   return (data: TestResults): Promise<Attempt<string[], TestResult[]>> => {
@@ -90,7 +89,7 @@ export const write = (settings: ReporterSettings) => {
             elem.startElement('failure')
               .writeAttribute('Test FAILED: some failed assert')
               .writeAttribute('type', 'failure');
-            const cdatas = splitCdatas(res.error);
+            const cdatas = splitCdatas(res.error?.text ?? '');
             cdatas.forEach((c) => elem.writeCData(c));
             elem.endElement();
           }

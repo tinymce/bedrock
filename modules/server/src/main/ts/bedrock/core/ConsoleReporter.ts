@@ -1,9 +1,16 @@
-import { TestResults } from '../server/Controller';
+import { TestErrorData, TestResults } from '../server/Controller';
 
 const numberOfErrorsToPrint = 5;
 
-export const generateReport = (data: TestResults): string => {
+const formatError = (err: TestErrorData | null) => {
+  if (err === null) {
+    return '';
+  } else {
+    return err.text;
+  }
+};
 
+export const generateReport = (data: TestResults): string => {
   const results = data.results;
   const failures = results.filter((x) => !x.passed && !x.skipped);
 
@@ -14,7 +21,7 @@ export const generateReport = (data: TestResults): string => {
     toShow.forEach((f) => {
       r.push(line);
       r.push(`Test failed: ${f.name} (${f.file})`);
-      r.push(f.error);
+      r.push(formatError(f.error));
       r.push('');
     });
     r.push(line);
