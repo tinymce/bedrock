@@ -1,4 +1,4 @@
-import { Failure, Suite } from '@ephox/bedrock-common';
+import { Suite } from '@ephox/bedrock-common';
 import { HarnessResponse } from '../core/ServerTypes';
 import { UrlParams } from '../core/UrlParams';
 import { noop } from '../core/Utils';
@@ -11,7 +11,7 @@ import { countTests, filterOnly } from './Utils';
 
 export interface Runner {
   readonly init: () => Promise<HarnessResponse>;
-  readonly run: (chunk: number, retries: number, timeout: number, stopOnFailure: boolean) => void;
+  readonly run: (chunk: number, retries: number, timeout: number, stopOnFailure: boolean) => Promise<void>;
 }
 
 // 5sec interval for the server to know the client hasn't disconnected
@@ -76,7 +76,7 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
     return callbacks.loadHarness();
   };
 
-  const run = (chunk: number, retries: number, timeout: number, stopOnFailure: boolean): void => {
+  const run = (chunk: number, retries: number, timeout: number, stopOnFailure: boolean): Promise<void> => {
     const runState: RunState = {
       totalTests: numTests,
       offset: params.offset,
@@ -94,7 +94,7 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
     };
 
     ui.setStopOnFailure(stopOnFailure);
-    runSuite(rootSuite, runState, runActions, reporter)
+    return runSuite(rootSuite, runState, runActions, reporter)
       .then(() => {
         reporter.done();
         // for easy rerun reset the URL
@@ -102,10 +102,11 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
       }, (e) => {
         // An error handled by the test runner won't return an error object and will just reject.
         // So if we have an error, it means an unexpected/unhandled error occurred in the promise
-        // chain, so ensure we log it and report we've stopped running.
+        // chain. If we have no error then the runner has finished due to a test failure.
         if (e !== undefined) {
-          console.error('Unexpected error occurred', e);
-          reporter.done(Failure.prepFailure(e));
+          return Promise.reject(e);
+        } else {
+          return Promise.resolve();
         }
       });
   };

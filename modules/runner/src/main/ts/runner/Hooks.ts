@@ -1,7 +1,7 @@
 import { Hook, HookType, RunnableState, Suite, Test } from '@ephox/bedrock-common';
 import Promise from '@ephox/wrap-promise-polyfill';
 import * as Context from '../core/Context';
-import { SkipError } from '../core/Errors';
+import { SkipError } from '../errors/Errors';
 import { runWithErrorCatcher, runWithTimeout } from './Run';
 import { loop } from './Utils';
 
