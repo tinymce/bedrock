@@ -23,7 +23,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
   const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
   routes.then((runner) => {
-    Driver.create({
+    return Driver.create({
       browser: settings.browser,
       basedir: settings.basedir,
       debuggingPort: settings.debuggingPort,
@@ -66,14 +66,14 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
 
         return Lifecycle.shutdown(result, webdriver, done, gruntDone, delayExit);
       });
-    }).catch((err) => {
-      console.error(chalk.red(err));
-      if (settings.gruntDone !== undefined) {
-        settings.gruntDone(false);
-      } else {
-        process.exit(ExitCodes.failures.unexpected);
-      }
     });
+  }).catch((err) => {
+    console.error(chalk.red(err));
+    if (settings.gruntDone !== undefined) {
+      settings.gruntDone(false);
+    } else {
+      process.exit(ExitCodes.failures.unexpected);
+    }
   });
 };
 
