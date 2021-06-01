@@ -1,5 +1,5 @@
 import { Global } from '@ephox/bedrock-common';
-import { isInternalError } from '../core/Errors';
+import { isInternalError } from './Errors';
 
 type ErrorHandler = (error: Error) => void
 

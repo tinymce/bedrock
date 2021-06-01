@@ -1,13 +1,15 @@
 import { LoggedError, Reporter } from '@ephox/bedrock-common';
 import { ReporterUi } from '../reporter/Reporter';
 
+type LoggedError = LoggedError.LoggedError;
+
 export interface Ui extends ReporterUi {
   readonly showRetry: () => void;
   readonly hideRetry: () => void;
   readonly showSkip: () => void;
   readonly hideSkip: () => void;
   readonly render: (offset: number, totalNumTests: number, onRestart: () => void, onRetry: () => void, onSkip: () => void) => void;
-  readonly error: (e: any) => void;
+  readonly error: (e: LoggedError) => void;
   readonly setStopOnFailure: (stopOnFailure: boolean) => void;
 }
 
@@ -83,7 +85,7 @@ export const Ui = (container: JQuery<HTMLElement>): Ui => {
       current.text(currentCount);
     };
 
-    const fail = (e: LoggedError.LoggedError, testTime: string, currentCount: number) => {
+    const fail = (e: LoggedError, testTime: string, currentCount: number) => {
       el.removeClass('running').addClass('failed');
       marker.text('[failed]').addClass('failed');
       // Don't use .text() as it strips out newlines in IE, even when used
@@ -110,8 +112,9 @@ export const Ui = (container: JQuery<HTMLElement>): Ui => {
     };
   };
 
-  const error = (e: any) => {
-    ui.append('<div class="failed done">ajax error: ' + JSON.stringify(e) + '</div>');
+  const error = (error: LoggedError) => {
+    const message = Reporter.html(error);
+    ui.append(`<div class="failed"><pre>${message}</pre></div>`);
   };
 
   const setStopOnFailure = (flag: boolean): void => {

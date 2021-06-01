@@ -11,7 +11,8 @@
     <script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
     <script type="text/javascript" src="lib/core-js-bundle/minified.js"></script>
     <script type="text/javascript" src="runner/runner.js"></script>
-    <script type="text/javascript" src="compiled/tests.js"></script>
-    <script type="text/javascript">bedrock.run();</script>
+    <script type="text/javascript">
+      bedrock.loadAndRun([ 'compiled/tests.js' ]);
+    </script>
 </body>
 </html>

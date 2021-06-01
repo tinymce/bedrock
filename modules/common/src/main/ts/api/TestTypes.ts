@@ -20,21 +20,18 @@ type AsyncFn = (this: Context) => PromiseLike<any>;
 
 export type ExecuteFn = SyncFn | AsyncFn;
 
-type StandaloneSuiteFn = (name: string, fn: (this: Suite) => void) => Suite;
+type StandaloneSuiteFn = (title: string, fn: (this: Suite) => void) => Suite;
 type StandaloneTestFn = {
   (title: string, fn: SyncFn): Test;
   (title: string, fn: AsyncFn): Test;
 };
 
-export interface SuiteFn {
-  (title: string, fn: (this: Suite) => void): Suite;
+export interface SuiteFn extends StandaloneSuiteFn {
   readonly only: StandaloneSuiteFn;
   readonly skip: StandaloneSuiteFn;
 }
 
-export interface TestFn {
-  (title: string, fn: SyncFn): Test;
-  (title: string, fn: AsyncFn): Test;
+export interface TestFn extends StandaloneTestFn {
   readonly only: StandaloneTestFn;
   readonly skip: StandaloneTestFn;
 }

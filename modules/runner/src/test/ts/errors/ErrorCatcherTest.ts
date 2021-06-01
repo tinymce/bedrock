@@ -1,7 +1,7 @@
 import { Global } from '@ephox/bedrock-common';
 import { assert } from 'chai';
 import { after, afterEach, before, beforeEach, describe, it } from 'mocha';
-import { ErrorCatcher } from '../../../main/ts/runner/ErrorCatcher';
+import { ErrorCatcher } from '../../../main/ts/errors/ErrorCatcher';
 
 describe('ErrorCatcher', () => {
   const originalAddEventListener = Global.addEventListener;
