@@ -1,4 +1,3 @@
-import * as ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import * as webpack from 'webpack';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -57,6 +56,8 @@ const webpackSharedRules = webpackRemap.concat([
 const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, coverage: string[], manualMode: boolean, basedir: string): webpack.Configuration => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
   return {
     stats: 'none',
     entry: scratchFile,
@@ -99,7 +100,6 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
                 colors: manualMode,
                 configFile: tsConfigFile,
                 transpileOnly: true,
-                experimentalWatchApi: manualMode,
                 onlyCompileBundledFiles: true,
                 projectReferences: true,
                 compilerOptions: {
@@ -127,12 +127,12 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
 
     plugins: [
       new ForkTsCheckerWebpackPlugin({
-        memoryLimit: manualMode ? 4096 : 2048,
-        tsconfig: tsConfigFile,
-        colors: manualMode,
         async: manualMode,
-        useTypescriptIncrementalApi: manualMode,
-        measureCompilationTime: true
+        typescript: {
+          memoryLimit: manualMode ? 4096 : 2048,
+          configFile: tsConfigFile,
+          build:  manualMode
+        }
       })
     ],
 
