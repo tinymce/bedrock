@@ -21,6 +21,6 @@
     "registry": "https://registry.npmjs.org"
   },
   "dependencies": {
-    "diff": "^4.0.1"
+    "diff": "^5.0.0"
   }
 }

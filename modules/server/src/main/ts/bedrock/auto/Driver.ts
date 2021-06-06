@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
-import { Options } from 'webdriver';
+import WebDriver from 'webdriver';
 import * as webdriverio from 'webdriverio';
 import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
@@ -68,7 +68,7 @@ const addArguments = (capabilities: Record<string, any>, name: string, args: str
   capabilities[name].args = currentArgs.concat(args);
 };
 
-const getOptions = (port: number, browserName: string, browserFamily: string, settings: DriverSettings): Options => {
+const getOptions = (port: number, browserName: string, browserFamily: string, settings: DriverSettings): WebDriver.Options => {
   const options = {
     path: '/',
     port,
