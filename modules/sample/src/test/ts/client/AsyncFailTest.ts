@@ -15,7 +15,7 @@ const asyncFail = () =>
   });
 
 const asyncPass = () =>
-  new Promise<void>((resolve, reject) => {
+  new Promise<void>((resolve, _reject) => {
     setTimeout(() => {
       resolve();
     }, 100);

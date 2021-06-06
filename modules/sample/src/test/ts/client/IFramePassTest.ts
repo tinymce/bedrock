@@ -13,7 +13,6 @@ UnitTest.asyncTest('IFrame Test', (success, failure) => {
     */
   const textarea = document.createElement('textarea');
 
-
   /*
     * This frame will get sent mouse events to its select inside
     */
@@ -30,7 +29,6 @@ UnitTest.asyncTest('IFrame Test', (success, failure) => {
     button.style.setProperty('background', '#cadbee');
     button.setAttribute('data-clicked', 'clicked');
   });
-
 
   const post = function (url, data, onSuccess, onFailure) {
     const request = new XMLHttpRequest();
@@ -52,7 +50,6 @@ UnitTest.asyncTest('IFrame Test', (success, failure) => {
     request.send(JSON.stringify(data));
   };
 
-
   const sendText = function (selector, text, onSuccess, onFailure) {
     post('/keys', { selector, keys: [ { text } ] }, onSuccess, onFailure);
   };
@@ -60,7 +57,6 @@ UnitTest.asyncTest('IFrame Test', (success, failure) => {
   const sendMouse = function (selector, type, onSuccess, onFailure) {
     post('/mouse', { selector, type }, onSuccess, onFailure);
   };
-
 
   const loadContentIntoFrame = function (fr, content, onSuccess, onFailure) {
     const listener = function () {
@@ -94,12 +90,10 @@ UnitTest.asyncTest('IFrame Test', (success, failure) => {
             assert.eq('going!', fr1.contentWindow.document.body.innerHTML.trim());
             assert.eq('blah', textarea.value);
 
-
             sendMouse('.iframe-mouse=>input', 'click', function () {
               assert.eq(true, fr2.contentWindow.document.body.querySelector('input').checked);
               sendMouse('.button-mouse', 'click', function () {
                 assert.eq('clicked', button.getAttribute('data-clicked'));
-
 
                 document.body.removeChild(fr1);
                 document.body.removeChild(fr2);
@@ -110,7 +104,6 @@ UnitTest.asyncTest('IFrame Test', (success, failure) => {
               }, failure);
             }, failure);
 
-
           }, failure);
         }, failure);
       }, failure);
@@ -118,12 +111,10 @@ UnitTest.asyncTest('IFrame Test', (success, failure) => {
       document.body.appendChild(iframe2);
     }, failure);
 
-
     document.body.appendChild(iframe1);
     document.body.appendChild(textarea);
 
     document.body.appendChild(button);
   }, 2000);
-
 
 });

@@ -34,8 +34,8 @@ UnitTest.asynctest('Clipboard Test', (success, failure) => {
   };
 
   const assert = function () {
-    return new Promise(function (done) {
-      setTimeout(function() {
+    return new Promise<void>(function (done) {
+      setTimeout(function () {
         alert(body.innerHTML);
         done();
       }, 1000);
@@ -50,10 +50,10 @@ UnitTest.asynctest('Clipboard Test', (success, failure) => {
   importClipboard('word.zip')
     .then(pasteInto(body) as any)
     .then(assert)
-    .then(function() {
+    .then(function () {
       success();
     })
-    .catch(function(ex) {
+    .catch(function (ex) {
       console.log('parsing failed', ex);
     });
 });

@@ -33,9 +33,8 @@ UnitTest.asyncTest('Tabbing Test', (success, failure) => {
     request.send(JSON.stringify(data));
   };
 
-
-  var sendText = function (selector, keys, onSuccess, onFailure) {
-    post('/keys', { selector: selector, keys: keys }, () => {
+  const sendText = function (selector, keys, onSuccess, onFailure) {
+    post('/keys', { selector, keys }, () => {
       setTimeout(() => {
         try {
           onSuccess();
@@ -65,7 +64,7 @@ UnitTest.asyncTest('Tabbing Test', (success, failure) => {
         document.body.removeChild(input1);
         document.body.removeChild(input2);
         success();
-      }, failure)
+      }, failure);
     }, failure);
   }, 1000);
 });
