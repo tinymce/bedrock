@@ -1,7 +1,7 @@
 import * as finalhandler from 'finalhandler';
 import * as http from 'http';
 import * as portfinder from 'portfinder';
-import { BrowserObject } from 'webdriverio';
+import { Browser} from 'webdriverio';
 import { Attempt } from '../core/Attempt';
 import * as Routes from './Routes';
 import * as Apis from './Apis';
@@ -17,7 +17,7 @@ interface Server {
 export interface ServeSettings {
   readonly basedir: string;
   readonly customRoutes: string | undefined;
-  readonly driver: Attempt<string, BrowserObject>;
+  readonly driver: Attempt<string, Browser<'async'>>;
   readonly loglevel: 'simple' | 'advanced';
   readonly master: DriverMaster | null;
   readonly overallTimeout: number;

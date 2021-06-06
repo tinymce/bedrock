@@ -10,7 +10,8 @@
     "sourceMap": true,
     "outDir": "lib",
     "types": [
-      "node"
+      "node",
+      "webdriverio/async",
     ],
     "rootDir": "src"
   },

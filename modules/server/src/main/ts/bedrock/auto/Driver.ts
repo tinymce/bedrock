@@ -1,8 +1,7 @@
 import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
-import WebDriver from 'webdriver';
-import * as webdriverio from 'webdriverio';
+import * as WebdriverIO from 'webdriverio';
 import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
 import * as DriverLoader from './DriverLoader';
@@ -18,7 +17,7 @@ export interface DriverSettings {
 }
 
 export interface Driver {
-  webdriver: webdriverio.BrowserObject;
+  webdriver: WebdriverIO.Browser<'async'>;
   shutdown: (immediate?: boolean) => Promise<void>;
 }
 
@@ -68,7 +67,7 @@ const addArguments = (capabilities: Record<string, any>, name: string, args: str
   capabilities[name].args = currentArgs.concat(args);
 };
 
-const getOptions = (port: number, browserName: string, browserFamily: string, settings: DriverSettings): WebDriver.Options => {
+const getOptions = (port: number, browserName: string, browserFamily: string, settings: DriverSettings): WebdriverIO.RemoteOptions => {
   const options = {
     path: '/',
     port,
@@ -111,7 +110,7 @@ const getOptions = (port: number, browserName: string, browserFamily: string, se
   return options;
 };
 
-const logDriverDetails = (driver: webdriverio.BrowserObject) => {
+const logDriverDetails = (driver: WebdriverIO.Browser<'async'>) => {
   const caps: Record<string, any> = driver.capabilities;
   const browserName = caps.browserName;
   const browserVersion = caps.browserVersion || caps.version;
@@ -139,7 +138,7 @@ const focusBrowser = (browserName: string, settings: DriverSettings) => {
   }
 };
 
-const setupShutdown = (driver: webdriverio.BrowserObject, driverApi: DriverLoader.DriverAPI, shutdownDelay = 0): (immediate?: boolean) => Promise<void> => {
+const setupShutdown = (driver: WebdriverIO.Browser<'async'>, driverApi: DriverLoader.DriverAPI, shutdownDelay = 0): (immediate?: boolean) => Promise<void> => {
   const driverShutdown = (immediate?: boolean) => {
     try {
       if (immediate) {
@@ -190,7 +189,7 @@ export const create = (settings: DriverSettings): Promise<Driver> => {
     // Wait for the driver to start up and then start the webdriver session
     return DriverLoader.startAndWaitForAlive(driverApi, port, webdriverTimeout).then(() => {
       const webdriverOptions = getOptions(port, browserName, browserFamily, settings);
-      return webdriverio.remote(webdriverOptions);
+      return WebdriverIO.remote(webdriverOptions);
     }).then((driver) => {
       // IEDriverServer ignores a delete session call if done too quickly so it needs a small delay
       const shutdownDelay = browserName === 'ie' ? 500 : 0;
