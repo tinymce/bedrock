@@ -1,10 +1,10 @@
 import * as chalk from 'chalk';
-import { BrowserObject } from 'webdriverio';
+import { Browser } from 'webdriverio';
 import { TestResult } from '../server/Controller';
 import { ExitCodes } from '../util/ExitCodes';
 import { Attempt } from './Attempt';
 
-export const shutdown = (promise: Promise<Attempt<string[], TestResult[]>>, driver: BrowserObject, done: () => Promise<any>, gruntDone: ((success: boolean) => void) | null, delayExiting: boolean): Promise<void> => {
+export const shutdown = (promise: Promise<Attempt<string[], TestResult[]>>, driver: Browser<'async'>, done: () => Promise<any>, gruntDone: ((success: boolean) => void) | null, delayExiting: boolean): Promise<void> => {
   const exitDelay = () => {
     // 17 minutes should be enough, if it's not we can make this configurable later.
     return delayExiting ? driver.pause(17 * 60 * 1000) : Promise.resolve();

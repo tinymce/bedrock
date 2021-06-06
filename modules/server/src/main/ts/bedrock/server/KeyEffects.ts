@@ -1,4 +1,4 @@
-import { BrowserObject, Element } from 'webdriverio';
+import { Browser, Element } from 'webdriverio';
 import * as EffectUtils from './EffectUtils';
 
 interface KeyCombo {
@@ -110,7 +110,7 @@ const scan = (keys: KeyItem[]) => {
   }, []);
 };
 
-const performAction = (driver: BrowserObject, target: Element, actions: string[], isW3C: boolean): Promise<void> => {
+const performAction = (driver: Browser<'async'>, target: Element<'async'>, actions: string[], isW3C: boolean): Promise<void> => {
   // Note: The webdriverio types appear to be wrong for elementSendKeys, but their docs are correct
   // https://webdriver.io/docs/api/jsonwp.html#elementsendkeys
   if (isW3C) {
@@ -120,14 +120,14 @@ const performAction = (driver: BrowserObject, target: Element, actions: string[]
   }
 };
 
-const execute = (driver: BrowserObject, data: KeyData): Promise<void> => {
+const execute = (driver: Browser<'async'>, data: KeyData): Promise<void> => {
   const actions = scan(data.keys);
   return EffectUtils.performActionOnTarget(driver, data, (target) => {
     return performAction(driver, target, actions, driver.isW3C);
   });
 };
 
-export const executor = (driver: BrowserObject) => {
+export const executor = (driver: Browser<'async'>) => {
   return (data: KeyData): Promise<void> => {
     return execute(driver, data);
   };

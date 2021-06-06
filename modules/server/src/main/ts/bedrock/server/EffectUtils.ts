@@ -1,11 +1,12 @@
-import { BrowserObject, Element } from 'webdriverio';
+import { Browser, Element } from 'webdriverio';
 
-export type ElementWithActions = Element & {
+export type ElementWithActions = Element<'async'> & {
   performActions: (actions: Array<Record<string, any>>) => Promise<void>;
   releaseActions: () => Promise<void>;
 };
 
-const frameSelected = (driver: BrowserObject, frame: string): () => Promise<boolean> => {
+// eslint-disable-next-line @typescript-eslint/ban-types
+const frameSelected = (driver: Browser<'async'>, frame: object): () => Promise<boolean> => {
   return () => {
     return driver.switchToFrame(frame).then(() => {
       return true;
@@ -18,7 +19,7 @@ const frameSelected = (driver: BrowserObject, frame: string): () => Promise<bool
   };
 };
 
-const getTargetFromFrame = (driver: BrowserObject, selector: string) => {
+const getTargetFromFrame = (driver: Browser<'async'>, selector: string) => {
   const sections = selector.split('=>');
   const frameSelector = sections[0];
   const targetSelector = sections[1];
@@ -35,7 +36,7 @@ const getTargetFromFrame = (driver: BrowserObject, selector: string) => {
   });
 };
 
-const performActionOnFrame = <T>(driver: BrowserObject, selector: string, action: (target: ElementWithActions) => Promise<T>) => {
+const performActionOnFrame = <T>(driver: Browser<'async'>, selector: string, action: (target: ElementWithActions) => Promise<T>) => {
   return getTargetFromFrame(driver, selector).then((target) => {
     return action(target).then((result) => {
       return driver.switchToFrame(null).then(() => {
@@ -49,23 +50,23 @@ const performActionOnFrame = <T>(driver: BrowserObject, selector: string, action
   });
 };
 
-const getTargetFromMain = (driver: BrowserObject, selector: string) => {
+const getTargetFromMain = (driver: Browser<'async'>, selector: string) => {
   return driver.$(selector) as Promise<ElementWithActions>;
 };
 
-const performActionOnMain = <T>(driver: BrowserObject, selector: string, action: (target: ElementWithActions) => Promise<T>) => {
+const performActionOnMain = <T>(driver: Browser<'async'>, selector: string, action: (target: ElementWithActions) => Promise<T>) => {
   return getTargetFromMain(driver, selector).then((target) => {
     return action(target);
   });
 };
 
-export const getTarget = (driver: BrowserObject, data: { selector: string }): Promise<ElementWithActions> => {
+export const getTarget = (driver: Browser<'async'>, data: { selector: string }): Promise<ElementWithActions> => {
   const selector = data.selector;
   const getter = selector.indexOf('=>') > -1 ? getTargetFromFrame : getTargetFromMain;
   return getter(driver, selector);
 };
 
-export const performActionOnTarget = <T>(driver: BrowserObject, data: { selector: string }, action: (target: ElementWithActions) => Promise<T>): Promise<T> => {
+export const performActionOnTarget = <T>(driver: Browser<'async'>, data: { selector: string }, action: (target: ElementWithActions) => Promise<T>): Promise<T> => {
   const selector = data.selector;
   const performer = selector.indexOf('=>') > -1 ? performActionOnFrame : performActionOnMain;
   return performer(driver, selector, action);

@@ -1,4 +1,4 @@
-import { BrowserObject } from 'webdriverio';
+import { Browser } from 'webdriverio';
 import * as EffectUtils from './EffectUtils';
 
 /*
@@ -43,13 +43,13 @@ const doAction = (target: EffectUtils.ElementWithActions, type: MouseData['type'
   }
 };
 
-const execute = (driver: BrowserObject, data: MouseData): Promise<void> => {
+const execute = (driver: Browser<'async'>, data: MouseData): Promise<void> => {
   return EffectUtils.performActionOnTarget(driver, data, (target) => {
     return doAction(target, data.type);
   });
 };
 
-export const executor = (driver: BrowserObject) => {
+export const executor = (driver: Browser<'async'>) => {
   return (data: MouseData): Promise<void> => {
     return execute(driver, data);
   };
