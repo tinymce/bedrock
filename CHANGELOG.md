@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 11.3.1 - 2021-06-10
+
+### Fixed
+- BDD hooks failed to register when passing `undefined` as the title.
+
 ## 11.3.0 - 2021-06-02
 
 ### Improved

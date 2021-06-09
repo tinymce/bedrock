@@ -19,16 +19,11 @@ const getCurrentSuiteOrDie = (): Suite => {
   }
 };
 
-const addHook = (suite: Suite, type: HookType, title: string | ExecuteFn, fn?: ExecuteFn) => {
-  if (typeof title === 'string' && fn !== undefined) {
-    const hook = Hook.createHook(`${type}: ${title}`, fn);
-    suite.hooks[type].push(hook);
-  } else if (typeof title === 'function') {
-    const hook = Hook.createHook(type, title);
-    suite.hooks[type].push(hook);
-  } else {
-    console.error('Failed to add hook', title, fn);
-  }
+const addHook = (suite: Suite, type: HookType, title: string | ExecuteFn | undefined, fn?: ExecuteFn) => {
+  const hookTitle = typeof title === 'string' ? `${type}: ${title}` : type;
+  const hookFn = typeof title === 'function' ? title : fn;
+  const hook = Hook.createHook(hookTitle, hookFn);
+  suite.hooks[type].push(hook);
 };
 
 export const describe = (title: string, fn: () => void): Suite => {

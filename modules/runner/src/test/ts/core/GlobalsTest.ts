@@ -109,4 +109,15 @@ describe('Globals.setup', () => {
     assert.equal(specifyTest.parent, suite);
     assert.isFunction(specifyTest.fn);
   });
+
+  it('handles hooks with an undefined title', () => {
+    mockGlobals.describe('test', () => {
+      // Note: We don't allow this via TypeScript, but mocha does handle it so we need to cast the undefined
+      mockGlobals.before(undefined as any, noop);
+    });
+
+    const suite = rootSuite.suites[0];
+    assert.lengthOf(suite.hooks[HookType.Before], 1);
+    assert.equal(suite.hooks[HookType.Before][0].title, 'before');
+  });
 });
