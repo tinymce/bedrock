@@ -4,6 +4,8 @@ import * as Register from './Register';
 import { createSuite, createRootSuite } from './Suite';
 import { createTest } from './Test';
 
+type TitleOrExecuteFn = string | undefined | ExecuteFn;
+
 const root = createRootSuite('');
 const suiteStack: Suite[] = [ root ];
 
@@ -19,16 +21,18 @@ const getCurrentSuiteOrDie = (): Suite => {
   }
 };
 
-const addHook = (suite: Suite, type: HookType, title: string | ExecuteFn, fn?: ExecuteFn) => {
-  if (typeof title === 'string' && fn !== undefined) {
-    const hook = Hook.createHook(`${type}: ${title}`, fn);
-    suite.hooks[type].push(hook);
-  } else if (typeof title === 'function') {
-    const hook = Hook.createHook(type, title);
-    suite.hooks[type].push(hook);
-  } else {
-    console.error('Failed to add hook', title, fn);
-  }
+/*
+  Mocha allows a mix of different overloads when registering hooks, so we need to account for them. The following are known:
+  - (title: string, fn: ExecuteFn) => void
+  - (title: undefined, fn: ExecuteFn) => void
+  - (title: string) => void
+  - (fn: ExecuteFn) => void
+ */
+const addHook = (suite: Suite, type: HookType, title: TitleOrExecuteFn, fn?: ExecuteFn) => {
+  const hookTitle = typeof title === 'string' ? `${type}: ${title}` : type;
+  const hookFn = typeof title === 'function' ? title : fn;
+  const hook = Hook.createHook(hookTitle, hookFn);
+  suite.hooks[type].push(hook);
 };
 
 export const describe = (title: string, fn: () => void): Suite => {
@@ -53,22 +57,22 @@ describe.skip = (title: string, fn: () => void): Suite => {
   return suite;
 };
 
-export const before = (title: string | ExecuteFn, fn?: ExecuteFn): void => {
+export const before = (title: TitleOrExecuteFn, fn?: ExecuteFn): void => {
   const suite = getCurrentSuiteOrDie();
   addHook(suite, HookType.Before, title, fn);
 };
 
-export const beforeEach = (title: string | ExecuteFn, fn?: ExecuteFn): void => {
+export const beforeEach = (title: TitleOrExecuteFn, fn?: ExecuteFn): void => {
   const suite = getCurrentSuiteOrDie();
   addHook(suite, HookType.BeforeEach, title, fn);
 };
 
-export const after = (title: string | ExecuteFn, fn?: ExecuteFn): void => {
+export const after = (title: TitleOrExecuteFn, fn?: ExecuteFn): void => {
   const suite = getCurrentSuiteOrDie();
   addHook(suite, HookType.After, title, fn);
 };
 
-export const afterEach = (title: string | ExecuteFn, fn?: ExecuteFn): void => {
+export const afterEach = (title: TitleOrExecuteFn, fn?: ExecuteFn): void => {
   const suite = getCurrentSuiteOrDie();
   addHook(suite, HookType.AfterEach, title, fn);
 };
