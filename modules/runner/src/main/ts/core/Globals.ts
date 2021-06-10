@@ -21,6 +21,13 @@ const getCurrentSuiteOrDie = (): Suite => {
   }
 };
 
+/*
+  Mocha allows a mix of different overloads when registering hooks, so we need to account for them. The following are known:
+  - (title: string, fn: ExecuteFn) => void
+  - (title: undefined, fn: ExecuteFn) => void
+  - (title: string) => void
+  - (fn: ExecuteFn) => void
+ */
 const addHook = (suite: Suite, type: HookType, title: TitleOrExecuteFn, fn?: ExecuteFn) => {
   const hookTitle = typeof title === 'string' ? `${type}: ${title}` : type;
   const hookFn = typeof title === 'function' ? title : fn;
