@@ -7,10 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Improved
-- Upgrade to `ts-loader` 8.x and `fork-ts-checker-webpack-plugin` 6.x to properly support TypeScript project references.
+- Upgrade to `ts-loader` 9.x and `fork-ts-checker-webpack-plugin` 6.x to properly support TypeScript project references.
 
 ### Changed
 - Upgrade to `webdriverio` 7.x.
+- Upgrade to `webpack` 5.x.
 
 ## 11.5.0 - 2021-08-30
 
