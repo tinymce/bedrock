@@ -8,7 +8,7 @@
   "scripts": {
     "lint": "yarn eslint 'modules/common/src/**/*.ts' 'modules/client/src/**/*.ts' 'modules/runner/src/**/*.ts' 'modules/server/src/**/*.ts' 'modules/server/tasks/**/*.js'",
     "prepublishOnly": "yarn build",
-    "postinstall": "patch-package",
+    "postinstall": "rimraf node_modules/@types/webpack-dev-server/node_modules/@types/webpack && patch-package",
     "clean": "git clean -dfx lib dist modules node_modules",
     "build-common": "yarn workspace @ephox/bedrock-common build",
     "build-client": "yarn workspace @ephox/bedrock-client build",
@@ -45,6 +45,7 @@
     "load-grunt-tasks": "^5.1.0",
     "mocha": "^8.2.0",
     "patch-package": "^6.4.7",
+    "rimraf": "^3.0.2",
     "ts-node": "^10.0.0",
     "typescript": "^4.0.3"
   },

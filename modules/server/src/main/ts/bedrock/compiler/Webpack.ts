@@ -38,6 +38,12 @@ const webpackRemap: Array<Record<string, any>> = moduleAvailable('@ephox/swag') 
 
 const webpackSharedRules = webpackRemap.concat([
   {
+    test: /\.js$/,
+    resolve: {
+      fullySpecified: false
+    }
+  },
+  {
     test: /\.(mjs)$/,
     type: 'javascript/auto',
     use: []
@@ -49,7 +55,11 @@ const webpackSharedRules = webpackRemap.concat([
   },
   {
     test: /\.(html|htm|css|bower|hex|rtf|xml|yml)$/,
-    use: [ 'raw-loader' ]
+    type: 'asset/source'
+  },
+  {
+    resourceQuery: /raw/,
+    type: 'asset/source'
   }
 ]);
 
@@ -58,11 +68,18 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
   const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+
+  const compilerOverrides = {
+    rootDir: '.',
+    declarationMap: false
+  };
+
   return {
     stats: 'none',
     entry: scratchFile,
     devtool: 'source-map',
     mode: manualMode ? 'development' : 'none',
+    target: [ 'web', 'es5' ],
 
     optimization: {
       usedExports: !manualMode
@@ -102,10 +119,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
                 transpileOnly: true,
                 onlyCompileBundledFiles: true,
                 projectReferences: true,
-                compilerOptions: {
-                  rootDir: '.',
-                  declarationMap: false
-                }
+                compilerOptions: compilerOverrides
               }
             }
           ]
@@ -131,8 +145,16 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
         typescript: {
           memoryLimit: manualMode ? 4096 : 2048,
           configFile: tsConfigFile,
-          build:  manualMode
+          build: true,
+          mode: 'readonly',
+          configOverwrite: {
+            compilerOptions: compilerOverrides
+          }
         }
+      }),
+      // See https://github.com/TypeStrong/ts-loader#usage-with-webpack-watch
+      new webpack.WatchIgnorePlugin({
+        paths: [ /\.d\.ts$/ ]
       })
     ],
 
@@ -150,6 +172,7 @@ const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[
     entry: scratchFile,
     devtool: 'source-map',
     mode: manualMode ? 'development' : 'none',
+    target: [ 'web', 'es5' ],
 
     optimization: {
       usedExports: !manualMode
@@ -198,8 +221,8 @@ const compileTests = (compileInfo: CompileInfo, exitOnCompileError: boolean, src
     fs.writeFileSync(compileInfo.scratchFile, Imports.generateImports(true, compileInfo.scratchFile, srcFiles, polyfills));
 
     webpack(compileInfo.config, (err, stats) => {
-      if (err || stats.hasErrors()) {
-        const msg = stats.toString({
+      if (err || stats && stats.hasErrors()) {
+        const msg = err ?? stats?.toString({
           all: false,
           errors: true,
           moduleTrace: true,
@@ -276,19 +299,29 @@ export const devserver = (settings: WebpackServeSettings): Promise<Serve.ServeSe
           compilation.fileDependencies.delete(scratchFile);
         });
 
-        return new WebpackDevServer(compiler, {
+        // Note: webpack-dev-server types don't work with v5, but the library itself does
+        return new WebpackDevServer(compiler as any, {
           publicPath: '/compiled/',
           disableHostCheck: true,
+          injectClient: true,
           headers: {
             'Cache-Control': 'public, max-age=0'  // Ensure compiled assets are re-validated
           },
           stats: {
             // copied from `'minimal'`
+            // https://github.com/webpack/webpack/blob/v5.40.0/lib/stats/DefaultStatsPresetPlugin.js#L78
             all: false,
+            version: false,
+            timings: true,
             modules: true,
-            maxModules: 0,
+            modulesSpace: 0,
+            assets: true,
+            assetsSpace: 0,
             errors: true,
+            errorsCount: true,
             warnings: true,
+            warningsCount: true,
+            logging: 'warn',
 
             // suppress type re-export warnings caused by `transpileOnly: true`
             warningsFilter: /export .* was not found in/
