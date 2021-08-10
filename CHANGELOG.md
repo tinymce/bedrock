@@ -6,10 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-## 11.3.2 - 2021-08-11
+## 11.3.2 - 2021-08-12
 
 ### Fixed
 - The runner was using incorrectly using unpolyfilled Promises.
+- The first stack trace line was incorrectly removed on Firefox.
 
 ## 11.3.1 - 2021-06-10
 
