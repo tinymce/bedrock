@@ -18,8 +18,14 @@ const cleanStack = (error: Error, linesToRemove = 1) => {
 
   const lines = error.stack.split('\n');
   const message = lines[0];
-  const stack = lines.slice(1 + linesToRemove);
-  return message + '\n' + stack.join('\n');
+  // If the first line is the `normalizeError` function then we have no message (e.g. Firefox errors)
+  if (message.indexOf('normalizeError') !== -1) {
+    const stack = lines.slice(linesToRemove);
+    return stack.join('\n');
+  } else {
+    const stack = lines.slice(1 + linesToRemove);
+    return message + '\n' + stack.join('\n');
+  }
 };
 
 export const normalizeError = (err: TestThrowable): TestError => {
