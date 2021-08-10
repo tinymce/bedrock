@@ -1,0 +1,68 @@
+diff --git a/node_modules/sourcemapped-stacktrace/dist/sourcemapped-stacktrace.js b/node_modules/sourcemapped-stacktrace/dist/sourcemapped-stacktrace.js
+index afb408a..019361a 100644
+--- a/node_modules/sourcemapped-stacktrace/dist/sourcemapped-stacktrace.js
++++ b/node_modules/sourcemapped-stacktrace/dist/sourcemapped-stacktrace.js
+@@ -116,17 +116,14 @@ return /******/ (function(modules) { // webpackBootstrap
+ 	    }
+ 
+ 	    if (traceFormat === "chrome") {
+-	      regex = /^ +at.+\((.*):([0-9]+):([0-9]+)/;
++	      regex = /^ +at.+(https?:\/\/.*):([0-9]+):([0-9]+)/;
+ 	      expected_fields = 4;
+-	      // (skip first line containing exception message)
+-	      skip_lines = 1;
+ 	    } else {
+-	      regex = /@(.*):([0-9]+):([0-9]+)/;
++	      regex = /@(https?:\/\/.*):([0-9]+):([0-9]+)/;
+ 	      expected_fields = 4;
+-	      skip_lines = 0;
+ 	    }
+ 
+-	    lines = stack.split("\n").slice(skip_lines);
++	    lines = stack.split("\n");
+ 
+ 	    for (var i=0; i < lines.length; i++) {
+ 	      line = lines[i];
+@@ -304,19 +301,22 @@ return /******/ (function(modules) { // webpackBootstrap
+ 	  };
+ 
+ 	  function origNameChrome(origLine) {
+-	    var match = / +at +([^ ]*).*/.exec(origLine);
++	    var match = / +at +([^ ]*).*\(/.exec(origLine);
+ 	    return match && match[1];
+ 	  }
+ 
+ 	  function origNameFirefox(origLine) {
+-	    var match = /([^@]*)@.*/.exec(origLine);
++	    var match = /([^@]*?)(\/<)*@.*/.exec(origLine);
+ 	    return match && match[1];
+ 	  }
+ 
+ 	  var formatOriginalPosition = function(source, line, column, name) {
+ 	    // mimic chrome's format
+-	    return "    at " + (name ? name : "(unknown)") +
+-	      " (" + source + ":" + line + ":" + column + ")";
++			if (name) {
++				return "    at " + name + " (" + source + ":" + line + ":" + column + ")";
++			} else {
++				return "    at " + source + ":" + line + ":" + column;
++			}
+ 	  };
+ 
+ 	  // xmlhttprequest boilerplate
+diff --git a/node_modules/sourcemapped-stacktrace/index.d.ts b/node_modules/sourcemapped-stacktrace/index.d.ts
+index 1240936..a4fa66b 100644
+--- a/node_modules/sourcemapped-stacktrace/index.d.ts
++++ b/node_modules/sourcemapped-stacktrace/index.d.ts
+@@ -16,6 +16,9 @@ declare module 'sourcemapped-stacktrace' {
+      * @param done Callback invoked with the transformed stacktrace.
+      * @param opts Options object.
+      */
+-    export function mapStackTrace(stack: string | undefined, done: (mappedStack: string[]) => void, opts?: MapStackTraceOptions): void
+-
++    function mapStackTrace(stack: string | undefined, done: (mappedStack: string[]) => void, opts?: MapStackTraceOptions): void;
++    const _default: {
++        mapStackTrace: typeof mapStackTrace;
++    };
++    export default _default
+ }

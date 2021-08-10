@@ -2,7 +2,7 @@ import { LoggedError, Reporter as ErrorReporter } from '@ephox/bedrock-common';
 import Promise from '@ephox/wrap-promise-polyfill';
 import { Callbacks } from './Callbacks';
 import { UrlParams } from '../core/UrlParams';
-import { formatElapsedTime } from '../core/Utils';
+import { formatElapsedTime, mapStackTrace } from '../core/Utils';
 
 type LoggedError = LoggedError.LoggedError;
 
@@ -103,15 +103,18 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
         reported = true;
         failCount++;
 
-        const errorData = ErrorReporter.data(e);
-        const error = {
-          data: errorData,
-          text: ErrorReporter.dataText(errorData)
-        };
         const testTime = elapsed(starttime);
+        return mapStackTrace(e.stack).then((mappedStack) => {
+          e.stack = mappedStack;
+          const errorData = ErrorReporter.data(e);
+          const error = {
+            data: errorData,
+            text: ErrorReporter.dataText(errorData)
+          };
 
-        testUi.fail(e, testTime, currentCount);
-        return callbacks.sendTestResult(params.session, file, name, false, testTime, error, null);
+          testUi.fail(e, testTime, currentCount);
+          return callbacks.sendTestResult(params.session, file, name, false, testTime, error, null);
+        });
       }
     };
 

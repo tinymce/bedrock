@@ -1,4 +1,6 @@
 import { Suite, Test } from '@ephox/bedrock-common';
+import Promise from '@ephox/wrap-promise-polyfill';
+import sourceMappedStackTrace from 'sourcemapped-stacktrace';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export const noop = (): void => {};
@@ -39,3 +41,17 @@ export const getFullTitle = (suiteOrTest: Suite | Test, separator: string): stri
 };
 
 export const makeSessionId = (): string => '' + Math.ceil((Math.random() * 100000000));
+
+export const mapStackTrace = (stack: string | undefined): Promise<string> => new Promise((resolve) => {
+  if (stack) {
+    // If the stack trace format can't be found then an Error will be thrown.
+    // In that case lets just return the original stack instead.
+    try {
+      sourceMappedStackTrace.mapStackTrace(stack, (stack) => resolve(stack.join('\n')));
+    } catch (e) {
+      resolve(stack);
+    }
+  } else {
+    resolve('');
+  }
+});
