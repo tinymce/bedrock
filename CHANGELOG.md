@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 11.3.3 - 2021-08-16
+
+### Fixed
+- The bedrock-auto `--debuggingPort` argument didn't work for PhantomJS.
+
 ## 11.3.2 - 2021-08-12
 
 ### Fixed
