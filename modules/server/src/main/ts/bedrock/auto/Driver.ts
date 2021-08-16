@@ -93,9 +93,7 @@ const getOptions = (port: number, browserName: string, browserFamily: string, se
   }
 
   // Setup any headless mode options
-  if (browserName === 'phantomjs') {
-    caps['phantomjs.cli.args'] = '--remote-debugger-port=' + settings.debuggingPort;
-  } else if (browserName === 'firefox-headless') {
+  if (browserName === 'firefox-headless') {
     // https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode#Debugging_headless_Firefox
     addArguments(caps, 'moz:firefoxOptions', ['-headless', '-start-debugger-server=' + settings.debuggingPort]);
     caps['moz:firefoxOptions'].prefs = {
@@ -182,7 +180,7 @@ export const create = (settings: DriverSettings): Promise<Driver> => {
   const browserName = settings.browser;
   const browserFamily = browserVariants[browserName] || browserName;
 
-  const driverApi = DriverLoader.loadDriver(browserFamily);
+  const driverApi = DriverLoader.loadDriver(browserFamily, settings);
 
   // Find an open port to start the driver on
   return portfinder.getPortPromise({

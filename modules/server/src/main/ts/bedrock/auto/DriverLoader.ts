@@ -3,6 +3,7 @@ import * as crossSpawn from 'cross-spawn';
 import * as http from 'http';
 import * as which from 'which';
 import * as Arr from '../util/Arr';
+import { DriverSettings } from './Driver';
 
 export interface DriverAPI {
   start: (args?: string[]) => ChildProcess;
@@ -55,8 +56,8 @@ const findExecutable = (execNames: string[]) => Arr.findMap(execNames, (execName
   return which.sync(execName, { nothrow: true });
 });
 
-const loadPhantomJs = () => {
-  const api = execLoader('phantomjs');
+const loadPhantomJs = (settings: DriverSettings) => {
+  const api = execLoader('phantomjs', [ '--remote-debugger-port=' + settings.debuggingPort ]);
 
   // Patch the start function to remap the arguments
   const origStart = api.start;
@@ -69,7 +70,7 @@ const loadPhantomJs = () => {
   return api;
 };
 
-export const loadDriver = (browserName: string): DriverAPI => {
+export const loadDriver = (browserName: string, settings: DriverSettings): DriverAPI => {
   const driverDeps = browserModules[browserName] || [];
   if (driverDeps.length === 0) {
     console.log('Not loading a local driver for browser ' + browserName);
@@ -84,7 +85,7 @@ export const loadDriver = (browserName: string): DriverAPI => {
 
   // Handle phantomjs a little differently
   if (browserName === 'phantomjs') {
-    return loadPhantomJs();
+    return loadPhantomJs(settings);
   }
 
   const execNames = browserExecutables[browserName] || [];
