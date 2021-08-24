@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock-server",
-  "version": "11.3.3",
+  "version": "11.4.0",
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
   "bin": {
@@ -16,7 +16,7 @@
   "dependencies": {
     "@ephox/bedrock-client": "^11.3.2",
     "@ephox/bedrock-common": "^11.3.2",
-    "@ephox/bedrock-runner": "^11.3.2",
+    "@ephox/bedrock-runner": "^11.4.0",
     "async": "^3.0.0",
     "chalk": "^4.1.1",
     "cli-highlight": "^2.1.11",
