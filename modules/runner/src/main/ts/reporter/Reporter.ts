@@ -32,6 +32,19 @@ export interface ReporterUi {
 
 const elapsed = (since: Date): string => formatElapsedTime(since, new Date());
 
+const mapError = (e: LoggedError) => mapStackTrace(e.stack).then((mappedStack) => {
+  const originalStack = e.stack;
+  e.stack = mappedStack;
+
+  // Logs may have the stack trace included as well, so ensure we replace that as well
+  if (e.logs !== undefined && originalStack !== undefined) {
+    const logs = e.logs.join('\n');
+    e.logs = logs.replace(originalStack, mappedStack).split('\n');
+  }
+
+  return Promise.resolve(e);
+});
+
 export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi): Reporter => {
   const initial = new Date();
   let currentCount = params.offset || 0;
@@ -104,9 +117,8 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
         failCount++;
 
         const testTime = elapsed(starttime);
-        return mapStackTrace(e.stack).then((mappedStack) => {
-          e.stack = mappedStack;
-          const errorData = ErrorReporter.data(e);
+        return mapError(e).then((err) => {
+          const errorData = ErrorReporter.data(err);
           const error = {
             data: errorData,
             text: ErrorReporter.dataText(errorData)
