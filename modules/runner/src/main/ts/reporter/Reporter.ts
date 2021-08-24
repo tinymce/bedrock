@@ -2,7 +2,7 @@ import { LoggedError, Reporter as ErrorReporter } from '@ephox/bedrock-common';
 import Promise from '@ephox/wrap-promise-polyfill';
 import { Callbacks } from './Callbacks';
 import { UrlParams } from '../core/UrlParams';
-import { formatElapsedTime } from '../core/Utils';
+import { formatElapsedTime, mapStackTrace } from '../core/Utils';
 
 type LoggedError = LoggedError.LoggedError;
 
@@ -31,6 +31,19 @@ export interface ReporterUi {
 }
 
 const elapsed = (since: Date): string => formatElapsedTime(since, new Date());
+
+const mapError = (e: LoggedError) => mapStackTrace(e.stack).then((mappedStack) => {
+  const originalStack = e.stack;
+  e.stack = mappedStack;
+
+  // Logs may have the stack trace included as well, so ensure we replace that as well
+  if (e.logs !== undefined && e.logs.length > 0 && originalStack !== undefined) {
+    const logs = e.logs.join('\n');
+    e.logs = logs.replace(originalStack, mappedStack).split('\n');
+  }
+
+  return Promise.resolve(e);
+});
 
 export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi): Reporter => {
   const initial = new Date();
@@ -103,15 +116,17 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
         reported = true;
         failCount++;
 
-        const errorData = ErrorReporter.data(e);
-        const error = {
-          data: errorData,
-          text: ErrorReporter.dataText(errorData)
-        };
         const testTime = elapsed(starttime);
+        return mapError(e).then((err) => {
+          const errorData = ErrorReporter.data(err);
+          const error = {
+            data: errorData,
+            text: ErrorReporter.dataText(errorData)
+          };
 
-        testUi.fail(e, testTime, currentCount);
-        return callbacks.sendTestResult(params.session, file, name, false, testTime, error, null);
+          testUi.fail(err, testTime, currentCount);
+          return callbacks.sendTestResult(params.session, file, name, false, testTime, error, null);
+        });
       }
     };
 

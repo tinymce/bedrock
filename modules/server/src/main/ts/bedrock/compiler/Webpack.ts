@@ -60,7 +60,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
   return {
     stats: 'none',
     entry: scratchFile,
-    devtool: manualMode ? 'source-map' : false,
+    devtool: 'source-map',
     mode: manualMode ? 'development' : 'none',
 
     optimization: {
@@ -148,7 +148,7 @@ const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[
   return {
     stats: 'none',
     entry: scratchFile,
-    devtool: manualMode ? 'source-map' : false,
+    devtool: 'source-map',
     mode: manualMode ? 'development' : 'none',
 
     optimization: {

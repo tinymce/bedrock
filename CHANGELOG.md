@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 11.4.0 - 2021-08-25
+
+### Improved
+- Stack traces for failed tests will now be resolved using the sourcemap where possible.
+
 ## 11.3.3 - 2021-08-16
 
 ### Fixed
