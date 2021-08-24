@@ -124,7 +124,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
             text: ErrorReporter.dataText(errorData)
           };
 
-          testUi.fail(e, testTime, currentCount);
+          testUi.fail(err, testTime, currentCount);
           return callbacks.sendTestResult(params.session, file, name, false, testTime, error, null);
         });
       }
