@@ -37,7 +37,7 @@ const mapError = (e: LoggedError) => mapStackTrace(e.stack).then((mappedStack) =
   e.stack = mappedStack;
 
   // Logs may have the stack trace included as well, so ensure we replace that as well
-  if (e.logs !== undefined && originalStack !== undefined) {
+  if (e.logs !== undefined && e.logs.length > 0 && originalStack !== undefined) {
     const logs = e.logs.join('\n');
     e.logs = logs.replace(originalStack, mappedStack).split('\n');
   }
