@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 11.5.0 - 2021-08-30
+
+### Improved
+- Improved test execution time on `Chrome` and `Edge` by using a faster mouse reset action.
+
 ## 11.4.0 - 2021-08-25
 
 ### Improved
