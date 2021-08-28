@@ -3,6 +3,7 @@
     "moduleResolution": "node",
     "strict": true,
     "noUnusedLocals": true,
+    "useUnknownInCatchVariables": false,
     "target": "es2018",
     "module": "commonjs",
     "lib": ["es2018", "dom"],

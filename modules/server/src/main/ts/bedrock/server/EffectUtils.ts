@@ -27,7 +27,8 @@ const getTargetFromFrame = (driver: Browser<'async'>, selector: string) => {
   // returned doesn't work when passed to driver.switchToFrame() on Edge.
   return driver.findElement('css selector', frameSelector).then((frame) => {
     return driver.waitUntil(frameSelected(driver, frame), { timeout: 500 }).then(() => {
-      return driver.$(targetSelector).then((target) => {
+      // Note: The webdriverio types are incorrect for `target` here so just cast as any
+      return driver.$(targetSelector).then((target: any) => {
         return target.waitForDisplayed({ timeout: 500 }).then(() => {
           return target as ElementWithActions;
         });
@@ -51,7 +52,7 @@ const performActionOnFrame = <T>(driver: Browser<'async'>, selector: string, act
 };
 
 const getTargetFromMain = (driver: Browser<'async'>, selector: string) => {
-  return driver.$(selector) as Promise<ElementWithActions>;
+  return driver.$(selector) as unknown as Promise<ElementWithActions>;
 };
 
 const performActionOnMain = <T>(driver: Browser<'async'>, selector: string, action: (target: ElementWithActions) => Promise<T>) => {
