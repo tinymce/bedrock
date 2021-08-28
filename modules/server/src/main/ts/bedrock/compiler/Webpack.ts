@@ -117,7 +117,6 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
                 colors: manualMode,
                 configFile: tsConfigFile,
                 transpileOnly: true,
-                onlyCompileBundledFiles: true,
                 projectReferences: true,
                 compilerOptions: compilerOverrides
               }
@@ -146,7 +145,6 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
           memoryLimit: manualMode ? 4096 : 2048,
           configFile: tsConfigFile,
           build: true,
-          mode: 'readonly',
           configOverwrite: {
             compilerOptions: compilerOverrides
           }
