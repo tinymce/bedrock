@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgrade to `webpack` 5.x.
 - Convert to using `async`/`await` syntax on the server.
 
+### Removed
+- Dropped support for versions of Node.js below version 12.
+
 ## 11.5.0 - 2021-08-30
 
 ### Improved
