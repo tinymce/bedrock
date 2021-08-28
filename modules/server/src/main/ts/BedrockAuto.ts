@@ -10,7 +10,6 @@ import * as Lifecycle from './bedrock/core/Lifecycle';
 import { BedrockAutoSettings } from './bedrock/core/Settings';
 import { ExitCodes } from './bedrock/util/ExitCodes';
 import * as ConsoleReporter from './bedrock/core/ConsoleReporter';
-import { TestResults } from './bedrock/server/Controller';
 import * as SettingsResolver from './bedrock/core/SettingsResolver';
 
 export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
@@ -22,51 +21,46 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
   const basePage = 'src/resources/html/' + (isPhantom ? 'bedrock-phantom.html' : 'bedrock.html');
   const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
-  routes.then((runner) => {
-    return Driver.create({
+  routes.then(async (runner) => {
+    const driver = await Driver.create({
       browser: settings.browser,
       basedir: settings.basedir,
       debuggingPort: settings.debuggingPort,
       useSandboxForHeadless: settings.useSandboxForHeadless,
       wipeBrowserCache: settings.wipeBrowserCache
-    }).then((driver) => {
-      const webdriver = driver.webdriver;
-      const serveSettings: Serve.ServeSettings = {
-        ...settings,
-        driver: Attempt.passed(webdriver),
-        master,
-        runner,
-        stickyFirstSession: true
-      };
-
-      return Serve.start(serveSettings).then((service) => {
-        if (!isPhantom) console.log('bedrock-auto ' + Version.get() + ' available at: http://localhost:' + service.port);
-        const result = webdriver.url('http://localhost:' + service.port).then(() => {
-          console.log(isPhantom ? '\nPhantom tests loading ...\n' : '\nInitial page has loaded ...\n');
-          service.markLoaded();
-          service.enableHud();
-          return service.awaitDone().then((data: TestResults) => {
-            ConsoleReporter.printReport(data);
-            return Reporter.write({
-              name: settings.name,
-              output: settings.output
-            })(data);
-          }).catch((data: TestResults) => {
-            ConsoleReporter.printReport(data);
-            return Reporter.writePollExit({
-              name: settings.name,
-              output: settings.output
-            }, data);
-          });
-        });
-
-        const delayExit = settings.delayExit !== undefined ? settings.delayExit : false;
-        const gruntDone = settings.gruntDone !== undefined ? settings.gruntDone : null;
-        const done = () => Promise.all([ service.shutdown(), driver.shutdown() ]);
-
-        return Lifecycle.shutdown(result, webdriver, done, gruntDone, delayExit);
-      });
     });
+
+    const webdriver = driver.webdriver;
+    const serveSettings: Serve.ServeSettings = {
+      ...settings,
+      driver: Attempt.passed(webdriver),
+      master,
+      runner,
+      stickyFirstSession: true
+    };
+
+    const service = await Serve.start(serveSettings);
+    if (!isPhantom) {
+      console.log('bedrock-auto ' + Version.get() + ' available at: http://localhost:' + service.port);
+    }
+    await webdriver.url('http://localhost:' + service.port);
+    console.log(isPhantom ? '\nPhantom tests loading ...\n' : '\nInitial page has loaded ...\n');
+    service.markLoaded();
+    service.enableHud();
+
+    const result = await service.awaitDone().then((data) => {
+      ConsoleReporter.printReport(data);
+      return Reporter.write(settings, data);
+    }).catch((data) => {
+      ConsoleReporter.printReport(data);
+      return Reporter.writePollExit(settings, data);
+    });
+
+    const delayExit = settings.delayExit !== undefined ? settings.delayExit : false;
+    const gruntDone = settings.gruntDone !== undefined ? settings.gruntDone : null;
+    const done = () => Promise.all([ service.shutdown(), driver.shutdown() ]);
+
+    return Lifecycle.shutdown(result, webdriver, done, gruntDone, delayExit);
   }).catch((err) => {
     console.error(chalk.red(err));
     if (settings.gruntDone !== undefined) {

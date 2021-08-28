@@ -13,7 +13,7 @@ export const go = (bedrockManualSettings: BedrockManualSettings): void => {
   const basePage = 'src/resources/html/bedrock.html';
   const routes = RunnerRoutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, 0, settings.singleTimeout, true, basePage, settings.coverage, settings.polyfills);
 
-  routes.then((runner) => {
+  routes.then(async (runner) => {
     const serveSettings: Webpack.WebpackServeSettings = {
       ...settings,
       // There is no driver for manual mode.
@@ -26,13 +26,14 @@ export const go = (bedrockManualSettings: BedrockManualSettings): void => {
       skipResetMousePosition: true
     };
 
-    return Webpack.devserver(serveSettings).then((service) => {
+    try {
+      const service = await Webpack.devserver(serveSettings);
       service.enableHud();
       console.log('bedrock-manual ' + Version.get() + ' available at: http://localhost:' + service.port);
-    }, (err) => {
+    } catch (err) {
       console.error(err);
       process.exit(ExitCodes.failures.error);
-    });
+    }
   });
 };
 

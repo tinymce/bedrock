@@ -30,101 +30,98 @@ export const splitCdatas = (s: string): string[] => {
   });
 };
 
-export const write = (settings: ReporterSettings) => {
-  return (data: TestResults): Promise<Attempt<string[], TestResult[]>> => {
-    return new Promise<Attempt<string[], TestResult[]>>((resolve) => {
-      const results = data.results;
-      const time = (data.now - data.start) / 1000;
-      const skipped = results.filter((result) => {
-        return result.passed !== true && result.skipped;
-      });
-      const failed = results.filter((result) => {
-        return result.passed !== true && !result.skipped;
-      });
+export const write = (settings: ReporterSettings, data: TestResults): Attempt<string[], TestResult[]> => {
+  const results = data.results;
+  const time = (data.now - data.start) / 1000;
+  const skipped = results.filter((result) => {
+    return result.passed !== true && result.skipped;
+  });
+  const failed = results.filter((result) => {
+    return result.passed !== true && !result.skipped;
+  });
 
-      /*
-      We need to NOT indent.
-      Yes, it would make the output prettier... but...
-      There's a situation where the test failure contains a CDATA end token ("]]>").
-      XML has no way of escaping this, so we have to break each of these into "]]" and ">" in separate CDATA sections.
-      We need these CDATA sections to be immediately beside each other, otherwise any indent whitespace is
-      displayed in the Jenkins test results.
+  /*
+  We need to NOT indent.
+  Yes, it would make the output prettier... but...
+  There's a situation where the test failure contains a CDATA end token ("]]>").
+  XML has no way of escaping this, so we have to break each of these into "]]" and ">" in separate CDATA sections.
+  We need these CDATA sections to be immediately beside each other, otherwise any indent whitespace is
+  displayed in the Jenkins test results.
 
-      As of Bedrock 8, we have errors printed to system error, so the xml file should be read by humans less often,
-      so the lack of pretty-printing should be tolerable.
+  As of Bedrock 8, we have errors printed to system error, so the xml file should be read by humans less often,
+  so the lack of pretty-printing should be tolerable.
 
-      An alternative would be to replace the XMLWriter with one that pretty-prints everything EXCEPT adjacent CDATA sections.
-       */
-      const w = new XMLWriter(false);
-      w.startDocument();
+  An alternative would be to replace the XMLWriter with one that pretty-prints everything EXCEPT adjacent CDATA sections.
+   */
+  const w = new XMLWriter(false);
+  w.startDocument();
 
-      const root = w.startElement('testsuites')
-        .writeAttribute('tests', results.length)
-        .writeAttribute('failures', failed.length)
-        .writeAttribute('time', time)
-        .writeAttribute('errors', 0);
+  const root = w.startElement('testsuites')
+    .writeAttribute('tests', results.length)
+    .writeAttribute('failures', failed.length)
+    .writeAttribute('time', time)
+    .writeAttribute('errors', 0);
 
-      const suite = w.startElement('testsuite')
-        .writeAttribute('tests', results.length)
-        .writeAttribute('name', settings.name)
-        .writeAttribute('host', 'localhost')
-        .writeAttribute('id', 0)
-        .writeAttribute('failures', failed.length)
-        .writeAttribute('skipped', skipped.length)
-        .writeAttribute('timestamp', data.start)
-        .writeAttribute('time', time);
+  const suite = w.startElement('testsuite')
+    .writeAttribute('tests', results.length)
+    .writeAttribute('name', settings.name)
+    .writeAttribute('host', 'localhost')
+    .writeAttribute('id', 0)
+    .writeAttribute('failures', failed.length)
+    .writeAttribute('skipped', skipped.length)
+    .writeAttribute('timestamp', data.start)
+    .writeAttribute('time', time);
 
-      results.forEach((res) => {
-        const elem = w.startElement('testcase')
-          .writeAttribute('name', res.file)
-          .writeAttribute('classname', settings.name + '.' + res.name)
-          .writeAttribute('time', outputTime(res.time));
+  results.forEach((res) => {
+    const elem = w.startElement('testcase')
+      .writeAttribute('name', res.file)
+      .writeAttribute('classname', settings.name + '.' + res.name)
+      .writeAttribute('time', outputTime(res.time));
 
-        if (res.passed !== true) {
-          if (res.skipped) {
-            elem.startElement('skipped')
-              .writeAttribute('message', res.skipped);
-            elem.endElement();
-          } else {
-            elem.startElement('failure')
-              .writeAttribute('Test FAILED: some failed assert')
-              .writeAttribute('type', 'failure');
-            const cdatas = splitCdatas(res.error?.text ?? '');
-            cdatas.forEach((c) => elem.writeCData(c));
-            elem.endElement();
-          }
-        }
+    if (res.passed !== true) {
+      if (res.skipped) {
+        elem.startElement('skipped')
+          .writeAttribute('message', res.skipped);
         elem.endElement();
-      });
-      suite.endElement();
-
-      root.endElement();
-
-      try {
-        fs.accessSync(settings.output);
-      } catch (err) {
-        fs.mkdirSync(settings.output);
+      } else {
+        elem.startElement('failure')
+          .writeAttribute('Test FAILED: some failed assert')
+          .writeAttribute('type', 'failure');
+        const cdatas = splitCdatas(res.error?.text ?? '');
+        cdatas.forEach((c) => elem.writeCData(c));
+        elem.endElement();
       }
+    }
+    elem.endElement();
+  });
+  suite.endElement();
 
-      const reportFile = settings.output + '/TEST-' + settings.name + '.xml';
-      fs.writeFileSync(reportFile, w.toString());
+  root.endElement();
 
-      if (failed.length > 0) resolve(Attempt.failed(['Some tests failed. See {' + reportFile + '} for details.']));
-      else resolve(Attempt.passed(results));
-    });
-  };
+  try {
+    fs.accessSync(settings.output);
+  } catch (err) {
+    fs.mkdirSync(settings.output);
+  }
+
+  const reportFile = settings.output + '/TEST-' + settings.name + '.xml';
+  fs.writeFileSync(reportFile, w.toString());
+
+  if (failed.length > 0) {
+    return Attempt.failed(['Some tests failed. See {' + reportFile + '} for details.']);
+  } else {
+    return Attempt.passed(results);
+  }
 };
 
-export const writePollExit = (settings: ReporterSettings, results: TestResults): Promise<Attempt<string[], TestResult[]>> => {
-  return write({
-    name: settings.name,
-    output: settings.output
-  })(results).then(() => {
-    return Promise.reject(results.message);
-  }, (err) => {
+export const writePollExit = async (settings: ReporterSettings, results: TestResults): Promise<Attempt<string[], TestResult[]>> => {
+  try {
+    write(settings, results);
+  } catch (err) {
     console.error('Error writing report for polling exit condition');
     console.error(err);
     console.error(err.stack);
-    return Promise.reject(results.message);
-  });
+  }
+
+  return Promise.reject(results.message);
 };

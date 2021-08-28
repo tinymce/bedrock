@@ -11,8 +11,8 @@ interface PackageJson {
   readonly workspaces: string[];
 }
 
-export const generate = (mode: string, projectdir: string, basedir: string, configFile: string, bundler: 'webpack' | 'rollup', testfiles: string[], chunk: number,
-                         retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[], polyfills: string[]): Promise<Routes.Runner> => {
+export const generate = async (mode: string, projectdir: string, basedir: string, configFile: string, bundler: 'webpack' | 'rollup', testfiles: string[], chunk: number,
+                               retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[], polyfills: string[]): Promise<Routes.Runner> => {
   const files = testfiles.map((filePath) => {
     return path.relative(projectdir, filePath);
   });
@@ -53,46 +53,42 @@ export const generate = (mode: string, projectdir: string, basedir: string, conf
 
   const resourceRoutes = resourceRoots.map(({name, folder}) => Routes.routing('GET', `/project/${name}`, path.join(projectdir, folder)));
 
-  const precompiledTests: Promise<Buffer | string | null> = (mode === 'auto' ? testGenerator.generate() : Promise.resolve(null));
+  const precompiledTests = mode === 'auto' ? await testGenerator.generate() : null;
 
-  return precompiledTests.then(
-    (precompTests) => {
-      const routers = resourceRoutes.concat([
-        // fallback resource route to project root
-        Routes.routing('GET', '/project', projectdir),
+  const routers = resourceRoutes.concat([
+    // fallback resource route to project root
+    Routes.routing('GET', '/project', projectdir),
 
-        // bedrock resources
-        Routes.routing('GET', '/runner', path.join(require.resolve('@ephox/bedrock-runner'), '../../../../../dist')),
-        Routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery'))),
-        Routes.routing('GET', '/lib/core-js-bundle', path.dirname(require.resolve('core-js-bundle'))),
-        Routes.routing('GET', '/css', path.join(basedir, 'src/resources/css')),
+    // bedrock resources
+    Routes.routing('GET', '/runner', path.join(require.resolve('@ephox/bedrock-runner'), '../../../../../dist')),
+    Routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery'))),
+    Routes.routing('GET', '/lib/core-js-bundle', path.dirname(require.resolve('core-js-bundle'))),
+    Routes.routing('GET', '/css', path.join(basedir, 'src/resources/css')),
 
-        // test code
-        Routes.asyncJs('GET', '/compiled/tests.js', (done) => {
-          if (precompTests !== null) {
-            done(precompTests);
-          } else {
-            testGenerator.generate().then(done);
-          }
-        }),
-        Routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
+    // test code
+    Routes.asyncJs('GET', '/compiled/tests.js', (done) => {
+      if (precompiledTests !== null) {
+        done(precompiledTests);
+      } else {
+        testGenerator.generate().then(done);
+      }
+    }),
+    Routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
 
-        // harness API
-        Routes.json('GET', '/harness', {
-          stopOnFailure,
-          chunk,
-          retries,
-          timeout: singleTimeout,
-          mode
-        })
-      ]);
+    // harness API
+    Routes.json('GET', '/harness', {
+      stopOnFailure,
+      chunk,
+      retries,
+      timeout: singleTimeout,
+      mode
+    })
+  ]);
 
-      const fallback = Routes.constant('GET', basedir, basePage);
+  const fallback = Routes.constant('GET', basedir, basePage);
 
-      return {
-        routers,
-        fallback
-      };
-    }
-  );
+  return {
+    routers,
+    fallback
+  };
 };

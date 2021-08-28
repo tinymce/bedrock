@@ -1,64 +1,56 @@
 import { Browser, Element } from 'webdriverio';
 
 export type ElementWithActions = Element<'async'> & {
-  performActions: (actions: Array<Record<string, any>>) => Promise<void>;
-  releaseActions: () => Promise<void>;
+  readonly performActions: (actions: Array<Record<string, any>>) => Promise<void>;
+  readonly releaseActions: () => Promise<void>;
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-const frameSelected = (driver: Browser<'async'>, frame: object): () => Promise<boolean> => {
-  return () => {
-    return driver.switchToFrame(frame).then(() => {
-      return true;
-    }).catch((e) => {
-      if (!(e.name && e.name === 'no such frame')) {
-        throw e;
-      }
-      return false;
-    });
-  };
+type ElementReference = ReturnType<Browser<'sync'>['findElement']>;
+
+const frameSelected = (driver: Browser<'async'>, frame: ElementReference) => async (): Promise<boolean> => {
+  try {
+    await driver.switchToFrame(frame);
+    return true;
+  } catch (e) {
+    if (!(e.name && e.name === 'no such frame')) {
+      throw e;
+    }
+    return false;
+  }
 };
 
-const getTargetFromFrame = (driver: Browser<'async'>, selector: string) => {
+const getTargetFromFrame = async (driver: Browser<'async'>, selector: string): Promise<ElementWithActions> => {
   const sections = selector.split('=>');
   const frameSelector = sections[0];
   const targetSelector = sections[1];
   // Note: Don't use driver.$() here to lookup the frame as the object reference
   // returned doesn't work when passed to driver.switchToFrame() on Edge.
-  return driver.findElement('css selector', frameSelector).then((frame) => {
-    return driver.waitUntil(frameSelected(driver, frame), { timeout: 500 }).then(() => {
-      // Note: The webdriverio types are incorrect for `target` here so just cast as any
-      return driver.$(targetSelector).then((target: any) => {
-        return target.waitForDisplayed({ timeout: 500 }).then(() => {
-          return target as ElementWithActions;
-        });
-      });
-    });
-  });
+  const frame = await driver.findElement('css selector', frameSelector);
+  await driver.waitUntil(frameSelected(driver, frame), { timeout: 500 });
+  const target = await driver.$(targetSelector);
+  await target.waitForDisplayed({ timeout: 500 });
+  return target as ElementWithActions;
 };
 
-const performActionOnFrame = <T>(driver: Browser<'async'>, selector: string, action: (target: ElementWithActions) => Promise<T>) => {
-  return getTargetFromFrame(driver, selector).then((target) => {
-    return action(target).then((result) => {
-      return driver.switchToFrame(null).then(() => {
-        return result;
-      });
-    });
-  }).catch((err: any) => {
-    return driver.switchToFrame(null).then(() => {
-      return Promise.reject(err);
-    });
-  });
+const performActionOnFrame = async <T>(driver: Browser<'async'>, selector: string, action: (target: ElementWithActions) => Promise<T>): Promise<T> => {
+  try {
+    const target = await getTargetFromFrame(driver, selector);
+    const result = await action(target);
+    await driver.switchToFrame(null);
+    return result;
+  } catch (err: any) {
+    await driver.switchToFrame(null);
+    return Promise.reject(err);
+  }
 };
 
-const getTargetFromMain = (driver: Browser<'async'>, selector: string) => {
-  return driver.$(selector) as unknown as Promise<ElementWithActions>;
+const getTargetFromMain = async (driver: Browser<'async'>, selector: string): Promise<ElementWithActions> => {
+  return driver.$(selector);
 };
 
-const performActionOnMain = <T>(driver: Browser<'async'>, selector: string, action: (target: ElementWithActions) => Promise<T>) => {
-  return getTargetFromMain(driver, selector).then((target) => {
-    return action(target);
-  });
+const performActionOnMain = async <T>(driver: Browser<'async'>, selector: string, action: (target: ElementWithActions) => Promise<T>) => {
+  const target = await getTargetFromMain(driver, selector);
+  return action(target);
 };
 
 export const getTarget = (driver: Browser<'async'>, data: { selector: string }): Promise<ElementWithActions> => {

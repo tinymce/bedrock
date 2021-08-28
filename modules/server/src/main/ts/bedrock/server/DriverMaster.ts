@@ -20,13 +20,11 @@ export const create = (): DriverMaster => {
   const use = <T>(f: Executor<T>) => {
     inUse = true;
 
-    return f().then((v) => {
+    try {
+      return f();
+    } finally {
       inUse = false;
-      return Promise.resolve(v);
-    }).catch((err) => {
-      inUse = false;
-      return Promise.reject(err);
-    });
+    }
   };
 
   /*
@@ -64,7 +62,7 @@ export const create = (): DriverMaster => {
    * fall out.
    */
 
-  const doWaitForIdle = <T>(identifier: string, f: Executor<T>, label: string, attempts: number): Promise<T> => {
+  const doWaitForIdle = async <T>(identifier: string, f: Executor<T>, label: string, attempts: number): Promise<T> => {
     // Locking has failed many times ... so just assume the lock should have been released.
     if (attempts === 0) return use(f);
     // Nothing has a lock, and there is no queue
@@ -77,9 +75,8 @@ export const create = (): DriverMaster => {
     // Either something has a lock, or this process is not at the head of the queue,
     // so it needs to wait its turn
     } else {
-      return Waiter.delay({}, 100).then(() => {
-        return doWaitForIdle(identifier, f, label, attempts - 1);
-      });
+      await Waiter.delay({}, 100);
+      return doWaitForIdle(identifier, f, label, attempts - 1);
     }
   };
 
