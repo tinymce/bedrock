@@ -7,7 +7,7 @@ import * as Imports from './Imports';
 import {ExitCodes} from '../util/ExitCodes';
 import * as FileUtils from '../util/FileUtils';
 
-export const compile = (tsConfigFile: string, scratchDir: string, exitOnCompileError: boolean, srcFiles: string[], polyfills: string[]): Promise<string> => {
+export const compile = async (tsConfigFile: string, scratchDir: string, exitOnCompileError: boolean, srcFiles: string[], polyfills: string[]): Promise<string> => {
   const scratchFile = path.join(scratchDir, 'compiled/tests.ts');
   const dest = path.join(scratchDir, 'compiled/tests.js');
 
@@ -28,37 +28,39 @@ export const compile = (tsConfigFile: string, scratchDir: string, exitOnCompileE
   const resolve = require('rollup-plugin-node-resolve');
   const sourcemaps = require('rollup-plugin-sourcemaps');
 
-  return rollup.rollup({
-    input: scratchFile,
-    treeshake: false,
-    plugins: [
-      resolve({
-        jsnext: true,
-        customResolveOptions: {
-          moduleDirectory: path.join(path.dirname(tsConfigFile), 'node_modules')
-        }
-      }),
-      typescript({
-        cacheRoot: path.join(scratchDir, 'rts2_cache'),
-        tsconfig: tsConfigFile,
-        verbosity: 2,
-        check: false,
-        // clean: true,
-        tsconfigOverride: {
-          compilerOptions: {
-            declaration: false
-          },
-          include: include.concat([
-            path.resolve(scratchFile)
-          ])
-        }
-      }),
-      sourcemaps()
-    ]
-  })
-  .then((bundle) => bundle.write(outputOptions))
-  .then(() => dest)
-  .catch((err) => {
+  try {
+    const bundle = await rollup.rollup({
+      input: scratchFile,
+      treeshake: false,
+      plugins: [
+        resolve({
+          jsnext: true,
+          customResolveOptions: {
+            moduleDirectory: path.join(path.dirname(tsConfigFile), 'node_modules')
+          }
+        }),
+        typescript({
+          cacheRoot: path.join(scratchDir, 'rts2_cache'),
+          tsconfig: tsConfigFile,
+          verbosity: 2,
+          check: false,
+          // clean: true,
+          tsconfigOverride: {
+            compilerOptions: {
+              declaration: false
+            },
+            include: include.concat([
+              path.resolve(scratchFile)
+            ])
+          }
+        }),
+        sourcemaps()
+      ]
+    });
+
+    await bundle.write(outputOptions);
+    return dest;
+  } catch(err) {
     console.log(err);
 
     if (exitOnCompileError) {
@@ -66,5 +68,5 @@ export const compile = (tsConfigFile: string, scratchDir: string, exitOnCompileE
     }
 
     return dest;
-  });
+  }
 };

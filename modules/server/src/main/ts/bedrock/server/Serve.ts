@@ -48,7 +48,7 @@ export interface ServeService {
  * master (can be null) The driver master (locking and unlocking)
  * runner: runner (e.g. runnerroutes, pageroutes etc). Has fallback and routers.
  */
-export const startCustom = (settings: ServeSettings, createServer: (listener: http.RequestListener) => Server): Promise<ServeService> => {
+export const startCustom = async (settings: ServeSettings, createServer: (listener: http.RequestListener) => Server): Promise<ServeService> => {
 
   const pref = <K extends keyof ServeSettings>(f: K): ServeSettings[K] => {
     const v = settings[f];
@@ -80,12 +80,12 @@ export const startCustom = (settings: ServeSettings, createServer: (listener: ht
 
   const fallback = runner.fallback;
 
-  return portfinder.getPortPromise({
-    port: 8000,
-    stopPort: 20000
-  }).catch((err) => {
-    return Promise.reject('Error looking for open port between 8000 and 20000: ' + err);
-  }).then((port) => {
+  try {
+    const port = await portfinder.getPortPromise({
+      port: 8000,
+      stopPort: 20000
+    });
+
     const server = createServer((request, response) => {
       const done = finalhandler(request, response);
       Routes.route(routers, fallback, request, response, done);
@@ -106,7 +106,9 @@ export const startCustom = (settings: ServeSettings, createServer: (listener: ht
         });
       }
     };
-  });
+  } catch (err) {
+    return Promise.reject('Error looking for open port between 8000 and 20000: ' + err);
+  }
 };
 
 export const start = (settings: ServeSettings): Promise<ServeService> => {

@@ -50,13 +50,14 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
   // effects before driver.get has returned properly, it throws "UnsupportedOperationErrors"
   // This code is designed to allow the driver.get promise launched in bedrock-auto to
   // let the server known when it is able to use driver when responding to effect ajax calls.
-  const waitForDriverReady = (attempts: number, f: () => Promise<void>): Promise<void> => {
-    if (pageHasLoaded && master !== null) return master.waitForIdle(f, 'effect');
-    else if (attempts === 0) return Promise.reject('Driver never appeared to be ready');
-    else {
-      return Waiter.delay({}, pollRate).then(() => {
-        return waitForDriverReady(attempts - 1, f);
-      });
+  const waitForDriverReady = async (attempts: number, f: () => Promise<void>): Promise<void> => {
+    if (pageHasLoaded && master !== null) {
+      return master.waitForIdle(f, 'effect');
+    } else if (attempts === 0) {
+      return Promise.reject('Driver never appeared to be ready');
+    } else {
+      await Waiter.delay({}, pollRate);
+      return waitForDriverReady(attempts - 1, f);
     }
   };
 
@@ -68,22 +69,20 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
     };
   };
 
-  const setInitialMousePosition = (driver: Browser<'async'>) => {
-    return () => {
-      // TODO re-enable resetting the mouse on other browsers when mouseMove gets fixed on Firefox/IE
-      const browserName = (driver.capabilities as Capabilities.Capabilities).browserName;
-      if (browserName === 'chrome' || browserName === 'msedge') {
-        // Reset the mouse position to the top left of the window
-        return driver.performActions([{
-          type: 'pointer',
-          id: 'finger1',
-          parameters: { pointerType: 'mouse' },
-          actions: [{ type: 'pointerMove', duration: 0, x: 0, y: 0 }]
-        }]);
-      } else {
-        return Promise.resolve();
-      }
-    };
+  const setInitialMousePosition = (driver: Browser<'async'>) => (): Promise<void> => {
+    // TODO re-enable resetting the mouse on other browsers when mouseMove gets fixed on Firefox/IE
+    const browserName = (driver.capabilities as Capabilities.Capabilities).browserName;
+    if (browserName === 'chrome' || browserName === 'msedge') {
+      // Reset the mouse position to the top left of the window
+      return driver.performActions([{
+        type: 'pointer',
+        id: 'finger1',
+        parameters: { pointerType: 'mouse' },
+        actions: [{ type: 'pointerMove', duration: 0, x: 0, y: 0 }]
+      }]);
+    } else {
+      return Promise.resolve();
+    }
   };
 
   const driverRouter = <D>(url: string, apiLabel: string, executor: Executor<D, void>) => {

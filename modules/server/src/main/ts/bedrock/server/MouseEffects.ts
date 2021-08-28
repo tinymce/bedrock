@@ -12,7 +12,7 @@ export interface MouseData {
   readonly selector: string;
 }
 
-const performAction = (target: EffectUtils.ElementWithActions, type: string) => {
+const performAction = async (target: EffectUtils.ElementWithActions, type: string) => {
   const action = {
     type: 'pointer',
     id: 'pointer1',
@@ -23,18 +23,16 @@ const performAction = (target: EffectUtils.ElementWithActions, type: string) => 
       { type, button: 0 }
     ]
   };
-  return target.performActions([action]).then(() => {
-    return target.releaseActions();
-  });
+  await target.performActions([action]);
+  return target.releaseActions();
 };
 
-const doAction = (target: EffectUtils.ElementWithActions, type: MouseData['type']): Promise<void> => {
+const doAction = async (target: EffectUtils.ElementWithActions, type: MouseData['type']): Promise<void> => {
   if (type === 'move') {
     return target.moveTo();
   } else if (type === 'down' || type === 'up') {
-    return target.moveTo().then(() => {
-      return performAction(target, type === 'down' ? 'pointerDown' : 'pointerUp');
-    });
+    await target.moveTo();
+    return performAction(target, type === 'down' ? 'pointerDown' : 'pointerUp');
   // MicrosoftEdge does support this, but does not seem to support click in an ActionSequence
   } else if (type === 'click') {
     return target.click();

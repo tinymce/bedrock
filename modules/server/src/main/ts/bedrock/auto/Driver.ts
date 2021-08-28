@@ -139,27 +139,20 @@ const focusBrowser = (browserName: string, settings: DriverSettings) => {
 };
 
 const setupShutdown = (driver: WebdriverIO.Browser<'async'>, driverApi: DriverLoader.DriverAPI, shutdownDelay = 0): (immediate?: boolean) => Promise<void> => {
-  const driverShutdown = (immediate?: boolean) => {
-    try {
-      if (immediate) {
-        driver.deleteSession();
-        driverApi.stop();
-        return Promise.resolve();
-      } else {
-        return driver.pause(shutdownDelay)
-          .then(() => driver.deleteSession())
-          .then(driverApi.stop, driverApi.stop);
-      }
-    } catch (e) {
-      // The above may throw an exception (eg if the connection to the browser is lost)
-      // and we want to make sure the driver process is always stopped
-      driverApi.stop();
-      return Promise.reject(e);
+  const driverShutdown = async (immediate?: boolean) => {
+    if (immediate) {
+      driver.deleteSession();
+    } else {
+      await driver.pause(shutdownDelay);
+      await driver.deleteSession();
     }
   };
 
   Shutdown.registerShutdown((code, immediate) => {
-    driverShutdown(immediate).then(() => process.exit(code));
+    driverShutdown(immediate).finally(() => {
+      driverApi.stop();
+      process.exit(code);
+    });
   });
 
   return driverShutdown;
@@ -172,7 +165,7 @@ const setupShutdown = (driver: WebdriverIO.Browser<'async'>, driverApi: DriverLo
  * webdriverPort: port to use for the webdriver server
  * webdriverTimeout: how long to wait for the webdriver server to start
  */
-export const create = (settings: DriverSettings): Promise<Driver> => {
+export const create = async (settings: DriverSettings): Promise<Driver> => {
   const webdriverPort = settings.webdriverPort || 4444;
   const webdriverTimeout = settings.webdriverTimeout || 30000;
 
@@ -181,48 +174,48 @@ export const create = (settings: DriverSettings): Promise<Driver> => {
 
   const driverApi = DriverLoader.loadDriver(browserFamily, settings);
 
-  // Find an open port to start the driver on
-  return portfinder.getPortPromise({
-    port: webdriverPort,
-    stopPort: webdriverPort + 100
-  }).then((port) => {
-    // Wait for the driver to start up and then start the webdriver session
-    return DriverLoader.startAndWaitForAlive(driverApi, port, webdriverTimeout).then(() => {
-      const webdriverOptions = getOptions(port, browserName, browserFamily, settings);
-      return WebdriverIO.remote(webdriverOptions);
-    }).then((driver) => {
-      // IEDriverServer ignores a delete session call if done too quickly so it needs a small delay
-      const shutdownDelay = browserName === 'ie' ? 500 : 0;
-
-      // Ensure the driver gets shutdown correctly if shutdown
-      // by the user instead of the application
-      const driverShutdown = setupShutdown(driver, driverApi, shutdownDelay);
-
-      // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
-      // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
-      return driver.pause(1500).then(() => {
-        // Log driver details
-        logDriverDetails(driver);
-
-        // Some tests require large windows, so make it as large as it can be.
-        // Headless modes can't use maximize, so just set the dimensions to 1280x1024
-        if (browserName === 'chrome-headless' || browserName === 'firefox-headless') {
-          return driver.setWindowSize(1280, 1024) as any;
-        } else {
-          return driver.maximizeWindow();
-        }
-      }).then(() => {
-        return focusBrowser(browserFamily, settings);
-      }).then(() => {
-        // Return the public driver api
-        return {
-          webdriver: driver,
-          shutdown: driverShutdown
-        };
-      });
+  try {
+    // Find an open port to start the driver on
+    const port = await portfinder.getPortPromise({
+      port: webdriverPort,
+      stopPort: webdriverPort + 100
     });
-  }).catch((e) => {
+
+    // Wait for the driver to start up and then start the webdriver session
+    await DriverLoader.startAndWaitForAlive(driverApi, port, webdriverTimeout);
+    const webdriverOptions = getOptions(port, browserName, browserFamily, settings);
+    const driver = await WebdriverIO.remote(webdriverOptions);
+
+    // IEDriverServer ignores a delete session call if done too quickly so it needs a small delay
+    const shutdownDelay = browserName === 'ie' ? 500 : 0;
+
+    // Ensure the driver gets shutdown correctly if shutdown
+    // by the user instead of the application
+    const driverShutdown = setupShutdown(driver, driverApi, shutdownDelay);
+
+    // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
+    // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
+    await driver.pause(1500);
+
+    // Log driver details
+    logDriverDetails(driver);
+
+    // Some tests require large windows, so make it as large as it can be.
+    // Headless modes can't use maximize, so just set the dimensions to 1280x1024
+    if (browserName === 'chrome-headless' || browserName === 'firefox-headless') {
+      await driver.setWindowSize(1280, 1024);
+    } else {
+      await driver.maximizeWindow();
+    }
+    await focusBrowser(browserFamily, settings);
+
+    // Return the public driver api
+    return {
+      webdriver: driver,
+      shutdown: driverShutdown
+    };
+  } catch (e) {
     driverApi.stop();
     return Promise.reject(e);
-  });
+  }
 };

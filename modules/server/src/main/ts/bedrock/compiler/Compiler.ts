@@ -10,9 +10,9 @@ export const compile = (tsConfigFile: string, scratchDir: string, basedir: strin
     return Webpack.compile;
   };
 
-  const generate = (): Promise<Buffer | string> => {
+  const generate = async (): Promise<Buffer | string> => {
     const compile = getCompileFunc();
-    return compile(
+    const compiledJsFilePath = await compile(
       tsConfigFile,
       scratchDir,
       basedir,
@@ -20,7 +20,8 @@ export const compile = (tsConfigFile: string, scratchDir: string, basedir: strin
       files,
       coverage,
       polyfills
-    ).then((compiledJsFilePath) => fs.readFileSync(compiledJsFilePath));
+    );
+    return fs.readFileSync(compiledJsFilePath);
   };
 
   return {

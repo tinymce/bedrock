@@ -272,66 +272,64 @@ const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: strin
   }
 };
 
-export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], coverage: string[], polyfills: string[]): Promise<string> => {
-  return getCompileInfo(tsConfigFile, scratchDir, basedir, false, srcFiles, coverage)
-    .then((compileInfo) => compileTests(compileInfo, exitOnCompileError, srcFiles, polyfills));
+export const compile = async (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], coverage: string[], polyfills: string[]): Promise<string> => {
+  const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, basedir, false, srcFiles, coverage);
+  return compileTests(compileInfo, exitOnCompileError, srcFiles, polyfills);
 };
 
 const isCompiledRequest = (request: { url: string }) => request.url.startsWith('/compiled/');
 
-export const devserver = (settings: WebpackServeSettings): Promise<Serve.ServeService> => {
+export const devserver = async (settings: WebpackServeSettings): Promise<Serve.ServeService> => {
   const scratchDir = path.resolve('scratch');
   const tsConfigFile = settings.config;
 
-  return getCompileInfo(tsConfigFile, scratchDir, settings.basedir, true, settings.testfiles, settings.coverage)
-    .then((compileInfo) => {
-      return Serve.startCustom(settings, (handler) => {
-        const scratchFile = compileInfo.scratchFile;
-        console.log(`Loading ${settings.testfiles.length} tests...`);
+  const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, settings.basedir, true, settings.testfiles, settings.coverage);
+  return Serve.startCustom(settings, (handler) => {
+    const scratchFile = compileInfo.scratchFile;
+    console.log(`Loading ${settings.testfiles.length} tests...`);
 
-        mkdirp.sync(path.dirname(scratchFile));
-        fs.writeFileSync(scratchFile, Imports.generateImports(true, scratchFile, settings.testfiles, settings.polyfills));
+    mkdirp.sync(path.dirname(scratchFile));
+    fs.writeFileSync(scratchFile, Imports.generateImports(true, scratchFile, settings.testfiles, settings.polyfills));
 
-        const compiler = webpack(compileInfo.config);
+    const compiler = webpack(compileInfo.config);
 
-        // Prevents webpack from doing a recompilation of a change of tests.ts over and over
-        compiler.hooks.emit.tap('bedrock', (compilation) => {
-          compilation.fileDependencies.delete(scratchFile);
-        });
-
-        // Note: webpack-dev-server types don't work with v5, but the library itself does
-        return new WebpackDevServer(compiler as any, {
-          publicPath: '/compiled/',
-          disableHostCheck: true,
-          injectClient: true,
-          headers: {
-            'Cache-Control': 'public, max-age=0'  // Ensure compiled assets are re-validated
-          },
-          stats: {
-            // copied from `'minimal'`
-            // https://github.com/webpack/webpack/blob/v5.40.0/lib/stats/DefaultStatsPresetPlugin.js#L78
-            all: false,
-            version: false,
-            timings: true,
-            modules: true,
-            modulesSpace: 0,
-            assets: true,
-            assetsSpace: 0,
-            errors: true,
-            errorsCount: true,
-            warnings: true,
-            warningsCount: true,
-            logging: 'warn',
-
-            // suppress type re-export warnings caused by `transpileOnly: true`
-            warningsFilter: /export .* was not found in/
-          },
-          before: (app) => {
-            app.all('*', (request, response, next) => {
-              return isCompiledRequest(request) ? next() : handler(request, response);
-            });
-          }
-        });
-      });
+    // Prevents webpack from doing a recompilation of a change of tests.ts over and over
+    compiler.hooks.emit.tap('bedrock', (compilation) => {
+      compilation.fileDependencies.delete(scratchFile);
     });
+
+    // Note: webpack-dev-server types don't work with v5, but the library itself does
+    return new WebpackDevServer(compiler as any, {
+      publicPath: '/compiled/',
+      disableHostCheck: true,
+      injectClient: true,
+      headers: {
+        'Cache-Control': 'public, max-age=0'  // Ensure compiled assets are re-validated
+      },
+      stats: {
+        // copied from `'minimal'`
+        // https://github.com/webpack/webpack/blob/v5.40.0/lib/stats/DefaultStatsPresetPlugin.js#L78
+        all: false,
+        version: false,
+        timings: true,
+        modules: true,
+        modulesSpace: 0,
+        assets: true,
+        assetsSpace: 0,
+        errors: true,
+        errorsCount: true,
+        warnings: true,
+        warningsCount: true,
+        logging: 'warn',
+
+        // suppress type re-export warnings caused by `transpileOnly: true`
+        warningsFilter: /export .* was not found in/
+      },
+      before: (app) => {
+        app.all('*', (request, response, next) => {
+          return isCompiledRequest(request) ? next() : handler(request, response);
+        });
+      }
+    });
+  });
 };
