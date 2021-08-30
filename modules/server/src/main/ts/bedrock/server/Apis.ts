@@ -5,7 +5,6 @@ import * as Waiter from '../util/Waiter';
 import * as ClipboardEffects from './ClipboardEffects';
 import * as Controller from './Controller';
 import { DriverMaster } from './DriverMaster';
-import * as EffectUtils from './EffectUtils';
 import * as KeyEffects from './KeyEffects';
 import * as MouseEffects from './MouseEffects';
 import * as Routes from './Routes';
@@ -73,9 +72,13 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
       // TODO re-enable resetting the mouse on other browsers when mouseMove gets fixed on Firefox/IE
       const browserName = driver.capabilities.browserName;
       if (browserName === 'chrome' || browserName === 'msedge') {
-        return EffectUtils.getTarget(driver, {selector: '.bedrock-mouse-reset'}).then((target) => {
-          return target.moveTo();
-        });
+        // Reset the mouse position to the top left of the window
+        return driver.performActions([{
+          type: 'pointer',
+          id: 'finger1',
+          parameters: { pointerType: 'mouse' },
+          actions: [{ type: 'pointerMove', duration: 0, x: 0, y: 0 }]
+        }]);
       } else {
         return Promise.resolve();
       }
