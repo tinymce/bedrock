@@ -128,7 +128,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
           {
             test: /\.(tsx?)$/,
             enforce: 'post',
-            loader: 'istanbul-instrumenter-loader',
+            loader: '@jsdevtools/coverage-istanbul-loader',
             include: coverage.map((p) => path.resolve(p)),
             options: {
               esModules: true
@@ -195,7 +195,7 @@ const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[
           {
             test: /\.(js|mjs)$/,
             enforce: 'post',
-            loader: 'istanbul-instrumenter-loader',
+            loader: '@jsdevtools/coverage-istanbul-loader',
             include: coverage.map((p) => path.resolve(p)),
             options: {
               esModules: true

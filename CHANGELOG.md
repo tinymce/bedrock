@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgrade to `webdriverio` 7.x.
 - Upgrade to `webpack` 5.x.
 - Convert to using `async`/`await` syntax on the server.
+- Replaced `istanbul-instrumenter-loader` with `coverage-istanbul-loader` as the former is no longer maintained.
 
 ### Removed
 - Dropped support for versions of Node.js below version 12.
