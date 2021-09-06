@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 12.0.0 - 2021-09-06
+
 ### Improved
 - Upgrade to `ts-loader` 9.x and `fork-ts-checker-webpack-plugin` 6.x to properly support TypeScript project references.
 
