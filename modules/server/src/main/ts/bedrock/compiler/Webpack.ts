@@ -204,6 +204,12 @@ const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[
         ] : []
       )
     },
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify('development'),
+        'process.env.NODE_DEBUG': JSON.stringify(false),
+      })
+    ],
     output: {
       filename: path.basename(dest),
       path: path.resolve(path.dirname(dest))
