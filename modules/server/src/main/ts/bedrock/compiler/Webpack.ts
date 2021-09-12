@@ -153,6 +153,10 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
       // See https://github.com/TypeStrong/ts-loader#usage-with-webpack-watch
       new webpack.WatchIgnorePlugin({
         paths: [ /\.d\.ts$/ ]
+      }),
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify('development'),
+        'process.env.NODE_DEBUG': JSON.stringify(false),
       })
     ],
 
