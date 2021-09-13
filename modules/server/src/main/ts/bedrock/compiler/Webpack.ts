@@ -155,8 +155,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
         paths: [ /\.d\.ts$/ ]
       }),
       new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify('development'),
-        'process.env.NODE_DEBUG': JSON.stringify(false),
+        'process.env.NODE_ENV': JSON.stringify('development')
       })
     ],
 
@@ -210,8 +209,7 @@ const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[
     },
     plugins: [
       new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify('development'),
-        'process.env.NODE_DEBUG': JSON.stringify(false),
+        'process.env.NODE_ENV': JSON.stringify('development')
       })
     ],
     output: {
