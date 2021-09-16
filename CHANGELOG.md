@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Improved
+- `process.env.NODE_ENV` is now set to `development` using a webpack `DefinePlugin`
+
 ## 12.0.0 - 2021-09-06
 
 ### Improved
