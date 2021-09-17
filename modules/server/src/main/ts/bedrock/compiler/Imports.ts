@@ -11,12 +11,10 @@ const filePathToImport = (useRequire: boolean, scratchFile: string) => {
   return (filePath: string) => {
     let relativePath = path.relative(path.dirname(scratchFile), filePath);
 
-    // make sure slashes are escaped for windows
-    relativePath = relativePath.replace(/\\/g, '\\\\');
+    // make sure backslashes are replaced for windows, as import paths should always use forward slashes
+    relativePath = relativePath.replace(/\\/g, '/');
 
     // make sure backslashes are replaced with forward slash for the UI and JSON output string.
-    // Escaping the slashes would also work, but in case we accidentally interpret them later
-    // let's just go with forward slash.
     filePath = filePath.replace(/\\/g, '/');
 
     const importString = useRequire ? `require("${relativePath}");` : `import "${relativePath}";`;
