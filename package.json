@@ -6,6 +6,8 @@
     "url": "https://github.com/ephox/bedrock"
   },
   "scripts": {
+    "bedrock": "node modules/server/bin/bedrock.js",
+    "bedrock-auto": "node modules/server/bin/bedrock-auto.js",
     "lint": "yarn eslint 'modules/common/src/**/*.ts' 'modules/client/src/**/*.ts' 'modules/runner/src/**/*.ts' 'modules/server/src/**/*.ts' 'modules/server/tasks/**/*.js'",
     "prepublishOnly": "yarn build",
     "postinstall": "rimraf node_modules/@types/webpack-dev-server/node_modules/@types/webpack && patch-package",

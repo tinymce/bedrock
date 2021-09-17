@@ -1,5 +1,5 @@
 #!groovy
-@Library('waluigi@v3.1.0') _
+@Library('waluigi@v4.5.0') _
 
 // NOTE: This Jenkinsfile relies on Tiny's internal infrastructure
 
@@ -14,24 +14,33 @@ node("primary") {
   }
 
   stage("clean") {
-    sh 'yarn clean'
+    exec('yarn clean')
   }
 
   stage("install") {
-    yarnInstall() 
+    yarnInstall()
   }
 
   stage("build") {
-    sh 'yarn build'
+    exec('yarn build')
   }
 
   stage("test") {
-    sh 'yarn test'
+    exec('yarn test')
   }
+
+  bedrockBrowsers(
+    prepareTests: {
+      yarnInstall()
+      exec('yarn build')
+    },
+    testDirs: [ 'modules/sample/src/test/ts/**/pass' ],
+    custom: '--config modules/sample/tsconfig.json --polyfills Promise Symbol'
+  )
 
   if (isReleaseBranch()) {
     stage("publish") {
-      sh 'yarn lerna publish from-package --yes --ignore @ephox/bedrock-sample'
+      exec('yarn lerna publish from-package --yes --ignore @ephox/bedrock-sample')
     }
   }
 }
