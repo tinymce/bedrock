@@ -157,7 +157,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
           /\.(js|ts)\.map$/,
           // Something seems to trigger that node module package.json files change when they
           // haven't, so lets just ignore them entirely
-          /node_modules\/.*package\.json$/
+          /node_modules\/.*\/package\.json$/
         ]
       }),
       new webpack.DefinePlugin({
