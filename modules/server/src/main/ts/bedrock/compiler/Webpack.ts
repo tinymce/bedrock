@@ -77,7 +77,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
   return {
     stats: 'none',
     entry: scratchFile,
-    devtool: 'source-map',
+    devtool: manualMode ? 'inline-source-map' : 'source-map',
     mode: manualMode ? 'development' : 'none',
     target: [ 'web', 'es5' ],
 
@@ -150,9 +150,15 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
           }
         }
       }),
-      // See https://github.com/TypeStrong/ts-loader#usage-with-webpack-watch
       new webpack.WatchIgnorePlugin({
-        paths: [ /\.d\.ts$/ ]
+        paths: [
+          // Ignore generated files. See https://github.com/TypeStrong/ts-loader#usage-with-webpack-watch
+          /\.d\.ts$/,
+          /\.(js|ts)\.map$/,
+          // Something seems to trigger that node module package.json files change when they
+          // haven't, so lets just ignore them entirely
+          /node_modules\/.*package\.json$/
+        ]
       }),
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('development')
