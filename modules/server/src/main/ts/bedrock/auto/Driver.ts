@@ -80,8 +80,9 @@ const getOptions = (port: number, browserName: string, browserFamily: string, se
   // Support for disabling the Automation Chrome Extension
   // https://stackoverflow.com/questions/43261516/selenium-chrome-i-just-cant-use-driver-maximize-window-to-maximize-window
   const caps: Record<string, any> = options.capabilities;
+  const baseChromeArgs = ['--disable-extensions', '--proxy-server="direct://"', '--proxy-bypass-list=*'];
   if (browserFamily === 'chrome') {
-    addArguments(caps, 'goog:chromeOptions', ['--start-maximized', '--disable-extensions']);
+    addArguments(caps, 'goog:chromeOptions', ['--start-maximized'].concat(baseChromeArgs));
   }
 
   // Setup wiping the browser cache if required, as IE 11 doesn't use a clean session by default
@@ -101,7 +102,7 @@ const getOptions = (port: number, browserName: string, browserFamily: string, se
       'devtools.chrome.enabled': true
     };
   } else if (browserName === 'chrome-headless') {
-    addArguments(caps, 'goog:chromeOptions', [ '--headless', '--remote-debugging-port=' + settings.debuggingPort ]);
+    addArguments(caps, 'goog:chromeOptions', [ '--headless', '--remote-debugging-port=' + settings.debuggingPort ].concat(baseChromeArgs));
     if (settings.useSandboxForHeadless) {
       addArguments(caps, 'goog:chromeOptions', [ '--no-sandbox' ]);
     }
