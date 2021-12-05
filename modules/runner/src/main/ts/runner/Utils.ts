@@ -1,5 +1,5 @@
 import { Suite, Test } from '@ephox/bedrock-common';
-import Promise from '@ephox/wrap-promise-polyfill';
+import Promise from 'promise-polyfill';
 
 export const countTests = (suite: Suite): number =>
   suite.tests.length + suite.suites.reduce((acc, suite) => acc + countTests(suite), 0);

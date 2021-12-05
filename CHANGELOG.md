@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 12.3.0 - 2021-12-07
+
+### Changed
+- Swap from using the `@ephox/wrap-promise-polyfill` wrapper to using `promise-polyfill` directly.
+
 ## 12.2.0 - 2021-11-18
 
 ### Changed

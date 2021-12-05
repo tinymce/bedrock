@@ -12,6 +12,7 @@
     "declaration": true,
     "outDir": "scratch/dist",
     "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
     "types": []
   },
   "include": [
