@@ -1,5 +1,5 @@
 import { UnitTest } from '@ephox/bedrock-client';
-import Promise from '@ephox/wrap-promise-polyfill';
+import Promise from 'promise-polyfill';
 
 UnitTest.asyncTest('AsyncPass Test 1', (success, _failure) => {
   new Promise<void>(function (resolve, _reject) {

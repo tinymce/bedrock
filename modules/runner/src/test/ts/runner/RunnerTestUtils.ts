@@ -1,5 +1,5 @@
 import { Hook, HookType, Suite } from '@ephox/bedrock-common';
-import Promise from '@ephox/wrap-promise-polyfill';
+import Promise from 'promise-polyfill';
 import { createHook } from '../../../main/ts/core/Hook';
 import { Reporter, TestReporter } from '../../../main/ts/reporter/Reporter';
 import { RunState } from '../../../main/ts/runner/TestRun';

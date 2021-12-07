@@ -1,5 +1,5 @@
 import { Suite, Test } from '@ephox/bedrock-common';
-import Promise from '@ephox/wrap-promise-polyfill';
+import Promise from 'promise-polyfill';
 import sourceMappedStackTrace from 'sourcemapped-stacktrace';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
