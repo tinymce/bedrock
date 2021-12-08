@@ -1,5 +1,5 @@
 import { LoggedError, Reporter as ErrorReporter } from '@ephox/bedrock-common';
-import Promise from 'promise-polyfill';
+import Promise from '@ephox/wrap-promise-polyfill';
 import { Callbacks } from './Callbacks';
 import { UrlParams } from '../core/UrlParams';
 import { formatElapsedTime, mapStackTrace } from '../core/Utils';

@@ -11,14 +11,13 @@
   },
   "dependencies": {
     "@ephox/bedrock-common": "^12.0.0",
+    "@ephox/wrap-promise-polyfill": "^2.2.0",
     "jquery": "^3.4.1",
-    "promise-polyfill": "^8.0.0",
     "querystringify": "^2.1.1"
   },
   "devDependencies": {
     "@types/diff": "^5.0.0",
     "@types/jquery": "^3.5.3",
-    "@types/promise-polyfill": "^6.0.4",
     "@types/querystringify": "^2.0.0",
     "rollup": "^1.20.2",
     "rollup-plugin-commonjs": "^10.1.0",
