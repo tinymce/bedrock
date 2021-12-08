@@ -1,5 +1,5 @@
 import { Failure, Global } from '@ephox/bedrock-common';
-import Promise from 'promise-polyfill';
+import Promise from '@ephox/wrap-promise-polyfill';
 import * as Globals from '../core/Globals';
 import * as TestLoader from '../core/TestLoader';
 import { UrlParams } from '../core/UrlParams';

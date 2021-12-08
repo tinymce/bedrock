@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 12.3.1 - 2021-12-08
+
+### Fixed
+- Rolled back to using the old `@ephox/wrap-promise-polyfill` due to `promise-polyfill` never attempting to use the native Promise implementation and was quite slow.
+
 ## 12.3.0 - 2021-12-07
 
 ### Changed

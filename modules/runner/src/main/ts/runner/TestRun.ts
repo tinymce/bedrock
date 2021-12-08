@@ -1,5 +1,5 @@
 import { Failure, LoggedError, RunnableState, Suite, Test } from '@ephox/bedrock-common';
-import Promise from 'promise-polyfill';
+import Promise from '@ephox/wrap-promise-polyfill';
 import * as Context from '../core/Context';
 import { InternalError, isInternalError, SkipError } from '../errors/Errors';
 import { Reporter, TestReporter } from '../reporter/Reporter';
