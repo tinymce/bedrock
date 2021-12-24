@@ -4,38 +4,40 @@ import { TestResult } from '../server/Controller';
 import { ExitCodes } from '../util/ExitCodes';
 import { Attempt } from './Attempt';
 
-export const shutdown = async (result: Attempt<string[], TestResult[]>, driver: Browser<'async'>, done: () => Promise<any>, gruntDone: ((success: boolean) => void) | null, delayExiting: boolean): Promise<void> => {
-  const exitDelay = () => {
-    // 17 minutes should be enough, if it's not we can make this configurable later.
-    return delayExiting ? driver.pause(17 * 60 * 1000) : Promise.resolve();
-  };
+type ShutdownFn = () => Promise<any>;
+type GruntDoneFn = ((success: boolean) => void) | undefined;
 
-  const exit = (exitCode: number) => {
-    if (gruntDone !== null) {
-      gruntDone(exitCode === 0);
-    } else {
-      process.exit(exitCode);
-    }
-  };
+const exitDelay = (driver: Browser<'async'>, delayExiting: boolean) => {
+  // 17 minutes should be enough, if it's not we can make this configurable later.
+  return delayExiting ? driver.pause(17 * 60 * 1000) : Promise.resolve();
+};
 
-  try {
-    // Only check the delay exit option if tests failed.
-    await Attempt.cata(result, () => exitDelay(), () => Promise.resolve());
-
-    const exitCode = Attempt.cata(result, (errs) => {
-      console.log(chalk.red(errs.join('\n')));
-      return ExitCodes.failures.tests;
-    }, () => {
-      console.log(chalk.green('All tests passed.'));
-      return ExitCodes.success;
-    });
-    await done();
-    exit(exitCode);
-  } catch (err) {
-    await exitDelay();
-    console.error(chalk.red('********** Unexpected Bedrock Error -> Server Quitting **********'));
-    console.error(err);
-    await done();
-    exit(ExitCodes.failures.unexpected);
+export const exit = (gruntDone: GruntDoneFn, exitCode: number): void => {
+  if (gruntDone !== undefined) {
+    gruntDone(exitCode === 0);
+  } else {
+    process.exit(exitCode);
   }
+};
+
+export const done = async (result: Attempt<string[], TestResult[]>, driver: Browser<'async'>, shutdown: ShutdownFn, gruntDone: GruntDoneFn, delayExiting: boolean): Promise<void> => {
+  // Only delay exiting if tests failed.
+  const exitCode = await Attempt.cata(result, async (errs) => {
+    await exitDelay(driver, delayExiting);
+    console.log(chalk.red(errs.join('\n')));
+    return ExitCodes.failures.tests;
+  }, async () => {
+    console.log(chalk.green('All tests passed.'));
+    return ExitCodes.success;
+  });
+  await shutdown();
+  exit(gruntDone, exitCode);
+};
+
+export const error = async (err: Error | string, driver: Browser<'async'>, shutdown: ShutdownFn, gruntDone: GruntDoneFn, delayExiting: boolean): Promise<void> => {
+  await exitDelay(driver, delayExiting);
+  console.error(chalk.red('********** Unexpected Bedrock Error -> Server Quitting **********'));
+  console.error(err);
+  await shutdown();
+  exit(gruntDone, ExitCodes.failures.unexpected);
 };
