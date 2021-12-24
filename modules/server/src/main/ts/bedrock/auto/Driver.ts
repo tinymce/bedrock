@@ -140,17 +140,20 @@ const focusBrowser = (browserName: string, settings: DriverSettings) => {
 
 const setupShutdown = (driver: WebdriverIO.Browser<'async'>, driverApi: DriverLoader.DriverAPI, shutdownDelay = 0): (immediate?: boolean) => Promise<void> => {
   const driverShutdown = async (immediate?: boolean) => {
-    if (immediate) {
-      driver.deleteSession();
-    } else {
-      await driver.pause(shutdownDelay);
-      await driver.deleteSession();
+    try {
+      if (immediate) {
+        driver.deleteSession();
+      } else {
+        await driver.pause(shutdownDelay);
+        await driver.deleteSession();
+      }
+    } finally {
+      driverApi.stop();
     }
   };
 
   Shutdown.registerShutdown((code, immediate) => {
     driverShutdown(immediate).finally(() => {
-      driverApi.stop();
       process.exit(code);
     });
   });
