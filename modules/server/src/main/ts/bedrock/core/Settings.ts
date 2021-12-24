@@ -4,7 +4,6 @@ export interface BedrockSettings {
   readonly basedir: string;
   readonly bundler: 'webpack' | 'rollup';
   readonly chunk: number;
-  readonly gruntDone?: (success: boolean) => void;
   readonly loglevel: 'simple' | 'advanced';
   readonly overallTimeout: number;
   readonly projectdir: string;
@@ -22,6 +21,7 @@ export interface BedrockSettings {
 export type BedrockManualSettings = BedrockSettings;
 
 export interface BedrockAutoSettings extends BedrockSettings {
+  readonly gruntDone?: (success: boolean) => void;
   readonly browser: string;
   readonly debuggingPort: number;
   readonly delayExit: boolean;
