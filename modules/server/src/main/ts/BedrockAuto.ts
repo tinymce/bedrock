@@ -31,43 +31,40 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
     });
 
     const webdriver = driver.webdriver;
-    const serveSettings: Serve.ServeSettings = {
+    const service = await Serve.start({
       ...settings,
       driver: Attempt.passed(webdriver),
       master,
       runner,
       stickyFirstSession: true
-    };
-
-    const service = await Serve.start(serveSettings);
-    if (!isPhantom) {
-      console.log('bedrock-auto ' + Version.get() + ' available at: http://localhost:' + service.port);
-    }
-    await webdriver.url('http://localhost:' + service.port);
-    console.log(isPhantom ? '\nPhantom tests loading ...\n' : '\nInitial page has loaded ...\n');
-    service.markLoaded();
-    service.enableHud();
-
-    const result = await service.awaitDone().then((data) => {
-      ConsoleReporter.printReport(data);
-      return Reporter.write(settings, data);
-    }).catch((data) => {
-      ConsoleReporter.printReport(data);
-      return Reporter.writePollExit(settings, data);
     });
 
-    const delayExit = settings.delayExit !== undefined ? settings.delayExit : false;
-    const gruntDone = settings.gruntDone !== undefined ? settings.gruntDone : null;
-    const done = () => Promise.all([ service.shutdown(), driver.shutdown() ]);
+    const shutdown = () => Promise.all([ service.shutdown(), driver.shutdown() ]);
 
-    return Lifecycle.shutdown(result, webdriver, done, gruntDone, delayExit);
+    try {
+      if (!isPhantom) {
+        console.log('bedrock-auto ' + Version.get() + ' available at: http://localhost:' + service.port);
+      }
+      await webdriver.url('http://localhost:' + service.port);
+      console.log(isPhantom ? '\nPhantom tests loading ...\n' : '\nInitial page has loaded ...\n');
+      service.markLoaded();
+      service.enableHud();
+
+      const result = await service.awaitDone().then((data) => {
+        ConsoleReporter.printReport(data);
+        return Reporter.write(settings, data);
+      }, (data) => {
+        ConsoleReporter.printReport(data);
+        return Reporter.writePollExit(settings, data);
+      });
+
+      return Lifecycle.done(result, webdriver, shutdown, settings.gruntDone, settings.delayExit);
+    } catch (e) {
+      return Lifecycle.error(e, webdriver, shutdown, settings.gruntDone, settings.delayExit);
+    }
   }).catch((err) => {
     console.error(chalk.red(err));
-    if (settings.gruntDone !== undefined) {
-      settings.gruntDone(false);
-    } else {
-      process.exit(ExitCodes.failures.unexpected);
-    }
+    Lifecycle.exit(settings.gruntDone, ExitCodes.failures.unexpected);
   });
 };
 

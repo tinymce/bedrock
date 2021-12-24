@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - The webdriver process would not be stopped in some cases when tests successfully completed.
+- The server would not gracefully shutdown if an unexpected runner error occurred.
 
 ## 12.3.1 - 2021-12-08
 
