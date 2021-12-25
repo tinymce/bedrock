@@ -42,7 +42,7 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
     const sum = reporter.summary();
     if (params.retry > 0) {
       params.retry = 0;
-      actions.updateHistory(params.offset, params.retry, sum.skipped);
+      actions.updateHistory(params.offset, sum.failed, sum.skipped, params.retry);
     }
   };
 
