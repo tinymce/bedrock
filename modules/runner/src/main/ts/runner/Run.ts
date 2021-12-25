@@ -94,9 +94,13 @@ const runWithCleanup = (runnable: Runnable, context: Context, cleanup: () => voi
   });
 
 export const runWithTimeout = (runnable: Runnable, context: Context, defaultTimeout: number): Promise<void> => {
+  // Update the runnable timeout to use the default timeout if required
+  if (runnable.timeout() === -1) {
+    runnable.timeout(defaultTimeout);
+  }
+
   // Run the execute function with a timeout if required
-  const timeout = runnable.timeout() === -1 ? defaultTimeout : runnable.timeout();
-  if (timeout <= 0) {
+  if (runnable.timeout() <= 0) {
     return run(runnable, context);
   } else {
     return new Promise((resolve, reject) => {
@@ -112,7 +116,7 @@ export const runWithTimeout = (runnable: Runnable, context: Context, defaultTime
       const unbind = runnable._onChange('timeout', timer.restart);
 
       // Start the timer
-      timer.start(timeout, () => {
+      timer.start(runnable.timeout(), () => {
         unbind();
         reject(Failure.prepFailure(new Error(`Test ran too long - timeout of ${runnable.timeout()}ms exceeded`)));
       });

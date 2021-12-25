@@ -1,9 +1,15 @@
-import { Hook, HookType, Suite } from '@ephox/bedrock-common';
+import { Hook, HookType, LoggedError, Suite } from '@ephox/bedrock-common';
 import Promise from '@ephox/wrap-promise-polyfill';
 import { createHook } from '../../../main/ts/core/Hook';
 import { Reporter, TestReporter } from '../../../main/ts/reporter/Reporter';
 import { RunState } from '../../../main/ts/runner/TestRun';
 import { noop } from '../TestUtils';
+
+type LoggedError = LoggedError.LoggedError;
+
+export interface MockReporter extends Reporter {
+  readonly failures: () => LoggedError[];
+}
 
 export const TEST_TIMEOUT = 200;
 
@@ -21,10 +27,10 @@ export const populateHooks = (suite: Suite, count: number, func: (idx: number, t
   }
 };
 
-export const MockReporter = (): Reporter => {
+export const MockReporter = (): MockReporter => {
   let passed = 0;
-  let failed = 0;
   let skipped = 0;
+  const failures: LoggedError[] = [];
 
   const test = (): TestReporter => ({
     start: () => Promise.resolve(),
@@ -33,8 +39,8 @@ export const MockReporter = (): Reporter => {
       passed++;
       return Promise.resolve();
     },
-    fail: () => {
-      failed++;
+    fail: (e) => {
+      failures.push(e);
       return Promise.resolve();
     },
     skip: () => {
@@ -45,8 +51,9 @@ export const MockReporter = (): Reporter => {
 
   return {
     test,
-    summary: () => ({ offset: 0, passed, failed, skipped }),
-    done: noop
+    summary: () => ({ offset: 0, passed, failed: failures.length, skipped }),
+    done: noop,
+    failures: () => failures
   };
 };
 

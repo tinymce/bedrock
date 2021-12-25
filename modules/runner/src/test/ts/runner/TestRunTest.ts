@@ -8,6 +8,7 @@ import { createTest } from '../../../main/ts/core/Test';
 import { Reporter } from '../../../main/ts/reporter/Reporter';
 import * as TestRun from '../../../main/ts/runner/TestRun';
 import { noop } from '../TestUtils';
+import { MockReporter } from './RunnerTestUtils';
 import * as RunnerTestUtils from './RunnerTestUtils';
 
 interface MockTest extends Test {
@@ -31,7 +32,7 @@ const createMockTest = (name: string, suite: Suite, testFn?: (this: Context) => 
 };
 
 describe('TestRun.runTest', () => {
-  let reporter: Reporter;
+  let reporter: MockReporter;
   let suite: Suite;
   let actions: TestRun.RunActions;
   let loadedNextChunk: boolean;
@@ -135,7 +136,7 @@ describe('TestRun.runTest', () => {
     });
   });
 
-  it('should fail on test timeout', () => {
+  it('should fail on default test timeout', () => {
     const test: MockTest = createMockTest('test', suite, () => {
       return sleep(RunnerTestUtils.TEST_TIMEOUT + 100);
     });
@@ -143,16 +144,37 @@ describe('TestRun.runTest', () => {
     TestRun.runTest(test, state, actions, reporter);
 
     // Wait for the test to have timed out and then run assertions
-    return sleep(RunnerTestUtils.TEST_TIMEOUT + 200)
-      .then(() => {
-        assert.deepEqual(reporter.summary(), { offset: 0, failed: 1, passed: 0, skipped: 0 });
-        assert.isTrue(test.hasRun);
-        assert.isTrue(onStartRun);
-        assert.isNotTrue(onPassRun);
-        assert.isNotTrue(onSkipRun);
-        assert.isTrue(onFailureRun);
-        assert.isNotTrue(loadedNextChunk);
-      });
+    return sleep(RunnerTestUtils.TEST_TIMEOUT + 200).then(() => {
+      assert.deepEqual(reporter.summary(), { offset: 0, failed: 1, passed: 0, skipped: 0 });
+      assert.isTrue(test.hasRun);
+      assert.isTrue(onStartRun);
+      assert.isNotTrue(onPassRun);
+      assert.isNotTrue(onSkipRun);
+      assert.isTrue(onFailureRun);
+      assert.isNotTrue(loadedNextChunk);
+      assert.equal(reporter.failures()[0].message, `Test ran too long - timeout of ${RunnerTestUtils.TEST_TIMEOUT}ms exceeded`);
+    });
+  });
+
+  it('should fail on explicit test timeout', () => {
+    const test: MockTest = createMockTest('test', suite, () => {
+      return sleep(100);
+    });
+    test.timeout(50);
+    const state = RunnerTestUtils.createRunState(0, 100, 0);
+    TestRun.runTest(test, state, actions, reporter);
+
+    // Wait for the test to have timed out and then run assertions
+    return sleep(200).then(() => {
+      assert.deepEqual(reporter.summary(), { offset: 0, failed: 1, passed: 0, skipped: 0 });
+      assert.isTrue(test.hasRun);
+      assert.isTrue(onStartRun);
+      assert.isNotTrue(onPassRun);
+      assert.isNotTrue(onSkipRun);
+      assert.isTrue(onFailureRun);
+      assert.isNotTrue(loadedNextChunk);
+      assert.equal(reporter.failures()[0].message, `Test ran too long - timeout of 50ms exceeded`);
+    });
   });
 
   it('should not timeout if the timeout is disabled', () => {
