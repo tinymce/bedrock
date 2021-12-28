@@ -40,5 +40,27 @@
         ]
       }
     }
+  },
+
+  {
+    "request": {
+      "method": "get",
+      "path": "/custom/image"
+    },
+
+    "response": {
+      "binary_file": "src/test/resources/dogleft.jpg"
+    }
+  },
+
+  {
+    "request": {
+      "method": "get",
+      "path": "/custom/text"
+    },
+
+    "response": {
+      "binary_file": "src/test/resources/plaintext.txt"
+    }
   }
 ]

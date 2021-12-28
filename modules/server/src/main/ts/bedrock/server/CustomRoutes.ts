@@ -1,4 +1,6 @@
+import * as fs from 'fs';
 import { IncomingMessage, ServerResponse } from 'http';
+import * as mime from 'mime-types';
 import * as path from 'path';
 import * as Matchers from './Matchers';
 import * as Obj from '../util/Obj';
@@ -20,6 +22,7 @@ interface CustomResponse {
   readonly headers?: Record<string, string>;
   readonly json?: any;
   readonly json_file?: string;
+  readonly binary_file?: string;
 }
 
 export interface CustomRouteSpec {
@@ -77,13 +80,21 @@ const parseJsonFromFile = (filePath: string, configPath: string) => {
   return FileUtils.readFileAsJson(resolvedFilePath);
 };
 
-const assignContentType = (headers: Record<string, string>, contentType: string): Record<string, string> => {
-  return Object.assign({}, {'content-type': contentType}, headers);
+const concludeJson = (response: ServerResponse, status: number, headers: Record<string, string>, json: any) => {
+  response.writeHead(status, { 'Content-Type': 'application/json', ...headers });
+  response.end(serializeJson(json));
 };
 
-const concludeJson = (response: ServerResponse, status: number, headers: Record<string, string>, json: any) => {
-  response.writeHead(status, assignContentType(headers, 'application/json'));
-  response.end(serializeJson(json));
+const concludeBinary = (response: ServerResponse, status: number, headers: Record<string, string>, filepath: string) => {
+  const contentType = mime.contentType(path.extname(filepath)) || 'application/octet-stream';
+  const size = fs.statSync(filepath).size;
+  response.writeHead(status, {
+    'Content-Type': contentType,
+    'Content-Length': size,
+    ...headers
+  });
+  const stream = fs.createReadStream(filepath);
+  stream.pipe(response);
 };
 
 const goFromResponse = (matchResponse: CustomResponse, configPath: string): Routes.RouteGoFunc => {
@@ -96,6 +107,9 @@ const goFromResponse = (matchResponse: CustomResponse, configPath: string): Rout
     } else if (Type.isString(matchResponse.json_file)) {
       const json = parseJsonFromFile(matchResponse.json_file, configPath);
       concludeJson(response, status, headers, json);
+    } else if (Type.isString(matchResponse.binary_file)) {
+      const resolvedFilePath = path.join(path.dirname(configPath), matchResponse.binary_file);
+      concludeBinary(response, status, headers, resolvedFilePath);
     }
   };
 };
