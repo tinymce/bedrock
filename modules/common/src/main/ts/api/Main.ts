@@ -7,6 +7,7 @@ import * as TestError from './TestError';
 import { TestLabel } from './TestLabel';
 import * as TestLogs from './TestLogs';
 import { Context, ExecuteFn, Hook, HookType, Runnable, RunnableState, Suite, Test, TestGlobals } from './TestTypes';
+import * as Type from './Type';
 
 type TestThrowable = TestLabel | TestError.TestError;
 
@@ -20,6 +21,7 @@ export {
   TestLabel,
   TestLogs,
   TestThrowable,
+  Type,
 
   Context,
   ExecuteFn,

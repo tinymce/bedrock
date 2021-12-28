@@ -1,4 +1,4 @@
-export const typeOf = function (x: any): string {
+export const typeOf = (x: any): string => {
   if (x === null) {
     return 'null';
   }
@@ -11,3 +11,11 @@ export const typeOf = function (x: any): string {
   }
   return t;
 };
+
+const isType = <T>(type: string) => (value: any): value is T => {
+  return typeOf(value) === type;
+};
+
+export const isString = isType<string>('string');
+// eslint-disable-next-line @typescript-eslint/ban-types
+export const isObject = isType<Object>('object');

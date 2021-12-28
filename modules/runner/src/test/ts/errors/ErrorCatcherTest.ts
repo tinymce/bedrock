@@ -112,4 +112,29 @@ describe('ErrorCatcher', () => {
     assert.lengthOf(errors, 0);
     assert.isFalse(prevented, 'Event should not be prevented from running the default action');
   });
+
+  it('should handle cross frame errors', () => {
+    let prevented = false;
+    // Note: As this doesn't run in the browser we can't do a proper cross frame check so simulate an Error
+    // that doesn't use the current Error prototype
+    const frameError = {
+      message: 'frame message',
+      name: 'Error',
+      stack: 'Error\n    at <anonymous>:1:1'
+    };
+    const unhandledException = {
+      message: 'Unhandled error: frame message',
+      error: frameError,
+      preventDefault: () => {
+        prevented = true;
+      }
+    } as ErrorEvent;
+    fireEvent('error', unhandledException);
+
+    assert.lengthOf(errors, 1, 'Should contain one caught error');
+    const error = errors[0];
+    assert.equal(error.message, 'Unhandled error: frame message');
+    assert.equal(error.stack, frameError.stack);
+    assert.isTrue(prevented, 'Event should be prevented from running the default action');
+  });
 });
