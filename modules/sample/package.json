@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@ephox/bedrock-client": "^12.3.2",
-    "@ephox/wrap-promise-polyfill": "^2.2.0"
+    "@ephox/wrap-promise-polyfill": "^2.2.1"
   },
   "devDependencies": {
     "@ephox/bedrock-server": "^12.3.2"

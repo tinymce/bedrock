@@ -10,8 +10,8 @@ import { DriverMaster } from './DriverMaster';
 import { TestResults } from './Controller';
 
 interface Server {
-  readonly listen: (port: number) => http.Server;
-  readonly close: (callback?: () => void) => void;
+  readonly start: () => Promise<void>;
+  readonly stop: () => Promise<void>;
 }
 
 export interface ServeSettings {
@@ -31,7 +31,6 @@ export interface ServeSettings {
 
 export interface ServeService {
   readonly port: number;
-  readonly server: Server;
   readonly markLoaded: () => void;
   readonly enableHud: () => void;
   readonly awaitDone: () => Promise<TestResults>;
@@ -48,7 +47,7 @@ export interface ServeService {
  * master (can be null) The driver master (locking and unlocking)
  * runner: runner (e.g. runnerroutes, pageroutes etc). Has fallback and routers.
  */
-export const startCustom = async (settings: ServeSettings, createServer: (listener: http.RequestListener) => Server): Promise<ServeService> => {
+export const startCustom = async (settings: ServeSettings, createServer: (port: number, listener: http.RequestListener) => Server): Promise<ServeService> => {
 
   const pref = <K extends keyof ServeSettings>(f: K): ServeSettings[K] => {
     const v = settings[f];
@@ -86,25 +85,18 @@ export const startCustom = async (settings: ServeSettings, createServer: (listen
       stopPort: 20000
     });
 
-    const server = createServer((request, response) => {
+    const server = createServer(port, (request, response) => {
       const done = finalhandler(request, response);
       Routes.route(routers, fallback, request, response, done);
-    }).listen(port);
+    });
+    await server.start();
 
     return {
       port,
-      server,
       markLoaded: api.markLoaded,
       enableHud: api.enableHud,
       awaitDone: api.awaitDone,
-      shutdown: () => {
-        return new Promise<void>((resolve) => {
-          server.close();
-          // TODO: Find out why this doesn't shutdown quickly as we may not be closing connections properly
-          // For now though give the server 1 sec to shutdown gracefully
-          setTimeout(resolve, 1000);
-        });
-      }
+      shutdown: server.stop
     };
   } catch (err) {
     return Promise.reject('Error looking for open port between 8000 and 20000: ' + err);
@@ -112,5 +104,18 @@ export const startCustom = async (settings: ServeSettings, createServer: (listen
 };
 
 export const start = (settings: ServeSettings): Promise<ServeService> => {
-  return startCustom(settings, http.createServer);
+  return startCustom(settings, (port, listener) => {
+    const server = http.createServer(listener);
+    return {
+      start: () => {
+        server.listen(port);
+        return Promise.resolve();
+      },
+      stop: () => new Promise((resolve, reject) => {
+        server.close((err?) => {
+          err ? reject(err) : resolve();
+        });
+      })
+    };
+  });
 };

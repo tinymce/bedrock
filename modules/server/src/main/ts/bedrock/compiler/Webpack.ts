@@ -296,52 +296,70 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
   const tsConfigFile = settings.config;
 
   const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, settings.basedir, true, settings.testfiles, settings.coverage);
-  return Serve.startCustom(settings, (handler) => {
+  return Serve.startCustom(settings, (port, handler) => {
     const scratchFile = compileInfo.scratchFile;
-    console.log(`Loading ${settings.testfiles.length} tests...`);
+    console.log(`Loading ${settings.testfiles.length} test files...`);
 
     mkdirp.sync(path.dirname(scratchFile));
     fs.writeFileSync(scratchFile, Imports.generateImports(true, scratchFile, settings.testfiles, settings.polyfills));
 
-    const compiler = webpack(compileInfo.config);
+    const compiler = webpack({
+      infrastructureLogging: { level: 'warn' },
+      ...compileInfo.config
+    });
 
     // Prevents webpack from doing a recompilation of a change of tests.ts over and over
     compiler.hooks.emit.tap('bedrock', (compilation) => {
       compilation.fileDependencies.delete(scratchFile);
     });
 
-    // Note: webpack-dev-server types don't work with v5, but the library itself does
-    return new WebpackDevServer(compiler as any, {
-      publicPath: '/compiled/',
-      disableHostCheck: true,
-      injectClient: true,
+    const server = new WebpackDevServer({
+      port,
+      allowedHosts: 'all',
+      hot: false,
+      setupExitSignals: false,
       headers: {
         'Cache-Control': 'public, max-age=0'  // Ensure compiled assets are re-validated
       },
-      stats: {
-        // copied from `'minimal'`
-        // https://github.com/webpack/webpack/blob/v5.40.0/lib/stats/DefaultStatsPresetPlugin.js#L78
-        all: false,
-        version: false,
-        timings: true,
-        modules: true,
-        modulesSpace: 0,
-        assets: true,
-        assetsSpace: 0,
-        errors: true,
-        errorsCount: true,
-        warnings: true,
-        warningsCount: true,
-        logging: 'warn',
+      devMiddleware: {
+        publicPath: '/compiled/',
+        stats: {
+          // copied from `'minimal'` and disabled assets
+          // https://github.com/webpack/webpack/blob/v5.40.0/lib/stats/DefaultStatsPresetPlugin.js#L78
+          all: false,
+          version: false,
+          timings: true,
+          modules: true,
+          modulesSpace: 0,
+          assets: false,
+          assetsSpace: 0,
+          errors: true,
+          errorsCount: true,
+          warnings: true,
+          warningsCount: true,
+          logging: 'warn',
 
-        // suppress type re-export warnings caused by `transpileOnly: true`
-        warningsFilter: /export .* was not found in/
+          // suppress type re-export warnings caused by `transpileOnly: true`
+          warningsFilter: /export .* was not found in/
+        }
       },
-      before: (app) => {
-        app.all('*', (request, response, next) => {
+      // Static content is handled via the bedrock middleware below
+      static: false,
+      magicHtml: false,
+      setupMiddlewares: (middlewares) => {
+        const bedrockHandler: WebpackDevServer.RequestHandler = (request, response, next) => {
           return isCompiledRequest(request) ? next() : handler(request, response);
-        });
+        };
+        return [
+          { name: 'bedrock', middleware: bedrockHandler },
+          ...middlewares
+        ];
       }
-    });
+    }, compiler);
+
+    return {
+      start: () => server.start(),
+      stop: () => server.stop()
+    };
   });
 };

@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 13.0.0 - 2022-01-10
+
+### Improved
+- Upgrade to `webpack-dev-server` 4.x.
+
 ## 12.3.2 - 2022-01-04
 
 ### Fixed
