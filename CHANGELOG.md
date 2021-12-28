@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Improved
 - Upgrade to `webpack-dev-server` 4.x.
 
+### Removed
+- Removed the deprecated `assert` client API.
+
 ## 12.3.2 - 2022-01-04
 
 ### Fixed

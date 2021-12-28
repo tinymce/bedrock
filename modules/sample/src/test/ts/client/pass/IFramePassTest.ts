@@ -1,4 +1,4 @@
-import { UnitTest, assert } from '@ephox/bedrock-client';
+import { Assert, UnitTest } from '@ephox/bedrock-client';
 
 UnitTest.asyncTest('IFrame Test', (success, failure) => {
 
@@ -87,13 +87,13 @@ UnitTest.asyncTest('IFrame Test', (success, failure) => {
 
         sendText('.iframe-keyboard=>body', 'going', function () {
           sendText('textarea', 'blah', function () {
-            assert.eq('going!', fr1.contentWindow.document.body.innerHTML.trim());
-            assert.eq('blah', textarea.value);
+            Assert.eq('', 'going!', fr1.contentWindow.document.body.innerHTML.trim());
+            Assert.eq('', 'blah', textarea.value);
 
             sendMouse('.iframe-mouse=>input', 'click', function () {
-              assert.eq(true, fr2.contentWindow.document.body.querySelector('input').checked);
+              Assert.eq('', true, fr2.contentWindow.document.body.querySelector('input').checked);
               sendMouse('.button-mouse', 'click', function () {
-                assert.eq('clicked', button.getAttribute('data-clicked'));
+                Assert.eq('', 'clicked', button.getAttribute('data-clicked'));
 
                 document.body.removeChild(fr1);
                 document.body.removeChild(fr2);

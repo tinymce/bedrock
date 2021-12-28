@@ -1,4 +1,4 @@
-import { UnitTest, assert } from '@ephox/bedrock-client';
+import { Assert, UnitTest } from '@ephox/bedrock-client';
 
 UnitTest.asyncTest('Tabbing Test', (success, failure) => {
   const input1 = document.createElement('input');
@@ -46,11 +46,11 @@ UnitTest.asyncTest('Tabbing Test', (success, failure) => {
   };
 
   setTimeout(() => {
-    assert.eq(true, document.activeElement === input1, 'Checking focus initially on first input');
+    Assert.eq('Checking focus initially on first input', true, document.activeElement === input1);
     sendText('.input-1', [{
       text: '\u0009'
     }], function () {
-      assert.eq(true, document.activeElement === input2, 'Checking focus now on second input');
+      Assert.eq('Checking focus now on second input', true, document.activeElement === input2);
       sendText('.input-2', [{
         combo: {
           ctrlKey: false,
@@ -60,7 +60,7 @@ UnitTest.asyncTest('Tabbing Test', (success, failure) => {
           key: '\u0009'
         }
       }], function () {
-        assert.eq(true, document.activeElement === input1, 'Checking focus back on first input');
+        Assert.eq('Checking focus back on first input', true, document.activeElement === input1);
         document.body.removeChild(input1);
         document.body.removeChild(input2);
         success();

@@ -1,7 +1,6 @@
 import { LoggedError, TestError, TestLabel } from '@ephox/bedrock-common';
 import { after, afterEach, before, beforeEach, context, describe, it, specify, xcontext, xdescribe, xspecify, xit } from './Bdd';
-import * as LegacyAssert from './LegacyAssert';
-import * as NewAssert from './NewAssert';
+import * as Assert from './Assert';
 import * as UnitTest from './UnitTest';
 
 export {
@@ -19,8 +18,7 @@ export {
   specify,
   xspecify,
 
-  LegacyAssert as assert,
-  NewAssert as Assert,
+  Assert,
   UnitTest,
   LoggedError,
   TestLabel,

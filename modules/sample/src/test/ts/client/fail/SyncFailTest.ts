@@ -1,6 +1,6 @@
-import { UnitTest, assert } from '@ephox/bedrock-client';
+import { Assert, UnitTest } from '@ephox/bedrock-client';
 
 UnitTest.test('SyncFail Test', () => {
-  assert.eq(1, 2);
+  Assert.eq('', 1, 2);
 
 });
