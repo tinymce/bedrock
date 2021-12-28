@@ -1,4 +1,4 @@
-import * as Type from './Type';
+import { Type } from '@ephox/bedrock-common';
 
 const Arr = {
   contains: (values: any[], value: any): boolean =>
