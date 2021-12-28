@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 13.0.0 - 2022-01-10
 
+### Added
+- Added the ability to serve binary files from custom routes.
+
 ### Improved
 - Upgrade to `webpack-dev-server` 4.x.
 
