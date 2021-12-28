@@ -1,9 +1,9 @@
-import { UnitTest, assert } from '@ephox/bedrock-client';
+import { Assert, UnitTest } from '@ephox/bedrock-client';
 
-UnitTest.test('SyncPass Test', () => {
+UnitTest.test('TsxPass Test', () => {
   const React = {
     createElement: (...props) => {}
   };
   const el = <div>blah</div>;
-  assert.eq(el, el);
+  Assert.eq('', el, el);
 });

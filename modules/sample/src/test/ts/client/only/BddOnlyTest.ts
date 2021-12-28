@@ -1,4 +1,4 @@
-import { afterEach, assert, beforeEach, describe, it } from '@ephox/bedrock-client';
+import { afterEach, Assert, beforeEach, describe, it } from '@ephox/bedrock-client';
 
 describe('BDD Only', () => {
   let count = 0;
@@ -8,7 +8,7 @@ describe('BDD Only', () => {
 
   describe.only('Only suite', () => {
     it.only('should work with only function', () => {
-      assert.eq(1, count);
+      Assert.eq('', 1, count);
     });
 
     it('should not run normal tests', () => {

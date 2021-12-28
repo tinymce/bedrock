@@ -1,7 +1,7 @@
 import { TestError, TestLabel } from '@ephox/bedrock-common';
 import { Pprint, Testable } from '@ephox/dispute';
 
-const eq = function <T> (message: TestLabel, expected: T, actual: T, tt: Testable.Testable<T> = Testable.tAny): void {
+const eq = <T>(message: TestLabel, expected: T, actual: T, tt: Testable.Testable<T> = Testable.tAny): void => {
   const result = tt.eq(expected, actual);
   if (!result) {
     const sMessage = TestLabel.asString(message);
@@ -11,7 +11,7 @@ const eq = function <T> (message: TestLabel, expected: T, actual: T, tt: Testabl
   }
 };
 
-const throws = function (message: TestLabel, f: () => void, expected?: string): void {
+const throws = (message: TestLabel, f: () => void, expected?: string): void => {
   const token = {};
 
   try {
@@ -28,7 +28,7 @@ const throws = function (message: TestLabel, f: () => void, expected?: string): 
   }
 };
 
-const throwsError = function (message: TestLabel, f: () => void, expected?: string): void {
+const throwsError = (message: TestLabel, f: () => void, expected?: string): void => {
   const token = {};
 
   try {
@@ -45,7 +45,7 @@ const throwsError = function (message: TestLabel, f: () => void, expected?: stri
   }
 };
 
-const succeeds = function (message: TestLabel, f: () => void): void {
+const succeeds = (message: TestLabel, f: () => void): void => {
   try {
     f();
   } catch (e) {
@@ -53,7 +53,7 @@ const succeeds = function (message: TestLabel, f: () => void): void {
   }
 };
 
-const fail = function (message: TestLabel): void {
+const fail = (message: TestLabel): void => {
   throw new Error('Test failed\n' + TestLabel.asString(message));
 };
 

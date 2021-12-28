@@ -1,4 +1,4 @@
-import { after, afterEach, assert, before, beforeEach, describe, it, xit } from '@ephox/bedrock-client';
+import { after, afterEach, Assert, before, beforeEach, describe, it, xit } from '@ephox/bedrock-client';
 
 describe('BDD Pass', () => {
   describe('Test count', () => {
@@ -24,16 +24,16 @@ describe('BDD Pass', () => {
     });
 
     it('should work with sync function', () => {
-      assert.eq(1, count);
+      Assert.eq('', 1, count);
     });
 
     it('should work with async done function', (done) => {
-      assert.eq(1, count);
+      Assert.eq('', 1, count);
       setTimeout(done, 100);
     });
 
     it('should work with async Promise function', async () => {
-      assert.eq(1, count);
+      Assert.eq('', 1, count);
       await new Promise((resolve) => {
         setTimeout(resolve, 100);
       });
@@ -41,11 +41,11 @@ describe('BDD Pass', () => {
 
     it('should work with retries', () => {
       retryCount++;
-      assert.eq(3, retryCount);
+      Assert.eq('', 3, retryCount);
     }).retries(2);
 
     it('should work with tests that contain ?? in the title', () => {
-      assert.eq(true, true);
+      Assert.eq('', true, true);
     });
 
     it.skip('should be skipped with outer call', () => {
