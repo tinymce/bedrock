@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock-client",
-  "version": "12.0.0",
+  "version": "12.3.2",
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
   "scripts": {
@@ -10,7 +10,7 @@
     "buildAndTest": "yarn prepublishOnly && yarn test"
   },
   "dependencies": {
-    "@ephox/bedrock-common": "^12.0.0",
+    "@ephox/bedrock-common": "^12.3.2",
     "@ephox/dispute": "^1.0.3"
   },
   "main": "./lib/main/ts/api/Main.js",
