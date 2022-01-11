@@ -108,8 +108,9 @@ export const start = (settings: ServeSettings): Promise<ServeService> => {
     const server = http.createServer(listener);
     return {
       start: () => {
-        server.listen(port);
-        return Promise.resolve();
+        return new Promise((resolve) => {
+          server.listen(port, resolve);
+        });
       },
       stop: () => new Promise((resolve, reject) => {
         server.close((err?) => {
