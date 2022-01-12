@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - Removed the deprecated `assert` client API.
+- Removed the TypeScript compiler `declarationMap` and `rootDir` overrides.
 
 ## 12.3.2 - 2022-01-04
 
