@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Improved
 - Upgrade to `webpack-dev-server` 4.x.
 
+### Fixed
+- Webdriver.io failed to connect to the webdriver instance on Node.js 17.
+
 ### Removed
 - Removed the deprecated `assert` client API.
 

@@ -98,7 +98,7 @@ export const loadDriver = (browserName: string, settings: DriverSettings): Drive
 };
 
 export const waitForAlive = (proc: ChildProcess, port: number, timeout = 30000): Promise<void> => {
-  const url = 'http://localhost:' + port + '/status';
+  const url = 'http://127.0.0.1:' + port + '/status';
   const start = Date.now();
   return new Promise<void>((resolve, reject) => {
     let timeoutId: ReturnType<typeof setTimeout> | null = null;

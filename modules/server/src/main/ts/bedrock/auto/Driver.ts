@@ -70,6 +70,7 @@ const addArguments = (capabilities: Record<string, any>, name: string, args: str
 const getOptions = (port: number, browserName: string, browserFamily: string, settings: DriverSettings): WebdriverIO.RemoteOptions => {
   const options = {
     path: '/',
+    host: '127.0.0.1',
     port,
     logLevel: 'silent' as const,
     capabilities: {
