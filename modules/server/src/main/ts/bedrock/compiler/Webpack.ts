@@ -69,11 +69,6 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
-  const compilerOverrides = {
-    rootDir: '.',
-    declarationMap: false
-  };
-
   return {
     stats: 'none',
     entry: scratchFile,
@@ -117,8 +112,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
                 colors: manualMode,
                 configFile: tsConfigFile,
                 transpileOnly: true,
-                projectReferences: true,
-                compilerOptions: compilerOverrides
+                projectReferences: true
               }
             }
           ]
@@ -144,10 +138,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
         typescript: {
           memoryLimit: manualMode ? 4096 : 2048,
           configFile: tsConfigFile,
-          build: true,
-          configOverwrite: {
-            compilerOptions: compilerOverrides
-          }
+          build: true
         }
       }),
       new webpack.WatchIgnorePlugin({
