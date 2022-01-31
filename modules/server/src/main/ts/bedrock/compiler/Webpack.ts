@@ -58,7 +58,7 @@ const webpackSharedRules = webpackRemap.concat([
     type: 'asset/source'
   },
   {
-    test: /\.(jpe?g|png|gif|svg)$/i,
+    test: /\.(jpe?g|png|gif|svg|apng|avif|webp|bmp|tiff)$/i,
     type: 'asset/inline'
   },
   {
