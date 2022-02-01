@@ -80,6 +80,12 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
       usedExports: !manualMode
     },
 
+    ignoreWarnings: [
+      // suppress type re-export warnings caused by `transpileOnly: true`
+      // See https://github.com/TypeStrong/ts-loader#transpileonly
+      /export .* was not found in/
+    ],
+
     resolve: {
       extensions: [ '.ts', '.tsx', '.js', '.mjs' ],
       plugins: [
@@ -328,10 +334,7 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
           errorsCount: true,
           warnings: true,
           warningsCount: true,
-          logging: 'warn',
-
-          // suppress type re-export warnings caused by `transpileOnly: true`
-          warningsFilter: /export .* was not found in/
+          logging: 'warn'
         }
       },
       // Static content is handled via the bedrock middleware below
