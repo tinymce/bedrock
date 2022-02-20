@@ -44,6 +44,7 @@ const maxInvalidAttempts = 300;
 // TODO: Do not use files here.
 export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Browser<'async'>>, projectdir: string, basedir: string, stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced', resetMousePosition: boolean): Apis => {
   let pageHasLoaded = false;
+  let needsMousePositionReset = true;
 
   // On IE, the webdriver seems to load the page before it's ready to start
   // responding to commands. If the testing page itself tries to interact with
@@ -61,31 +62,43 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
     }
   };
 
-  const effect = <D>(executor: Executor<D, void>, driver: Browser<'async'>) => {
+  const effect = <D>(executor: Executor<D, void>, driver: Browser<'async'>, effectChangesMouse: boolean) => {
     return (data: D) => {
       return waitForDriverReady(maxInvalidAttempts, () => {
+        if (effectChangesMouse) {
+          needsMousePositionReset = true;
+        }
         return executor(driver)(data);
       });
     };
   };
 
-  const setInitialMousePosition = (driver: Browser<'async'>) => (): Promise<void> => {
-    // TODO re-enable resetting the mouse on other browsers when mouseMove gets fixed on Firefox/IE
-    const browserName = (driver.capabilities as Capabilities.Capabilities).browserName;
-    if (browserName === 'chrome' || browserName === 'msedge') {
-      // Reset the mouse position to the top left of the window
-      return driver.performActions([{
-        type: 'pointer',
-        id: 'finger1',
-        parameters: { pointerType: 'mouse' },
-        actions: [{ type: 'pointerMove', duration: 0, x: 0, y: 0 }]
-      }]);
+  const resetMousePositionAction = (force = false): Promise<void> => {
+    if (resetMousePosition) {
+      return Attempt.cata(maybeDriver,
+        () => Promise.reject('Resetting mouse position not supported without webdriver running. Use bedrock-auto to get this feature.'),
+        (driver) => waitForDriverReady(maxInvalidAttempts, async () => {
+          const shouldResetMousePos = force || needsMousePositionReset;
+          // TODO re-enable resetting the mouse on other browsers when mouseMove gets fixed on Firefox/IE
+          const browserName = (driver.capabilities as Capabilities.Capabilities).browserName;
+          if (shouldResetMousePos && (browserName === 'chrome' || browserName === 'msedge')) {
+            // Reset the mouse position to the top left of the window
+            await driver.performActions([{
+              type: 'pointer',
+              id: 'finger1',
+              parameters: { pointerType: 'mouse' },
+              actions: [{ type: 'pointerMove', duration: 0, x: 0, y: 0 }]
+            }]);
+            needsMousePositionReset = false;
+          }
+        })
+      );
     } else {
       return Promise.resolve();
     }
   };
 
-  const driverRouter = <D>(url: string, apiLabel: string, executor: Executor<D, void>) => {
+  const driverRouter = <D>(url: string, apiLabel: string, executor: Executor<D, void>, effectChangesMouse: boolean) => {
     return Attempt.cata(maybeDriver, () => {
       return Routes.unsupported(
         'POST',
@@ -93,7 +106,7 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
         apiLabel + ' API not supported without webdriver running. Use bedrock-auto to get this feature.'
       );
     }, (driver) => {
-      return Routes.effect('POST', url, effect(executor, driver));
+      return Routes.effect('POST', url, effect(executor, driver, effectChangesMouse));
     });
   };
 
@@ -104,24 +117,16 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
   const c = Controller.create(stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel);
 
   const routers = [
-
-    driverRouter('/keys', 'Keys', KeyEffects.executor),
-    driverRouter('/mouse', 'Mouse', MouseEffects.executor),
+    driverRouter('/keys', 'Keys', KeyEffects.executor, false),
+    driverRouter('/mouse', 'Mouse', MouseEffects.executor, true),
     Routes.effect('POST', '/tests/alive', (data: { session: string }) => {
       c.recordAlive(data.session);
       return Promise.resolve();
     }),
+    Routes.effect('POST', '/tests/init', () => resetMousePositionAction(true)),
     Routes.effect('POST', '/tests/start', (data: StartData) => {
       c.recordTestStart(data.session, data.name, data.file, data.totalTests);
-      if (resetMousePosition) {
-        return Attempt.cata(maybeDriver, () => {
-          return Promise.reject('Resetting mouse position not supported without webdriver running. Use bedrock-auto to get this feature.');
-        }, (driver) => {
-          return effect(setInitialMousePosition, driver)({});
-        });
-      } else {
-        return Promise.resolve();
-      }
+      return resetMousePositionAction();
     }),
     Routes.effect('POST', '/tests/result', (data: ResultData) => {
       c.recordTestResult(data.session, data.name, data.file, data.passed, data.time, data.error, data.skipped);

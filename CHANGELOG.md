@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## Improved
+- The mouse position reset logic now only runs when required, instead of for every test.
+
 ## 13.0.1 - 2022-02-01
 
 ### Fixed

@@ -279,7 +279,7 @@ export const skipResetMousePosition: ClOption = {
   name: 'skipResetMousePosition',
   type: Boolean,
   defaultValue: false,
-  description: 'Prevent bedrock from resetting the mouse position to the top left corner of the screen between each test',
+  description: 'Prevent bedrock from resetting the mouse position to the top left corner of the screen between tests',
   validate: Extraction.any,
   uncommon: true
 };
