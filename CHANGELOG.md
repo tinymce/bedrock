@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Images (svg, png, gif, jpg, etc...) can now be imported by tests, and will be available as data URIs using the `asset/inline` webpack loader
 
+## 13.0.1 - 2022-02-01
+
+### Fixed
+- The `webpack-dev-server` warning overlay would incorrectly show for re-exported types.
+
 ## 13.0.0 - 2022-01-10
 
 ### Added
