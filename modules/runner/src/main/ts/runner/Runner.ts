@@ -74,7 +74,7 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
       });
     }, KEEP_ALIVE_INTERVAL);
 
-    return callbacks.loadHarness();
+    return callbacks.sendInit(params.session).then(() => callbacks.loadHarness());
   };
 
   const run = (chunk: number, retries: number, timeout: number, stopOnFailure: boolean): Promise<void> => {
