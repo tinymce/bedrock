@@ -54,8 +54,12 @@ const webpackSharedRules = webpackRemap.concat([
     enforce: 'pre'
   },
   {
-    test: /\.(html|htm|css|bower|hex|rtf|xml|yml)$/,
+    test: /\.(html|htm|css|bower|hex|rtf|xml|yml|svg)$/i,
     type: 'asset/source'
+  },
+  {
+    test: /\.(jpe?g|png|gif|apng|avif|webp|bmp|tiff)$/i,
+    type: 'asset/inline'
   },
   {
     resourceQuery: /raw/,
