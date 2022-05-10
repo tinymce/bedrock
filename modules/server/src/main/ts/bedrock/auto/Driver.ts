@@ -11,6 +11,7 @@ export interface DriverSettings {
   browser: string;
   debuggingPort: number;
   useSandboxForHeadless: boolean;
+  extraBrowserCapabilities: string;
   webdriverPort?: number;
   webdriverTimeout?: number;
   wipeBrowserCache?: boolean;
@@ -67,6 +68,14 @@ const addArguments = (capabilities: Record<string, any>, name: string, args: str
   capabilities[name].args = currentArgs.concat(args);
 };
 
+const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
+  if (settings.extraBrowserCapabilities && settings.extraBrowserCapabilities.length > 0) {
+    return settings.extraBrowserCapabilities.trim().split(' ');
+  } else {
+    return [];
+  }
+};
+
 const getOptions = (port: number, browserName: string, browserFamily: string, settings: DriverSettings): WebdriverIO.RemoteOptions => {
   const options = {
     path: '/',
@@ -77,15 +86,21 @@ const getOptions = (port: number, browserName: string, browserFamily: string, se
     }
   };
 
+  // NOTE: We are currently not supporting extra browser capabilities for IE, Legacy Edge, 
+  // or Chromium-based Edge. We should start supporting extra browser capabilities for Chromium-based
+  // Edge, though.
+  const extraCaps = getExtraBrowserCapabilities(settings);
+
   // Support for disabling the Automation Chrome Extension
   // https://stackoverflow.com/questions/43261516/selenium-chrome-i-just-cant-use-driver-maximize-window-to-maximize-window
   const caps: Record<string, any> = options.capabilities;
   if (browserFamily === 'chrome') {
-    addArguments(caps, 'goog:chromeOptions', ['--start-maximized', '--disable-extensions']);
-  }
-
-  // Setup wiping the browser cache if required, as IE 11 doesn't use a clean session by default
-  if (browserFamily === 'internet explorer' && settings.wipeBrowserCache) {
+    addArguments(caps, 'goog:chromeOptions', ['--start-maximized', '--disable-extensions']);    
+    addArguments(caps, 'goog:chromeOptions', extraCaps);
+  } else if (browserFamily === 'firefox') {
+    addArguments(caps, 'moz:firefoxOptions', extraCaps);
+  } else if (browserFamily === 'internet explorer' && settings.wipeBrowserCache) {
+    // Setup wiping the browser cache if required, as IE 11 doesn't use a clean session by default
     caps['se:ieOptions'] = {
       'ie.ensureCleanSession': true
     };
@@ -187,6 +202,11 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
     // Wait for the driver to start up and then start the webdriver session
     await DriverLoader.startAndWaitForAlive(driverApi, port, webdriverTimeout);
     const webdriverOptions = getOptions(port, browserName, browserFamily, settings);
+
+    console.log(
+      `Browser capabilities: ${JSON.stringify(webdriverOptions.capabilities)}`
+    );
+
     const driver = await WebdriverIO.remote(webdriverOptions);
 
     // IEDriverServer ignores a delete session call if done too quickly so it needs a small delay
