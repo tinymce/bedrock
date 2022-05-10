@@ -264,6 +264,22 @@ export const useSandboxForHeadless: ClOption = {
   uncommon: true
 };
 
+/* In several situations, we need to pass through specific options to the 
+ * browser's being launched. For example, Chrome Headless uses quite a lot 
+ * of /dev/shm which can be a problem when running in docker containers, 
+ * as the default of docker containers is just 64MB. The solution that 
+ * Google tends to offer is to disable /dev/shm usage altogether through a 
+ * chrome flag (https://developers.google.com/web/tools/puppeteer/troubleshooting#tips)
+ */
+export const extraBrowserCapabilities: ClOption = {
+  name: 'extraBrowserCapabilities',
+  type: String,
+  defaultValue: '',
+  description: 'Pass additional capabilities to the browser (e.g. " --disable-dev-shm-usage" for Chrome). Note, you must surround the value in quotes, and have a leading space if the capabilities contain hyphens, otherwise, bedrock\'s command line parser will throw errors.',
+  validate: Extraction.any,
+  uncommon: true
+};
+
 export const coverage: ClOption = {
   name: 'coverage',
   output: 'coverage',

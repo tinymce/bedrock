@@ -30,5 +30,6 @@ export interface BedrockAutoSettings extends BedrockSettings {
   readonly retries: number;
   readonly skipResetMousePosition: boolean;
   readonly useSandboxForHeadless: boolean;
+  readonly extraBrowserCapabilities: string;
   readonly wipeBrowserCache: boolean;
 }
