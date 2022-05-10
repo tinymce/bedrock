@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 13.2.0 - 2022-05-10
 
 ### Added
-- Added ability to use `--extraBrowserCapabilities` in bedrock-auto command.
+- Additional webdriver browser capabilities can be passed via the `--extraBrowserCapabilities` argument in the bedrock-auto command.
 
 ## 13.1.0 - 2022-02-22
 
