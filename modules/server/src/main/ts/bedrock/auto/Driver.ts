@@ -69,7 +69,7 @@ const addArguments = (capabilities: Record<string, any>, name: string, args: str
 };
 
 const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
-  if (settings.extraBrowserCapabilities && settings.extraBrowserCapabilities.length > 0) {
+  if (settings.extraBrowserCapabilities.length > 0) {
     return settings.extraBrowserCapabilities.trim().split(' ');
   } else {
     return [];
