@@ -45,6 +45,7 @@ export const forAuto = (directories: Directories, argv: string[] = process.argv)
     ClOptions.retries,
     ClOptions.delayExiting,
     ClOptions.useSandboxForHeadless,
+    ClOptions.extraBrowserCapabilities,
     ClOptions.skipResetMousePosition,
     ClOptions.wipeBrowserCache
   ]), argv) as Attempt<cli.CliError, BedrockAutoSettings>;

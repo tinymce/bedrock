@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 12.4.0 - 2022-05-10
+
+### Added
+- Added ability to use `--extraBrowserCapabilities` in bedrock-auto command.
+
 ## 12.3.2 - 2022-01-04
 
 ### Fixed
