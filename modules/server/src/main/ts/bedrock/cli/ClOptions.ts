@@ -264,7 +264,8 @@ export const useSandboxForHeadless: ClOption = {
   uncommon: true
 };
 
-/* In several situations, we need to pass through specific options to the 
+/*
+ * In several situations, we need to pass through specific options to the 
  * browser's being launched. For example, Chrome Headless uses quite a lot 
  * of /dev/shm which can be a problem when running in docker containers, 
  * as the default of docker containers is just 64MB. The solution that 
