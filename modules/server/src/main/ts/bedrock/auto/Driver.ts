@@ -12,6 +12,7 @@ export interface DriverSettings {
   debuggingPort: number;
   useSandboxForHeadless: boolean;
   extraBrowserCapabilities: string;
+  verbose: boolean;
   webdriverPort?: number;
   webdriverTimeout?: number;
   wipeBrowserCache?: boolean;
@@ -69,8 +70,9 @@ const addArguments = (capabilities: Record<string, any>, name: string, args: str
 };
 
 const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
-  if (settings.extraBrowserCapabilities.length > 0) {
-    return settings.extraBrowserCapabilities.trim().split(' ');
+  const extraCaps = settings.extraBrowserCapabilities.trim();
+  if (extraCaps.length > 0) {
+    return extraCaps.split(' ');
   } else {
     return [];
   }
@@ -204,9 +206,11 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
     await DriverLoader.startAndWaitForAlive(driverApi, port, webdriverTimeout);
     const webdriverOptions = getOptions(port, browserName, browserFamily, settings);
 
-    console.log(
-      `Browser capabilities: ${JSON.stringify(webdriverOptions.capabilities)}`
-    );
+    if (settings.verbose) {
+      console.log(
+        `Browser capabilities: ${JSON.stringify(webdriverOptions.capabilities)}`
+      );
+    }
 
     const driver = await WebdriverIO.remote(webdriverOptions);
 
