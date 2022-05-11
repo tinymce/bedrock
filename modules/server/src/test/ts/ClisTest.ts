@@ -54,6 +54,45 @@ describe('Clis.forAuto', () => {
       chunk: 100,
       retries: 0,
       polyfills: [ 'Symbol' ],
+      verbose: false,
+      bucket: 1,
+      buckets: 1,
+      useSandboxForHeadless: false,
+      extraBrowserCapabilities: '',
+      skipResetMousePosition: false,
+      wipeBrowserCache: false
+    }, cleanResult(actual));
+  });
+
+  it('parses verbose logging mode', () => {
+    const args = [
+      '--browser', 'MicrosoftEdge',
+      '--files', 'src/test/resources/test.file1',
+      '--config', 'src/test/resources/tsconfig.sample.json',
+      '--verbose'
+    ];
+    const actual = Clis.forAuto(directories, args);
+    AttemptUtils.assertResult({
+      browser: 'MicrosoftEdge',
+      bundler: 'webpack',
+      config: 'src/test/resources/tsconfig.sample.json',
+      name: 'bedrock-run',
+      output: 'scratch',
+      help: false,
+      testfiles: [
+        'src/test/resources/test.file1'
+      ],
+      debuggingPort: 9000,
+      delayExit: false,
+      singleTimeout: 30000,
+      stopOnFailure: false,
+      overallTimeout: 600000,
+      loglevel: 'advanced',
+      version: false,
+      chunk: 100,
+      retries: 0,
+      polyfills: [ 'Symbol' ],
+      verbose: true,
       bucket: 1,
       buckets: 1,
       useSandboxForHeadless: false,
@@ -92,6 +131,7 @@ describe('Clis.forAuto', () => {
       chunk: 100,
       retries: 0,
       polyfills: [ 'Symbol' ],
+      verbose: false,
       bucket: 3,
       buckets: 7,
       useSandboxForHeadless: false,
@@ -129,6 +169,7 @@ describe('Clis.forAuto', () => {
       chunk: 100,
       retries: 0,
       polyfills: [ 'Symbol' ],
+      verbose: false,
       bucket: 1,
       buckets: 1,
       useSandboxForHeadless: false,
@@ -195,6 +236,7 @@ describe('Clis.forManual', () => {
     AttemptUtils.assertResult({
       ...defaultCliOptions,
       config: 'src/test/resources/tsconfig.sample.json',
+      verbose: false,
       testfiles: [
         'src/test/resources/test.file1'
       ]
@@ -212,7 +254,29 @@ describe('Clis.forManual', () => {
       testfiles: [
         'src/test/resources/test.file1'
       ],
+      verbose: false,
       customRoutes: 'src/test/resources/routes.json'
+    }, Attempt.map(actual, exclude(['projectdir', 'basedir'])));
+  });
+
+  it('parses verbose logging mode', () => {
+    const args = [
+      '--files', 'src/test/resources/test.file1',
+      '--config', 'src/test/resources/tsconfig.sample.json',
+      '--bucket', '4',
+      '--buckets', '15',
+      '--verbose'
+    ];
+    const actual = Clis.forManual(directories, args);
+    AttemptUtils.assertResult({
+      ...defaultCliOptions,
+      config: 'src/test/resources/tsconfig.sample.json',
+      testfiles: [
+        'src/test/resources/test.file1'
+      ],
+      verbose: true,
+      bucket: 4,
+      buckets: 15
     }, Attempt.map(actual, exclude(['projectdir', 'basedir'])));
   });
 
@@ -230,6 +294,7 @@ describe('Clis.forManual', () => {
       testfiles: [
         'src/test/resources/test.file1'
       ],
+      verbose: false,
       bucket: 4,
       buckets: 15
     }, Attempt.map(actual, exclude(['projectdir', 'basedir'])));

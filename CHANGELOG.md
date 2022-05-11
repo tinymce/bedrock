@@ -6,10 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-## 13.2.0 - 2022-05-10
+## 13.2.0 - 2022-05-11
 
 ### Added
 - Additional webdriver browser capabilities can be passed via the `--extraBrowserCapabilities` argument in the bedrock-auto command.
+- Verbose logging mode can be passed via the `--verbose` argument in bedrock and bedrock-auto
 
 ## 13.1.0 - 2022-02-22
 

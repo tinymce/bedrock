@@ -28,6 +28,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       debuggingPort: settings.debuggingPort,
       useSandboxForHeadless: settings.useSandboxForHeadless,
       extraBrowserCapabilities: settings.extraBrowserCapabilities,
+      verbose: settings.verbose,
       wipeBrowserCache: settings.wipeBrowserCache
     });
 
