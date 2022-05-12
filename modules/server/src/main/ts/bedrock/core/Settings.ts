@@ -16,6 +16,7 @@ export interface BedrockSettings {
   readonly bucket: number;
   readonly buckets: number;
   readonly testfiles: string[];
+  readonly verbose: boolean;
 }
 
 export type BedrockManualSettings = BedrockSettings;

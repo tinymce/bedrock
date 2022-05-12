@@ -309,3 +309,12 @@ export const polyfills: ClOption = {
   validate: Extraction.inSet([ 'ArrayBuffer', 'Map', 'Object', 'Promise', 'Set', 'Symbol', 'TypedArray', 'WeakMap', 'WeakSet' ]),
   uncommon: true
 };
+
+export const verbose: ClOption = {
+  name: 'verbose',
+  type: Boolean,
+  defaultValue: false,
+  description: 'Enable verbose logging mode',
+  validate: Extraction.any,
+  uncommon: false
+};
