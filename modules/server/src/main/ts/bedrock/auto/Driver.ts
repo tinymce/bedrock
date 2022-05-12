@@ -78,7 +78,6 @@ const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
   }
 };
 
-
 const getOptions = (port: number, browserName: string, browserFamily: string, settings: DriverSettings): WebdriverIO.RemoteOptions => {
   const options = {
     path: '/',
