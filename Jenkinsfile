@@ -3,6 +3,17 @@
 
 // NOTE: This Jenkinsfile relies on Tiny's internal infrastructure
 
+def isReleaseBranch() {
+    // The branch name could be in the BRANCH_NAME or GIT_BRANCH variable depending on the type of job
+    def branchName = env.BRANCH_NAME ? env.BRANCH_NAME : env.GIT_BRANCH
+    if (branchName =~ ~"release/\\d+\\.x") {
+      return true;
+    } else {
+      // If branch name is null then just assume it's a release branch (which it is for things like regular pipeline builds)
+      return branchName == null;
+    }
+}
+
 standardProperties()
 
 node("primary") {
