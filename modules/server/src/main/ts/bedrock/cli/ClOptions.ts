@@ -139,7 +139,6 @@ export const debuggingPort: ClOption = {
   type: Number,
   description: 'The port for remote debugging (used for phantom and headless browsers)',
   validate: Extraction.any,
-  defaultValue: 9000,
   uncommon: true
 };
 
@@ -265,11 +264,11 @@ export const useSandboxForHeadless: ClOption = {
 };
 
 /*
- * In several situations, we need to pass through specific options to the 
- * browser's being launched. For example, Chrome Headless uses quite a lot 
- * of /dev/shm which can be a problem when running in docker containers, 
- * as the default of docker containers is just 64MB. The solution that 
- * Google tends to offer is to disable /dev/shm usage altogether through a 
+ * In several situations, we need to pass through specific options to the
+ * browser's being launched. For example, Chrome Headless uses quite a lot
+ * of /dev/shm which can be a problem when running in docker containers,
+ * as the default of docker containers is just 64MB. The solution that
+ * Google tends to offer is to disable /dev/shm usage altogether through a
  * chrome flag (https://developers.google.com/web/tools/puppeteer/troubleshooting#tips)
  */
 export const extraBrowserCapabilities: ClOption = {
