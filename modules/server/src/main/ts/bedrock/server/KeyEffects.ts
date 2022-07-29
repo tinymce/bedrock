@@ -1,3 +1,4 @@
+import { Capabilities } from '@wdio/types';
 import { Browser, Element } from 'webdriverio';
 import * as EffectUtils from './EffectUtils';
 
@@ -24,6 +25,11 @@ type KeyItem = KeyTextItem | KeyComboItem;
 export interface KeyData {
   keys: KeyItem[];
   selector: string;
+}
+
+interface Action {
+  type: 'text' | 'combo';
+  data: string[];
 }
 
 const NO_ACTION = null;
@@ -79,7 +85,7 @@ const mapKeys = (action: string[]): string[] => {
   });
 };
 
-const scanCombo = (combo: KeyCombo) => {
+const scanCombo = (combo: KeyCombo): string[] => {
   const keys: string[] = [];
   if (combo.ctrlKey) keys.push('Control');
   if (combo.metaKey) keys.push('Meta');
@@ -93,30 +99,59 @@ const isTextItem = (item: KeyItem): item is KeyTextItem => {
   return Object.prototype.hasOwnProperty.call(item, 'text');
 };
 
-const scanItem = (item: KeyItem) => {
-  if (isTextItem(item)) return mapKeys([item.text]);
-  else if (item.combo) return scanCombo(item.combo);
-  return NO_ACTION;
+const scanItem = (item: KeyItem): Action | null => {
+  if (isTextItem(item)) {
+    return { type: 'text', data: mapKeys([item.text]) };
+  } else if (item.combo) {
+    // If there are no modifiers and is only a key, then insert it as plain text
+    const data = scanCombo(item.combo);
+    return { type: data.length === 1 ? 'text' : 'combo', data };
+  } else {
+    return NO_ACTION;
+  }
 };
 
-const scan = (keys: KeyItem[]) => {
-  return keys.reduce((acc: string[], key) => {
+const scan = (keys: KeyItem[]): Action[] => {
+  return keys.reduce<Action[]>((acc, key) => {
     const action = scanItem(key);
     if (action !== NO_ACTION) {
-      return acc.concat(action);
+      return acc.concat([ action ]);
     } else {
       return acc;
     }
   }, []);
 };
 
-const performAction = (driver: Browser<'async'>, target: Element<'async'>, actions: string[], isW3C: boolean): Promise<void> => {
-  // Note: The webdriverio types appear to be wrong for elementSendKeys, but their docs are correct
-  // https://webdriver.io/docs/api/jsonwp.html#elementsendkeys
+const scrollToAndFocus = async (driver: Browser<'async'>, target: Element<'async'>): Promise<void> => {
+  await driver.execute((element) => {
+    element.scrollIntoView();
+    element.focus();
+  }, target as unknown as HTMLElement);
+};
+
+const performAction = async (driver: Browser<'async'>, target: Element<'async'>, actions: Action[], isW3C: boolean): Promise<void> => {
   if (isW3C) {
-    return (driver as any).elementSendKeys(target.elementId, actions.join(''));
+    // TINY-8944: Since Safari has issues with using elementSendKeys we use a different method for combo keys.
+    // So to simulate the same behaviour, ensure the target is scrolled in view and focused as per https://w3c.github.io/webdriver/#element-send-keys
+    const isSafari = (driver.capabilities as Capabilities.DesiredCapabilities).browserName?.toLowerCase() === 'safari';
+    const hasComboAction = actions.some((action) => action.type === 'combo');
+    if (isSafari && hasComboAction) {
+      await scrollToAndFocus(driver, target);
+    }
+
+    // Perform the actions
+    for (const action of actions) {
+      if (isSafari && action.type === 'combo') {
+        await driver.keys(action.data);
+      } else {
+        await driver.elementSendKeys(target.elementId, action.data.join(''));
+      }
+    }
   } else {
-    return (driver as any).elementSendKeys(target.elementId, actions);
+    const keys = actions.flatMap((action) => action.data);
+    // Note: The webdriverio types appear to be wrong for elementSendKeys, but their docs are correct
+    // https://webdriver.io/docs/api/jsonwp.html#elementsendkeys
+    return (driver as any).elementSendKeys(target.elementId, keys);
   }
 };
 
