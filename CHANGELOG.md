@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Modifier keys would not be released on all browsers when using a key effect.
+- The error message was lost when running on phantomjs.
 
 ## 13.2.1 - 2022-05-17
 
