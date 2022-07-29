@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 13.2.2 - 2022-07-29
+
+### Fixed
+- Modifier keys would not be released on all browsers when using a key effect.
+
 ## 13.2.1 - 2022-05-17
 
 ### Security

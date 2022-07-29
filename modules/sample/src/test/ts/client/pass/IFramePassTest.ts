@@ -1,5 +1,7 @@
 import { Assert, UnitTest } from '@ephox/bedrock-client';
 
+import { sendText, sendMouse } from '../../utils/Utils';
+
 UnitTest.asyncTest('IFrame Test', (success, failure) => {
 
   /*
@@ -30,34 +32,6 @@ UnitTest.asyncTest('IFrame Test', (success, failure) => {
     button.setAttribute('data-clicked', 'clicked');
   });
 
-  const post = function (url, data, onSuccess, onFailure) {
-    const request = new XMLHttpRequest();
-    request.open('POST', url, true);
-    request.onload = function () {
-      try {
-        onSuccess();
-      } catch (err) {
-        onFailure(err);
-      }
-    };
-
-    request.onerror = function (err) {
-      debugger;
-      console.error(err);
-      onFailure();
-    };
-
-    request.send(JSON.stringify(data));
-  };
-
-  const sendText = function (selector, text, onSuccess, onFailure) {
-    post('/keys', { selector, keys: [ { text } ] }, onSuccess, onFailure);
-  };
-
-  const sendMouse = function (selector, type, onSuccess, onFailure) {
-    post('/mouse', { selector, type }, onSuccess, onFailure);
-  };
-
   const loadContentIntoFrame = function (fr, content, onSuccess, onFailure) {
     const listener = function () {
       fr.removeEventListener('load', listener);
@@ -85,27 +59,29 @@ UnitTest.asyncTest('IFrame Test', (success, failure) => {
         // IE requires focus.
         fr1.contentWindow.document.body.focus();
 
-        sendText('.iframe-keyboard=>body', 'going', function () {
-          sendText('textarea', 'blah', function () {
+        sendText('.iframe-keyboard=>body', 'going')
+          .then(() => sendText('textarea', 'blah'))
+          .then(() => {
             Assert.eq('', 'going!', fr1.contentWindow.document.body.innerHTML.trim());
             Assert.eq('', 'blah', textarea.value);
+          })
+          .then(() => sendMouse('.iframe-mouse=>input', 'click'))
+          .then(() => {
+            Assert.eq('', true, fr2.contentWindow.document.body.querySelector('input').checked);
+          })
+          .then(() => sendMouse('.button-mouse', 'click'))
+          .then(() => {
+            Assert.eq('', 'clicked', button.getAttribute('data-clicked'));
 
-            sendMouse('.iframe-mouse=>input', 'click', function () {
-              Assert.eq('', true, fr2.contentWindow.document.body.querySelector('input').checked);
-              sendMouse('.button-mouse', 'click', function () {
-                Assert.eq('', 'clicked', button.getAttribute('data-clicked'));
+            document.body.removeChild(fr1);
+            document.body.removeChild(fr2);
+            document.body.removeChild(textarea);
+            document.body.removeChild(button);
 
-                document.body.removeChild(fr1);
-                document.body.removeChild(fr2);
-                document.body.removeChild(textarea);
-                document.body.removeChild(button);
+            success();
+          })
+          .catch(failure);
 
-                success();
-              }, failure);
-            }, failure);
-
-          }, failure);
-        }, failure);
       }, failure);
 
       document.body.appendChild(iframe2);

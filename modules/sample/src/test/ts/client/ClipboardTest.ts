@@ -1,36 +1,14 @@
 import { UnitTest } from '@ephox/bedrock-client';
 
+import { post, sendKeyCombo } from '../utils/Utils';
+
 UnitTest.asynctest('Clipboard Test', (success, failure) => {
-
-  if (window.fetch === undefined) return failure('This sample only runs on Chrome');
-
-  const importClipboard = function (fileName) {
-    return fetch('/clipboard', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        import: fileName
-      })
-    });
+  const importClipboard = function (fileName: string) {
+    return post('/clipboard', { import: fileName });
   };
 
   const pasteInto = function (elm) {
-    return fetch('/keys', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        keys: [
-          {combo: {ctrlKey: true, key: 'v'}}
-        ],
-        selector: '#' + elm.id
-      })
-    });
+    return sendKeyCombo('#' + elm.id, 'v', { ctrlKey: true });
   };
 
   const assert = function () {
@@ -55,5 +33,6 @@ UnitTest.asynctest('Clipboard Test', (success, failure) => {
     })
     .catch(function (ex) {
       console.log('parsing failed', ex);
+      failure(ex);
     });
 });
