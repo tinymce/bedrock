@@ -6,9 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-## 13.2.2 - 2022-07-29
+## 13.3.0 - 2022-08-01
+
+### Improved
+- Headless browsers will now detect an available debugging port instead of always using port 9000.
+- Allow `edge` to be used as an alias for `MicrosoftEdge`.
 
 ### Fixed
+- Chrome headless tests no longer hang indefinitely if something else is running on port 9000.
 - Modifier keys would not be released on all browsers when using a key effect.
 - The error message was lost when running on phantomjs.
 

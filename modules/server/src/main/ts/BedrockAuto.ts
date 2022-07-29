@@ -17,14 +17,19 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
 
   const settings = SettingsResolver.resolveAndLog(bedrockAutoSettings);
   const master = DriverMaster.create();
-  const isPhantom = settings.browser === 'phantomjs';
+  const browserName = settings.browser.replace('-headless', '');
+  const isPhantom = browserName === 'phantomjs';
+  const isHeadless = settings.browser.endsWith('-headless') || isPhantom;
   const basePage = 'src/resources/html/' + (isPhantom ? 'bedrock-phantom.html' : 'bedrock.html');
+
   const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
   routes.then(async (runner) => {
+
     const driver = await Driver.create({
-      browser: settings.browser,
+      browser: browserName,
       basedir: settings.basedir,
+      headless: isHeadless,
       debuggingPort: settings.debuggingPort,
       useSandboxForHeadless: settings.useSandboxForHeadless,
       extraBrowserCapabilities: settings.extraBrowserCapabilities,
@@ -44,9 +49,10 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
     const shutdown = () => Promise.all([ service.shutdown(), driver.shutdown() ]);
 
     try {
-      if (!isPhantom) {
+      if (!isHeadless) {
         console.log('bedrock-auto ' + Version.get() + ' available at: http://localhost:' + service.port);
       }
+
       await webdriver.url('http://localhost:' + service.port);
       console.log(isPhantom ? '\nPhantom tests loading ...\n' : '\nInitial page has loaded ...\n');
       service.markLoaded();

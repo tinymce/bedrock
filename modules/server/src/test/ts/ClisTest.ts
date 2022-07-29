@@ -44,7 +44,6 @@ describe('Clis.forAuto', () => {
       testfiles: [
         'src/test/resources/test.file1'
       ],
-      debuggingPort: 9000,
       delayExit: false,
       singleTimeout: 30000,
       stopOnFailure: false,
@@ -82,7 +81,6 @@ describe('Clis.forAuto', () => {
       testfiles: [
         'src/test/resources/test.file1'
       ],
-      debuggingPort: 9000,
       delayExit: false,
       singleTimeout: 30000,
       stopOnFailure: false,
@@ -121,7 +119,6 @@ describe('Clis.forAuto', () => {
       testfiles: [
         'src/test/resources/test.file1'
       ],
-      debuggingPort: 9000,
       delayExit: false,
       singleTimeout: 30000,
       stopOnFailure: false,
@@ -159,7 +156,6 @@ describe('Clis.forAuto', () => {
       testfiles: [
         'src/test/resources/test.file1'
       ],
-      debuggingPort: 9000,
       delayExit: false,
       singleTimeout: 30000,
       stopOnFailure: false,
@@ -179,8 +175,8 @@ describe('Clis.forAuto', () => {
     }, cleanResult(actual));
   });
 
-  // This isn't so much of desired test outcome, just a reality. If we don't have 
-  // a leading space in the extraBrowserCapabilities, and the first value in the 
+  // This isn't so much of desired test outcome, just a reality. If we don't have
+  // a leading space in the extraBrowserCapabilities, and the first value in the
   // string is --, then command-line-arguments (third party parser) will get confused
   // and throw errors.
   it('can not parse extra browser capabilities arguments without a leading space', () => {

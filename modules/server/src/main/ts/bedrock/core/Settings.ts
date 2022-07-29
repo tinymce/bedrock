@@ -24,7 +24,7 @@ export type BedrockManualSettings = BedrockSettings;
 export interface BedrockAutoSettings extends BedrockSettings {
   readonly gruntDone?: (success: boolean) => void;
   readonly browser: string;
-  readonly debuggingPort: number;
+  readonly debuggingPort?: number;
   readonly delayExit: boolean;
   readonly name: string;
   readonly output: string;
