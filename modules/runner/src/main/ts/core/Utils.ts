@@ -55,3 +55,11 @@ export const mapStackTrace = (stack: string | undefined): Promise<string> => new
     resolve('');
   }
 });
+
+export const setStack = (error: Error, stack: string | undefined): void => {
+  try {
+    error.stack = stack;
+  } catch (err) {
+    // Do nothing
+  }
+};

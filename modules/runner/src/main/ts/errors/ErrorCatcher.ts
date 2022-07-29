@@ -1,4 +1,5 @@
 import { Global, Type } from '@ephox/bedrock-common';
+import { setStack } from '../core/Utils';
 import { isInternalError } from './Errors';
 
 type ErrorHandler = (error: Error) => void
@@ -35,7 +36,7 @@ export const ErrorCatcher = (): ErrorCatcher => {
   const onUnhandledRejection = createHandler((e: PromiseRejectionEvent) => {
     if (isError(e.reason)) {
       const error = new Error(`Unhandled promise rejection: ${e.reason.message}`);
-      error.stack = e.reason.stack;
+      setStack(error, e.reason.stack);
       return error;
     } else {
       return new Error(`Unhandled promise rejection: ${e.reason}`);
@@ -48,7 +49,7 @@ export const ErrorCatcher = (): ErrorCatcher => {
         return e.error;
       } else {
         const error = new Error(e.message);
-        error.stack = e.error.stack;
+        setStack(error, e.error.stack);
         return error;
       }
     } else {
