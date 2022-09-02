@@ -5,38 +5,40 @@
 
 standardProperties()
 
-tinyPods.node() {
-  stage("clean") {
-    exec('yarn clean')
-  }
+timestamps {
+  tinyPods.node() {
+    stage("clean") {
+      exec('yarn clean')
+    }
 
-  stage("install") {
-    yarnInstall()
-  }
+    stage("install") {
+      yarnInstall()
+    }
 
-  stage("build") {
-    exec('yarn build')
-  }
+    stage("build") {
+      exec('yarn build')
+    }
 
-  stage("test") {
-    exec('yarn test')
+    stage("test") {
+      exec('yarn test')
 
-    bedrockBrowsers(
-      prepareTests: {
-        yarnInstall()
-        exec('yarn build')
-      },
-      testDirs: [ 'modules/sample/src/test/ts/**/pass' ],
-      custom: '--config modules/sample/tsconfig.json --customRoutes modules/sample/routes.json --polyfills Promise Symbol'
-    )
-  }
+      bedrockBrowsers(
+        prepareTests: {
+          yarnInstall()
+          exec('yarn build')
+        },
+        testDirs: [ 'modules/sample/src/test/ts/**/pass' ],
+        custom: '--config modules/sample/tsconfig.json --customRoutes modules/sample/routes.json --polyfills Promise Symbol'
+      )
+    }
 
-  if (isReleaseBranch()) {
-    stage("publish") {
-      tinyNpm.withNpmPublishCredentials {
-        // We need to tell git to ignore the changes to .npmrc when publishing
-        exec('git update-index --assume-unchanged .npmrc')
-        exec('yarn lerna publish from-package --yes --no-git-reset --ignore @ephox/bedrock-sample')
+    if (isReleaseBranch()) {
+      stage("publish") {
+        tinyNpm.withNpmPublishCredentials {
+          // We need to tell git to ignore the changes to .npmrc when publishing
+          exec('git update-index --assume-unchanged .npmrc')
+          exec('yarn lerna publish from-package --yes --no-git-reset --ignore @ephox/bedrock-sample')
+        }
       }
     }
   }
