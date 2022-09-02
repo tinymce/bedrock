@@ -34,7 +34,9 @@ tinyPods.node() {
   if (isReleaseBranch()) {
     stage("publish") {
       tinyNpm.withNpmPublishCredentials {
-        exec('yarn lerna publish from-package --yes --ignore @ephox/bedrock-sample')
+        // We need to tell git to ignore the changes to .npmrc when publishing
+        exec('git update-index --assume-unchanged .npmrc')
+        exec('yarn lerna publish from-package --yes --no-git-reset --ignore @ephox/bedrock-sample')
       }
     }
   }
