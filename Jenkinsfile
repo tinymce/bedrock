@@ -1,5 +1,5 @@
 #!groovy
-@Library('waluigi@v6.0.1') _
+@Library('waluigi@release/7') _
 
 // NOTE: This Jenkinsfile relies on Tiny's internal infrastructure
 
