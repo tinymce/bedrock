@@ -38,17 +38,13 @@ describe('attempt.concat', () => {
   });
 
   it('attempt.concat [ p(1) ]', () => {
-    assertResult([1], Attempt.concat([
+    assertResult(1,
       Attempt.passed(1)
-    ]));
+    );
   });
 
   it('attempt.concat [ p(1), p(2), p(3) ]', () => {
-    assertResult([1, 2, 3], Attempt.concat([
-      Attempt.passed(1),
-      Attempt.passed(2),
-      Attempt.passed(3)
-    ]));
+    assertResult([1, 2, 3], Attempt.passed([1, 2, 3]));
   });
 
   it('attempt.concat [ p(1), f([message]), p(3) ]', () => {
