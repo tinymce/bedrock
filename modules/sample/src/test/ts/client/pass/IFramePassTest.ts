@@ -52,8 +52,8 @@ UnitTest.asyncTest('IFrame Test', (success, failure) => {
 
   // Give IE a bit of lead in time.
   setTimeout(function () {
-
-    loadContentIntoFrame(iframe1, '<! doctype><html><body contenteditable="true">!</body></html>', function (fr1) {
+    // TINY-9852: Removed the initial text to avoid inconsistent failures because the new text is inserted to either left or right of the initial text using sendText()
+    loadContentIntoFrame(iframe1, '<! doctype><html><body contenteditable="true"></body></html>', function (fr1) {
       loadContentIntoFrame(iframe2, '<! doctype><html><body><input id="chk" type="checkbox"><label for="chk">Check me</label></body></html>', function (fr2) {
 
         // IE requires focus.
@@ -62,7 +62,7 @@ UnitTest.asyncTest('IFrame Test', (success, failure) => {
         sendText('.iframe-keyboard=>body', 'going')
           .then(() => sendText('textarea', 'blah'))
           .then(() => {
-            Assert.eq('', 'going!', fr1.contentWindow.document.body.innerHTML.trim());
+            Assert.eq('', 'going', fr1.contentWindow.document.body.innerHTML.trim());
             Assert.eq('', 'blah', textarea.value);
           })
           .then(() => sendMouse('.iframe-mouse=>input', 'click'))
