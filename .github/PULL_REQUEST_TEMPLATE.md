@@ -5,7 +5,7 @@ Description of Changes:
 
 Pre-checks:
 * [ ] Changelog entry added
-* [ ] package.json version bumped (if first change of new major/minor)
+* [ ] package.json versions have not been changed (done by Lerna on release)
 * [ ] Tests have been added (if applicable)
 
 Before merging:
