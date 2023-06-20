@@ -11,11 +11,13 @@ import { BedrockAutoSettings } from './bedrock/core/Settings';
 import { ExitCodes } from './bedrock/util/ExitCodes';
 import * as ConsoleReporter from './bedrock/core/ConsoleReporter';
 import * as SettingsResolver from './bedrock/core/SettingsResolver';
+import * as localtunnel from 'localtunnel';
 
 export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
   console.log('bedrock-auto ' + Version.get() + ' starting...');
 
   const settings = SettingsResolver.resolveAndLog(bedrockAutoSettings);
+  console.log('settings: ', settings);
   const master = DriverMaster.create();
   const browserName = settings.browser.replace('-headless', '');
   const isPhantom = browserName === 'phantomjs';
@@ -34,7 +36,8 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       useSandboxForHeadless: settings.useSandboxForHeadless,
       extraBrowserCapabilities: settings.extraBrowserCapabilities,
       verbose: settings.verbose,
-      wipeBrowserCache: settings.wipeBrowserCache
+      wipeBrowserCache: settings.wipeBrowserCache,
+      farm: settings.farm
     });
 
     const webdriver = driver.webdriver;
@@ -46,14 +49,25 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       stickyFirstSession: true
     });
 
-    const shutdown = () => Promise.all([ service.shutdown(), driver.shutdown() ]);
+    const tunnel = await localtunnel({port: service.port});
+    tunnel.on('close', () => {
+      console.log('closing tunnel');
+    });
+
+    const shutdowntunnel = async () => {
+      tunnel.close();
+    };
+
+    const location = settings.farm ? tunnel.url : 'http://localhost:' + service.port;
+
+    const shutdown = () => Promise.all([ service.shutdown(), driver.shutdown(), shutdowntunnel ]);
 
     try {
       if (!isHeadless) {
-        console.log('bedrock-auto ' + Version.get() + ' available at: http://localhost:' + service.port);
+        console.log('bedrock-auto ' + Version.get() + ' available at: ' + location);
       }
 
-      await webdriver.url('http://localhost:' + service.port);
+      await webdriver.url(location);
       console.log(isPhantom ? '\nPhantom tests loading ...\n' : '\nInitial page has loaded ...\n');
       service.markLoaded();
       service.enableHud();

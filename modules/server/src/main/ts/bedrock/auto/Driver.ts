@@ -5,6 +5,8 @@ import * as WebdriverIO from 'webdriverio';
 import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
 import * as DriverLoader from './DriverLoader';
+import { DeviceFarmClient, CreateTestGridUrlCommand } from '@aws-sdk/client-device-farm';
+import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
 
 export interface DriverSettings {
   basedir: string;
@@ -17,6 +19,7 @@ export interface DriverSettings {
   webdriverPort?: number;
   webdriverTimeout?: number;
   wipeBrowserCache?: boolean;
+  farm?: boolean;
 }
 
 export interface Driver {
@@ -197,6 +200,56 @@ const getPort = async (port: number | undefined, fallbackPort: number): Promise<
   }
 };
 
+const getFarmUrl = async (): Promise<URL> => {
+  console.log('getting id...');
+  const iclient = new STSClient({region: 'us-west-2'});
+  const icommand = new GetCallerIdentityCommand({});
+  console.log('calling identity');
+  const iresponse = await iclient.send(icommand);
+  console.log('identity: ', iresponse);
+
+  const client = new DeviceFarmClient({region: 'us-west-2'});
+  const input = {
+    projectArn: 'arn:aws:devicefarm:us-west-2:425564247115:testgrid-project:05af6148-0fef-4afc-8ec7-485367a4f15d',
+    expiresInSeconds: 3000
+  };
+  const command = new CreateTestGridUrlCommand(input);
+  const response = await client.send(command);
+  return new URL(response.url as string);
+};
+
+const createFarm = async (settings: DriverSettings): Promise<Driver> => {
+  try {
+
+    console.log('setting for driver: ', settings);
+
+    const url = await getFarmUrl();
+
+    const driver = await WebdriverIO.remote({
+      logLevel: 'trace',
+      hostname: url.host,
+      path: url.pathname,
+      protocol: 'https',
+      port: 443,
+      connectionRetryTimeout: 180000,
+      capabilities: {
+        browserName: 'chrome'
+      }
+    });
+
+    return {
+      webdriver: driver,
+      shutdown: (i: boolean | undefined) => {
+        console.log('shutdown farm?', i);
+        return Promise.resolve();
+      }
+    };
+  } catch (e) {
+    // cleanup?
+    return Promise.reject(e);
+  }
+};
+
 /* Settings:
  *
  * browser: the name of the browser
@@ -208,6 +261,10 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
   const webdriverTimeout = settings.webdriverTimeout || 30000;
 
   const browserName = browserVariants[settings.browser] || settings.browser;
+
+  if (settings.farm) {
+    return createFarm(settings);
+  }
 
   const driverApi = DriverLoader.loadDriver(browserName, settings);
 
@@ -224,6 +281,10 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
       console.log(
         `Browser capabilities: ${JSON.stringify(webdriverOptions.capabilities)}`
       );
+    }
+
+    if (settings.farm) {
+      console.log('make  farm');
     }
 
     const driver = await WebdriverIO.remote(webdriverOptions);

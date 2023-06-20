@@ -93,7 +93,7 @@ export const loadDriver = (browserName: string, settings: DriverSettings): Drive
   if (execPath !== null) {
     return execLoader(execPath);
   } else {
-    throw new Error('Unable to find a suitable driver for ' + browserName);
+    throw new Error('Local1: Unable to find a suitable driver for ' + browserName);
   }
 };
 

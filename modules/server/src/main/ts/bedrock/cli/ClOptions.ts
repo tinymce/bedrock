@@ -318,3 +318,12 @@ export const verbose: ClOption = {
   validate: Extraction.any,
   uncommon: false
 };
+
+export const farm: ClOption = {
+  name: 'farm',
+  type: Boolean,
+  defaultValue: false,
+  description: 'I have no clue',
+  validate: Extraction.any,
+  uncommon: true
+};

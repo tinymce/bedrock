@@ -17,11 +17,14 @@
     "node": ">=12.0.0"
   },
   "dependencies": {
+    "@aws-sdk/client-device-farm": "^3.354.0",
+    "@aws-sdk/client-sts": "^3.354.0",
     "@ephox/bedrock-client": "^13.0.0",
     "@ephox/bedrock-common": "^13.0.0",
     "@ephox/bedrock-runner": "^13.3.0",
     "@jsdevtools/coverage-istanbul-loader": "^3.0.5",
     "async": "^3.0.0",
+    "aws-sdk": "^2.1399.0",
     "chalk": "^4.1.1",
     "cli-highlight": "^2.1.11",
     "command-line-args": "^5.0.0",
@@ -36,6 +39,7 @@
     "glob": "^7.1.6",
     "grunt": "^1.0.4",
     "jquery": "^3.4.1",
+    "localtunnel": "^2.0.2",
     "mime-types": "^2.1.34",
     "mkdirp": "^1.0.0",
     "portfinder": "^1.0.25",
@@ -61,6 +65,7 @@
     "@types/finalhandler": "^1.1.0",
     "@types/fresh": "^0.5.0",
     "@types/jquery": "^3.5.11",
+    "@types/localtunnel": "^2.0.1",
     "@types/mime-types": "^2.1.1",
     "@types/mkdirp": "^1.0.1",
     "@wdio/types": "^7.30.2"

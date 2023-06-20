@@ -1,6 +1,6 @@
 import { Suite, Test } from '@ephox/bedrock-common';
 import Promise from '@ephox/wrap-promise-polyfill';
-import sourceMappedStackTrace from 'sourcemapped-stacktrace';
+import * as sourceMappedStackTrace from 'sourcemapped-stacktrace';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export const noop = (): void => {};
@@ -47,7 +47,7 @@ export const mapStackTrace = (stack: string | undefined): Promise<string> => new
     // If the stack trace format can't be found then an Error will be thrown.
     // In that case lets just return the original stack instead.
     try {
-      sourceMappedStackTrace.mapStackTrace(stack, (stack) => resolve(stack.join('\n')));
+      sourceMappedStackTrace.mapStackTrace(stack, (stack: any) => resolve(stack.join('\n')));
     } catch (e) {
       resolve(stack);
     }

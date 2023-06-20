@@ -33,7 +33,8 @@ const commonOptions = (directories: Directories) => {
     ClOptions.bucket,
     ClOptions.buckets,
     ClOptions.stopOnFailure,
-    ClOptions.verbose
+    ClOptions.verbose,
+    ClOptions.farm
   ];
 };
 
