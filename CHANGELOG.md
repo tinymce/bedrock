@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 13.4.1 - 2023-06-09
+
 ### Fixed
 - update `fork-ts-checker-webpack-plugin`. #TINY-9855
 
