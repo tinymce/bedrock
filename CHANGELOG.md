@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 13.4.2 - 2023-06-22
+
 ### Fixed
 - Add `--guest` command line argument for Microsoft Edge to disable popups like the new Personalization experience. #TINY-10014
 
