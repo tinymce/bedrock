@@ -102,6 +102,8 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
     addArguments(caps, 'goog:chromeOptions', extraCaps);
   } else if (browserName === 'firefox') {
     addArguments(caps, 'moz:firefoxOptions', extraCaps);
+  } else if (browserName === 'MicrosoftEdge') {
+    addArguments(caps, 'ms:edgeOptions', ['--guest']);
   } else if (browserName === 'internet explorer' && settings.wipeBrowserCache) {
     // Setup wiping the browser cache if required, as IE 11 doesn't use a clean session by default
     caps['se:ieOptions'] = {
@@ -136,15 +138,15 @@ const logDriverDetails = (driver: WebdriverIO.Browser<'async'>, headless: boolea
   const browserVersion = caps.browserVersion || caps.version;
 
   if (browserName === 'chrome') {
-    console.log('browser:', browserVersion, 'driver:', caps.chrome.chromedriverVersion);
+    console.log('chrome version:', browserVersion, 'driver:', caps.chrome.chromedriverVersion);
   } else if (browserName === 'firefox') {
-    console.log('browser:', browserVersion, 'driver:', caps['moz:geckodriverVersion']);
+    console.log('firefox version:', browserVersion, 'driver:', caps['moz:geckodriverVersion']);
   } else if (browserName === 'phantomjs') {
-    console.log('browser:', browserVersion, 'driver:', caps.driverVersion);
+    console.log('phantom version:', browserVersion, 'driver:', caps.driverVersion);
   } else if (browserName === 'MicrosoftEdge') {
-    console.log('browser:', browserVersion);
+    console.log('Edge version:', browserVersion);
   } else if (browserName === 'msedge') {
-    console.log('browser:', browserVersion, 'driver:', caps.msedge.msedgedriverVersion);
+    console.log('MSEdge version:', browserVersion, 'driver:', caps.msedge.msedgedriverVersion);
   }
 
   if (headless) {
