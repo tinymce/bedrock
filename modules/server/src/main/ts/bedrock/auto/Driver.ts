@@ -5,8 +5,8 @@ import * as WebdriverIO from 'webdriverio';
 import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
 import * as DriverLoader from './DriverLoader';
-// import { DeviceFarmClient, CreateTestGridUrlCommand } from '@aws-sdk/client-device-farm';
-// import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
+import { DeviceFarmClient, CreateTestGridUrlCommand } from '@aws-sdk/client-device-farm';
+import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
 
 export interface DriverSettings {
   basedir: string;
@@ -200,7 +200,6 @@ const getPort = async (port: number | undefined, fallbackPort: number): Promise<
   }
 };
 
-/*
 const getFarmUrl = async (): Promise<URL> => {
   console.log('getting id...');
   const iclient = new STSClient({region: 'us-west-2'});
@@ -224,17 +223,21 @@ const createFarm = async (settings: DriverSettings): Promise<Driver> => {
 
     console.log('setting for driver: ', settings);
 
+    const validBrowsers = ['firefox', 'chrome', 'MicrosoftEdge'];
+    if (!validBrowsers.includes(settings.browser)) {
+      return Promise.reject('Browser not a valid Device Farm browser');
+    }
     const url = await getFarmUrl();
 
     const driver = await WebdriverIO.remote({
-      logLevel: 'trace',
+      // logLevel: 'trace',
       hostname: url.host,
       path: url.pathname,
       protocol: 'https',
       port: 443,
       connectionRetryTimeout: 180000,
       capabilities: {
-        browserName: 'chrome'
+        browserName: settings.browser
       }
     });
 
@@ -250,7 +253,7 @@ const createFarm = async (settings: DriverSettings): Promise<Driver> => {
     return Promise.reject(e);
   }
 };
-*/
+
 /* Settings:
  *
  * browser: the name of the browser
@@ -264,7 +267,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
   const browserName = browserVariants[settings.browser] || settings.browser;
 
   if (settings.farm) {
-    // return createFarm(settings);
+    return createFarm(settings);
   }
 
   const driverApi = DriverLoader.loadDriver(browserName, settings);
