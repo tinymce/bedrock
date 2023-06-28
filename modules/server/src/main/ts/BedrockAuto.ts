@@ -6,12 +6,12 @@ import * as RunnerRoutes from './bedrock/server/RunnerRoutes';
 import * as Reporter from './bedrock/core/Reporter';
 import * as DriverMaster from './bedrock/server/DriverMaster';
 import * as Driver from './bedrock/auto/Driver';
+import * as Tunnel from './bedrock/auto/Tunnel';
 import * as Lifecycle from './bedrock/core/Lifecycle';
 import { BedrockAutoSettings } from './bedrock/core/Settings';
 import { ExitCodes } from './bedrock/util/ExitCodes';
 import * as ConsoleReporter from './bedrock/core/ConsoleReporter';
 import * as SettingsResolver from './bedrock/core/SettingsResolver';
-import * as localtunnel from 'localtunnel';
 
 export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
   console.log('bedrock-auto ' + Version.get() + ' starting...');
@@ -49,18 +49,17 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       stickyFirstSession: true
     });
 
-    const tunnel = await localtunnel({port: service.port});
-    tunnel.on('close', () => {
-      console.log('closing tunnel');
-    });
-
-    const shutdowntunnel = async () => {
-      tunnel.close();
-    };
-
-    const location = settings.farm ? tunnel.url : 'http://localhost:' + service.port;
-
-    const shutdown = () => Promise.all([ service.shutdown(), driver.shutdown(), shutdowntunnel ]);
+    // TODO: Extensible. This is not a great way to do this but I can't think of a clean, easy way to fix it.
+    let shutdown;
+    let location;
+    if (settings.farm) {
+      const tunnel = await Tunnel.create(service.port);
+      location = tunnel.url.href;
+      shutdown = () => Promise.all([ service.shutdown(), driver.shutdown(), tunnel.shutdown()]);
+    } else {
+      location = 'http://localhost:' + service.port;
+      shutdown = () => Promise.all([ service.shutdown(), driver.shutdown()]);
+    }
 
     try {
       if (!isHeadless) {
