@@ -17,6 +17,7 @@ export interface DriverSettings {
   webdriverPort?: number;
   webdriverTimeout?: number;
   wipeBrowserCache?: boolean;
+  useSelenium?: boolean;
 }
 
 export interface Driver {
@@ -80,7 +81,7 @@ const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
 
 const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): WebdriverIO.RemoteOptions => {
   const options = {
-    path: '/',
+    path: '/wd/hub',
     host: '127.0.0.1',
     port,
     logLevel: 'silent' as const,
@@ -199,6 +200,27 @@ const getPort = async (port: number | undefined, fallbackPort: number): Promise<
   }
 };
 
+// const seleniumDriver = async (browserName: string, settings: DriverSettings): Promise<Driver> => {
+
+//   const shutdown = function (i?: boolean | undefined) {
+//     console.log('shutting down: ', i);
+//     return Promise.resolve();
+//   };
+
+//   try {
+
+//     const driver = await new selenium.Builder().forBrowser(selenium.Browser.CHROME).usingServer('http://localhost:4445/wd/hub').build();
+//     //
+//     return {
+//       webdriver: driver,
+//       shutdown
+//     };
+//   } catch (e) {
+//     console.error(e);
+//     return Promise.reject(e);
+//   }
+// };
+
 /* Settings:
  *
  * browser: the name of the browser
@@ -207,6 +229,7 @@ const getPort = async (port: number | undefined, fallbackPort: number): Promise<
  * webdriverTimeout: how long to wait for the webdriver server to start
  */
 export const create = async (settings: DriverSettings): Promise<Driver> => {
+  console.log('creating driver: ', settings);
   const webdriverTimeout = settings.webdriverTimeout || 30000;
 
   const browserName = browserVariants[settings.browser] || settings.browser;
@@ -219,7 +242,12 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
     const debuggingPort = settings.headless ? await getPort(settings.debuggingPort, 9000) : 9000;
 
     // Wait for the driver to start up and then start the webdriver session
-    await DriverLoader.startAndWaitForAlive(driverApi, port, webdriverTimeout);
+    if (settings.useSelenium) {
+      await DriverLoader.waitForStatus('http://127.0.0.1:' + port + '/wd/hub/status');
+    } else {
+      await DriverLoader.startAndWaitForAlive(driverApi, port, webdriverTimeout);
+    }
+
     const webdriverOptions = getOptions(port, browserName, settings, debuggingPort);
 
     if (settings.verbose) {
@@ -227,6 +255,8 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
         `Browser capabilities: ${JSON.stringify(webdriverOptions.capabilities)}`
       );
     }
+
+    console.log('opts: ', webdriverOptions);
 
     const driver = await WebdriverIO.remote(webdriverOptions);
 
@@ -236,6 +266,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
     // Ensure the driver gets shutdown correctly if shutdown
     // by the user instead of the application
     const driverShutdown = setupShutdown(driver, driverApi, shutdownDelay);
+    // const driverShutdown = () => Promise.resolve();
 
     // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
     // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
@@ -259,7 +290,8 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
       shutdown: driverShutdown
     };
   } catch (e) {
-    driverApi.stop();
+    console.error(e);
+    // driverApi.stop();
     return Promise.reject(e);
   }
 };

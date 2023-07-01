@@ -34,7 +34,9 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       useSandboxForHeadless: settings.useSandboxForHeadless,
       extraBrowserCapabilities: settings.extraBrowserCapabilities,
       verbose: settings.verbose,
-      wipeBrowserCache: settings.wipeBrowserCache
+      wipeBrowserCache: settings.wipeBrowserCache,
+      webdriverPort: settings.webdriverPort,
+      useSelenium: settings.useSelenium
     });
 
     const webdriver = driver.webdriver;

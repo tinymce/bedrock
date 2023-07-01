@@ -76,6 +76,7 @@ export const loadDriver = (browserName: string, settings: DriverSettings): Drive
     console.log('Not loading a local driver for browser ' + browserName);
   } else {
     const driver = findNpmPackage(driverDeps);
+    console.log(driver);
     if (driver !== null) {
       return driver;
     } else {
@@ -97,8 +98,53 @@ export const loadDriver = (browserName: string, settings: DriverSettings): Drive
   }
 };
 
-export const waitForAlive = (proc: ChildProcess, port: number, timeout = 30000): Promise<void> => {
-  const url = 'http://127.0.0.1:' + port + '/status';
+export const waitForStatus = (url: string, timeout = 30000): Promise<void> => {
+  const start = Date.now();
+  return new Promise<void>((resolve, reject) => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    const onServerError = (err: string) => {
+      if (Date.now() - start > timeout) {
+        reject('Timed out waiting for the webdriver server. Error: ' + err);
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        timeoutId = setTimeout(checkServerStatus, 50);
+      }
+    };
+
+    const checkServerStatus = () => {
+      http.get(url, (res) => {
+        if (res.statusCode === 200) {
+          let rawData = '';
+          res.on('data', (chunk) => rawData += chunk);
+          res.on('end', () => {
+            try {
+              const data = JSON.parse(rawData);
+              if (data.value.ready || data.status === 0) {
+                if (timeoutId) {
+                  clearTimeout(timeoutId);
+                }
+                resolve();
+              } else {
+                onServerError('Not ready to accept connections');
+              }
+            } catch (e) {
+              onServerError(e.message);
+            }
+          });
+        } else {
+          onServerError('Received non 200 status (' + res.statusCode + ')');
+        }
+      });
+    };
+
+    checkServerStatus();
+  });
+};
+
+export const waitForAlive = (proc: ChildProcess, port: number, timeout = 30000, statusPath = '/status'): Promise<void> => {
+  const url = 'http://127.0.0.1:' + port + statusPath;
+  console.log('waiting for alive @: ', url);
   const start = Date.now();
   return new Promise<void>((resolve, reject) => {
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
