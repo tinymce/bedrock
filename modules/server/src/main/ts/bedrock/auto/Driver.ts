@@ -81,7 +81,7 @@ const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
 
 const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): WebdriverIO.RemoteOptions => {
   const options = {
-    path: '/wd/hub',
+    path: settings.useSelenium ? '/wd/hub' : '/',
     host: '127.0.0.1',
     port,
     logLevel: 'silent' as const,

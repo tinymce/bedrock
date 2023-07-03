@@ -47,7 +47,7 @@ export const mapStackTrace = (stack: string | undefined): Promise<string> => new
     // If the stack trace format can't be found then an Error will be thrown.
     // In that case lets just return the original stack instead.
     try {
-      sourceMappedStackTrace.mapStackTrace(stack, (stack) => resolve(stack.join('\n')));
+      sourceMappedStackTrace.mapStackTrace(stack, (stack: string[]) => resolve(stack.join('\n')));
     } catch (e) {
       resolve(stack);
     }
