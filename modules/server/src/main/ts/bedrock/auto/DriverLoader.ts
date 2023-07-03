@@ -159,9 +159,9 @@ export const waitForAlive = (proc: ChildProcess | null, port: number, timeout: n
   });
 };
 
-export const startAndWaitForAlive = (driverApi: DriverAPI, port: number, timeout = 30000, status = '/status/'): Promise<void> => {
+export const startAndWaitForAlive = (driverApi: DriverAPI | null, port: number, timeout = 30000, status = '/status/'): Promise<void> => {
   // Start the driver
-  const driverProc = driverApi.start(['--port=' + port]);
+  const driverProc = driverApi ? driverApi.start(['--port=' + port]) : null;
   // Wait for it to be alive
   return waitForAlive(driverProc, port, timeout, status);
 };

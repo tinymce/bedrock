@@ -165,7 +165,7 @@ const focusBrowser = (browserName: string, settings: DriverSettings) => {
   }
 };
 
-const setupShutdown = (driver: WebdriverIO.Browser<'async'>, driverApi: DriverLoader.DriverAPI, shutdownDelay = 0): (immediate?: boolean) => Promise<void> => {
+const setupShutdown = (driver: WebdriverIO.Browser<'async'>, driverApi: DriverLoader.DriverAPI | null, shutdownDelay = 0): (immediate?: boolean) => Promise<void> => {
   const driverShutdown = async (immediate?: boolean) => {
     try {
       if (immediate) {
@@ -175,7 +175,7 @@ const setupShutdown = (driver: WebdriverIO.Browser<'async'>, driverApi: DriverLo
         await driver.deleteSession();
       }
     } finally {
-      driverApi.stop();
+      driverApi?.stop();
     }
   };
 
@@ -185,7 +185,7 @@ const setupShutdown = (driver: WebdriverIO.Browser<'async'>, driverApi: DriverLo
     });
   });
 
-  return driverShutdown;
+  return driverApi ? driverShutdown : () => Promise.resolve();
 };
 
 const getPort = async (port: number | undefined, fallbackPort: number): Promise<number> => {
@@ -213,7 +213,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
 
   const browserName = browserVariants[settings.browser] || settings.browser;
 
-  const driverApi = DriverLoader.loadDriver(browserName, settings);
+  const driverApi = settings.useSelenium ? null : DriverLoader.loadDriver(browserName, settings);
 
   try {
     // Find an open port to start the driver on
