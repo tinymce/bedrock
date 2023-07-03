@@ -11,6 +11,11 @@ export interface DriverAPI {
   defaultInstance: ChildProcess | null;
 }
 
+export interface DriverSpec {
+  driverApi: DriverAPI;
+  path: string;
+}
+
 const browserModules: Record<string, string[]> = {
   'chrome': [ 'chromedriver' ],
   'firefox': [ 'geckodriver' ],
@@ -70,13 +75,28 @@ const loadPhantomJs = (settings: DriverSettings) => {
   return api;
 };
 
+/*
+  start: (args?: string[]) => ChildProcess;
+  stop: () => void;
+  defaultInstance: ChildProcess | null;
+*/
+
+export const makeDriverStub = (): DriverAPI => {
+  const start = () => crossSpawn('', [], {});
+  const stop = () => { console.log('Stopping stub ChildProcess'); };
+  return {
+      start,
+      stop,
+      defaultInstance: null
+  };
+};
+
 export const loadDriver = (browserName: string, settings: DriverSettings): DriverAPI => {
   const driverDeps = browserModules[browserName] || [];
   if (driverDeps.length === 0) {
     console.log('Not loading a local driver for browser ' + browserName);
   } else {
     const driver = findNpmPackage(driverDeps);
-    console.log(driver);
     if (driver !== null) {
       return driver;
     } else {
@@ -98,7 +118,7 @@ export const loadDriver = (browserName: string, settings: DriverSettings): Drive
   }
 };
 
-export const waitForAlive = (proc: ChildProcess | null, port: number, timeout: number, statusPath: string): Promise<void> => {
+export const waitForAlive = (proc: ChildProcess, port: number, timeout: number, statusPath: string): Promise<void> => {
   const url = 'http://127.0.0.1:' + port + statusPath;
   console.log('waiting for alive @: ', url);
   const start = Date.now();
@@ -159,9 +179,9 @@ export const waitForAlive = (proc: ChildProcess | null, port: number, timeout: n
   });
 };
 
-export const startAndWaitForAlive = (driverApi: DriverAPI | null, port: number, timeout = 30000, status = '/status/'): Promise<void> => {
+export const startAndWaitForAlive = (driverSpec: DriverSpec, port: number, timeout = 30000): Promise<void> => {
   // Start the driver
-  const driverProc = driverApi ? driverApi.start(['--port=' + port]) : null;
+  const driverProc = driverSpec.driverApi.start(['--port=' + port]);
   // Wait for it to be alive
-  return waitForAlive(driverProc, port, timeout, status);
+  return waitForAlive(driverProc, port, timeout, driverSpec.path);
 };
