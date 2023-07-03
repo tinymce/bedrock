@@ -82,7 +82,10 @@ const loadPhantomJs = (settings: DriverSettings) => {
 */
 
 export const makeDriverStub = (): DriverAPI => {
-  const start = () => crossSpawn('', [], {});
+  const start = () => {
+    console.log('debugging crossSapwn');
+    return crossSpawn('ls', [], {});
+  };
   const stop = () => { console.log('Stopping stub ChildProcess'); };
   return {
       start,
