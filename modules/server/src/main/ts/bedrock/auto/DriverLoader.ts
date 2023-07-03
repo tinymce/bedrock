@@ -6,7 +6,7 @@ import * as Arr from '../util/Arr';
 import { DriverSettings } from './Driver';
 
 export interface DriverAPI {
-  start: (args?: string[]) => ChildProcess;
+  start: (args?: string[]) => ChildProcess | null;
   stop: () => void;
   defaultInstance: ChildProcess | null;
 }
@@ -82,14 +82,9 @@ const loadPhantomJs = (settings: DriverSettings) => {
 */
 
 export const makeDriverStub = (): DriverAPI => {
-  const start = () => {
-    console.log('debugging crossSapwn');
-    return crossSpawn('ls', [], {});
-  };
-  const stop = () => { console.log('Stopping stub ChildProcess'); };
   return {
-      start,
-      stop,
+      start: () => null,
+      stop: () => { console.log('Stop driver stub'); },
       defaultInstance: null
   };
 };
@@ -121,8 +116,8 @@ export const loadDriver = (browserName: string, settings: DriverSettings): Drive
   }
 };
 
-export const waitForAlive = (proc: ChildProcess, port: number, timeout: number, statusPath: string): Promise<void> => {
-  const url = 'http://127.0.0.1:' + port + statusPath;
+export const waitForAlive = (proc: ChildProcess | null, port: number, timeout: number, path: string): Promise<void> => {
+  const url = 'http://127.0.0.1:' + port + path;
   console.log('waiting for alive @: ', url);
   const start = Date.now();
   return new Promise<void>((resolve, reject) => {
