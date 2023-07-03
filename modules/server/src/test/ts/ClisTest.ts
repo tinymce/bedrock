@@ -57,8 +57,10 @@ describe('Clis.forAuto', () => {
       bucket: 1,
       buckets: 1,
       useSandboxForHeadless: false,
+      useSelenium: false,
       extraBrowserCapabilities: '',
       skipResetMousePosition: false,
+      webdriverPort: 4444,
       wipeBrowserCache: false
     }, cleanResult(actual));
   });
@@ -94,8 +96,10 @@ describe('Clis.forAuto', () => {
       bucket: 1,
       buckets: 1,
       useSandboxForHeadless: false,
+      useSelenium: false,
       extraBrowserCapabilities: '',
       skipResetMousePosition: false,
+      webdriverPort: 4444,
       wipeBrowserCache: false
     }, cleanResult(actual));
   });
@@ -132,8 +136,10 @@ describe('Clis.forAuto', () => {
       bucket: 3,
       buckets: 7,
       useSandboxForHeadless: false,
+      useSelenium: false,
       extraBrowserCapabilities: '',
       skipResetMousePosition: false,
+      webdriverPort: 4444,
       wipeBrowserCache: false
     }, cleanResult(actual));
   });
@@ -169,8 +175,10 @@ describe('Clis.forAuto', () => {
       bucket: 1,
       buckets: 1,
       useSandboxForHeadless: false,
+      useSelenium: false,
       extraBrowserCapabilities: ' --some-browser-flag',
       skipResetMousePosition: false,
+      webdriverPort: 4444,
       wipeBrowserCache: false
     }, cleanResult(actual));
   });
