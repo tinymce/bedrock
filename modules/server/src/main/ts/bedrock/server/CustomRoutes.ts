@@ -125,7 +125,7 @@ const jsonToRouters = (data: CustomRouteSpec[], configPath: string) => {
 
 const fallbackGo = (filePath: string | undefined): Routes.RouteGoFunc => {
   return (request, response, done) => {
-    response.writeHead(404, {'content-type': 'text/plain'});
+    response.writeHead(404, {'Content-Type': 'text/plain; charset=utf-8'});
     response.end([
       'Could not find a matching custom route for: ',
       'Method: ' + request.method,
