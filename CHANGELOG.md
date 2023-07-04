@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+- Add `--useSelenium` command line argument to use `selenium/standalone-<browser>` #DEVOPS-813
+
 ## 13.4.2 - 2023-06-22
 
 ### Fixed
