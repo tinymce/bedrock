@@ -82,9 +82,9 @@ const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
 };
 
 const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): WebdriverIO.RemoteOptions => {
-  const options = {
+  const options: WebdriverIO.RemoteOptions = {
     path: '/',
-    host: '127.0.0.1',
+    hostname: '127.0.0.1',
     port,
     logLevel: 'silent' as const,
     capabilities: {
@@ -200,6 +200,25 @@ const getPort = async (port: number | undefined, fallbackPort: number): Promise<
   }
 };
 
+const driverSetup = async (driver: WebdriverIO.Browser<'async'>, settings: DriverSettings, browserName: string, debuggingPort: number): Promise<void> => {
+  // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
+    // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
+    await driver.pause(1500);
+
+    // Log driver details
+    logDriverDetails(driver, settings.headless, debuggingPort);
+
+    // Some tests require large windows, so make it as large as it can be.
+    // Headless modes can't use maximize, so just set the dimensions to 1280x1024
+    if (settings.headless) {
+      await driver.setWindowSize(1280, 1024);
+    } else {
+      await driver.maximizeWindow();
+    }
+    
+    return Promise.resolve();
+};
+
 const getFarmUrl = async (): Promise<URL> => {
   console.log('getting id...');
   const iclient = new STSClient({region: 'us-west-2'});
@@ -211,16 +230,15 @@ const getFarmUrl = async (): Promise<URL> => {
   const client = new DeviceFarmClient({region: 'us-west-2'});
   const input = {
     projectArn: 'arn:aws:devicefarm:us-west-2:425564247115:testgrid-project:05af6148-0fef-4afc-8ec7-485367a4f15d',
-    expiresInSeconds: 3000
+    expiresInSeconds: 5000
   };
   const command = new CreateTestGridUrlCommand(input);
   const response = await client.send(command);
   return new URL(response.url as string);
 };
 
-const createFarm = async (settings: DriverSettings): Promise<Driver> => {
+const createFarm = async (settings: DriverSettings, defaultSettings: WebdriverIO.RemoteOptions): Promise<Driver> => {
   try {
-
     console.log('setting for driver: ', settings);
 
     const validBrowsers = ['firefox', 'chrome', 'MicrosoftEdge'];
@@ -229,8 +247,9 @@ const createFarm = async (settings: DriverSettings): Promise<Driver> => {
     }
     const url = await getFarmUrl();
 
-    const driver = await WebdriverIO.remote({
-      // logLevel: 'trace',
+    const options: WebdriverIO.RemoteOptions = {
+      ...defaultSettings,
+      logLevel: 'trace',
       hostname: url.host,
       path: url.pathname,
       protocol: 'https',
@@ -239,12 +258,16 @@ const createFarm = async (settings: DriverSettings): Promise<Driver> => {
       capabilities: {
         browserName: settings.browser
       }
-    });
+    };
+
+    console.log('Starting Webdriver with options:', options);
+    const driver = await WebdriverIO.remote(options);
+    console.log('Webdriver started.');
 
     return {
       webdriver: driver,
       shutdown: (i: boolean | undefined) => {
-        console.log('shutdown farm?', i);
+        console.log('shutdown farm. Immediate?', i);
         return Promise.resolve();
       }
     };
@@ -265,32 +288,31 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
   const webdriverTimeout = settings.webdriverTimeout || 30000;
 
   const browserName = browserVariants[settings.browser] || settings.browser;
+  
+  // Find an open port to start the driver on
+  const port = await getPort(settings.webdriverPort, 4444);
+  const debuggingPort = settings.headless ? await getPort(settings.debuggingPort, 9000) : 9000;
+  const webdriverOptions = getOptions(port, browserName, settings, debuggingPort);
 
   if (settings.farm) {
-    return createFarm(settings);
+    const api = await createFarm(settings, webdriverOptions);
+    await driverSetup(api.webdriver, settings, browserName, debuggingPort);
+    return api;
   }
 
   const driverApi = DriverLoader.loadDriver(browserName, settings);
 
   try {
-    // Find an open port to start the driver on
-    const port = await getPort(settings.webdriverPort, 4444);
-    const debuggingPort = settings.headless ? await getPort(settings.debuggingPort, 9000) : 9000;
-
-    // Wait for the driver to start up and then start the webdriver session
-    await DriverLoader.startAndWaitForAlive(driverApi, port, webdriverTimeout);
-    const webdriverOptions = getOptions(port, browserName, settings, debuggingPort);
 
     if (settings.verbose) {
       console.log(
         `Browser capabilities: ${JSON.stringify(webdriverOptions.capabilities)}`
       );
     }
-
-    if (settings.farm) {
-      console.log('make  farm');
-    }
-
+    
+    // Wait for the driver to start up and then start the webdriver session
+    await DriverLoader.startAndWaitForAlive(driverApi, port, webdriverTimeout);
+    
     const driver = await WebdriverIO.remote(webdriverOptions);
 
     // IEDriverServer ignores a delete session call if done too quickly so it needs a small delay
@@ -300,20 +322,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
     // by the user instead of the application
     const driverShutdown = setupShutdown(driver, driverApi, shutdownDelay);
 
-    // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
-    // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
-    await driver.pause(1500);
-
-    // Log driver details
-    logDriverDetails(driver, settings.headless, debuggingPort);
-
-    // Some tests require large windows, so make it as large as it can be.
-    // Headless modes can't use maximize, so just set the dimensions to 1280x1024
-    if (settings.headless) {
-      await driver.setWindowSize(1280, 1024);
-    } else {
-      await driver.maximizeWindow();
-    }
+    await driverSetup(driver, settings, browserName, debuggingPort);    
     await focusBrowser(browserName, settings);
 
     // Return the public driver api

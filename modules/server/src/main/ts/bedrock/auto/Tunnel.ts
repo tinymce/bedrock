@@ -8,21 +8,22 @@ export interface Tunnel {
     shutdown: () => Promise<void>;
 }
 
-const load = (port: number | string): ExecUtils.ChildAPI => {
-    const execCmd = 'npx';
-    const execArgs = ['tmole', port.toString()];
-    return ExecUtils.execLoader(execCmd, execArgs);
+const load = (): ExecUtils.ChildAPI => {
+    // Installs tunnelmole in current node project. If testing on TinyMCE it will install in TinyMCE package.json.
+    const exec = 'npx';
+    const args = [ '--yes', 'tunnelmole'];
+    return ExecUtils.execLoader(exec, args);
 };
 
-const waitForUrl = (proc: ChildProcess, timeout = 10000): Promise<string> => {
+const waitForUrl = (proc: ChildProcess, timeout = 20000): Promise<string> => {
     return new Promise((resolve, reject) => {
-        setTimeout(() => reject(), timeout);
+        setTimeout(() => reject('Tunnel could not be installed with npx.'), timeout);
         const output = (proc.stdout ?? reject()) as internal.Readable;
         let url;
         const wordStream = output.pipe(split2(' '));
         wordStream.on('data', (data) => {
             url = data.toString();
-
+            console.log(data.toString());
             // Stop listening. Even though it resolves instantly, this code block would otherwise
             // still be run on every data event.
             wordStream.removeAllListeners('data');
@@ -32,11 +33,13 @@ const waitForUrl = (proc: ChildProcess, timeout = 10000): Promise<string> => {
 };
 
 export const create = async (port: number): Promise<Tunnel> => {
-    const api = load(port);
-    const tunnelProc = api.start();
+    const api = load();
+    const tunnelProc = api.start([port.toString()]);
+    console.log('Tunnel process running. Waiting for URL...');
 
     try {
         const urlText = await waitForUrl(tunnelProc);
+        console.log('Tunnel URL: ' + urlText);
         const url = new URL(urlText);
         // await ExecUtils.waitForAlive(tunnelProc, port, 10000, actualUrl.toString());
 
