@@ -75,7 +75,7 @@ The `dockerfile` is just to test the no-sandbox option for chrome-headless. We s
 
 `bedrock-auto` accepts a `--useSelenium` flag to lift the browser driver burden out unto a docker container.
 
-For local testing you can leverage docker and connect to a local standalone machine.
+For local testing you can leverage docker and connect to a local standalone machine. Note that this uses a Linux GUI, so keep that in mind for cross-platform testing.
 
 Start a `selenium/standalone` docker in your local environment:
 
