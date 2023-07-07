@@ -73,7 +73,7 @@ The `dockerfile` is just to test the no-sandbox option for chrome-headless. We s
 
 ## Using selenium standalone machine
 
-`bedrock-auto` accepts a `--useSelenium` flag to lift the browser driver burden out unto a docker container.
+`bedrock-auto` accepts a `--useSelenium` flag to lift the browser driver burden into a docker container.
 
 For local testing you can leverage docker and connect to a local standalone machine. Note that this uses a Linux GUI, so keep that in mind for cross-platform testing.
 
@@ -81,11 +81,11 @@ Start a `selenium/standalone` docker in your local environment:
 
 `docker run -d --net=host --shm-size="2g" selenium/standalone-chrome:latest`.
 
-You can start a remote selenium docker but bedrock does not play nice with this setup as it requires a server being accesible to the webdriver
+You can start a remote selenium docker but bedrock does not play nice with this setup as it requires a server to be accessible to the webdriver
 
 `docker run -d -p 4444:4444 -p 7900:7900 --shm-size="2g" selenium/standalone-chrome:latest`
 
-* Make sure that your por 4444 and port 7900 are not in use when running `--net=host`
+* Make sure that your port 4444 and port 7900 are not in use when running `--net=host`
 
 # FAQ
 
