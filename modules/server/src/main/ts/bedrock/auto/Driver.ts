@@ -204,12 +204,12 @@ const getDriverSpec = (settings: DriverSettings, browserName: string): DriverLoa
   if (settings.useSelenium) {
     return {
       driverApi: DriverLoader.makeDriverStub(),
-      path: '/wd/hub/status'
+      path: '/wd/hub'
     };
   }
   return {
     driverApi: DriverLoader.loadDriver(browserName, settings),
-    path: '/status'
+    path: ''
   };
 };
 

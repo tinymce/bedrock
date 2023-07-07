@@ -117,7 +117,7 @@ export const loadDriver = (browserName: string, settings: DriverSettings): Drive
 };
 
 export const waitForAlive = (proc: ChildProcess | null, port: number, timeout: number, path: string): Promise<void> => {
-  const url = 'http://127.0.0.1:' + port + path;
+  const url = 'http://127.0.0.1:' + port + path + '/status';
   console.log('waiting for alive @: ', url);
   const start = Date.now();
   return new Promise<void>((resolve, reject) => {
