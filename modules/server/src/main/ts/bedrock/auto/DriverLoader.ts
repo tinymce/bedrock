@@ -75,12 +75,6 @@ const loadPhantomJs = (settings: DriverSettings) => {
   return api;
 };
 
-/*
-  start: (args?: string[]) => ChildProcess;
-  stop: () => void;
-  defaultInstance: ChildProcess | null;
-*/
-
 export const makeDriverStub = (): DriverAPI => {
   return {
       start: () => null,
