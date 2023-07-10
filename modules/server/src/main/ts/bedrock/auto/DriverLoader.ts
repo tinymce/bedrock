@@ -6,9 +6,14 @@ import * as Arr from '../util/Arr';
 import { DriverSettings } from './Driver';
 
 export interface DriverAPI {
-  start: (args?: string[]) => ChildProcess;
+  start: (args?: string[]) => ChildProcess | null;
   stop: () => void;
   defaultInstance: ChildProcess | null;
+}
+
+export interface DriverSpec {
+  driverApi: DriverAPI;
+  path: string;
 }
 
 const browserModules: Record<string, string[]> = {
@@ -70,6 +75,14 @@ const loadPhantomJs = (settings: DriverSettings) => {
   return api;
 };
 
+export const makeDriverStub = (): DriverAPI => {
+  return {
+      start: () => null,
+      stop: () => { console.log('Stop driver stub'); },
+      defaultInstance: null
+  };
+};
+
 export const loadDriver = (browserName: string, settings: DriverSettings): DriverAPI => {
   const driverDeps = browserModules[browserName] || [];
   if (driverDeps.length === 0) {
@@ -97,8 +110,9 @@ export const loadDriver = (browserName: string, settings: DriverSettings): Drive
   }
 };
 
-export const waitForAlive = (proc: ChildProcess, port: number, timeout = 30000): Promise<void> => {
-  const url = 'http://127.0.0.1:' + port + '/status';
+export const waitForAlive = (proc: ChildProcess | null, port: number, timeout: number, path: string): Promise<void> => {
+  const url = 'http://127.0.0.1:' + port + path + '/status';
+  console.log('waiting for alive @: ', url);
   const start = Date.now();
   return new Promise<void>((resolve, reject) => {
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -128,8 +142,10 @@ export const waitForAlive = (proc: ChildProcess, port: number, timeout = 30000):
             try {
               const data = JSON.parse(rawData);
               if (data.value.ready || data.status === 0) {
-                proc.removeListener('exit', onStartError);
-                proc.removeListener('error', onStartError);
+                if (proc) {
+                  proc.removeListener('exit', onStartError);
+                  proc.removeListener('error', onStartError);
+                }
                 resolve();
               } else {
                 onServerError('Not ready to accept connections');
@@ -145,17 +161,19 @@ export const waitForAlive = (proc: ChildProcess, port: number, timeout = 30000):
     };
 
     // Bind process listeners
-    proc.on('exit', onStartError);
-    proc.on('error', onStartError);
+    if (proc) {
+      proc.on('exit', onStartError);
+      proc.on('error', onStartError);
+    }
 
     // Start listening for the server to be ready
     checkServerStatus();
   });
 };
 
-export const startAndWaitForAlive = (driverApi: DriverAPI, port: number, timeout = 30000): Promise<void> => {
+export const startAndWaitForAlive = (driverSpec: DriverSpec, port: number, timeout = 30000): Promise<void> => {
   // Start the driver
-  const driverProc = driverApi.start(['--port=' + port]);
+  const driverProc = driverSpec.driverApi.start(['--port=' + port]);
   // Wait for it to be alive
-  return waitForAlive(driverProc, port, timeout);
+  return waitForAlive(driverProc, port, timeout, driverSpec.path);
 };
