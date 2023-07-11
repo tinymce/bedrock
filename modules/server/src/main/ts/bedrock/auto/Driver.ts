@@ -6,7 +6,6 @@ import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
 import * as DriverLoader from './DriverLoader';
 import { DeviceFarmClient, CreateTestGridUrlCommand } from '@aws-sdk/client-device-farm';
-import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
 
 export interface DriverSettings {
   basedir: string;
@@ -220,12 +219,6 @@ const driverSetup = async (driver: WebdriverIO.Browser<'async'>, settings: Drive
 };
 
 const getFarmUrl = async (): Promise<URL> => {
-  console.log('getting id...');
-  const iclient = new STSClient({region: 'us-west-2'});
-  const icommand = new GetCallerIdentityCommand({});
-  console.log('calling identity');
-  const iresponse = await iclient.send(icommand);
-  console.log('identity: ', iresponse);
 
   const client = new DeviceFarmClient({region: 'us-west-2'});
   const input = {
@@ -234,6 +227,7 @@ const getFarmUrl = async (): Promise<URL> => {
   };
   const command = new CreateTestGridUrlCommand(input);
   const response = await client.send(command);
+  console.log('DF URL expires at:', response.expires);
   return new URL(response.url as string);
 };
 
@@ -247,17 +241,17 @@ const createFarm = async (settings: DriverSettings, defaultSettings: WebdriverIO
     }
     const url = await getFarmUrl();
 
-    const options: WebdriverIO.RemoteOptions = {
+    const options = {
       ...defaultSettings,
-      logLevel: 'trace',
       hostname: url.host,
       path: url.pathname,
       protocol: 'https',
       port: 443,
       connectionRetryTimeout: 180000,
       capabilities: {
-        browserName: settings.browser
-      }
+        browserName: settings.browser,
+        'aws:maxDurationSecs': 2400,
+      },
     };
 
     console.log('Starting Webdriver with options:', options);
@@ -266,8 +260,8 @@ const createFarm = async (settings: DriverSettings, defaultSettings: WebdriverIO
 
     return {
       webdriver: driver,
-      shutdown: (i: boolean | undefined) => {
-        console.log('shutdown farm. Immediate?', i);
+      shutdown: (_: boolean | undefined) => {
+        console.log('Shutting down Device Farm. This currently does nothing.');
         return Promise.resolve();
       }
     };

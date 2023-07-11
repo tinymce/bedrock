@@ -23,11 +23,14 @@ const waitForUrl = (proc: ChildProcess, timeout = 20000): Promise<string> => {
         const wordStream = output.pipe(split2(' '));
         wordStream.on('data', (data) => {
             url = data.toString();
-            console.log(data.toString());
+            console.log('Tunnel says:', data.toString());
             // Stop listening. Even though it resolves instantly, this code block would otherwise
             // still be run on every data event.
             wordStream.removeAllListeners('data');
             resolve(url);
+        });
+        proc.stderr?.on('data', (data) => {
+            console.error('Tunnel error:', data.toString());
         });
     });
 };
@@ -41,7 +44,8 @@ export const create = async (port: number): Promise<Tunnel> => {
         const urlText = await waitForUrl(tunnelProc);
         console.log('Tunnel URL: ' + urlText);
         const url = new URL(urlText);
-        // await ExecUtils.waitForAlive(tunnelProc, port, 10000, actualUrl.toString());
+
+        // No waitForAlive. Webdriver creation waits for it and has its own connection timeout.
 
         const shutdown = async (): Promise<void> => {
             return new Promise((resolve) => {

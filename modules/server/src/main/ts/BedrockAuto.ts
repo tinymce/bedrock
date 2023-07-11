@@ -40,6 +40,10 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       farm: settings.farm
     });
 
+    if (settings.farm) {
+        console.log('Webdriver waits for device farm session to activate. Takes 30-45s.');
+    }
+
     const webdriver = driver.webdriver;
     const service = await Serve.start({
       ...settings,
