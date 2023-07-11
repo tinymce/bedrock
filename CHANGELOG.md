@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 13.5.0 - 2023-07-11
+
 ### Fixed
 - Add `--useSelenium` command line argument to use a `selenium/standalone-<browser>` docker connection #DEVOPS-813
 
