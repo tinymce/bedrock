@@ -58,7 +58,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
     let location;
     if (settings.farm) {
       const tunnel = await Tunnel.create(service.port);
-      location = 'https://' + tunnel.url.host;
+      location = tunnel.url.href;
       shutdown = () => Promise.all([ service.shutdown(), driver.shutdown(), tunnel.shutdown()]);
     } else {
       location = 'http://localhost:' + service.port;
