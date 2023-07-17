@@ -28,6 +28,10 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
 
   routes.then(async (runner) => {
 
+    if (settings.farm) {
+        console.log('Webdriver creation waits for device farm session to activate. Takes 30-45s.');
+    }
+
     const driver = await Driver.create({
       browser: browserName,
       basedir: settings.basedir,
@@ -39,10 +43,6 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       wipeBrowserCache: settings.wipeBrowserCache,
       farm: settings.farm
     });
-
-    if (settings.farm) {
-        console.log('Webdriver waits for device farm session to activate. Takes 30-45s.');
-    }
 
     const webdriver = driver.webdriver;
     const service = await Serve.start({
