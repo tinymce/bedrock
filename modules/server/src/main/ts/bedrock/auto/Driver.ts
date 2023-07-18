@@ -222,7 +222,7 @@ const getFarmUrl = async (): Promise<URL> => {
 
   const client = new DeviceFarmClient({region: 'us-west-2'});
   const input = {
-    projectArn: 'arn:aws:devicefarm:us-west-2:425564247115:testgrid-project:05af6148-0fef-4afc-8ec7-485367a4f15d',
+    projectArn: 'arn:aws:devicefarm:us-west-2:103651136441:testgrid-project:79ff2b40-fe26-440f-9539-53163c25442e',
     expiresInSeconds: 5000
   };
   const command = new CreateTestGridUrlCommand(input);
