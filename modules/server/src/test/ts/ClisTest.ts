@@ -59,7 +59,8 @@ describe('Clis.forAuto', () => {
       useSandboxForHeadless: false,
       extraBrowserCapabilities: '',
       skipResetMousePosition: false,
-      wipeBrowserCache: false
+      wipeBrowserCache: false,
+      farm: false
     }, cleanResult(actual));
   });
 
@@ -96,7 +97,8 @@ describe('Clis.forAuto', () => {
       useSandboxForHeadless: false,
       extraBrowserCapabilities: '',
       skipResetMousePosition: false,
-      wipeBrowserCache: false
+      wipeBrowserCache: false,
+      farm: false
     }, cleanResult(actual));
   });
 
@@ -134,7 +136,8 @@ describe('Clis.forAuto', () => {
       useSandboxForHeadless: false,
       extraBrowserCapabilities: '',
       skipResetMousePosition: false,
-      wipeBrowserCache: false
+      wipeBrowserCache: false,
+      farm: false
     }, cleanResult(actual));
   });
 
@@ -171,7 +174,8 @@ describe('Clis.forAuto', () => {
       useSandboxForHeadless: false,
       extraBrowserCapabilities: ' --some-browser-flag',
       skipResetMousePosition: false,
-      wipeBrowserCache: false
+      wipeBrowserCache: false,
+      farm: false
     }, cleanResult(actual));
   });
 
@@ -220,7 +224,8 @@ describe('Clis.forManual', () => {
     chunk: 100,
     polyfills: [ 'Symbol' ],
     bucket: 1,
-    buckets: 1
+    buckets: 1,
+    farm: false
   };
 
   it('Minimal specification of bedrock-manual', () => {
