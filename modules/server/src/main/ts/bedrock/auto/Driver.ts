@@ -85,7 +85,7 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
     path: '/',
     hostname: '127.0.0.1',
     port,
-    logLevel: 'silent' as const,
+    logLevel: 'trace' as const,
     capabilities: {
       browserName
     }
@@ -219,12 +219,13 @@ const driverSetup = async (driver: WebdriverIO.Browser<'async'>, settings: Drive
 };
 
 const getFarmUrl = async (): Promise<URL> => {
-
+  console.log('Creating DeviceFarmClient...');
   const client = new DeviceFarmClient({region: 'us-west-2'});
   const input = {
     projectArn: 'arn:aws:devicefarm:us-west-2:103651136441:testgrid-project:79ff2b40-fe26-440f-9539-53163c25442e',
     expiresInSeconds: 5000
   };
+  console.log('Sending command to create DF Test Grid URL...');
   const command = new CreateTestGridUrlCommand(input);
   const response = await client.send(command);
   console.log('DF URL expires at:', response.expires);
