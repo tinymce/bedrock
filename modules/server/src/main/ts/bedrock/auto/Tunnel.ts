@@ -12,7 +12,7 @@ export interface Tunnel {
 const load = (subdomain: string, port: number): ExecUtils.ChildAPI => {
     // Installs tunnelmole in current node project. If testing on TinyMCE it will install in TinyMCE package.json.
     const exec = 'ssh';
-    const args = ['-R', subdomain + ':80:localhost:' + port, 'sish.osu.tiny.work'];
+    const args = ['-vvv', '-R', subdomain + ':80:localhost:' + port, 'sish.osu.tiny.work'];
     return ExecUtils.execLoader(exec, args);
 };
 
