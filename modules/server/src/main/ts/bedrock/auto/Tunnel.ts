@@ -2,6 +2,7 @@ import { ChildProcess } from 'child_process';
 import * as ExecUtils from '../util/ExecUtils';
 import internal = require('stream');
 import split2 = require('split2');
+import * as crypto from 'node:crypto'; // Not needed with Node 19+
 
 export interface Tunnel {
     url: URL;
