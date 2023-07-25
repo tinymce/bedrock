@@ -85,7 +85,7 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
     path: '/',
     hostname: '127.0.0.1',
     port,
-    logLevel: 'trace' as const,
+    logLevel: 'silent' as const,
     capabilities: {
       browserName
     }
