@@ -22,7 +22,7 @@ export interface DriverSettings {
 }
 
 export interface Driver {
-  webdriver: WebdriverIO.Browser<'async'>;
+  webdriver: WebdriverIO.Browser;
   shutdown: (immediate?: boolean) => Promise<void>;
 }
 
@@ -132,7 +132,7 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
   return options;
 };
 
-const logDriverDetails = (driver: WebdriverIO.Browser<'async'>, headless: boolean, debuggingPort: number) => {
+const logDriverDetails = (driver: WebdriverIO.Browser, headless: boolean, debuggingPort: number) => {
   const caps: Record<string, any> = driver.capabilities;
   const browserName = caps.browserName;
   const browserVersion = caps.browserVersion || caps.version;
@@ -164,7 +164,7 @@ const focusBrowser = (browserName: string, settings: DriverSettings) => {
   }
 };
 
-const setupShutdown = (driver: WebdriverIO.Browser<'async'>, driverApi: DriverLoader.DriverAPI, shutdownDelay = 0): (immediate?: boolean) => Promise<void> => {
+const setupShutdown = (driver: WebdriverIO.Browser, driverApi: DriverLoader.DriverAPI, shutdownDelay = 0): (immediate?: boolean) => Promise<void> => {
   const driverShutdown = async (immediate?: boolean) => {
     try {
       if (immediate) {
@@ -199,7 +199,7 @@ const getPort = async (port: number | undefined, fallbackPort: number): Promise<
   }
 };
 
-const driverSetup = async (driver: WebdriverIO.Browser<'async'>, settings: DriverSettings, browserName: string, debuggingPort: number): Promise<void> => {
+const driverSetup = async (driver: WebdriverIO.Browser, settings: DriverSettings, browserName: string, debuggingPort: number): Promise<void> => {
   // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
     // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
     await driver.pause(1500);
