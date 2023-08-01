@@ -17,7 +17,6 @@ export interface BedrockSettings {
   readonly buckets: number;
   readonly testfiles: string[];
   readonly verbose: boolean;
-  readonly farm?: boolean;
 }
 
 export type BedrockManualSettings = BedrockSettings;
@@ -34,4 +33,5 @@ export interface BedrockAutoSettings extends BedrockSettings {
   readonly useSandboxForHeadless: boolean;
   readonly extraBrowserCapabilities: string;
   readonly wipeBrowserCache: boolean;
+  readonly remote: boolean;
 }

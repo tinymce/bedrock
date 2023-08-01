@@ -33,8 +33,7 @@ const commonOptions = (directories: Directories) => {
     ClOptions.bucket,
     ClOptions.buckets,
     ClOptions.stopOnFailure,
-    ClOptions.verbose,
-    ClOptions.farm
+    ClOptions.verbose
   ];
 };
 
@@ -49,7 +48,8 @@ export const forAuto = (directories: Directories, argv: string[] = process.argv)
     ClOptions.useSandboxForHeadless,
     ClOptions.extraBrowserCapabilities,
     ClOptions.skipResetMousePosition,
-    ClOptions.wipeBrowserCache
+    ClOptions.wipeBrowserCache,
+    ClOptions.remote
   ]), argv) as Attempt<cli.CliError, BedrockAutoSettings>;
 };
 

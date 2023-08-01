@@ -28,7 +28,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
 
   routes.then(async (runner) => {
 
-    if (settings.farm) {
+    if (settings.remote) {
         console.log('Webdriver creation waits for device farm session to activate. Takes 30-45s.');
     }
 
@@ -41,7 +41,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       extraBrowserCapabilities: settings.extraBrowserCapabilities,
       verbose: settings.verbose,
       wipeBrowserCache: settings.wipeBrowserCache,
-      farm: settings.farm
+      remote: settings.remote
     });
 
     const webdriver = driver.webdriver;
@@ -56,7 +56,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
     // TODO: Extensible. This is not a great way to do this but I can't think of a clean, easy way to fix it.
     let shutdown;
     let location;
-    if (settings.farm) {
+    if (settings.remote) {
       const tunnel = await Tunnel.create(service.port);
       location = tunnel.url.href;
       shutdown = () => Promise.all([ service.shutdown(), driver.shutdown(), tunnel.shutdown()]);

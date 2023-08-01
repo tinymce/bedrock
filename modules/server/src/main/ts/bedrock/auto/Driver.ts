@@ -18,7 +18,7 @@ export interface DriverSettings {
   webdriverPort?: number;
   webdriverTimeout?: number;
   wipeBrowserCache?: boolean;
-  farm?: boolean;
+  remote?: boolean;
 }
 
 export interface Driver {
