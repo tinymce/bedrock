@@ -289,7 +289,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
   const debuggingPort = settings.headless ? await getPort(settings.debuggingPort, 9000) : 9000;
   const webdriverOptions = getOptions(port, browserName, settings, debuggingPort);
 
-  if (settings.farm) {
+  if (settings.remote) {
     const api = await createFarm(settings, webdriverOptions);
     await driverSetup(api.webdriver, settings, browserName, debuggingPort);
     return api;
