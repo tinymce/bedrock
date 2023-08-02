@@ -147,11 +147,6 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
       w3c: true,
       plugin: 'node_js-webdriverio',
     };
-    caps['moz:firefoxOptions'].prefs = {
-      'devtools.debugger.remote-enabled': true,
-      'devtools.debugger.prompt-connection': false,
-      'devtools.chrome.enabled': true
-    };
   }
 
   return options;
