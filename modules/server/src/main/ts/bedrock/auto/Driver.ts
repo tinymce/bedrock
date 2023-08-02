@@ -18,7 +18,8 @@ export interface DriverSettings {
   webdriverPort?: number;
   webdriverTimeout?: number;
   wipeBrowserCache?: boolean;
-  remote?: boolean;
+  servicePort?: number;
+  remoteWebdriver?: string;
 }
 
 export interface Driver {
@@ -82,14 +83,17 @@ const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
 
 const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): WebdriverIO.RemoteOptions => {
   const options: WebdriverIO.RemoteOptions = {
-    path: '/',
-    hostname: '127.0.0.1',
-    port,
-    logLevel: 'silent' as const,
+    logLevel: 'warn' as const,
     capabilities: {
       browserName
     }
   };
+
+  if (!settings.remoteWebdriver) {
+    options.path = '/';
+    options.hostname = '127.0.0.1';
+    options.port = port;
+  }
 
   // NOTE: We are currently not supporting extra browser capabilities for IE, Legacy Edge,
   // or Chromium-based Edge. We should start supporting extra browser capabilities for Chromium-based
@@ -127,6 +131,24 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
         addArguments(caps, 'goog:chromeOptions', [ '--no-sandbox' ]);
       }
     }
+  }
+
+  if (settings.remoteWebdriver === 'LambdaTest') {
+    options.user = process.env.LT_USERNAME;
+    options.key = process.env.LT_ACCESS_KEY;
+    caps['LT:Options'] = {
+      username: process.env.LT_USERNAME,
+      accesskey: process.env.LT_ACCESS_KEY,
+      tunnel: true,
+      console: true,
+      w3c: true,
+      plugin: 'node_js-webdriverio',
+    };
+    caps['moz:firefoxOptions'].prefs = {
+      'devtools.debugger.remote-enabled': true,
+      'devtools.debugger.prompt-connection': false,
+      'devtools.chrome.enabled': true
+    };
   }
 
   return options;
@@ -199,7 +221,7 @@ const getPort = async (port: number | undefined, fallbackPort: number): Promise<
   }
 };
 
-const driverSetup = async (driver: WebdriverIO.Browser, settings: DriverSettings, browserName: string, debuggingPort: number): Promise<void> => {
+const driverSetup = async (driver: WebdriverIO.Browser, settings: DriverSettings, _browserName: string, debuggingPort: number): Promise<void> => {
   // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
     // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
     await driver.pause(1500);
@@ -288,45 +310,55 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
   const port = await getPort(settings.webdriverPort, 4444);
   const debuggingPort = settings.headless ? await getPort(settings.debuggingPort, 9000) : 9000;
   const webdriverOptions = getOptions(port, browserName, settings, debuggingPort);
+  console.log('Webdriver options:', webdriverOptions);
 
-  if (settings.remote) {
+  if (settings.remoteWebdriver === 'AWS') {
+    // Device Farm
     const api = await createFarm(settings, webdriverOptions);
     await driverSetup(api.webdriver, settings, browserName, debuggingPort);
     return api;
-  }
-
-  const driverApi = DriverLoader.loadDriver(browserName, settings);
-
-  try {
-
-    if (settings.verbose) {
-      console.log(
-        `Browser capabilities: ${JSON.stringify(webdriverOptions.capabilities)}`
-      );
-    }
-    
-    // Wait for the driver to start up and then start the webdriver session
-    await DriverLoader.startAndWaitForAlive(driverApi, port, webdriverTimeout);
-    
+  } else if (settings.remoteWebdriver === 'LambdaTest') {
+    // LambdaTest
     const driver = await WebdriverIO.remote(webdriverOptions);
-
-    // IEDriverServer ignores a delete session call if done too quickly so it needs a small delay
-    const shutdownDelay = browserName === 'internet explorer' ? 500 : 0;
-
-    // Ensure the driver gets shutdown correctly if shutdown
-    // by the user instead of the application
-    const driverShutdown = setupShutdown(driver, driverApi, shutdownDelay);
-
-    await driverSetup(driver, settings, browserName, debuggingPort);    
-    await focusBrowser(browserName, settings);
-
-    // Return the public driver api
+    await driverSetup(driver, settings, browserName, debuggingPort);  
     return {
       webdriver: driver,
-      shutdown: driverShutdown
+      shutdown: () => Promise.resolve()
     };
-  } catch (e) {
-    driverApi.stop();
-    return Promise.reject(e);
+  } else {
+    // Local
+    const driverApi = DriverLoader.loadDriver(browserName, settings);
+    try {
+
+      if (settings.verbose) {
+        console.log(
+          `Browser capabilities: ${JSON.stringify(webdriverOptions.capabilities)}`
+        );
+      }
+
+      // Wait for the driver to start up and then start the webdriver session
+      await DriverLoader.startAndWaitForAlive(driverApi, port, webdriverTimeout);
+      
+      const driver = await WebdriverIO.remote(webdriverOptions);
+
+      // IEDriverServer ignores a delete session call if done too quickly so it needs a small delay
+      const shutdownDelay = browserName === 'internet explorer' ? 500 : 0;
+
+      // Ensure the driver gets shutdown correctly if shutdown
+      // by the user instead of the application
+      const driverShutdown = setupShutdown(driver, driverApi, shutdownDelay);
+
+      await driverSetup(driver, settings, browserName, debuggingPort);
+      await focusBrowser(browserName, settings);
+
+      // Return the public driver api
+      return {
+        webdriver: driver,
+        shutdown: driverShutdown
+      };
+    } catch (e) {
+      driverApi.stop();
+      return Promise.reject(e);
+    }
   }
 };

@@ -22,6 +22,7 @@
     "@ephox/bedrock-common": "^13.0.0",
     "@ephox/bedrock-runner": "^13.3.0",
     "@jsdevtools/coverage-istanbul-loader": "^3.0.5",
+    "@lambdatest/node-tunnel": "^4.0.4",
     "@wdio/globals": "^8.14.1",
     "async": "^3.0.0",
     "chalk": "^4.1.1",
