@@ -63,7 +63,9 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       extraBrowserCapabilities: settings.extraBrowserCapabilities,
       verbose: settings.verbose,
       wipeBrowserCache: settings.wipeBrowserCache,
-      remoteWebdriver
+      remoteWebdriver,
+      webdriverPort: settings.webdriverPort,
+      useSelenium: settings.useSelenium
     });
 
     const webdriver = driver.webdriver;

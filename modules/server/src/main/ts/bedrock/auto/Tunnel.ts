@@ -43,6 +43,9 @@ const createSSH = async (port: number | string): Promise<Tunnel> => {
   const subdomain = crypto.randomUUID();
   const api = loadSSH(subdomain, port);
   const tunnelProc = api.start();
+  if (tunnelProc == null) {
+    throw new Error('Tunnel api returned null');
+  }
   console.log('Tunnel process running. Waiting for URL...');
 
   try {

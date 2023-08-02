@@ -1,6 +1,11 @@
 import { DriverSettings } from './Driver';
 import * as ExecUtils from '../util/ExecUtils';
 
+export interface DriverSpec {
+  driverApi: DriverAPI;
+  path: string;
+}
+
 const browserModules: Record<string, string[]> = {
   'chrome': [ 'chromedriver' ],
   'firefox': [ 'geckodriver' ],
@@ -30,6 +35,14 @@ const loadPhantomJs = (settings: DriverSettings) => {
   return api;
 };
 
+export const makeDriverStub = (): ExecUtils.ChildAPI => {
+  return {
+      start: () => null,
+      stop: () => { console.log('Stop driver stub'); },
+      defaultInstance: null
+  };
+};
+
 export const loadDriver = (browserName: string, settings: DriverSettings): ExecUtils.ChildAPI => {
   const driverDeps = browserModules[browserName] || [];
   if (driverDeps.length === 0) {
@@ -57,11 +70,11 @@ export const loadDriver = (browserName: string, settings: DriverSettings): ExecU
   }
 };
 
-export const startAndWaitForAlive = (driverApi: ExecUtils.ChildAPI, port: number, timeout = 30000): Promise<void> => {
+export const startAndWaitForAlive = (driverSpec: DriverSpec, port: number, timeout = 30000): Promise<void> => {
   // Start the driver
-  const driverProc = driverApi.start(['--port=' + port]);
+  const driverProc = driverSpec.driverApi.start(['--port=' + port]);
   // Wait for it to be alive
-  return ExecUtils.waitForAlive(driverProc, port, timeout, 'http://127.0.0.1', '/status');
+  return ExecUtils.waitForAlive(driverProc, port, timeout, driverSpec.path);
 };
 
 export type DriverAPI = ExecUtils.ChildAPI;

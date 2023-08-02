@@ -20,6 +20,7 @@ export interface DriverSettings {
   wipeBrowserCache?: boolean;
   servicePort?: number;
   remoteWebdriver?: string;
+  useSelenium?: boolean;
 }
 
 export interface Driver {
@@ -83,14 +84,14 @@ const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
 
 const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): WebdriverIO.RemoteOptions => {
   const options: WebdriverIO.RemoteOptions = {
-    logLevel: 'warn' as const,
+    logLevel: 'silent' as const,
     capabilities: {
       browserName
     }
   };
 
   if (!settings.remoteWebdriver) {
-    options.path = '/';
+    options.path = settings.useSelenium ? '/wd/hub' : '/';
     options.hostname = '127.0.0.1';
     options.port = port;
   }
@@ -108,6 +109,8 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
     addArguments(caps, 'goog:chromeOptions', extraCaps);
   } else if (browserName === 'firefox') {
     addArguments(caps, 'moz:firefoxOptions', extraCaps);
+  } else if (browserName === 'MicrosoftEdge') {
+    addArguments(caps, 'ms:edgeOptions', ['--guest']);
   } else if (browserName === 'internet explorer' && settings.wipeBrowserCache) {
     // Setup wiping the browser cache if required, as IE 11 doesn't use a clean session by default
     caps['se:ieOptions'] = {
@@ -160,15 +163,15 @@ const logDriverDetails = (driver: WebdriverIO.Browser, headless: boolean, debugg
   const browserVersion = caps.browserVersion || caps.version;
 
   if (browserName === 'chrome') {
-    console.log('browser:', browserVersion, 'driver:', caps.chrome.chromedriverVersion);
+    console.log('chrome version:', browserVersion, 'driver:', caps.chrome.chromedriverVersion);
   } else if (browserName === 'firefox') {
-    console.log('browser:', browserVersion, 'driver:', caps['moz:geckodriverVersion']);
+    console.log('firefox version:', browserVersion, 'driver:', caps['moz:geckodriverVersion']);
   } else if (browserName === 'phantomjs') {
-    console.log('browser:', browserVersion, 'driver:', caps.driverVersion);
+    console.log('phantom version:', browserVersion, 'driver:', caps.driverVersion);
   } else if (browserName === 'MicrosoftEdge') {
-    console.log('browser:', browserVersion);
+    console.log('Edge version:', browserVersion);
   } else if (browserName === 'msedge') {
-    console.log('browser:', browserVersion, 'driver:', caps.msedge.msedgedriverVersion);
+    console.log('MSEdge version:', browserVersion, 'driver:', caps.msedge.msedgedriverVersion);
   }
 
   if (headless) {
@@ -221,23 +224,37 @@ const getPort = async (port: number | undefined, fallbackPort: number): Promise<
   }
 };
 
+const getDriverSpec = (settings: DriverSettings, browserName: string): DriverLoader.DriverSpec => {
+  if (settings.useSelenium) {
+    return {
+      driverApi: DriverLoader.makeDriverStub(),
+      path: '/wd/hub'
+    };
+  }
+  return {
+    driverApi: DriverLoader.loadDriver(browserName, settings),
+    path: ''
+  };
+};
+
 const driverSetup = async (driver: WebdriverIO.Browser, settings: DriverSettings, _browserName: string, debuggingPort: number): Promise<void> => {
   // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
-    // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
-    await driver.pause(1500);
 
-    // Log driver details
-    logDriverDetails(driver, settings.headless, debuggingPort);
+  // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
+  await driver.pause(1500);
 
-    // Some tests require large windows, so make it as large as it can be.
-    // Headless modes can't use maximize, so just set the dimensions to 1280x1024
-    if (settings.headless) {
-      await driver.setWindowSize(1280, 1024);
-    } else {
-      await driver.maximizeWindow();
-    }
-    
-    return Promise.resolve();
+  // Log driver details
+  logDriverDetails(driver, settings.headless, debuggingPort);
+
+  // Some tests require large windows, so make it as large as it can be.
+  // Headless modes can't use maximize, so just set the dimensions to 1280x1024
+  if (settings.headless) {
+    await driver.setWindowSize(1280, 1024);
+  } else {
+    await driver.maximizeWindow();
+  }
+  
+  return Promise.resolve();
 };
 
 const getFarmUrl = async (): Promise<URL> => {
@@ -289,7 +306,6 @@ const createFarm = async (settings: DriverSettings, defaultSettings: WebdriverIO
       }
     };
   } catch (e) {
-    // cleanup?
     return Promise.reject(e);
   }
 };
@@ -305,7 +321,6 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
   const webdriverTimeout = settings.webdriverTimeout || 30000;
 
   const browserName = browserVariants[settings.browser] || settings.browser;
-  
   // Find an open port to start the driver on
   const port = await getPort(settings.webdriverPort, 4444);
   const debuggingPort = settings.headless ? await getPort(settings.debuggingPort, 9000) : 9000;
@@ -327,7 +342,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
     };
   } else {
     // Local
-    const driverApi = DriverLoader.loadDriver(browserName, settings);
+    const driverSpec = getDriverSpec(settings, browserName);
     try {
 
       if (settings.verbose) {
@@ -337,7 +352,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
       }
 
       // Wait for the driver to start up and then start the webdriver session
-      await DriverLoader.startAndWaitForAlive(driverApi, port, webdriverTimeout);
+      await DriverLoader.startAndWaitForAlive(driverSpec, port, webdriverTimeout);
       
       const driver = await WebdriverIO.remote(webdriverOptions);
 
@@ -346,7 +361,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
 
       // Ensure the driver gets shutdown correctly if shutdown
       // by the user instead of the application
-      const driverShutdown = setupShutdown(driver, driverApi, shutdownDelay);
+      const driverShutdown = setupShutdown(driver, driverSpec.driverApi, shutdownDelay);
 
       await driverSetup(driver, settings, browserName, debuggingPort);
       await focusBrowser(browserName, settings);
@@ -357,7 +372,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
         shutdown: driverShutdown
       };
     } catch (e) {
-      driverApi.stop();
+      driverSpec.driverApi.stop();
       return Promise.reject(e);
     }
   }

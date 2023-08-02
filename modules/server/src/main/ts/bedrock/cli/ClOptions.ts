@@ -327,3 +327,21 @@ export const remote: ClOption = {
   validate: Extraction.any,
   uncommon: true
 };
+
+export const useSelenium: ClOption = {
+  name: 'useSelenium',
+  type: Boolean,
+  defaultValue: false,
+  description: 'Use selenium docker via selenium drivers',
+  validate: Extraction.any,
+  uncommon: true
+};
+
+export const webdriverPort: ClOption = {
+  name: 'webdriverPort',
+  type: Number,
+  description: 'Select the webdriver port.',
+  validate: Extraction.any,
+  defaultValue: 4444,
+  uncommon: true
+};
