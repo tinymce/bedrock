@@ -49,19 +49,16 @@ const getJson = <T>(url: string): Promise<T> => {
 
 export const Callbacks = (): Callbacks => {
   const loadHarness = (): Promise<HarnessResponse> => {
-    console.log('loadHarness()');
     return getJson('harness');
   };
 
   const sendInit = (session: string): Promise<void> => {
-    console.log(`sendInit(${session})`);
     return sendJson('/tests/init', {
       session,
     });
   };
 
   const sendKeepAlive = (session: string): Promise<void> => {
-    console.log(`sendKeepAlive(${session})`, (new Date()).toISOString());
     return sendJson('/tests/alive', {
       session,
     });

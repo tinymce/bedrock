@@ -59,7 +59,6 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
   };
 
   const init = (): Promise<HarnessResponse> => {
-    console.log('init()');
     // Filter the tests to ensure we have an accurate total test count
     filterOnly(rootSuite);
     numTests = countTests(rootSuite);
@@ -69,14 +68,11 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
 
     // delay this ajax call until after the reporter status elements are in the page
     const keepAliveTimer = setInterval(() => {
-      console.log('keepAliveTimer()');
-      callbacks.sendKeepAlive(params.session).catch((err) => {
-        console.error(err);
+      callbacks.sendKeepAlive(params.session).catch(() => {
         // if the server shuts down stop trying to send messages
         clearInterval(keepAliveTimer);
       });
     }, KEEP_ALIVE_INTERVAL);
-    console.log('setInterval(keepAliveTimer, ...)');
 
     return callbacks.sendInit(params.session).then(() => callbacks.loadHarness());
   };
