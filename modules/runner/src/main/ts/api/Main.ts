@@ -16,6 +16,7 @@ declare const $: JQueryStatic;
 Globals.setup();
 
 const setupAndRun = (loadError?: Error) => {
+  console.log('setupAndRun()');
   const params = UrlParams.parse(window.location.search, makeSessionId);
   const ui = Ui($('body'));
   const callbacks = Callbacks();
@@ -23,6 +24,7 @@ const setupAndRun = (loadError?: Error) => {
 
   const runner = Runner(Globals.rootSuite(), params, callbacks, reporter, ui);
   runner.init().then((data) => {
+    console.log('init() complete');
     if (data.mode === 'auto') {
       // Try to ensure the page has focus
       window.focus();
@@ -46,6 +48,7 @@ const run = () => setupAndRun();
 const runError = (e: Error) => setupAndRun(e);
 
 const loadAndRun = (scripts: string[]) => {
+  console.log('loadAndRun(...)');
   // Load the scripts and then run
   loop(scripts, TestLoader.load)
     .then(run, runError);
