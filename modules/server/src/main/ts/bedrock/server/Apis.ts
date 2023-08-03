@@ -121,7 +121,8 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
     driverRouter('/mouse', 'Mouse', MouseEffects.executor, true),
     Routes.effect('POST', '/tests/alive', (data: { session: string }) => {
       c.recordAlive(data.session);
-      return Promise.resolve();
+      const keepAlive: Executor<unknown, void> = (driver) => (_) => Promise.resolve(void driver.execute('Date.now()'));
+      return Attempt.cata(maybeDriver, () => Promise.resolve(), (driver) => effect(keepAlive, driver, false)(0));
     }),
     Routes.effect('POST', '/tests/init', () => resetMousePositionAction(true)),
     Routes.effect('POST', '/tests/start', (data: StartData) => {
