@@ -73,7 +73,7 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
     };
   };
 
-  const sendKeepAlive = (driver: Browser) => Promise.resolve(void driver.execute('Date.now()'));
+  const sendKeepAlive = (driver: Browser) => Promise.resolve(void driver.execute(() => Date.now()));
 
   const keepAliveAction = () => Attempt.cata(maybeDriver, () => Promise.resolve(),
     (driver) => waitForDriverReady(maxInvalidAttempts, () => sendKeepAlive(driver)));
