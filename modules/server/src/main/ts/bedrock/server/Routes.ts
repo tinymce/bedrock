@@ -79,7 +79,7 @@ export const asyncJs = (method: HTTPMethod, url: string, fn: ((data: any) => voi
   };
 };
 
-export const effect = <D>(method: HTTPMethod, prefix: string, action: (data: D) => Promise<void>): Route => {
+export const effect = <D>(method: HTTPMethod, prefix: string, action: (data: D) => Promise<unknown>): Route => {
   const go: RouteGoFunc = (request, response/* , done */) => {
     let body = '';
     request.on('data', (data) => {
