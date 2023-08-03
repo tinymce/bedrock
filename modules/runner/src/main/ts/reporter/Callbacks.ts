@@ -59,6 +59,7 @@ export const Callbacks = (): Callbacks => {
   };
 
   const sendKeepAlive = (session: string): Promise<void> => {
+    console.log('Sending keep-alive', (new Date()).toISOString());
     return sendJson('/tests/alive', {
       session,
     });
