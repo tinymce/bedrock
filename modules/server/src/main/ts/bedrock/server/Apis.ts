@@ -73,6 +73,16 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
     };
   };
 
+  const sendKeepAlive = (driver: Browser) => Promise.resolve(void driver.execute(function() {
+    console.log('Received keep-alive', (new Date()).toISOString());
+  }));
+
+  const keepAliveAction = () => Attempt.cata(
+    maybeDriver,
+    () => Promise.resolve(),
+    (driver) => waitForDriverReady(maxInvalidAttempts, () => sendKeepAlive(driver))
+  );
+
   const resetMousePositionAction = (force = false): Promise<void> => {
     if (resetMousePosition) {
       return Attempt.cata(maybeDriver,
@@ -120,14 +130,14 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
     driverRouter('/keys', 'Keys', KeyEffects.executor, false),
     driverRouter('/mouse', 'Mouse', MouseEffects.executor, true),
     Routes.effect('POST', '/tests/alive', (data: { session: string }) => {
-      console.log('Server received keep-alive', (new Date()).toISOString())
+      console.log('Server received keep-alive', (new Date()).toISOString());
       c.recordAlive(data.session);
-      const keepAlive: Executor<unknown, void> = (driver) => (_) => Promise.resolve(void driver.execute(function() {
-        console.log('Received keep-alive', (new Date()).toISOString());
-      }));
-      return Attempt.cata(maybeDriver, () => Promise.resolve(), (driver) => effect(keepAlive, driver, false)(0));
+      return keepAliveAction();
     }),
-    Routes.effect('POST', '/tests/init', () => resetMousePositionAction(true)),
+    Routes.effect('POST', '/tests/init', () => {
+      console.log('Server received init', (new Date()).toISOString());
+      return Promise.all([resetMousePositionAction(true), keepAliveAction()]).then(() => undefined);
+    }),
     Routes.effect('POST', '/tests/start', (data: StartData) => {
       c.recordTestStart(data.session, data.name, data.file, data.totalTests);
       return resetMousePositionAction();
