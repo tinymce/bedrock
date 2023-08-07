@@ -17,7 +17,7 @@ interface Server {
 export interface ServeSettings {
   readonly basedir: string;
   readonly customRoutes: string | undefined;
-  readonly driver: Attempt<string, Browser<'async'>>;
+  readonly driver: Attempt<string, Browser>;
   readonly loglevel: 'simple' | 'advanced';
   readonly master: DriverMaster | null;
   readonly overallTimeout: number;
@@ -27,6 +27,7 @@ export interface ServeSettings {
   readonly skipResetMousePosition: boolean;
   readonly stickyFirstSession: boolean;
   readonly testfiles: string[];
+  readonly port?: number;
 }
 
 export interface ServeService {
@@ -80,7 +81,7 @@ export const startCustom = async (settings: ServeSettings, createServer: (port: 
   const fallback = runner.fallback;
 
   try {
-    const port = await portfinder.getPortPromise({
+    const port = settings.port ?? await portfinder.getPortPromise({
       port: 8000,
       stopPort: 20000
     });

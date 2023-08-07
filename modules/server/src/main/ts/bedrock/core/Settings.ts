@@ -35,4 +35,5 @@ export interface BedrockAutoSettings extends BedrockSettings {
   readonly useSandboxForHeadless: boolean;
   readonly extraBrowserCapabilities: string;
   readonly wipeBrowserCache: boolean;
+  readonly remote: string;
 }

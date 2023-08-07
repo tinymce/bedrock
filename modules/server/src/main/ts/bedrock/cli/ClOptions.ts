@@ -43,7 +43,8 @@ export const browser: ClOption = {
     'ie',
     'firefox',
     'firefox-headless',
-    'MicrosoftEdge',
+    'MicrosoftEdge', // ? I doubt this should be here.
+    'edge',
     'chrome',
     'chrome-headless',
     'safari',
@@ -317,6 +318,14 @@ export const verbose: ClOption = {
   description: 'Enable verbose logging mode',
   validate: Extraction.any,
   uncommon: false
+};
+
+export const remote: ClOption = {
+  name: 'remote',
+  type: String,
+  defaultValue: '',
+  description: 'Run tests on an online remote webdriver. AWS Device Farm (chrome/firefox) or LambdaTest (safari)',
+  validate: Extraction.inSet(['', 'aws', 'lambdatest' ])
 };
 
 export const useSelenium: ClOption = {

@@ -122,14 +122,14 @@ const scan = (keys: KeyItem[]): Action[] => {
   }, []);
 };
 
-const scrollToAndFocus = async (driver: Browser<'async'>, target: Element<'async'>): Promise<void> => {
+const scrollToAndFocus = async (driver: Browser, target: Element): Promise<void> => {
   await driver.execute((element) => {
     element.scrollIntoView();
     element.focus();
   }, target as unknown as HTMLElement);
 };
 
-const performAction = async (driver: Browser<'async'>, target: Element<'async'>, actions: Action[], isW3C: boolean): Promise<void> => {
+const performAction = async (driver: Browser, target: Element, actions: Action[], isW3C: boolean): Promise<void> => {
   if (isW3C) {
     // TINY-8944: Since Safari has issues with using elementSendKeys we use a different method for combo keys.
     // So to simulate the same behaviour, ensure the target is scrolled in view and focused as per https://w3c.github.io/webdriver/#element-send-keys
@@ -155,14 +155,14 @@ const performAction = async (driver: Browser<'async'>, target: Element<'async'>,
   }
 };
 
-const execute = (driver: Browser<'async'>, data: KeyData): Promise<void> => {
+const execute = (driver: Browser, data: KeyData): Promise<void> => {
   const actions = scan(data.keys);
   return EffectUtils.performActionOnTarget(driver, data, (target) => {
     return performAction(driver, target, actions, driver.isW3C);
   });
 };
 
-export const executor = (driver: Browser<'async'>) => {
+export const executor = (driver: Browser) => {
   return (data: KeyData): Promise<void> => {
     return execute(driver, data);
   };
