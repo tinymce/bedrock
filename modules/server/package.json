@@ -14,7 +14,7 @@
     "buildAndTest": "yarn prepublishOnly && yarn test"
   },
   "engines": {
-    "node": ">=18.12.1"
+    "node": ">=16.0.0"
   },
   "dependencies": {
     "@aws-sdk/client-device-farm": "^3.354.0",
