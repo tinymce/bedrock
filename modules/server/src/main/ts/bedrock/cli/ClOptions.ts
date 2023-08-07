@@ -319,6 +319,15 @@ export const verbose: ClOption = {
   uncommon: false
 };
 
+export const remote: ClOption = {
+  name: 'remote',
+  type: Boolean,
+  defaultValue: false,
+  description: 'Run tests on an online remote webdriver. AWS Device Farm (chrome/firefox) or LambdaTest (safari)',
+  validate: Extraction.any,
+  uncommon: true
+};
+
 export const useSelenium: ClOption = {
   name: 'useSelenium',
   type: Boolean,

@@ -41,13 +41,13 @@ const doAction = async (target: EffectUtils.ElementWithActions, type: MouseData[
   }
 };
 
-const execute = (driver: Browser<'async'>, data: MouseData): Promise<void> => {
+const execute = (driver: Browser, data: MouseData): Promise<void> => {
   return EffectUtils.performActionOnTarget(driver, data, (target) => {
     return doAction(target, data.type);
   });
 };
 
-export const executor = (driver: Browser<'async'>) => {
+export const executor = (driver: Browser) => {
   return (data: MouseData): Promise<void> => {
     return execute(driver, data);
   };
