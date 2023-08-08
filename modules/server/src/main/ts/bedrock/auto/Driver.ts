@@ -149,7 +149,8 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
     };
   }
 
-  if (settings.remoteWebdriver) {
+  if (settings.remoteWebdriver && settings.browser == 'firefox') {
+    caps['moz:firefoxOptions'].prefs = caps['moz:firefoxOptions'].prefs ?? {};
     caps['moz:firefoxOptions'].prefs['security.remote_settings.intermediates.enabled'] = false;
   }
 
