@@ -74,8 +74,7 @@ const createSSH = async (port: number | string): Promise<Tunnel> => {
 
 // LambdaTest supplied tunnel
 const createLambda = async (port: number | string): Promise<Tunnel> => {
-  // Overriden type definitions are outdated in the library. Not ideal but cleaner than patch-package
-  /* eslint-disable @typescript-eslint/ban-ts-comment */
+  // This package has promise-based variants of all the functions but no type definitions for them
   const tunnel = new LambdaTunnel();
 
   const tunnelArguments = {
@@ -86,25 +85,25 @@ const createLambda = async (port: number | string): Promise<Tunnel> => {
   
   const shutdown = async (): Promise<void> => {
     console.log('Shutting down tunnel...');
-    // @ts-ignore
-    return tunnel.stop().then((status) => {
+    return tunnel.stop((status, err) => {
+      if (err) {
+        console.error('Tunnel error when stopping:', err);
+      }
       console.log('Tunnel exited cleanly?', status);
     });
   };
 
-  return tunnel
-  // @ts-ignore
-  .start(tunnelArguments)
-  // @ts-ignore
-  .then((status) => {
-    console.log('Tunnel status:', status);
-      return {
-        url: new URL('http://localhost:' + port),
-        shutdown
-      };
+  const result: Tunnel = {
+    url: new URL('http://localhost:' + port),
+    shutdown
+  };
+
+  return new Promise((resolve, reject) => {
+    tunnel.start(tunnelArguments, (err) => {
+      err ? reject(err) : resolve(result);
+    });
   });
 };
-/* eslint-enable @typescript-eslint/ban-ts-comment */
 
 export const create = async (remoteWebdriver: string, port: number | string): Promise<Tunnel> => {
   if (remoteWebdriver === 'LambdaTest') {

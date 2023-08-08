@@ -149,6 +149,10 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
     };
   }
 
+  if (settings.remoteWebdriver) {
+    caps['moz:firefoxOptions'].prefs['security.remote_settings.intermediates.enabled'] = false;
+  }
+
   return options;
 };
 
@@ -367,7 +371,11 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
         shutdown: driverShutdown
       };
     } catch (e) {
-      driverSpec.driverApi.stop();
+      try {
+        driverSpec.driverApi.stop();
+      } catch {
+       // Ignore 
+      }
       return Promise.reject(e);
     }
   }
