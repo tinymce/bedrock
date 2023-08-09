@@ -43,7 +43,8 @@ export const browser: ClOption = {
     'ie',
     'firefox',
     'firefox-headless',
-    'MicrosoftEdge',
+    'MicrosoftEdge', // ? I doubt this should be here.
+    'edge',
     'chrome',
     'chrome-headless',
     'safari',

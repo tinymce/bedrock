@@ -17,6 +17,7 @@ import { format } from 'node:util';
 
 const remoteWebdriverMap: Record<string, string> = {
   'chrome': 'AWS',
+  'edge': 'AWS',
   'firefox': 'LambdaTest',
   'safari': 'LambdaTest'
 };
