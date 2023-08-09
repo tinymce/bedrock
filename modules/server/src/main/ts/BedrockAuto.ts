@@ -37,12 +37,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
   const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
   routes.then(async (runner) => {
-    console.log('Creating webdriver...');
-    if (remoteWebdriver == 'AWS') {
-        console.log('INFO: Webdriver creation waits for device farm session to activate. Takes 30-45s.');
-    }
-
-    const shutdownServices: (() => Promise<any>)[] = [];
+     const shutdownServices: (() => Promise<any>)[] = [];
 
     // LambdaTest Tunnel must know dev server port, but tunnel must be created before dev server.
     let servicePort: number | undefined;
@@ -55,6 +50,10 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       shutdownServices.push(tunnel.shutdown);
     }
 
+    console.log('Creating webdriver...');
+    if (remoteWebdriver == 'AWS') {
+        console.log('INFO: Webdriver creation waits for device farm session to activate. Takes 30-45s.');
+    }
     const driver = await Driver.create({
       browser: browserName,
       basedir: settings.basedir,

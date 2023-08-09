@@ -275,7 +275,7 @@ const createFarm = async (settings: DriverSettings, defaultSettings: WebdriverIO
   try {
     console.log('setting for driver: ', settings);
 
-    const validBrowsers = ['firefox', 'chrome', 'MicrosoftEdge'];
+    const validBrowsers = ['firefox', 'chrome', 'edge'];
     if (!validBrowsers.includes(settings.browser)) {
       return Promise.reject('Browser not a valid Device Farm browser');
     }
