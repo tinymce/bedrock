@@ -271,12 +271,10 @@ const getFarmUrl = async (): Promise<URL> => {
   return new URL(response.url as string);
 };
 
-const createFarm = async (settings: DriverSettings, defaultSettings: WebdriverIO.RemoteOptions): Promise<Driver> => {
+const createFarm = async (browserName: string, defaultSettings: WebdriverIO.RemoteOptions): Promise<Driver> => {
   try {
-    console.log('setting for driver: ', settings);
-
     const validBrowsers = ['firefox', 'chrome', 'edge'];
-    if (!validBrowsers.includes(settings.browser)) {
+    if (!validBrowsers.includes(browserName)) {
       return Promise.reject('Browser not a valid Device Farm browser');
     }
     const url = await getFarmUrl();
@@ -289,7 +287,7 @@ const createFarm = async (settings: DriverSettings, defaultSettings: WebdriverIO
       port: 443,
       connectionRetryTimeout: 180000,
       capabilities: {
-        browserName: settings.browser,
+        browserName,
         'aws:maxDurationSecs': 2400,
       },
     };
@@ -329,7 +327,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
 
   if (settings.remoteWebdriver === 'AWS') {
     // Device Farm
-    const api = await createFarm(settings, webdriverOptions);
+    const api = await createFarm(browserName, webdriverOptions);
     await driverSetup(api.webdriver, settings, browserName, debuggingPort);
     return api;
   } else if (settings.remoteWebdriver === 'LambdaTest') {
