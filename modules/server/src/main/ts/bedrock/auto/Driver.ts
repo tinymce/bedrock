@@ -273,7 +273,7 @@ const getFarmUrl = async (): Promise<URL> => {
 
 const createFarm = async (browserName: string, defaultSettings: WebdriverIO.RemoteOptions): Promise<Driver> => {
   try {
-    const validBrowsers = ['firefox', 'chrome', 'edge'];
+    const validBrowsers = ['firefox', 'chrome', 'MicrosoftEdge'];
     if (!validBrowsers.includes(browserName)) {
       return Promise.reject('Browser not a valid Device Farm browser');
     }
