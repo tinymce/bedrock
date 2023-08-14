@@ -6,6 +6,7 @@ import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
 import * as DriverLoader from './DriverLoader';
 import { DeviceFarmClient, CreateTestGridUrlCommand } from '@aws-sdk/client-device-farm';
+import merge = require('deepmerge');
 
 export interface DriverSettings {
   basedir: string;
@@ -111,6 +112,7 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
     addArguments(caps, 'moz:firefoxOptions', extraCaps);
   } else if (browserName === 'MicrosoftEdge') {
     addArguments(caps, 'ms:edgeOptions', ['--guest']);
+    caps['ms:edgeChromium'] = true;
   } else if (browserName === 'internet explorer' && settings.wipeBrowserCache) {
     // Setup wiping the browser cache if required, as IE 11 doesn't use a clean session by default
     caps['se:ieOptions'] = {
@@ -136,22 +138,25 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
     }
   }
 
-  if (settings.remoteWebdriver === 'LambdaTest') {
-    options.user = process.env.LT_USERNAME;
-    options.key = process.env.LT_ACCESS_KEY;
-    caps['LT:Options'] = {
-      username: process.env.LT_USERNAME,
-      accesskey: process.env.LT_ACCESS_KEY,
-      tunnel: true,
-      console: true,
-      w3c: true,
-      plugin: 'node_js-webdriverio',
-    };
-  }
+  // Remote webdriver settings
+  if (settings.remoteWebdriver) {
+    if (settings.remoteWebdriver === 'LambdaTest') {
+      options.user = process.env.LT_USERNAME;
+      options.key = process.env.LT_ACCESS_KEY;
+      caps['LT:Options'] = {
+        username: process.env.LT_USERNAME,
+        accesskey: process.env.LT_ACCESS_KEY,
+        tunnel: true,
+        console: true,
+        w3c: true,
+        plugin: 'node_js-webdriverio',
+      };
+    }
 
-  if (settings.remoteWebdriver && settings.browser == 'firefox') {
-    caps['moz:firefoxOptions'].prefs = caps['moz:firefoxOptions'].prefs ?? {};
-    caps['moz:firefoxOptions'].prefs['security.remote_settings.intermediates.enabled'] = false;
+    if (browserName === 'firefox') {
+      caps['moz:firefoxOptions'].prefs = caps['moz:firefoxOptions'].prefs ?? {};
+      caps['moz:firefoxOptions'].prefs['security.remote_settings.intermediates.enabled'] = false;
+    }
   }
 
   return options;
@@ -279,20 +284,17 @@ const createFarm = async (browserName: string, defaultSettings: WebdriverIO.Remo
     }
     const url = await getFarmUrl();
 
-    const options = {
-      ...defaultSettings,
+    const options = merge(defaultSettings, {
       hostname: url.host,
       path: url.pathname,
       protocol: 'https',
       port: 443,
-      connectionRetryTimeout: 180000,
       capabilities: {
-        browserName,
         'aws:maxDurationSecs': 2400,
       },
-    };
+    });
 
-    console.log('Starting Webdriver with options:', options);
+    console.log('Starting Device Farm session with options:', options);
     const driver = await WebdriverIO.remote(options);
     console.log('Webdriver started.');
 
