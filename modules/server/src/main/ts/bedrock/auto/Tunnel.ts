@@ -106,7 +106,7 @@ const createLambda = async (port: number | string): Promise<Tunnel> => {
 };
 
 export const create = async (remoteWebdriver: string, port: number | string): Promise<Tunnel> => {
-  if (remoteWebdriver === 'LambdaTest') {
+  if (remoteWebdriver === 'lambdatest') {
     return createLambda(port);
   } else {
     return createSSH(port);

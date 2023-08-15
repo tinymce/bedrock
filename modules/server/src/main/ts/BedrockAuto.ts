@@ -15,13 +15,6 @@ import * as SettingsResolver from './bedrock/core/SettingsResolver';
 import * as portfinder from 'portfinder';
 import { format } from 'node:util';
 
-const remoteWebdriverMap: Record<string, string> = {
-  'chrome': 'AWS',
-  'edge': 'AWS',
-  'firefox': 'AWS',
-  'safari': 'LambdaTest'
-};
-
 export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
   console.log('bedrock-auto ' + Version.get() + ' starting...');
 
@@ -32,7 +25,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
   const isPhantom = browserName === 'phantomjs';
   const isHeadless = settings.browser.endsWith('-headless') || isPhantom;
   const basePage = 'src/resources/html/' + (isPhantom ? 'bedrock-phantom.html' : 'bedrock.html');
-  const remoteWebdriver = settings.remote ? remoteWebdriverMap[settings.browser] : undefined;
+  const remoteWebdriver = settings.remote;
 
   const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
@@ -41,7 +34,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
 
     // LambdaTest Tunnel must know dev server port, but tunnel must be created before dev server.
     let servicePort: number | undefined;
-    if (remoteWebdriver === 'LambdaTest') {
+    if (remoteWebdriver === 'lambdatest') {
       servicePort = await portfinder.getPortPromise({
         port: 8000,
         stopPort: 20000
@@ -51,7 +44,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
     }
 
     console.log('Creating webdriver...');
-    if (remoteWebdriver == 'AWS') {
+    if (remoteWebdriver == 'aws') {
         console.log('INFO: Webdriver creation waits for device farm session to activate. Takes 30-45s.');
     }
     const driver = await Driver.create({
@@ -79,7 +72,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
     shutdownServices.push(service.shutdown);
 
     let location;
-    if (remoteWebdriver === 'AWS') {
+    if (remoteWebdriver === 'aws') {
       const tunnel = await Tunnel.create(remoteWebdriver, service.port);
       location = tunnel.url.href;
       shutdownServices.push(driver.shutdown, tunnel.shutdown);

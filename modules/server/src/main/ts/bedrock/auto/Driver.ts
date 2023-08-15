@@ -140,7 +140,7 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
 
   // Remote webdriver settings
   if (settings.remoteWebdriver) {
-    if (settings.remoteWebdriver === 'LambdaTest') {
+    if (settings.remoteWebdriver === 'lambdatest') {
       options.user = process.env.LT_USERNAME;
       options.key = process.env.LT_ACCESS_KEY;
       caps['LT:Options'] = {
@@ -151,11 +151,6 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
         w3c: true,
         plugin: 'node_js-webdriverio',
       };
-    }
-
-    if (browserName === 'firefox') {
-      caps['moz:firefoxOptions'].prefs = caps['moz:firefoxOptions'].prefs ?? {};
-      caps['moz:firefoxOptions'].prefs['security.remote_settings.intermediates.enabled'] = false;
     }
   }
 
@@ -327,12 +322,12 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
   const webdriverOptions = getOptions(port, browserName, settings, debuggingPort);
   console.log('Webdriver options:', webdriverOptions);
 
-  if (settings.remoteWebdriver === 'AWS') {
+  if (settings.remoteWebdriver === 'aws') {
     // Device Farm
     const api = await createFarm(browserName, webdriverOptions);
     await driverSetup(api.webdriver, settings, browserName, debuggingPort);
     return api;
-  } else if (settings.remoteWebdriver === 'LambdaTest') {
+  } else if (settings.remoteWebdriver === 'lambdatest') {
     // LambdaTest
     const driver = await WebdriverIO.remote(webdriverOptions);
     await driverSetup(driver, settings, browserName, debuggingPort);  

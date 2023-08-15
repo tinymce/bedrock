@@ -61,7 +61,7 @@ describe('Clis.forAuto', () => {
       extraBrowserCapabilities: '',
       skipResetMousePosition: false,
       wipeBrowserCache: false,
-      remote: false,
+      remote: '',
       webdriverPort: 4444
     }, cleanResult(actual));
   });
@@ -101,7 +101,7 @@ describe('Clis.forAuto', () => {
       extraBrowserCapabilities: '',
       skipResetMousePosition: false,
       wipeBrowserCache: false,
-      remote: false,
+      remote: '',
       webdriverPort: 4444
     }, cleanResult(actual));
   });
@@ -142,7 +142,7 @@ describe('Clis.forAuto', () => {
       extraBrowserCapabilities: '',
       skipResetMousePosition: false,
       wipeBrowserCache: false,
-      remote: false,
+      remote: '',
       webdriverPort: 4444
     }, cleanResult(actual));
   });
@@ -182,7 +182,7 @@ describe('Clis.forAuto', () => {
       extraBrowserCapabilities: ' --some-browser-flag',
       skipResetMousePosition: false,
       wipeBrowserCache: false,
-      remote: false,
+      remote: '',
       webdriverPort: 4444
     }, cleanResult(actual));
   });
