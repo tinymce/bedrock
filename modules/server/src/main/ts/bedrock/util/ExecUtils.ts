@@ -35,10 +35,10 @@ const childAPIWrapper = (startFunc: ChildAPI['start'], isNpm: boolean, ...defaul
       } else {
         // DefaultArgs of the form [execpath, ...execOptions]
         args = [defaultArgs[0]]; // exec path
-        const defaultOptions = defaultArgs?.[1];
-        const overrideOptions = argsOverride?.[0];
+        const defaultOptions = defaultArgs[1];
+        const overrideOptions = argsOverride[0];
         if (defaultOptions && overrideOptions) {
-          args.push(deepmerge(defaultArgs?.[1], argsOverride[0]));
+          args.push(deepmerge(defaultOptions, overrideOptions));
         } else if (defaultOptions || overrideOptions) {
           args.push(defaultOptions || overrideOptions);
         }
