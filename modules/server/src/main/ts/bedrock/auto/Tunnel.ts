@@ -1,6 +1,5 @@
 import { ChildProcess } from 'child_process';
 import * as ExecUtils from '../util/ExecUtils';
-import * as internal from 'stream';
 import * as split2 from 'split2';
 import * as crypto from 'node:crypto'; // Not needed with Node 19+
 import { Tunnel as LambdaTunnel } from '@lambdatest/node-tunnel';
@@ -19,7 +18,11 @@ const loadSSH = (subdomain: string, port: number | string): ExecUtils.ChildAPI =
 const waitForReady = (proc: ChildProcess, timeout = 20000): Promise<void> => {
   return new Promise((resolve, reject) => {
     setTimeout(() => reject('Tunnel creation took too long.'), timeout);
-    const output = (proc.stdout ?? reject()) as internal.Readable;
+    const output = proc.stdout;
+    if (output === null) {
+      reject('Tunnel did not yield a URL');
+      return;
+    }
 
     const wordStream = output.pipe(split2());
     wordStream.on('data', (data) => {
@@ -42,7 +45,7 @@ const waitForReady = (proc: ChildProcess, timeout = 20000): Promise<void> => {
 const createSSH = async (port: number | string): Promise<Tunnel> => {  
   const subdomain = crypto.randomUUID();
   const api = loadSSH(subdomain, port);
-  const tunnelProc = api.start();
+  const tunnelProc = await api.start();
   if (tunnelProc == null) {
     throw new Error('Tunnel api returned null');
   }

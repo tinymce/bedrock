@@ -3,18 +3,47 @@ import * as Arr from './Arr';
 import * as crossSpawn from 'cross-spawn';
 import { ChildProcess } from 'child_process';
 import * as http from 'http';
+import * as deepmerge from 'deepmerge';
 
 export interface ChildAPI {
-    start: (args?: string[]) => (ChildProcess | null);
+    start: (...args: any[]) => Promise<ChildProcess | null> | ChildProcess | null;
     stop: () => void;
     defaultInstance: ChildProcess | null;
+    readonly isNpm?: boolean;
 }
 
 export const execLoader = (exec: string, args: string[] = []): ChildAPI => {
-    const api = {} as ChildAPI;
-    api.start = (argsOverride = []) => {
-      const finalArgs = args.concat(argsOverride);
-      api.defaultInstance = crossSpawn(exec, finalArgs);
+  const api = childAPIWrapper(crossSpawn, false, exec, args);
+    return api;
+};
+
+// Npm drivers (e.g. geckodriver) are called differently to binaries. This is to conform them
+// into a single compatible type. I don't think npm drivers were used until WDIOv8, which has them
+// installed by default as dependencies.
+// Exec example:
+// const api = ChildAPIWrapper(crossSpawn, 'geckodriver', ['port=4444']);
+// Npm example:
+// const api = ChildAPIWrapper(require('geckodriver'), {port: 4444})
+const childAPIWrapper = (startFunc: ChildAPI['start'], isNpm: boolean, ...defaultArgs: any[]): ChildAPI => {
+  const api = {isNpm} as ChildAPI;
+  api.defaultInstance = null;
+
+    api.start = async (...argsOverride) => {
+      let args;
+      if (isNpm) {
+        args = deepmerge(defaultArgs, argsOverride);
+      } else {
+        // DefaultArgs of the form [execpath, ...execOptions]
+        args = [defaultArgs[0]]; // exec path
+        const defaultOptions = defaultArgs?.[1];
+        const overrideOptions = argsOverride?.[0];
+        if (defaultOptions && overrideOptions) {
+          args.push(deepmerge(defaultArgs?.[1], argsOverride[0]));
+        } else if (defaultOptions || overrideOptions) {
+          args.push(defaultOptions || overrideOptions);
+        }
+      }
+      api.defaultInstance = await startFunc(...args);
       return api.defaultInstance;
     };
   
@@ -24,18 +53,25 @@ export const execLoader = (exec: string, args: string[] = []): ChildAPI => {
         api.defaultInstance = null;
       }
     };
-  
     return api;
 };
-  
-export const findNpmPackage = (driverDeps: string[]): ChildAPI => Arr.findMap(driverDeps, (driverDep) => {
+
+const findNpmPackage = (driverDeps: string[]): any => Arr.findMap(driverDeps, (driverDep) => {
     try {
       return require(driverDep);
     } catch (e) {
       return null;
     }
 });
-  
+
+export const npmLoader = (driverDeps: string[]): ChildAPI | null => {
+  const npmDriver = findNpmPackage(driverDeps);
+  if (npmDriver === null) {
+    return null;
+  }
+  return childAPIWrapper(npmDriver.start, true);
+};
+
 export const findExecutable = (execNames: string[]): string | null => Arr.findMap(execNames, (execName) => {
     return which.sync(execName, { nothrow: true });
 });
@@ -73,8 +109,8 @@ export const waitForAlive = (proc: ChildProcess | null, port: number, timeout: n
               const data = JSON.parse(rawData);
               if (data.value.ready || data.status === 0) {
                 if (proc) {
-                  proc.removeListener('exit', onStartError);
-                  proc.removeListener('error', onStartError);
+                  proc.removeListener?.('exit', onStartError);
+                  proc.removeListener?.('error', onStartError);
                 }
                 resolve();
               } else {
@@ -92,8 +128,8 @@ export const waitForAlive = (proc: ChildProcess | null, port: number, timeout: n
 
     // Bind process listeners
     if (proc) {
-      proc.on('exit', onStartError);
-      proc.on('error', onStartError);
+      proc.on?.('exit', onStartError);
+      proc.on?.('error', onStartError);
     }
     // Start listening for the server to be ready
     checkServerStatus();

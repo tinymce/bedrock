@@ -6,7 +6,7 @@ import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
 import * as DriverLoader from './DriverLoader';
 import { DeviceFarmClient, CreateTestGridUrlCommand } from '@aws-sdk/client-device-farm';
-import merge = require('deepmerge');
+import * as deepmerge from 'deepmerge';
 
 export interface DriverSettings {
   basedir: string;
@@ -237,7 +237,7 @@ const getDriverSpec = (settings: DriverSettings, browserName: string): DriverLoa
   };
 };
 
-const driverSetup = async (driver: WebdriverIO.Browser, settings: DriverSettings, _browserName: string, debuggingPort: number): Promise<void> => {
+const driverSetup = async (driver: WebdriverIO.Browser, settings: DriverSettings, debuggingPort: number): Promise<void> => {
   // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
 
   // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
@@ -279,7 +279,7 @@ const createFarm = async (browserName: string, defaultSettings: WebdriverIO.Remo
     }
     const url = await getFarmUrl();
 
-    const options = merge(defaultSettings, {
+    const options = deepmerge(defaultSettings, {
       hostname: url.host,
       path: url.pathname,
       protocol: 'https',
@@ -325,12 +325,12 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
   if (settings.remoteWebdriver === 'aws') {
     // Device Farm
     const api = await createFarm(browserName, webdriverOptions);
-    await driverSetup(api.webdriver, settings, browserName, debuggingPort);
+    await driverSetup(api.webdriver, settings, debuggingPort);
     return api;
   } else if (settings.remoteWebdriver === 'lambdatest') {
     // LambdaTest
     const driver = await WebdriverIO.remote(webdriverOptions);
-    await driverSetup(driver, settings, browserName, debuggingPort);  
+    await driverSetup(driver, settings, debuggingPort);  
     return {
       webdriver: driver,
       shutdown: () => Promise.resolve()
@@ -358,7 +358,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
       // by the user instead of the application
       const driverShutdown = setupShutdown(driver, driverSpec.driverApi, shutdownDelay);
 
-      await driverSetup(driver, settings, browserName, debuggingPort);
+      await driverSetup(driver, settings, debuggingPort);
       await focusBrowser(browserName, settings);
 
       // Return the public driver api

@@ -27,7 +27,7 @@ const loadPhantomJs = (settings: DriverSettings) => {
   // Patch the start function to remap the arguments
   const origStart = api.start;
   api.start = (args = []) => {
-    const patchedArgs = args.map((arg) => {
+    const patchedArgs = args.map((arg: any) => {
       return arg.indexOf('--port') !== -1 ? arg.replace('--port', '--webdriver') : arg;
     });
     return origStart(patchedArgs);
@@ -48,7 +48,7 @@ export const loadDriver = (browserName: string, settings: DriverSettings): ExecU
   if (driverDeps.length === 0) {
     console.log('Not loading a local driver for browser ' + browserName);
   } else {
-    const driver = ExecUtils.findNpmPackage(driverDeps);
+    const driver = ExecUtils.npmLoader(driverDeps);
     if (driver !== null) {
       return driver;
     } else {
@@ -70,9 +70,18 @@ export const loadDriver = (browserName: string, settings: DriverSettings): ExecU
   }
 };
 
-export const startAndWaitForAlive = (driverSpec: DriverSpec, port: number, timeout = 30000): Promise<void> => {
+export const startAndWaitForAlive = async (driverSpec: DriverSpec, port: number, timeout = 30000): Promise<void> => {
+  const api = driverSpec.driverApi;
+  
   // Start the driver
-  const driverProc = driverSpec.driverApi.start(['--port=' + port]);
+  let args;
+  if (api.isNpm) {
+    args = {port};
+  } else {
+    args = ['--port=' + port];
+  }
+  const driverProc = await driverSpec.driverApi.start(args);
+
   // Wait for it to be alive
   return ExecUtils.waitForAlive(driverProc, port, timeout, driverSpec.path);
 };
