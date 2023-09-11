@@ -1,3 +1,4 @@
+
 import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
@@ -140,6 +141,11 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
 
   // Remote webdriver settings
   if (settings.remoteWebdriver) {
+    if (browserName == 'firefox') {
+      caps['moz:firefoxOptions'].prefs = {
+        'marionette.log.level': 'debug'
+      };
+    }
     if (settings.remoteWebdriver === 'lambdatest') {
       options.user = process.env.LT_USERNAME;
       options.key = process.env.LT_ACCESS_KEY;
