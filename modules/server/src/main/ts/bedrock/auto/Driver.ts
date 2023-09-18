@@ -86,7 +86,7 @@ const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
 
 const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): WebdriverIO.RemoteOptions => {
   const options: WebdriverIO.RemoteOptions = {
-    logLevel: 'silent' as const,
+    logLevel: 'warn' as const,
     capabilities: {
       browserName
     }
@@ -142,9 +142,7 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
   // Remote webdriver settings
   if (settings.remoteWebdriver) {
     if (browserName == 'firefox') {
-      caps['moz:firefoxOptions'].prefs = {
-        'marionette.log.level': 'debug'
-      };
+      caps['moz:firefoxOptions'].log = { level: 'warn' };
     }
     if (settings.remoteWebdriver === 'lambdatest') {
       options.user = process.env.LT_USERNAME;
