@@ -76,8 +76,9 @@ const createSSH = async (port: number | string): Promise<Tunnel> => {
 };
 
 // LambdaTest supplied tunnel
+// @lambdatest/nodetunnel has some weird quasi-overriden promise-based versions of functions
+// and no proper typing for it. Excuse the hard type casting
 const createLambda = async (port: number | string): Promise<Tunnel> => {
-  // This package has promise-based variants of all the functions but no type definitions for them
   const tunnel = new LambdaTunnel();
 
   const tunnelArguments = {
@@ -88,12 +89,7 @@ const createLambda = async (port: number | string): Promise<Tunnel> => {
   
   const shutdown = async (): Promise<void> => {
     console.log('Shutting down tunnel...');
-    return tunnel.stop((status, err) => {
-      if (err) {
-        console.error('Tunnel error when stopping:', err);
-      }
-      console.log('Tunnel exited cleanly?', status);
-    });
+    return tunnel.stop(null as unknown as ((_: boolean) => void));
   };
 
   const result: Tunnel = {
@@ -101,11 +97,14 @@ const createLambda = async (port: number | string): Promise<Tunnel> => {
     shutdown
   };
 
-  return new Promise((resolve, reject) => {
-    tunnel.start(tunnelArguments, (err) => {
-      err ? reject(err) : resolve(result);
+  const startPromise = tunnel.start(tunnelArguments, null as unknown as (() => void)) as unknown as Promise<boolean>;
+  return startPromise.then((success) => {
+      if (success) {
+        return result;
+      } else {
+        return Promise.reject('Tunnel did not start correctly.');
+      }
     });
-  });
 };
 
 export const create = async (remoteWebdriver: string, port: number | string): Promise<Tunnel> => {

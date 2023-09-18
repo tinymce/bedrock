@@ -69,7 +69,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       runner,
       stickyFirstSession: true
     });
-    shutdownServices.push(service.shutdown);
+    shutdownServices.push(service.shutdown, driver.shutdown);
 
     let location;
     if (remoteWebdriver === 'aws') {
@@ -78,7 +78,6 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       shutdownServices.push(driver.shutdown, tunnel.shutdown);
     } else {
       location = 'http://localhost:' + service.port;
-      shutdownServices.push(driver.shutdown);
     }
 
     try {
@@ -100,12 +99,13 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
         return Reporter.writePollExit(settings, data);
       });
 
-      // Combine all shutdowns into single function call.
-      const shutdown = () => Promise.all(shutdownServices.map((shutdown_fn) => shutdown_fn()));
+      // Combine all shutdowns into single function call.)
+      const shutdown = () => Promise.allSettled(shutdownServices.map((shutdown_fn) => shutdown_fn()));
+
       return Lifecycle.done(result, webdriver, shutdown, settings.gruntDone, settings.delayExit);
     } catch (e) {
       // Combine all shutdowns into single function call.
-      const shutdown = () => Promise.all(shutdownServices.map((shutdown_fn) => shutdown_fn()));
+      const shutdown = () => Promise.allSettled(shutdownServices.map((shutdown_fn) => shutdown_fn()));
       return Lifecycle.error(e, webdriver, shutdown, settings.gruntDone, settings.delayExit);
     }
   }).catch((err) => {
