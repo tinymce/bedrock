@@ -76,9 +76,7 @@ export const findExecutable = (execNames: string[]): string | null => Arr.findMa
     return which.sync(execName, { nothrow: true });
 });
 
-export const waitForAlive = (proc: ChildProcess | null, port: number, timeout: number, path: string): Promise<void> => {
-  const url = 'http://127.0.0.1:' + port + path + '/status';
-  console.log('waiting for alive @: ', url);
+export const waitForAlive = (proc: ChildProcess | null, url: string, timeout: number): Promise<void> => {
   const start = Date.now();
   return new Promise<void>((resolve, reject) => {
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -118,7 +116,7 @@ export const waitForAlive = (proc: ChildProcess | null, port: number, timeout: n
               }
             } catch (e) {
               onServerError(e.message);
-            }
+            } 
           });
         } else {
           onServerError('Received non 200 status (' + res.statusCode + ')');

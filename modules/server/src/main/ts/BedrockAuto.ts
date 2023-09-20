@@ -33,13 +33,17 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
      const shutdownServices: (() => Promise<any>)[] = [];
 
     // LambdaTest Tunnel must know dev server port, but tunnel must be created before dev server.
-    let servicePort: number | undefined;
+    const servicePort = await portfinder.getPortPromise({
+      port: 8000,
+      stopPort: 20000
+    });
+    let location = 'http://localhost:' + servicePort;
     if (remoteWebdriver === 'lambdatest') {
-      servicePort = await portfinder.getPortPromise({
-        port: 8000,
-        stopPort: 20000
-      });
       const tunnel = await Tunnel.create(remoteWebdriver, servicePort);
+      shutdownServices.push(tunnel.shutdown);
+    } else if (remoteWebdriver === 'aws') {
+      const tunnel = await Tunnel.create(remoteWebdriver, servicePort);
+      location = tunnel.url.href;
       shutdownServices.push(tunnel.shutdown);
     }
 
@@ -70,15 +74,6 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       stickyFirstSession: true
     });
     shutdownServices.push(service.shutdown, driver.shutdown);
-
-    let location;
-    if (remoteWebdriver === 'aws') {
-      const tunnel = await Tunnel.create(remoteWebdriver, service.port);
-      location = tunnel.url.href;
-      shutdownServices.push(driver.shutdown, tunnel.shutdown);
-    } else {
-      location = 'http://localhost:' + service.port;
-    }
 
     try {
       if (!isHeadless) {

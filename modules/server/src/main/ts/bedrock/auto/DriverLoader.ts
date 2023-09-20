@@ -83,7 +83,8 @@ export const startAndWaitForAlive = async (driverSpec: DriverSpec, port: number,
   const driverProc = await driverSpec.driverApi.start(args);
 
   // Wait for it to be alive
-  return ExecUtils.waitForAlive(driverProc, port, timeout, driverSpec.path);
+  const status_url = 'http://localhost:' + port + driverSpec.path;
+  return ExecUtils.waitForAlive(driverProc, status_url, timeout);
 };
 
 export type DriverAPI = ExecUtils.ChildAPI;

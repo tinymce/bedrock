@@ -25,8 +25,8 @@ const waitForReady = (proc: ChildProcess, timeout = 20000): Promise<void> => {
     }
 
     const wordStream = output.pipe(split2());
-    wordStream.on('data', (data) => {
-      console.log('Tunnel says:', data.toString());
+    wordStream.on('data', (_) => {
+      // console.log('Tunnel says:', data.toString());
       // Stop listening. Even though it resolves instantly, this code block would otherwise
       // still be run on every data event.
       // wordStream.removeAllListeners('data');

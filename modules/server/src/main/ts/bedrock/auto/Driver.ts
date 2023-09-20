@@ -141,9 +141,13 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
 
   // Remote webdriver settings
   if (settings.remoteWebdriver) {
+
+    caps.browserVersion = 'latest';
+
     if (browserName == 'firefox') {
       caps['moz:firefoxOptions'].log = { level: 'warn' };
     }
+
     if (settings.remoteWebdriver === 'lambdatest') {
       options.user = process.env.LT_USERNAME;
       options.key = process.env.LT_ACCESS_KEY;
@@ -293,7 +297,7 @@ const createFarm = async (browserName: string, defaultSettings: WebdriverIO.Remo
       },
     });
 
-    console.log('Starting Device Farm session with options:', options);
+    console.log('Starting Device Farm session with options:', JSON.stringify(options, null, 2));
     const driver = await WebdriverIO.remote(options);
     console.log('Webdriver started.');
 
