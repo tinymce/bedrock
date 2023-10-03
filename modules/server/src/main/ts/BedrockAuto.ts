@@ -71,7 +71,8 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       driver: Attempt.passed(webdriver),
       master,
       runner,
-      stickyFirstSession: true
+      stickyFirstSession: true,
+      port: servicePort
     });
     shutdownServices.push(service.shutdown, driver.shutdown);
 
