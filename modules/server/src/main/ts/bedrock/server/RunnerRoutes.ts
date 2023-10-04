@@ -61,7 +61,6 @@ export const generate = async (mode: string, projectdir: string, basedir: string
     ...nodeModuleRoutes,
     ...resourceRoutes,
     ...[
-      // fallback node_modules route to from project root
       Routes.nodeResolve('GET', '/project/node_modules', projectdir),
 
       // fallback resource route to project root
