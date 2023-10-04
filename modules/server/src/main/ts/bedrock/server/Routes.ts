@@ -193,7 +193,7 @@ export const nodeResolve = (method: HTTPMethod, prefix: string, source: string):
       done();
     };
 
-    const modulePath = request.url?.substring(prefix.length + 1);
+    const modulePath = request.url?.substring(prefix.length + 1).split('?')[0];
     try {
       if (modulePath) {
         const moduleResolvedPath = require.resolve(modulePath, { paths: [ source ] });
