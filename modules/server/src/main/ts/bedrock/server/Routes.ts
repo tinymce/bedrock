@@ -1,5 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import * as server from 'serve-static';
+import * as path from 'path';
 import * as RouteUtils from '../util/RouteUtils';
 import * as Matchers from './Matchers';
 
@@ -184,3 +185,32 @@ export const route = (routes: Route[], fallback: Route, request: IncomingMessage
   const matching = match === undefined ? fallback : match;
   matching.go(request, response, done);
 };
+
+export const nodeResolve = (method: HTTPMethod, prefix: string, source: string): Route => {
+  const go: RouteGoFunc = (request, response, done) => {
+    const failure = (status: number, data: string) => {
+      doResponse(request, response, status, 'text/plain', data);
+      done();
+    };
+
+    const modulePath = request.url?.substring(prefix.length + 1);
+    try {
+      if (modulePath) {
+        const moduleResolvedPath = require.resolve(modulePath, { paths: [ source ] });
+        const router = createServer(path.dirname(moduleResolvedPath));
+        request.url = '/' + path.basename(moduleResolvedPath);
+        router(request, response, done);
+      } else {
+        failure(500, `Invalid node module path`);
+      }
+    } catch (e) {
+      failure(404, `Failed to resolve node module path: ${modulePath}`);
+    }
+  };
+
+  return {
+    matches: [Matchers.methodMatch(method), Matchers.prefixMatch(prefix)],
+    go
+  };
+};
+

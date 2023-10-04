@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## Improved
+
+- Urls like `/project/node_modules` and `/project/<package name>/node_modules` are now using node package resolve to serve files. #TINY-10281
+
 ## 13.5.0 - 2023-07-11
 
 ### Fixed
@@ -52,7 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Images (svg, png, gif, jpg, etc...) can now be imported by tests, and will be available as data URIs using the `asset/inline` webpack loader.
- 
+
 ## Improved
 - The mouse position reset logic now only runs when required, instead of for every test.
 
