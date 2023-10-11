@@ -7,6 +7,8 @@ import * as Serve from '../server/Serve';
 import { ExitCodes } from '../util/ExitCodes';
 import * as Imports from './Imports';
 import { hasTs } from './TsUtils';
+import { createServer, ViteDevServer } from 'vite';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 export interface WebpackServeSettings extends Serve.ServeSettings {
   readonly config: string;
@@ -290,9 +292,52 @@ export const compile = async (tsConfigFile: string, scratchDir: string, basedir:
   return compileTests(compileInfo, exitOnCompileError, srcFiles, polyfills);
 };
 
-const isCompiledRequest = (request: { url: string }) => request.url.startsWith('/compiled/');
+const isCompiledRequest = (request: { url?: string }) => request.url?.startsWith('/scratch/compiled/');
 
 export const devserver = async (settings: WebpackServeSettings): Promise<Serve.ServeService> => {
+  const scratchDir = path.resolve('scratch');
+  const tsConfigFile = settings.config;
+
+  const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, settings.basedir, true, settings.testfiles, settings.coverage);
+  return Serve.startCustom(settings, (port, handler) => {
+    let server: ViteDevServer | null = null;
+
+    const scratchFile = compileInfo.scratchFile;
+    console.log(`Loading ${settings.testfiles.length} test files...`);
+
+    mkdirp.sync(path.dirname(scratchFile));
+    fs.writeFileSync(scratchFile, Imports.generateImports(false, scratchFile, settings.testfiles, []));
+
+    const start = async () => {
+      server = await createServer({
+        appType: 'custom',
+        root: settings.projectdir,
+        configFile: false, 
+        plugins: [
+          tsconfigPaths()
+        ],
+        server: {
+          port
+        },
+        optimizeDeps: { force: true }
+      });
+
+      server.middlewares.use(function (request, response, next) {
+        // console.log(request)
+        return isCompiledRequest(request) ? next() : handler(request, response);
+      });
+
+      await server.listen();
+    };
+
+    return {
+      start: () => start(),
+      stop: () => server ? server.close() : Promise.resolve()
+    };
+  });
+};
+
+export const devserverWebpack = async (settings: WebpackServeSettings): Promise<Serve.ServeService> => {
   const scratchDir = path.resolve('scratch');
   const tsConfigFile = settings.config;
 

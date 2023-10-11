@@ -4,7 +4,7 @@ import { ErrorCatcher } from '../errors/ErrorCatcher';
 export const load = (scriptUrl: string): Promise<void> =>
   new Promise((resolve, reject) => {
     const script = document.createElement('script');
-    script.type = 'text/javascript';
+    script.type = 'module';
     script.src = scriptUrl;
 
     // Setup the error catcher to handle syntax errors or similar in the scripts

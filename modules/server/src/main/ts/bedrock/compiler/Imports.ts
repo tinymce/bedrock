@@ -44,6 +44,7 @@ const generateImportsTs = (useRequire: boolean, scratchFile: string, srcFiles: s
   const imports = srcFiles.map(filePathToImport(useRequire, scratchFile)).join('\n');
   // header code for tests.ts
   return `${generatePolyfills(useRequire, polyfills)}
+  ${useRequire ? 'const UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
 
 declare let require: any;
 declare let __tests: any[];
@@ -73,7 +74,6 @@ const addTest = (testFilePath: string) => {
 };
 
 const importErrorHandler = (event: any) => { 
-  ${useRequire ? 'const UnitTest = require(\'@ephox/bedrock-client\').UnitTest;' : 'import { UnitTest } from \'@ephox/bedrock-client\';'}
   UnitTest.test('Error', () => {
     if (event.error) {
       throw event.error;
