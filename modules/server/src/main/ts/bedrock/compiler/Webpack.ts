@@ -374,7 +374,7 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
         sourcemap: 'linked',
         outfile,
         loader: {
-          '.svg': 'dataurl' // Silver theme imports svg files
+          '.svg': 'text' // Silver theme imports svg files
         },
         plugins: [ bedrockPlugin ]
       });
