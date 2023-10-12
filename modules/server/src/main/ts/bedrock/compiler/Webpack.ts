@@ -292,7 +292,8 @@ export const compile = async (tsConfigFile: string, scratchDir: string, basedir:
   return compileTests(compileInfo, exitOnCompileError, srcFiles, polyfills);
 };
 
-const isCompiledRequest = (request: { url?: string }) => request.url?.startsWith('/compiled/') ?? false;
+const isCompiledRequest = (request: { url?: string }) => request.url === '/compiled/tests.js';
+const isCompiledMapRequest = (request: { url?: string }) => request.url === '/compiled/tests.js.map';
 
 const resolveImport = (source: string, modulePath: string): string | null => {
   try {
@@ -359,8 +360,9 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
     const setupEsBuild = async () => {
       const ctx = await esbuild.context({
         entryPoints: [scratchFile],
-        banner: { js: ' (() => new EventSource("/esbuild").onmessage = () => location.reload())();' }, 
+        footer: { js: ' (() => new EventSource("/esbuild").onmessage = () => location.reload())();' }, 
         bundle: true,
+        sourcemap: 'linked',
         outfile,
         loader: {
           '.svg': 'dataurl' // Silver theme imports svg files
@@ -378,6 +380,12 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
         });
 
         fs.createReadStream(outfile).pipe(res);
+      } else if (isCompiledMapRequest(req)) {
+        res.writeHead(200, {
+          'Content-Type': 'application/json'
+        });
+
+        fs.createReadStream(outfile + '.map').pipe(res);
       } else if (req.url === '/esbuild') {
         clients.push(res);
         res.writeHead(200, {
