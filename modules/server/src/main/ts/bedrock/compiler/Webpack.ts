@@ -7,6 +7,8 @@ import * as Serve from '../server/Serve';
 import { ExitCodes } from '../util/ExitCodes';
 import * as Imports from './Imports';
 import { hasTs } from './TsUtils';
+import * as esbuild from 'esbuild';
+import * as http from 'http';
 
 export interface WebpackServeSettings extends Serve.ServeSettings {
   readonly config: string;
@@ -293,6 +295,84 @@ export const compile = async (tsConfigFile: string, scratchDir: string, basedir:
 const isCompiledRequest = (request: { url: string }) => request.url.startsWith('/compiled/');
 
 export const devserver = async (settings: WebpackServeSettings): Promise<Serve.ServeService> => {
+  const scratchDir = path.resolve('scratch');
+  const tsConfigFile = settings.config;
+
+  const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, settings.basedir, true, settings.testfiles, settings.coverage);
+  return Serve.startCustom(settings, (port, handler) => {
+    const scratchFile = compileInfo.scratchFile;
+    console.log(`Loading ${settings.testfiles.length} test files...`);
+    const clients: http.ServerResponse<http.IncomingMessage>[] = [];
+
+    mkdirp.sync(path.dirname(scratchFile));
+    fs.writeFileSync(scratchFile, Imports.generateImports(false, scratchFile, settings.testfiles, []));
+
+    const bedrockPlugin: esbuild.Plugin = {
+      name: 'bedrock',
+      setup(build) {
+        let last = Date.now();
+        build.onStart(() => {
+          last = Date.now();
+        });
+        build.onEnd(() => {
+          console.log(`Esbuild build took ${Date.now() - last}ms`);
+          clients.forEach((res) => res.write('data: reload\n\n'));
+          clients.length = 0;
+        });
+        build.onResolve({ filter: /^@ephox\// }, (args) => {
+          // TODO: This needs to be smarter without this custom resolve then it wont recompile if TS files changes in libraries 
+          const name = path.basename(args.path);
+          const newPath = path.join(settings.projectdir, `modules/${name}/src/main/ts/ephox/${name}/api/Main.ts`);
+          return fs.existsSync(newPath) ? { path: newPath } : null;
+        });
+      },
+    };
+
+    const setupEsBuild = async () => {
+      const ctx = await esbuild.context({
+        entryPoints: [scratchFile],
+        banner: { js: ' (() => new EventSource("/esbuild").onmessage = () => location.reload())();' }, 
+        bundle: true,
+        outfile: path.join(scratchDir, '/compiled/tests.js'),
+        loader: {
+          '.svg': 'dataurl' // Silver theme imports svg files
+        },
+        plugins: [ bedrockPlugin ]
+      });
+
+      await ctx.watch();
+    };
+
+    const server = http.createServer((req, res) => {
+      if (req.url === '/esbuild') {
+        clients.push(res);
+        res.writeHead(200, {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          Connection: 'keep-alive',
+        });
+      } else {
+        handler(req, res);
+      }
+    });
+    return {
+      start: async () => {
+        await setupEsBuild();
+
+        return new Promise((resolve) => {
+          server.listen(port, resolve);
+        });
+      },
+      stop: () => new Promise((resolve, reject) => {
+        server.close((err?) => {
+          err ? reject(err) : resolve();
+        });
+      })
+    };
+  });
+};
+
+export const devserverWebpack = async (settings: WebpackServeSettings): Promise<Serve.ServeService> => {
   const scratchDir = path.resolve('scratch');
   const tsConfigFile = settings.config;
 

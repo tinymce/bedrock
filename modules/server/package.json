@@ -29,6 +29,7 @@
     "core-js": "^3.6.4",
     "core-js-bundle": "^3.6.4",
     "cross-spawn": "^7.0.0",
+    "esbuild": "^0.19.4",
     "etag": "^1.8.1",
     "finalhandler": "^1.1.2",
     "fork-ts-checker-webpack-plugin": "^8.0.0",
