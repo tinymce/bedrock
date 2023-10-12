@@ -292,7 +292,7 @@ export const compile = async (tsConfigFile: string, scratchDir: string, basedir:
   return compileTests(compileInfo, exitOnCompileError, srcFiles, polyfills);
 };
 
-const isCompiledRequest = (request: { url: string }) => request.url.startsWith('/compiled/');
+const isCompiledRequest = (request: { url?: string }) => request.url?.startsWith('/compiled/') ?? false;
 
 const resolveImport = (source: string, modulePath: string): string | null => {
   try {
@@ -312,6 +312,7 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
     console.log(`Loading ${settings.testfiles.length} test files...`);
     const clients: http.ServerResponse<http.IncomingMessage>[] = [];
     const cache = new Map<string, string>();
+    const outfile = path.join(scratchDir, '/compiled/tests.js');
 
     mkdirp.sync(path.dirname(scratchFile));
     fs.writeFileSync(scratchFile, Imports.generateImports(false, scratchFile, settings.testfiles, []));
@@ -360,7 +361,7 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
         entryPoints: [scratchFile],
         banner: { js: ' (() => new EventSource("/esbuild").onmessage = () => location.reload())();' }, 
         bundle: true,
-        outfile: path.join(scratchDir, '/compiled/tests.js'),
+        outfile,
         loader: {
           '.svg': 'dataurl' // Silver theme imports svg files
         },
@@ -371,7 +372,13 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
     };
 
     const server = http.createServer((req, res) => {
-      if (req.url === '/esbuild') {
+      if (isCompiledRequest(req)) {
+        res.writeHead(200, {
+          'Content-Type': 'text/javascript'
+        });
+
+        fs.createReadStream(outfile).pipe(res);
+      } else if (req.url === '/esbuild') {
         clients.push(res);
         res.writeHead(200, {
           'Content-Type': 'text/event-stream',
