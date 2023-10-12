@@ -294,6 +294,14 @@ export const compile = async (tsConfigFile: string, scratchDir: string, basedir:
 
 const isCompiledRequest = (request: { url: string }) => request.url.startsWith('/compiled/');
 
+const resolveImport = (source: string, modulePath: string): string | null => {
+  try {
+      return require.resolve(modulePath, { paths: [ source ] });
+  } catch (_) {
+    return null;
+  }
+};
+
 export const devserver = async (settings: WebpackServeSettings): Promise<Serve.ServeService> => {
   const scratchDir = path.resolve('scratch');
   const tsConfigFile = settings.config;
@@ -303,6 +311,7 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
     const scratchFile = compileInfo.scratchFile;
     console.log(`Loading ${settings.testfiles.length} test files...`);
     const clients: http.ServerResponse<http.IncomingMessage>[] = [];
+    const cache = new Map<string, string>();
 
     mkdirp.sync(path.dirname(scratchFile));
     fs.writeFileSync(scratchFile, Imports.generateImports(false, scratchFile, settings.testfiles, []));
@@ -319,11 +328,29 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
           clients.forEach((res) => res.write('data: reload\n\n'));
           clients.length = 0;
         });
-        build.onResolve({ filter: /^@ephox\// }, (args) => {
-          // TODO: This needs to be smarter without this custom resolve then it wont recompile if TS files changes in libraries 
-          const name = path.basename(args.path);
-          const newPath = path.join(settings.projectdir, `modules/${name}/src/main/ts/ephox/${name}/api/Main.ts`);
-          return fs.existsSync(newPath) ? { path: newPath } : null;
+        build.onResolve({ filter: /^@ephox\/[^\/]+$/ }, (args) => {
+          // This is needed for esbuild to detect changes in TS files from package imports to for example '@ephox/alloy'
+          // This might need to be smarted by parsing the tsconfig files to resolve paths or us typescript module resolver
+
+          // This is called a ton of times everytime you use katamari so we need to cache it
+          const cachedAbsPath = cache.get(args.path);
+          if (cachedAbsPath) {
+            return { path: cachedAbsPath };
+          }
+
+          // Resolve package names like `@ephox/something` to an absolute path to `api/Main.ts`
+          const packageJsonPath = resolveImport(args.resolveDir, path.join(args.path, 'package.json'));
+          if (packageJsonPath) {
+            const name = path.basename(args.path);
+            const tryPaths = [ `src/main/ts/ephox/${name}/api/Main.ts`, 'src/main/ts/api/Main.ts' ];
+            for (const tryPath of tryPaths) {
+              const absTryPath = path.join(path.dirname(packageJsonPath), tryPath);
+              if (fs.existsSync(absTryPath)) {
+                cache.set(args.path, absTryPath);
+                return { path: absTryPath };
+              }
+            }
+          }
         });
       },
     };
