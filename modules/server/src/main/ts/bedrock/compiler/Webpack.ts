@@ -330,6 +330,15 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
           clients.forEach((res) => res.write('data: reload\n\n'));
           clients.length = 0;
         });
+        // Sizzle is imported very strangly it exports a function but is imported as a * module the types require that type of import
+        // So this hack simply repalces that at compile time
+        build.onLoad({ filter: /\/SizzleFind.[tj]s$/ }, async (args) => {
+          const text = await fs.promises.readFile(args.path, 'utf8');
+          return {
+            contents: text.replace(/import \* as Sizzle/g, 'import Sizzle'),
+            loader: 'ts'
+          };
+        });
         build.onResolve({ filter: /^@ephox\/[^\/]+$/ }, (args) => {
           // This is needed for esbuild to detect changes in TS files from package imports to for example '@ephox/alloy'
           // This might need to be smarted by parsing the tsconfig files to resolve paths or us typescript module resolver
