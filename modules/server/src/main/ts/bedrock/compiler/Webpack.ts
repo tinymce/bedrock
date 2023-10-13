@@ -295,14 +295,6 @@ export const compile = async (tsConfigFile: string, scratchDir: string, basedir:
 const isCompiledRequest = (request: { url?: string }) => request.url === '/compiled/tests.js';
 const isCompiledMapRequest = (request: { url?: string }) => request.url === '/compiled/tests.js.map';
 
-const resolveImport = (source: string, modulePath: string): string | null => {
-  try {
-      return require.resolve(modulePath, { paths: [ source ] });
-  } catch (_) {
-    return null;
-  }
-};
-
 export const devserver = async (settings: WebpackServeSettings): Promise<Serve.ServeService> => {
   const scratchDir = path.resolve('scratch');
   const tsConfigFile = settings.config;
@@ -312,7 +304,6 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
     const scratchFile = compileInfo.scratchFile;
     console.log(`Loading ${settings.testfiles.length} test files...`);
     const clients: http.ServerResponse<http.IncomingMessage>[] = [];
-    const cache = new Map<string, string>();
     const outfile = path.join(scratchDir, '/compiled/tests.js');
 
     mkdirp.sync(path.dirname(scratchFile));
@@ -331,37 +322,13 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
           clients.length = 0;
         });
         // Sizzle is imported very strangly it exports a function but is imported as a * module the types require that type of import
-        // So this hack simply repalces that at compile time
+        // So this hack simply replaces that at compile time until we properly fix this
         build.onLoad({ filter: /\/SizzleFind.[tj]s$/ }, async (args) => {
           const text = await fs.promises.readFile(args.path, 'utf8');
           return {
             contents: text.replace(/import \* as Sizzle/g, 'import Sizzle'),
             loader: 'ts'
           };
-        });
-        build.onResolve({ filter: /^@ephox\/[^\/]+$/ }, (args) => {
-          // This is needed for esbuild to detect changes in TS files from package imports to for example '@ephox/alloy'
-          // This might need to be smarted by parsing the tsconfig files to resolve paths or us typescript module resolver
-
-          // This is called a ton of times everytime you use katamari so we need to cache it
-          const cachedAbsPath = cache.get(args.path);
-          if (cachedAbsPath) {
-            return { path: cachedAbsPath };
-          }
-
-          // Resolve package names like `@ephox/something` to an absolute path to `api/Main.ts`
-          const packageJsonPath = resolveImport(args.resolveDir, path.join(args.path, 'package.json'));
-          if (packageJsonPath) {
-            const name = path.basename(args.path);
-            const tryPaths = [ `src/main/ts/ephox/${name}/api/Main.ts`, 'src/main/ts/api/Main.ts' ];
-            for (const tryPath of tryPaths) {
-              const absTryPath = path.join(path.dirname(packageJsonPath), tryPath);
-              if (fs.existsSync(absTryPath)) {
-                cache.set(args.path, absTryPath);
-                return { path: absTryPath };
-              }
-            }
-          }
         });
       },
     };
