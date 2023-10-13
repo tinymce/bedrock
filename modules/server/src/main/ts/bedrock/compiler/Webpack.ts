@@ -319,7 +319,19 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
         server: {
           port
         },
-        optimizeDeps: { force: true }
+        optimizeDeps: {
+          force: true,
+          // Doesn't seem to do anything
+          include: [
+            'modules/tinymce/**/*.ts',
+            'modules/alloy/**/*.ts',
+          ],
+        },
+        build: {
+          commonjsOptions: {
+            include: [/tinymce/, /alloy/, /node_modules/],
+          },
+        }
       });
 
       server.middlewares.use(function (request, response, next) {
