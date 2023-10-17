@@ -20,6 +20,7 @@
     "@ephox/bedrock-client": "^13.0.0",
     "@ephox/bedrock-common": "^13.0.0",
     "@ephox/bedrock-runner": "^13.5.0",
+    "@jgoz/esbuild-plugin-typecheck": "^3.1.0",
     "@jsdevtools/coverage-istanbul-loader": "^3.0.5",
     "async": "^3.0.0",
     "chalk": "^4.1.1",

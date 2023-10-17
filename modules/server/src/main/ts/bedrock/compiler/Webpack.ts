@@ -9,6 +9,7 @@ import * as Imports from './Imports';
 import { hasTs } from './TsUtils';
 import * as esbuild from 'esbuild';
 import * as http from 'http';
+import { typecheckPlugin } from '@jgoz/esbuild-plugin-typecheck';
 
 export interface WebpackServeSettings extends Serve.ServeSettings {
   readonly config: string;
@@ -343,7 +344,10 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
         loader: {
           '.svg': 'text' // Silver theme imports svg files
         },
-        plugins: [ bedrockPlugin ]
+        plugins: [
+          bedrockPlugin,
+          typecheckPlugin({ buildMode: 'readonly', watch: true })
+        ]
       });
 
       await ctx.watch();
