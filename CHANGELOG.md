@@ -6,10 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Removed
+- Removed `/clipboard` effects. #TINY-10275
+
 ## 13.6.0 - 2023-10-16
 
-## Improved
-
+### Improved
 - Urls like `/project/node_modules` and `/project/<package name>/node_modules` are now using node package resolve to serve files. #TINY-10281
 
 ## 13.5.0 - 2023-07-11

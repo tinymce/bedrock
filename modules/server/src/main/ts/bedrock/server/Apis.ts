@@ -3,7 +3,6 @@ import { Browser } from 'webdriverio';
 import { Attempt } from '../core/Attempt';
 import * as Coverage from '../core/Coverage';
 import * as Waiter from '../util/Waiter';
-import * as ClipboardEffects from './ClipboardEffects';
 import * as Controller from './Controller';
 import { DriverMaster } from './DriverMaster';
 import * as KeyEffects from './KeyEffects';
@@ -137,8 +136,6 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
       c.recordDone(data.session, data.error);
       return Promise.resolve();
     }),
-    // This does not need the webdriver.
-    Routes.effect('POST', '/clipboard', ClipboardEffects.route(basedir, projectdir))
   ];
 
   return {
