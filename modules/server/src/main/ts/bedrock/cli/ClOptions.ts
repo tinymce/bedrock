@@ -328,6 +328,41 @@ export const remote: ClOption = {
   validate: Extraction.inSet(['', 'aws', 'lambdatest' ])
 };
 
+export const sishDomain: ClOption = {
+  name: 'sishDomain',
+  type: String,
+  description: 'Use selected domain when connecting via Sish Tunnel',
+  validate: Extraction.any
+};
+
+export const username: ClOption = {
+  name: 'username',
+  type: String,
+  description: 'Username authentication ofr remote services',
+  validate: Extraction.any
+};
+
+export const accesskey: ClOption = {
+  name: 'accesskey',
+  type: String,
+  description: 'Access key authentication for remote services',
+  validate: Extraction.any
+};
+
+export const devicefarmRegion: ClOption = {
+  name: 'devicefarmRegion',
+  type: String,
+  description: 'Region selected for AWS Device Farm usage',
+  validate: Extraction.any
+};
+
+export const devicefarmArn: ClOption = {
+  name: 'devicefarmArn',
+  type: String,
+  description: 'Resource name identifier for AWS Device Farm usage',
+  validate: Extraction.any
+};
+
 export const useSelenium: ClOption = {
   name: 'useSelenium',
   type: Boolean,

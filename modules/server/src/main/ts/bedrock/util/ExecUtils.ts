@@ -6,15 +6,15 @@ import * as http from 'http';
 import * as deepmerge from 'deepmerge';
 
 export interface ChildAPI {
-    start: (...args: any[]) => Promise<ChildProcess | null> | ChildProcess | null;
-    stop: () => void;
-    defaultInstance: ChildProcess | null;
-    readonly isNpm?: boolean;
+  start: (...args: any[]) => Promise<ChildProcess | null> | ChildProcess | null;
+  stop: () => void;
+  defaultInstance: ChildProcess | null;
+  readonly isNpm?: boolean;
 }
 
 export const execLoader = (exec: string, args: string[] = []): ChildAPI => {
   const api = childAPIWrapper(crossSpawn, false, exec, args);
-    return api;
+  return api;
 };
 
 // Npm drivers (e.g. geckodriver) are called differently to binaries. This is to conform them
@@ -24,36 +24,40 @@ export const execLoader = (exec: string, args: string[] = []): ChildAPI => {
 // const api = ChildAPIWrapper(crossSpawn, 'geckodriver', ['port=4444']);
 // Npm example:
 // const api = ChildAPIWrapper(require('geckodriver'), {port: 4444})
-const childAPIWrapper = (startFunc: ChildAPI['start'], isNpm: boolean, ...defaultArgs: any[]): ChildAPI => {
-  const api = {isNpm} as ChildAPI;
-  api.defaultInstance = null;
+const childAPIWrapper = (startFunc: ChildAPI['start'], isNpm: boolean, ...defaultArgs: (string|string[]|Record<string,unknown>)[]): ChildAPI => {
+  const api = {
+    isNpm,
+    defaultInstance: null
+  } as ChildAPI;
 
-    api.start = async (...argsOverride) => {
-      let args;
-      if (isNpm) {
-        args = deepmerge(defaultArgs, argsOverride);
-      } else {
-        // DefaultArgs of the form [execpath, ...execOptions]
-        args = [defaultArgs[0]]; // exec path
-        const defaultOptions = defaultArgs[1];
-        const overrideOptions = argsOverride[0];
-        if (defaultOptions && overrideOptions) {
-          args.push(deepmerge(defaultOptions, overrideOptions));
-        } else if (defaultOptions || overrideOptions) {
-          args.push(defaultOptions || overrideOptions);
-        }
-      }
-      api.defaultInstance = await startFunc(...args);
-      return api.defaultInstance;
-    };
-  
-    api.stop = (signal: number | NodeJS.Signals | undefined = undefined) => {
-      if (api.defaultInstance) {
-        api.defaultInstance.kill(signal);
-        api.defaultInstance = null;
-      }
-    };
-    return api;
+  // This could definitely be nicer. Types need a deeper review
+  const coalesceArgs = (baseArgs: unknown[], override: unknown[]): unknown[] => {
+    const args = [baseArgs[0]]; // exec path
+    const defaultOptions = baseArgs[1];
+    const overrideOptions = override[0];
+    if (defaultOptions && overrideOptions) {
+      args.push(deepmerge(defaultOptions, overrideOptions));
+    }
+    if (defaultOptions || overrideOptions) {
+      args.push(defaultOptions || overrideOptions);
+    }
+    return args;
+  };
+
+  api.start = async (...argsOverride) => {
+    const args = isNpm ? deepmerge(defaultArgs, argsOverride) : coalesceArgs(defaultArgs, argsOverride);
+    api.defaultInstance = await startFunc(...args);
+    return api.defaultInstance;
+  };
+
+  api.stop = (signal: number | NodeJS.Signals | undefined = undefined) => {
+    if (api.defaultInstance) {
+      api.defaultInstance.kill(signal);
+      api.defaultInstance = null;
+    }
+  };
+
+  return api;
 };
 
 const findNpmPackage = (driverDeps: string[]): any => Arr.findMap(driverDeps, (driverDep) => {

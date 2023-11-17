@@ -6,8 +6,9 @@ import * as WebdriverIO from 'webdriverio';
 import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
 import * as DriverLoader from './DriverLoader';
-import { DeviceFarmClient, CreateTestGridUrlCommand } from '@aws-sdk/client-device-farm';
-import * as deepmerge from 'deepmerge';
+import * as RemoteDriver from './RemoteDriver';
+import deepmerge = require('deepmerge');
+import { RemoteOptions } from 'webdriverio';
 
 export interface DriverSettings {
   basedir: string;
@@ -23,6 +24,10 @@ export interface DriverSettings {
   servicePort?: number;
   remoteWebdriver?: string;
   useSelenium?: boolean;
+  username?: string;
+  accesskey?: string;
+  devicefarmRegion?: string;
+  deviceFarmArn?: string;
 }
 
 export interface Driver {
@@ -92,12 +97,6 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
     }
   };
 
-  if (!settings.remoteWebdriver) {
-    options.path = settings.useSelenium ? '/wd/hub' : '/';
-    options.hostname = '127.0.0.1';
-    options.port = port;
-  }
-
   // NOTE: We are currently not supporting extra browser capabilities for IE, Legacy Edge,
   // or Chromium-based Edge. We should start supporting extra browser capabilities for Chromium-based
   // Edge, though.
@@ -139,30 +138,19 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
     }
   }
 
-  // Remote webdriver settings
-  if (settings.remoteWebdriver) {
+  const driverOpts = deepmerge(
+    options,
+    settings.remoteWebdriver ?
+      RemoteDriver.getOpts(browserName, settings) :
+      {
+        path: settings.useSelenium ? '/wd/hub' : '/',
+        hostname: '127.0.0.1',
+        port
+      }
+  ) as RemoteOptions;
+  console.log('Print Opts: ', driverOpts);
 
-    caps.browserVersion = 'latest';
-
-    if (browserName == 'firefox') {
-      caps['moz:firefoxOptions'].log = { level: 'warn' };
-    }
-
-    if (settings.remoteWebdriver === 'lambdatest') {
-      options.user = process.env.LT_USERNAME;
-      options.key = process.env.LT_ACCESS_KEY;
-      caps['LT:Options'] = {
-        username: process.env.LT_USERNAME,
-        accesskey: process.env.LT_ACCESS_KEY,
-        tunnel: true,
-        console: true,
-        w3c: true,
-        plugin: 'node_js-webdriverio',
-      };
-    }
-  }
-
-  return options;
+  return driverOpts;
 };
 
 const logDriverDetails = (driver: WebdriverIO.Browser, headless: boolean, debuggingPort: number) => {
@@ -265,54 +253,6 @@ const driverSetup = async (driver: WebdriverIO.Browser, settings: DriverSettings
   return Promise.resolve();
 };
 
-const getFarmUrl = async (): Promise<URL> => {
-  console.log('Creating DeviceFarmClient...');
-  const client = new DeviceFarmClient({region: 'us-west-2'});
-  const input = {
-    projectArn: 'arn:aws:devicefarm:us-west-2:103651136441:testgrid-project:79ff2b40-fe26-440f-9539-53163c25442e',
-    expiresInSeconds: 5000
-  };
-  console.log('Sending command to create DF Test Grid URL...');
-  const command = new CreateTestGridUrlCommand(input);
-  const response = await client.send(command);
-  console.log('DF URL expires at:', response.expires);
-  return new URL(response.url as string);
-};
-
-const createFarm = async (browserName: string, defaultSettings: WebdriverIO.RemoteOptions): Promise<Driver> => {
-  try {
-    const validBrowsers = ['firefox', 'chrome', 'MicrosoftEdge'];
-    if (!validBrowsers.includes(browserName)) {
-      return Promise.reject('Browser not a valid Device Farm browser');
-    }
-    const url = await getFarmUrl();
-
-    const options = deepmerge(defaultSettings, {
-      hostname: url.host,
-      path: url.pathname,
-      protocol: 'https',
-      port: 443,
-      capabilities: {
-        'aws:maxDurationSecs': 2400,
-      },
-    });
-
-    console.log('Starting Device Farm session with options:', JSON.stringify(options, null, 2));
-    const driver = await WebdriverIO.remote(options);
-    console.log('Webdriver started.');
-
-    return {
-      webdriver: driver,
-      shutdown: (_: boolean | undefined) => {
-        console.log('Shutting down Device Farm. This currently does nothing.');
-        return Promise.resolve();
-      }
-    };
-  } catch (e) {
-    return Promise.reject(e);
-  }
-};
-
 /* Settings:
  *
  * browser: the name of the browser
@@ -330,19 +270,10 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
   const webdriverOptions = getOptions(port, browserName, settings, debuggingPort);
   console.log('Webdriver options:', webdriverOptions);
 
-  if (settings.remoteWebdriver === 'aws') {
-    // Device Farm
-    const api = await createFarm(browserName, webdriverOptions);
-    await driverSetup(api.webdriver, settings, debuggingPort);
-    return api;
-  } else if (settings.remoteWebdriver === 'lambdatest') {
-    // LambdaTest
-    const driver = await WebdriverIO.remote(webdriverOptions);
-    await driverSetup(driver, settings, debuggingPort);  
-    return {
-      webdriver: driver,
-      shutdown: () => Promise.resolve()
-    };
+  if (settings.remoteWebdriver) {
+    const remoteDriver = await RemoteDriver.getApi(settings, browserName, webdriverOptions);
+    await driverSetup(remoteDriver.webdriver, settings, debuggingPort);
+    return remoteDriver;
   } else {
     // Local
     const driverSpec = getDriverSpec(settings, browserName);

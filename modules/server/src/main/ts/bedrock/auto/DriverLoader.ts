@@ -27,7 +27,7 @@ const loadPhantomJs = (settings: DriverSettings) => {
   // Patch the start function to remap the arguments
   const origStart = api.start;
   api.start = (args = []) => {
-    const patchedArgs = args.map((arg: any) => {
+    const patchedArgs = args.map((arg: string) => {
       return arg.indexOf('--port') !== -1 ? arg.replace('--port', '--webdriver') : arg;
     });
     return origStart(patchedArgs);
@@ -72,14 +72,8 @@ export const loadDriver = (browserName: string, settings: DriverSettings): ExecU
 
 export const startAndWaitForAlive = async (driverSpec: DriverSpec, port: number, timeout = 30000): Promise<void> => {
   const api = driverSpec.driverApi;
-  
-  // Start the driver
-  let args;
-  if (api.isNpm) {
-    args = {port};
-  } else {
-    args = ['--port=' + port];
-  }
+
+  const args = api.isNpm ? { port } : [ '--port=' + port ];
   const driverProc = await driverSpec.driverApi.start(args);
 
   // Wait for it to be alive

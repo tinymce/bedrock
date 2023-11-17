@@ -19,33 +19,36 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
   console.log('bedrock-auto ' + Version.get() + ' starting...');
 
   const settings = SettingsResolver.resolveAndLog(bedrockAutoSettings);
-  console.log('Bedrock settings:', settings);
   const master = DriverMaster.create();
   const browserName = settings.browser.replace('-headless', '');
   const isPhantom = browserName === 'phantomjs';
   const isHeadless = settings.browser.endsWith('-headless') || isPhantom;
   const basePage = 'src/resources/html/' + (isPhantom ? 'bedrock-phantom.html' : 'bedrock.html');
+  // Remote settings
   const remoteWebdriver = settings.remote;
+  const sishDomain = settings.sishDomain;
+  const username = settings.username ?? process.env.LT_USERNAME;
+  const accesskey = settings.accesskey ?? process.env.LT_ACCESS_KEY;
 
   const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
   routes.then(async (runner) => {
-     const shutdownServices: (() => Promise<any>)[] = [];
+    const shutdownServices: (() => Promise<any>)[] = [];
 
     // LambdaTest Tunnel must know dev server port, but tunnel must be created before dev server.
     const servicePort = await portfinder.getPortPromise({
       port: 8000,
       stopPort: 20000
     });
-    let location = 'http://localhost:' + servicePort;
-    if (remoteWebdriver === 'lambdatest') {
-      const tunnel = await Tunnel.create(remoteWebdriver, servicePort);
-      shutdownServices.push(tunnel.shutdown);
-    } else if (remoteWebdriver === 'aws') {
-      const tunnel = await Tunnel.create(remoteWebdriver, servicePort);
-      location = tunnel.url.href;
-      shutdownServices.push(tunnel.shutdown);
-    }
+
+    const tunnelCredentials = {
+      user: username,
+      key: accesskey
+    };
+
+    const tunnel = await Tunnel.prepareConnection(servicePort, remoteWebdriver, sishDomain, tunnelCredentials);
+    shutdownServices.push(tunnel.shutdown);
+    const location = tunnel.url.href;
 
     console.log('Creating webdriver...');
     if (remoteWebdriver == 'aws') {
@@ -62,7 +65,11 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       wipeBrowserCache: settings.wipeBrowserCache,
       remoteWebdriver,
       webdriverPort: settings.webdriverPort,
-      useSelenium: settings.useSelenium
+      useSelenium: settings.useSelenium,
+      username,
+      accesskey,
+      devicefarmRegion: settings.devicefarmRegion,
+      deviceFarmArn: settings.devicefarmArn
     });
 
     const webdriver = driver.webdriver;
@@ -75,6 +82,8 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       port: servicePort
     });
     shutdownServices.push(service.shutdown, driver.shutdown);
+
+    const shutdown = () => Promise.allSettled(shutdownServices.map((shutdown_fn) => shutdown_fn()));
 
     try {
       if (!isHeadless) {
@@ -95,13 +104,8 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
         return Reporter.writePollExit(settings, data);
       });
 
-      // Combine all shutdowns into single function call.)
-      const shutdown = () => Promise.allSettled(shutdownServices.map((shutdown_fn) => shutdown_fn()));
-
       return Lifecycle.done(result, webdriver, shutdown, settings.gruntDone, settings.delayExit);
     } catch (e) {
-      // Combine all shutdowns into single function call.
-      const shutdown = () => Promise.allSettled(shutdownServices.map((shutdown_fn) => shutdown_fn()));
       return Lifecycle.error(e, webdriver, shutdown, settings.gruntDone, settings.delayExit);
     }
   }).catch((err) => {

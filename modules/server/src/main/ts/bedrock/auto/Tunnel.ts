@@ -9,9 +9,14 @@ export interface Tunnel {
   shutdown: () => Promise<void>;
 }
 
-const loadSSH = (subdomain: string, port: number | string): ExecUtils.ChildAPI => {
+export interface LambdaCredentials {
+  user: string;
+  key: string;
+}
+
+const loadSSH = (subdomain: string, port: number | string, domain: string): ExecUtils.ChildAPI => {
   const exec = 'ssh';
-  const args = ['-R', subdomain + ':80:localhost:' + port, 'sish.osu.tiny.work'];
+  const args = ['-R', subdomain + ':80:localhost:' + port, domain];
   return ExecUtils.execLoader(exec, args);
 };
 
@@ -42,9 +47,9 @@ const waitForReady = (proc: ChildProcess, timeout = 20000): Promise<void> => {
 };
 
 // Connect to sish server @ sish.osu.tiny.work
-const createSSH = async (port: number | string): Promise<Tunnel> => {  
+const createSSH = async (port: number | string, domain: string): Promise<Tunnel> => {
   const subdomain = crypto.randomUUID();
-  const api = loadSSH(subdomain, port);
+  const api = loadSSH(subdomain, port, domain);
   const tunnelProc = await api.start();
   if (tunnelProc == null) {
     throw new Error('Tunnel api returned null');
@@ -53,7 +58,7 @@ const createSSH = async (port: number | string): Promise<Tunnel> => {
 
   try {
     await waitForReady(tunnelProc);
-    const urlText = 'http://' + subdomain + '.sish.osu.tiny.work';
+    const urlText = 'http://' + subdomain + '.' + domain;
     console.log('Tunnel URL: ' + urlText);
     const url = new URL(urlText);
 
@@ -78,12 +83,12 @@ const createSSH = async (port: number | string): Promise<Tunnel> => {
 // LambdaTest supplied tunnel
 // @lambdatest/nodetunnel has some weird quasi-overriden promise-based versions of functions
 // and no proper typing for it. Excuse the hard type casting
-const createLambda = async (port: number | string): Promise<Tunnel> => {
+const createLambda = async (port: number | string, credentials: LambdaCredentials): Promise<Tunnel> => {
   const tunnel = new LambdaTunnel();
 
   const tunnelArguments = {
-    user: process.env.LT_USERNAME,
-    key: process.env.LT_ACCESS_KEY,
+    user: credentials.user,
+    key: credentials.key,
     port: port.toString()
   };
   
@@ -107,10 +112,21 @@ const createLambda = async (port: number | string): Promise<Tunnel> => {
     });
 };
 
-export const create = async (remoteWebdriver: string, port: number | string): Promise<Tunnel> => {
-  if (remoteWebdriver === 'lambdatest') {
-    return createLambda(port);
-  } else {
-    return createSSH(port);
-  }
+const createTunnel = async (port: number, domain: string | undefined, credentials: LambdaCredentials): Promise<Tunnel> => {
+  return domain ? createSSH(port, domain) : createLambda(port, credentials);
+};
+
+/**
+ * Prepare Bedrock connection. Create a tunnel and shutdown methods if necessary
+ *
+ * @param port Dev server connection port
+ * @param remote Name of remote service or undefined
+ * @param domain Domain for sish connection or undefined
+ * @returns Connection tunnel
+ */
+export const prepareConnection = async (port: number, remote: string | undefined, domain: string | undefined, credentials: LambdaCredentials ): Promise<Tunnel> => {
+  return remote ? createTunnel(port, domain, credentials) : Promise.resolve({
+    url: new URL('http://localhost:' + port),
+    shutdown: () => Promise.resolve()
+  });
 };
