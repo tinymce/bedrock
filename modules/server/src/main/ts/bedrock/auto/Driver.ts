@@ -264,6 +264,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
   const webdriverTimeout = settings.webdriverTimeout || 30000;
 
   const browserName = browserVariants[settings.browser] || settings.browser;
+
   // Find an open port to start the driver on
   const port = await getPort(settings.webdriverPort, 4444);
   const debuggingPort = settings.headless ? await getPort(settings.debuggingPort, 9000) : 9000;
