@@ -1,3 +1,4 @@
+
 import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
@@ -5,6 +6,9 @@ import * as WebdriverIO from 'webdriverio';
 import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
 import * as DriverLoader from './DriverLoader';
+import * as RemoteDriver from './RemoteDriver';
+import deepmerge = require('deepmerge');
+import { RemoteOptions } from 'webdriverio';
 
 export interface DriverSettings {
   basedir: string;
@@ -17,11 +21,17 @@ export interface DriverSettings {
   webdriverPort?: number;
   webdriverTimeout?: number;
   wipeBrowserCache?: boolean;
+  servicePort?: number;
+  remoteWebdriver?: string;
   useSelenium?: boolean;
+  username?: string;
+  accesskey?: string;
+  devicefarmRegion?: string;
+  deviceFarmArn?: string;
 }
 
 export interface Driver {
-  webdriver: WebdriverIO.Browser<'async'>;
+  webdriver: WebdriverIO.Browser;
   shutdown: (immediate?: boolean) => Promise<void>;
 }
 
@@ -80,11 +90,8 @@ const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
 };
 
 const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): WebdriverIO.RemoteOptions => {
-  const options = {
-    path: settings.useSelenium ? '/wd/hub' : '/',
-    host: '127.0.0.1',
-    port,
-    logLevel: 'silent' as const,
+  const options: WebdriverIO.RemoteOptions = {
+    logLevel: 'warn' as const,
     capabilities: {
       browserName
     }
@@ -105,6 +112,7 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
     addArguments(caps, 'moz:firefoxOptions', extraCaps);
   } else if (browserName === 'MicrosoftEdge') {
     addArguments(caps, 'ms:edgeOptions', ['--guest']);
+    caps['ms:edgeChromium'] = true;
   } else if (browserName === 'internet explorer' && settings.wipeBrowserCache) {
     // Setup wiping the browser cache if required, as IE 11 doesn't use a clean session by default
     caps['se:ieOptions'] = {
@@ -130,10 +138,22 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
     }
   }
 
-  return options;
+  const driverOpts = deepmerge(
+    options,
+    settings.remoteWebdriver ?
+      RemoteDriver.getOpts(browserName, settings) :
+      {
+        path: settings.useSelenium ? '/wd/hub' : '/',
+        hostname: '127.0.0.1',
+        port
+      }
+  ) as RemoteOptions;
+  console.log('Print Opts: ', driverOpts);
+
+  return driverOpts;
 };
 
-const logDriverDetails = (driver: WebdriverIO.Browser<'async'>, headless: boolean, debuggingPort: number) => {
+const logDriverDetails = (driver: WebdriverIO.Browser, headless: boolean, debuggingPort: number) => {
   const caps: Record<string, any> = driver.capabilities;
   const browserName = caps.browserName;
   const browserVersion = caps.browserVersion || caps.version;
@@ -165,7 +185,7 @@ const focusBrowser = (browserName: string, settings: DriverSettings) => {
   }
 };
 
-const setupShutdown = (driver: WebdriverIO.Browser<'async'>, driverApi: DriverLoader.DriverAPI, shutdownDelay = 0): (immediate?: boolean) => Promise<void> => {
+const setupShutdown = (driver: WebdriverIO.Browser, driverApi: DriverLoader.DriverAPI, shutdownDelay = 0): (immediate?: boolean) => Promise<void> => {
   const driverShutdown = async (immediate?: boolean) => {
     try {
       if (immediate) {
@@ -213,6 +233,26 @@ const getDriverSpec = (settings: DriverSettings, browserName: string): DriverLoa
   };
 };
 
+const driverSetup = async (driver: WebdriverIO.Browser, settings: DriverSettings, debuggingPort: number): Promise<void> => {
+  // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
+
+  // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
+  await driver.pause(1500);
+
+  // Log driver details
+  logDriverDetails(driver, settings.headless, debuggingPort);
+
+  // Some tests require large windows, so make it as large as it can be.
+  // Headless modes can't use maximize, so just set the dimensions to 1280x1024
+  if (settings.headless) {
+    await driver.setWindowSize(1280, 1024);
+  } else {
+    await driver.maximizeWindow();
+  }
+  
+  return Promise.resolve();
+};
+
 /* Settings:
  *
  * browser: the name of the browser
@@ -221,61 +261,58 @@ const getDriverSpec = (settings: DriverSettings, browserName: string): DriverLoa
  * webdriverTimeout: how long to wait for the webdriver server to start
  */
 export const create = async (settings: DriverSettings): Promise<Driver> => {
-
   const webdriverTimeout = settings.webdriverTimeout || 30000;
 
   const browserName = browserVariants[settings.browser] || settings.browser;
 
-  const driverSpec = getDriverSpec(settings, browserName);
+  // Find an open port to start the driver on
+  const port = await getPort(settings.webdriverPort, 4444);
+  const debuggingPort = settings.headless ? await getPort(settings.debuggingPort, 9000) : 9000;
+  const webdriverOptions = getOptions(port, browserName, settings, debuggingPort);
+  console.log('Webdriver options:', webdriverOptions);
 
-  try {
-    // Find an open port to start the driver on
-    const port = await getPort(settings.webdriverPort, 4444);
-    const debuggingPort = settings.headless ? await getPort(settings.debuggingPort, 9000) : 9000;
+  if (settings.remoteWebdriver) {
+    const remoteDriver = await RemoteDriver.getApi(settings, browserName, webdriverOptions);
+    await driverSetup(remoteDriver.webdriver, settings, debuggingPort);
+    return remoteDriver;
+  } else {
+    // Local
+    const driverSpec = getDriverSpec(settings, browserName);
+    try {
 
-    // Wait for the driver to start up and then start the webdriver session
-    await DriverLoader.startAndWaitForAlive(driverSpec, port, webdriverTimeout);
+      if (settings.verbose) {
+        console.log(
+          `Browser capabilities: ${JSON.stringify(webdriverOptions.capabilities)}`
+        );
+      }
 
-    const webdriverOptions = getOptions(port, browserName, settings, debuggingPort);
+      // Wait for the driver to start up and then start the webdriver session
+      await DriverLoader.startAndWaitForAlive(driverSpec, port, webdriverTimeout);
+      
+      const driver = await WebdriverIO.remote(webdriverOptions);
 
-    if (settings.verbose) {
-      console.log(
-        `Browser capabilities: ${JSON.stringify(webdriverOptions.capabilities)}`
-      );
+      // IEDriverServer ignores a delete session call if done too quickly so it needs a small delay
+      const shutdownDelay = browserName === 'internet explorer' ? 500 : 0;
+
+      // Ensure the driver gets shutdown correctly if shutdown
+      // by the user instead of the application
+      const driverShutdown = setupShutdown(driver, driverSpec.driverApi, shutdownDelay);
+
+      await driverSetup(driver, settings, debuggingPort);
+      await focusBrowser(browserName, settings);
+
+      // Return the public driver api
+      return {
+        webdriver: driver,
+        shutdown: driverShutdown
+      };
+    } catch (e) {
+      try {
+        driverSpec.driverApi.stop();
+      } catch {
+       // Ignore 
+      }
+      return Promise.reject(e);
     }
-
-    const driver = await WebdriverIO.remote(webdriverOptions);
-
-    // IEDriverServer ignores a delete session call if done too quickly so it needs a small delay
-    const shutdownDelay = browserName === 'internet explorer' ? 500 : 0;
-
-    // Ensure the driver gets shutdown correctly if shutdown
-    // by the user instead of the application
-    const driverShutdown = setupShutdown(driver, driverSpec.driverApi, shutdownDelay);
-
-    // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
-    // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
-    await driver.pause(1500);
-
-    // Log driver details
-    logDriverDetails(driver, settings.headless, debuggingPort);
-
-    // Some tests require large windows, so make it as large as it can be.
-    // Headless modes can't use maximize, so just set the dimensions to 1280x1024
-    if (settings.headless) {
-      await driver.setWindowSize(1280, 1024);
-    } else {
-      await driver.maximizeWindow();
-    }
-    await focusBrowser(browserName, settings);
-
-    // Return the public driver api
-    return {
-      webdriver: driver,
-      shutdown: driverShutdown
-    };
-  } catch (e) {
-    driverSpec.driverApi.stop();
-    return Promise.reject(e);
   }
 };

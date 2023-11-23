@@ -20,7 +20,7 @@ describe('CustomRouteTest', () => {
 
   it('undefined route', sendTest('/custom/non-existent', 'json', (xhr) => {
     Assert.eq('Status', 404, xhr.status);
-    Assert.eq('Content Type', 'text/plain', xhr.getResponseHeader('Content-Type'));
+    Assert.eq('Content Type', 'text/plain; charset=utf-8', xhr.getResponseHeader('Content-Type'));
   }));
 
   it('image binary file route', sendTest('/custom/image', 'arraybuffer', (xhr) => {

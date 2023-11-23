@@ -1,15 +1,5 @@
-import { ChildProcess } from 'child_process';
-import * as crossSpawn from 'cross-spawn';
-import * as http from 'http';
-import * as which from 'which';
-import * as Arr from '../util/Arr';
 import { DriverSettings } from './Driver';
-
-export interface DriverAPI {
-  start: (args?: string[]) => ChildProcess | null;
-  stop: () => void;
-  defaultInstance: ChildProcess | null;
-}
+import * as ExecUtils from '../util/ExecUtils';
 
 export interface DriverSpec {
   driverApi: DriverAPI;
@@ -31,43 +21,13 @@ const browserExecutables: Record<string, string[]> = {
   'MicrosoftEdge': [ 'msedgedriver', 'MicrosoftWebDriver' ]
 };
 
-const execLoader = (exec: string, driverArgs: string[] = []) => {
-  const api = {} as DriverAPI;
-  api.start = (args = []) => {
-    const finalArgs = driverArgs.concat(args);
-    api.defaultInstance = crossSpawn(exec, finalArgs);
-    return api.defaultInstance;
-  };
-
-  api.stop = () => {
-    if (api.defaultInstance) {
-      api.defaultInstance.kill();
-      api.defaultInstance = null;
-    }
-  };
-
-  return api;
-};
-
-const findNpmPackage = (driverDeps: string[]) => Arr.findMap(driverDeps, (driverDep) => {
-  try {
-    return require(driverDep);
-  } catch (e) {
-    return null;
-  }
-});
-
-const findExecutable = (execNames: string[]) => Arr.findMap(execNames, (execName) => {
-  return which.sync(execName, { nothrow: true });
-});
-
 const loadPhantomJs = (settings: DriverSettings) => {
-  const api = execLoader('phantomjs', [ '--remote-debugger-port=' + settings.debuggingPort ]);
+  const api = ExecUtils.execLoader('phantomjs', [ '--remote-debugger-port=' + settings.debuggingPort ]);
 
   // Patch the start function to remap the arguments
   const origStart = api.start;
   api.start = (args = []) => {
-    const patchedArgs = args.map((arg) => {
+    const patchedArgs = args.map((arg: string) => {
       return arg.indexOf('--port') !== -1 ? arg.replace('--port', '--webdriver') : arg;
     });
     return origStart(patchedArgs);
@@ -75,7 +35,7 @@ const loadPhantomJs = (settings: DriverSettings) => {
   return api;
 };
 
-export const makeDriverStub = (): DriverAPI => {
+export const makeDriverStub = (): ExecUtils.ChildAPI => {
   return {
       start: () => null,
       stop: () => { console.log('Stop driver stub'); },
@@ -83,12 +43,12 @@ export const makeDriverStub = (): DriverAPI => {
   };
 };
 
-export const loadDriver = (browserName: string, settings: DriverSettings): DriverAPI => {
+export const loadDriver = (browserName: string, settings: DriverSettings): ExecUtils.ChildAPI => {
   const driverDeps = browserModules[browserName] || [];
   if (driverDeps.length === 0) {
     console.log('Not loading a local driver for browser ' + browserName);
   } else {
-    const driver = findNpmPackage(driverDeps);
+    const driver = ExecUtils.npmLoader(driverDeps);
     if (driver !== null) {
       return driver;
     } else {
@@ -102,78 +62,23 @@ export const loadDriver = (browserName: string, settings: DriverSettings): Drive
   }
 
   const execNames = browserExecutables[browserName] || [];
-  const execPath = findExecutable(execNames);
+  const execPath = ExecUtils.findExecutable(execNames);
   if (execPath !== null) {
-    return execLoader(execPath);
+    return ExecUtils.execLoader(execPath);
   } else {
     throw new Error('Unable to find a suitable driver for ' + browserName);
   }
 };
 
-export const waitForAlive = (proc: ChildProcess | null, port: number, timeout: number, path: string): Promise<void> => {
-  const url = 'http://127.0.0.1:' + port + path + '/status';
-  console.log('waiting for alive @: ', url);
-  const start = Date.now();
-  return new Promise<void>((resolve, reject) => {
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+export const startAndWaitForAlive = async (driverSpec: DriverSpec, port: number, timeout = 30000): Promise<void> => {
+  const api = driverSpec.driverApi;
 
-    const onStartError = (error: string) => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-      reject('Driver failed to start (' + error + ')');
-    };
+  const args = api.isNpm ? { port } : [ '--port=' + port ];
+  const driverProc = await driverSpec.driverApi.start(args);
 
-    const onServerError = (err: string) => {
-      if (Date.now() - start > timeout) {
-        reject('Timed out waiting for the webdriver server. Error: ' + err);
-      } else {
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        timeoutId = setTimeout(checkServerStatus, 50);
-      }
-    };
-
-    const checkServerStatus = () => {
-      http.get(url, (res) => {
-        if (res.statusCode === 200) {
-          let rawData = '';
-          res.on('data', (chunk) => rawData += chunk);
-          res.on('end', () => {
-            try {
-              const data = JSON.parse(rawData);
-              if (data.value.ready || data.status === 0) {
-                if (proc) {
-                  proc.removeListener('exit', onStartError);
-                  proc.removeListener('error', onStartError);
-                }
-                resolve();
-              } else {
-                onServerError('Not ready to accept connections');
-              }
-            } catch (e) {
-              onServerError(e.message);
-            }
-          });
-        } else {
-          onServerError('Received non 200 status (' + res.statusCode + ')');
-        }
-      }).on('error', onServerError);
-    };
-
-    // Bind process listeners
-    if (proc) {
-      proc.on('exit', onStartError);
-      proc.on('error', onStartError);
-    }
-
-    // Start listening for the server to be ready
-    checkServerStatus();
-  });
-};
-
-export const startAndWaitForAlive = (driverSpec: DriverSpec, port: number, timeout = 30000): Promise<void> => {
-  // Start the driver
-  const driverProc = driverSpec.driverApi.start(['--port=' + port]);
   // Wait for it to be alive
-  return waitForAlive(driverProc, port, timeout, driverSpec.path);
+  const status_url = 'http://127.0.0.1:' + port + driverSpec.path + '/status';
+  return ExecUtils.waitForAlive(driverProc, status_url, timeout);
 };
+
+export type DriverAPI = ExecUtils.ChildAPI;

@@ -43,7 +43,8 @@ export const browser: ClOption = {
     'ie',
     'firefox',
     'firefox-headless',
-    'MicrosoftEdge',
+    'MicrosoftEdge', // ? I doubt this should be here.
+    'edge',
     'chrome',
     'chrome-headless',
     'safari',
@@ -317,6 +318,49 @@ export const verbose: ClOption = {
   description: 'Enable verbose logging mode',
   validate: Extraction.any,
   uncommon: false
+};
+
+export const remote: ClOption = {
+  name: 'remote',
+  type: String,
+  defaultValue: '',
+  description: 'Run tests on an online remote webdriver. AWS Device Farm (chrome/firefox) or LambdaTest (safari)',
+  validate: Extraction.inSet(['', 'aws', 'lambdatest' ])
+};
+
+export const sishDomain: ClOption = {
+  name: 'sishDomain',
+  type: String,
+  description: 'Use selected domain when connecting via Sish Tunnel',
+  validate: Extraction.any
+};
+
+export const username: ClOption = {
+  name: 'username',
+  type: String,
+  description: 'Username authentication ofr remote services',
+  validate: Extraction.any
+};
+
+export const accesskey: ClOption = {
+  name: 'accesskey',
+  type: String,
+  description: 'Access key authentication for remote services',
+  validate: Extraction.any
+};
+
+export const devicefarmRegion: ClOption = {
+  name: 'devicefarmRegion',
+  type: String,
+  description: 'Region selected for AWS Device Farm usage',
+  validate: Extraction.any
+};
+
+export const devicefarmArn: ClOption = {
+  name: 'devicefarmArn',
+  type: String,
+  description: 'Resource name identifier for AWS Device Farm usage',
+  validate: Extraction.any
 };
 
 export const useSelenium: ClOption = {

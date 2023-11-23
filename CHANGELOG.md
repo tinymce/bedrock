@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+- Add `--remote <webdriver>` to support remote webdrivers: aws device farm and lambdatest #TINY-10006
+- Tunneling configuration: Ssh Tunneling and LambdaTest Tunneling #TINY-10006
+
 ## 13.6.0 - 2023-10-16
 
 ## Improved

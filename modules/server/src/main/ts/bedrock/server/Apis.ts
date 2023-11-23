@@ -10,7 +10,7 @@ import * as KeyEffects from './KeyEffects';
 import * as MouseEffects from './MouseEffects';
 import * as Routes from './Routes';
 
-type Executor<D, T> = (driver: Browser<'async'>) => (data: D) => Promise<T>;
+type Executor<D, T> = (driver: Browser) => (data: D) => Promise<T>;
 
 export interface Apis {
   readonly routers: Routes.Route[];
@@ -42,7 +42,7 @@ const pollRate = 200;
 const maxInvalidAttempts = 300;
 
 // TODO: Do not use files here.
-export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Browser<'async'>>, projectdir: string, basedir: string, stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced', resetMousePosition: boolean): Apis => {
+export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Browser>, projectdir: string, basedir: string, stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced', resetMousePosition: boolean): Apis => {
   let pageHasLoaded = false;
   let needsMousePositionReset = true;
 
@@ -62,7 +62,7 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
     }
   };
 
-  const effect = <D>(executor: Executor<D, void>, driver: Browser<'async'>, effectChangesMouse: boolean) => {
+  const effect = <D>(executor: Executor<D, void>, driver: Browser, effectChangesMouse: boolean) => {
     return (data: D) => {
       return waitForDriverReady(maxInvalidAttempts, () => {
         if (effectChangesMouse) {
@@ -72,6 +72,11 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
       });
     };
   };
+
+  const sendKeepAlive = (driver: Browser) => Promise.resolve(void driver.execute(() => console.info('keep-alive', Date.now())));
+
+  const keepAliveAction = () => Attempt.cata(maybeDriver, () => Promise.resolve(),
+    (driver) => waitForDriverReady(maxInvalidAttempts, () => sendKeepAlive(driver)));
 
   const resetMousePositionAction = (force = false): Promise<void> => {
     if (resetMousePosition) {
@@ -121,9 +126,9 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
     driverRouter('/mouse', 'Mouse', MouseEffects.executor, true),
     Routes.effect('POST', '/tests/alive', (data: { session: string }) => {
       c.recordAlive(data.session);
-      return Promise.resolve();
+      return keepAliveAction();
     }),
-    Routes.effect('POST', '/tests/init', () => resetMousePositionAction(true)),
+    Routes.effect('POST', '/tests/init', () => Promise.all([ resetMousePositionAction(true), keepAliveAction() ])),
     Routes.effect('POST', '/tests/start', (data: StartData) => {
       c.recordTestStart(data.session, data.name, data.file, data.totalTests);
       return resetMousePositionAction();
