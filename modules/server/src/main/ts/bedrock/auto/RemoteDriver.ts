@@ -33,6 +33,7 @@ const createFarm = async (browserName: string, remoteOpts: WebdriverIO.RemoteOpt
 
     const url = await getFarmUrl(region, projectArn);
 
+    // aws:maxDurationSecs is the maximum duration of the session before it is forcibly closed. (180 - 2400)
     const options = deepmerge(remoteOpts, {
       hostname: url.host,
       path: url.pathname,
@@ -97,6 +98,7 @@ const addDriverSpecificOpts = (opts: WebdriverIO.RemoteOptions, settings: Driver
 
 const addBrowserSpecificOpts = (opts: WebdriverIO.RemoteOptions, browser: string): WebdriverIO.RemoteOptions => {
   if (browser === 'firefox') {
+    // Change firefox log level for readability
     return deepmerge(opts, {
       capabilities: {
         'moz:firefoxOptions': {
