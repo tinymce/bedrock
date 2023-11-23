@@ -51,39 +51,47 @@ export const generate = async (mode: string, projectdir: string, basedir: string
 
   // console.log(`Resource maps from ${projectdir}: \n`, resourceRoots.map(({ name, folder }) => `/project/${name}/ => ${folder}`));
 
+  const nodeModuleRoutes = resourceRoots.map(({name, folder}) => Routes.nodeResolve('GET', `/project/${name}/node_modules`, path.join(projectdir, folder)));
+
   const resourceRoutes = resourceRoots.map(({name, folder}) => Routes.routing('GET', `/project/${name}`, path.join(projectdir, folder)));
 
   const precompiledTests = mode === 'auto' ? await testGenerator.generate() : null;
 
-  const routers = resourceRoutes.concat([
-    // fallback resource route to project root
-    Routes.routing('GET', '/project', projectdir),
+  const routers = [
+    ...nodeModuleRoutes,
+    ...resourceRoutes,
+    ...[
+      Routes.nodeResolve('GET', '/project/node_modules', projectdir),
 
-    // bedrock resources
-    Routes.routing('GET', '/runner', path.join(require.resolve('@ephox/bedrock-runner'), '../../../../../dist')),
-    Routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery'))),
-    Routes.routing('GET', '/lib/core-js-bundle', path.dirname(require.resolve('core-js-bundle'))),
-    Routes.routing('GET', '/css', path.join(basedir, 'src/resources/css')),
+      // fallback resource route to project root
+      Routes.routing('GET', '/project', projectdir),
 
-    // test code
-    Routes.asyncJs('GET', '/compiled/tests.js', (done) => {
-      if (precompiledTests !== null) {
-        done(precompiledTests);
-      } else {
-        testGenerator.generate().then(done);
-      }
-    }),
-    Routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
+      // bedrock resources
+      Routes.routing('GET', '/runner', path.join(require.resolve('@ephox/bedrock-runner'), '../../../../../dist')),
+      Routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery'))),
+      Routes.routing('GET', '/lib/core-js-bundle', path.dirname(require.resolve('core-js-bundle'))),
+      Routes.routing('GET', '/css', path.join(basedir, 'src/resources/css')),
 
-    // harness API
-    Routes.json('GET', '/harness', {
-      stopOnFailure,
-      chunk,
-      retries,
-      timeout: singleTimeout,
-      mode
-    })
-  ]);
+      // test code
+      Routes.asyncJs('GET', '/compiled/tests.js', (done) => {
+        if (precompiledTests !== null) {
+          done(precompiledTests);
+        } else {
+          testGenerator.generate().then(done);
+        }
+      }),
+      Routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
+
+      // harness API
+      Routes.json('GET', '/harness', {
+        stopOnFailure,
+        chunk,
+        retries,
+        timeout: singleTimeout,
+        mode
+      })
+    ]
+  ];
 
   const fallback = Routes.constant('GET', basedir, basePage);
 
