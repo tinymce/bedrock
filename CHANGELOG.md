@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+- Add `--platformName` and `--browserVersion` arguments for Lambdatest #TINY-10466
+
 ## 14.0.0 - 2023-11-27
 
 ### Added
