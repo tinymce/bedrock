@@ -36,6 +36,7 @@ describe('Clis.forAuto', () => {
     const actual = Clis.forAuto(directories, args);
     AttemptUtils.assertResult({
       browser: 'MicrosoftEdge',
+      browserVersion: 'latest',
       bundler: 'webpack',
       config: 'src/test/resources/tsconfig.sample.json',
       name: 'bedrock-run',
@@ -76,6 +77,7 @@ describe('Clis.forAuto', () => {
     const actual = Clis.forAuto(directories, args);
     AttemptUtils.assertResult({
       browser: 'MicrosoftEdge',
+      browserVersion: 'latest',
       bundler: 'webpack',
       config: 'src/test/resources/tsconfig.sample.json',
       name: 'bedrock-run',
@@ -117,6 +119,7 @@ describe('Clis.forAuto', () => {
     const actual = Clis.forAuto(directories, args);
     AttemptUtils.assertResult({
       browser: 'MicrosoftEdge',
+      browserVersion: 'latest',
       bundler: 'webpack',
       config: 'src/test/resources/tsconfig.sample.json',
       name: 'bedrock-run',
@@ -157,6 +160,7 @@ describe('Clis.forAuto', () => {
     const actual = Clis.forAuto(directories, args);
     AttemptUtils.assertResult({
       browser: 'chrome-headless',
+      browserVersion: 'latest',
       bundler: 'webpack',
       config: 'src/test/resources/tsconfig.sample.json',
       name: 'bedrock-run',
@@ -193,11 +197,14 @@ describe('Clis.forAuto', () => {
       '--files', 'src/test/resources/test.file1',
       '--username', 'lt_username',
       '--accesskey', 'lt_access_key',
-      '--remote', 'lambdatest'
+      '--remote', 'lambdatest',
+      '--platformName', 'macOS Catalina',
+      '--browserVersion', '117.0'
     ];
     const actual = Clis.forAuto(directories, args);
     AttemptUtils.assertResult({
       browser: 'chrome-headless',
+      browserVersion: '117.0',
       bundler: 'webpack',
       config: 'tsconfig.json',
       name: 'bedrock-run',
@@ -226,7 +233,8 @@ describe('Clis.forAuto', () => {
       remote: 'lambdatest',
       username: 'lt_username',
       accesskey: 'lt_access_key',
-      webdriverPort: 4444
+      webdriverPort: 4444,
+      platformName: 'macOS Catalina'
     }, cleanResult(actual));
   });
 
@@ -242,6 +250,7 @@ describe('Clis.forAuto', () => {
     const actual = Clis.forAuto(directories, args);
     AttemptUtils.assertResult({
       browser: 'chrome-headless',
+      browserVersion: 'latest',
       bundler: 'webpack',
       config: 'tsconfig.json',
       name: 'bedrock-run',

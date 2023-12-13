@@ -28,6 +28,8 @@ export interface DriverSettings {
   accesskey?: string;
   devicefarmRegion?: string;
   deviceFarmArn?: string;
+  platformName?: string;
+  browserVersion: string;
 }
 
 export interface Driver {

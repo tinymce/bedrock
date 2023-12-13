@@ -69,7 +69,9 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       username,
       accesskey,
       devicefarmRegion: settings.devicefarmRegion,
-      deviceFarmArn: settings.devicefarmArn
+      deviceFarmArn: settings.devicefarmArn,
+      browserVersion: settings.browserVersion,
+      platformName: settings.platformName
     });
 
     const webdriver = driver.webdriver;
