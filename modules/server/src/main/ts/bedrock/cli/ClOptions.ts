@@ -363,6 +363,21 @@ export const devicefarmArn: ClOption = {
   validate: Extraction.any
 };
 
+export const browserVersion: ClOption = {
+  name: 'browserVersion',
+  type: String,
+  defaultValue: 'latest',
+  description: 'Browser version used by lambdatest, defaults to "latest"',
+  validate: Extraction.any
+};
+
+export const platformName: ClOption = {
+  name: 'platformName',
+  type: String,
+  description: 'Platform name used by lambdatest',
+  validate: Extraction.any
+};
+
 export const useSelenium: ClOption = {
   name: 'useSelenium',
   type: Boolean,

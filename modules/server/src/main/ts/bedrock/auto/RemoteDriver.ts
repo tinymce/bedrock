@@ -78,6 +78,7 @@ export const getApi = async (settings: DriverSettings, browser: string, opts: We
 
 const addDriverSpecificOpts = (opts: WebdriverIO.RemoteOptions, settings: DriverSettings): WebdriverIO.RemoteOptions => {
   if (settings.remoteWebdriver === 'lambdatest') {
+    const platformName = settings.platformName ? { platformName: settings.platformName } : {};
     return deepmerge(opts, {
       user: settings.username,
       key: settings.accesskey,
@@ -88,7 +89,8 @@ const addDriverSpecificOpts = (opts: WebdriverIO.RemoteOptions, settings: Driver
           tunnel: true,
           console: true,
           w3c: true,
-          plugin: 'node_js-webdriverio'
+          plugin: 'node_js-webdriverio',
+          ...platformName
         }
       }
     });
@@ -113,7 +115,7 @@ const addBrowserSpecificOpts = (opts: WebdriverIO.RemoteOptions, browser: string
 export const getOpts = (browserName: string, settings: DriverSettings): WebdriverIO.RemoteOptions => {
   const driverOpts: WebdriverIO.RemoteOptions = {
     capabilities: {
-      browserVersion: 'latest'
+      browserVersion: settings.browserVersion
     }
   };
   const withBrowserOpts = addDriverSpecificOpts(driverOpts, settings);
