@@ -8,7 +8,7 @@ import * as EffectUtils from './EffectUtils';
  }
  */
 export interface MouseData {
-  readonly type: 'move' | 'click' | 'down' | 'up';
+  readonly type: 'move' | 'click' | 'rightClick' | 'down' | 'up';
   readonly selector: string;
 }
 
@@ -36,6 +36,8 @@ const doAction = async (target: EffectUtils.ElementWithActions, type: MouseData[
   // MicrosoftEdge does support this, but does not seem to support click in an ActionSequence
   } else if (type === 'click') {
     return target.click();
+  } else if (type === 'rightClick') {
+    return target.click({ button: 'right' });
   } else {
     return Promise.reject('Unknown mouse effect type: ' + type);
   }
