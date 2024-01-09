@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock-server",
-  "version": "14.1.0",
+  "version": "14.1.1",
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
   "bin": {
@@ -18,9 +18,9 @@
   },
   "dependencies": {
     "@aws-sdk/client-device-farm": "^3.354.0",
-    "@ephox/bedrock-client": "^14.1.0",
-    "@ephox/bedrock-common": "^14.1.0",
-    "@ephox/bedrock-runner": "^14.1.0",
+    "@ephox/bedrock-client": "^14.1.1",
+    "@ephox/bedrock-common": "^14.1.1",
+    "@ephox/bedrock-runner": "^14.1.1",
     "@jsdevtools/coverage-istanbul-loader": "^3.0.5",
     "@lambdatest/node-tunnel": "^4.0.4",
     "@wdio/globals": "^8.14.1",
