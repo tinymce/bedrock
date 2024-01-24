@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "declaration": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "outDir": "./lib",
+    "preserveConstEnums": true,
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es5",
+    "types": [
+      "node",
+      "prop-types",
+      "react", 
+      "react-dom"
+    ],
+    "rootDir": "."
+  },
+  "include": [
+    "tests/**/*.ts",
+  ],
+  "exclude": []
+}
