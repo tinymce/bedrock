@@ -7,11 +7,14 @@ import { Tunnel as LambdaTunnel } from '@lambdatest/node-tunnel';
 export interface Tunnel {
   url: URL;
   shutdown: () => Promise<void>;
+  tunnel?: any;
+  tunnelName?: any;
 }
 
 export interface LambdaCredentials {
   user: string;
   key: string;
+  name?: string;
 }
 
 const loadSSH = (subdomain: string, port: number | string, domain: string): ExecUtils.ChildAPI => {
@@ -85,11 +88,16 @@ const createSSH = async (port: number | string, domain: string): Promise<Tunnel>
 // and no proper typing for it. Excuse the hard type casting
 const createLambda = async (port: number | string, credentials: LambdaCredentials): Promise<Tunnel> => {
   const tunnel = new LambdaTunnel();
+  // const suffix = crypto.randomUUID();
+  const tunnelName = credentials.name ? { tunnelName: credentials.name } : {};
 
   const tunnelArguments = {
+    ...tunnelName,
     user: credentials.user,
     key: credentials.key,
-    port: port.toString()
+    port: port.toString(),
+    serverdomain: 'ts-oregon.lambdatest.com',
+    v: true
   };
   
   const shutdown = async (): Promise<void> => {
@@ -99,12 +107,19 @@ const createLambda = async (port: number | string, credentials: LambdaCredential
 
   const result: Tunnel = {
     url: new URL('http://localhost:' + port),
-    shutdown
+    shutdown,
+    tunnel,
+    ...tunnelName
   };
 
+  console.log('Starting tunnel: ', tunnelArguments);
   const startPromise = tunnel.start(tunnelArguments, null as unknown as (() => void)) as unknown as Promise<boolean>;
-  return startPromise.then((success) => {
+  return startPromise.then(async (success) => {
       if (success) {
+        const delay = (s: number) => new Promise(res => setTimeout(res, s * 1000));
+        console.log('tunnel started [' + new Date().toLocaleTimeString('en-us', {hour: 'numeric', minute: 'numeric', second: 'numeric'}) + ']: ', success);
+        await delay(15);
+        console.log('Delay over [' + new Date().toLocaleTimeString('en-us', {hour: 'numeric', minute: 'numeric', second: 'numeric'}) + ']');
         return result;
       } else {
         return Promise.reject('Tunnel did not start correctly.');

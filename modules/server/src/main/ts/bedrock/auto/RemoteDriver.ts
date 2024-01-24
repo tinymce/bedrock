@@ -60,17 +60,35 @@ const createFarm = async (browserName: string, remoteOpts: WebdriverIO.RemoteOpt
   }
 };
 
-export const getApi = async (settings: DriverSettings, browser: string, opts: WebdriverIO.RemoteOptions): Promise<Driver> => {
+export const getApi = async (settings: DriverSettings, browser: string, opts: WebdriverIO.RemoteOptions, tunnel: any): Promise<Driver> => {
   const remoteWebdriver = settings.remoteWebdriver;
   if (remoteWebdriver === 'aws') {
     const farmApi = await createFarm(browser, opts, settings);
     return farmApi;
   }
   if (remoteWebdriver == 'lambdatest') {
-    const driver = await WebdriverIO.remote(opts);
+    console.log('getting lt webdriver');
+    if (tunnel.tunnel.isRunning()) {
+      console.log('tunnel is running');
+    }
+    let driver: WebdriverIO.Browser;
+    try {
+      driver = await WebdriverIO.remote(opts);
+    } catch(e) {
+      console.log('Failed to create webdriver');
+      if (tunnel.tunnel.isRunning()) {
+        console.log('tunnel is still running?');
+        tunnel.tunnel.stop();
+      }
+      console.log(e);
+      throw new Error(e)
+    }
+    console.log('driver: ', driver);
     return {
       webdriver: driver,
-      shutdown: () => Promise.resolve()
+      shutdown: async () => {
+        await driver?.deleteSession();
+      }
     };
   }
   return Promise.reject('Unrecognized remote provider: [' + remoteWebdriver + ']');
@@ -78,6 +96,7 @@ export const getApi = async (settings: DriverSettings, browser: string, opts: We
 
 const addDriverSpecificOpts = (opts: WebdriverIO.RemoteOptions, settings: DriverSettings): WebdriverIO.RemoteOptions => {
   if (settings.remoteWebdriver === 'lambdatest') {
+    const tunnelName = settings.tunnelName ? { tunnelname: settings.tunnelName } : {};
     const platformName = settings.platformName ? { platformName: settings.platformName } : {};
     return deepmerge(opts, {
       user: settings.username,
@@ -87,10 +106,13 @@ const addDriverSpecificOpts = (opts: WebdriverIO.RemoteOptions, settings: Driver
           username: settings.username,
           accesskey: settings.accesskey,
           tunnel: true,
+          // loadbalanced: true,
+          // tunnelname: 'testing-tunnel-static',
           console: true,
           w3c: true,
           plugin: 'node_js-webdriverio',
-          ...platformName
+          ...platformName,
+          ...tunnelName
         }
       }
     });
@@ -118,8 +140,8 @@ export const getOpts = (browserName: string, settings: DriverSettings): Webdrive
       browserVersion: settings.browserVersion
     }
   };
-  const withBrowserOpts = addDriverSpecificOpts(driverOpts, settings);
-  const withDriverOpts = addBrowserSpecificOpts(withBrowserOpts, browserName);
+  const withDriverOpts = addDriverSpecificOpts(driverOpts, settings);
+  const withBrowserOpts = addBrowserSpecificOpts(withDriverOpts, browserName);
 
-  return withDriverOpts;
+  return withBrowserOpts;
 };

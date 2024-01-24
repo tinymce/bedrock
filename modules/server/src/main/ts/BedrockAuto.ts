@@ -41,19 +41,22 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       stopPort: 20000
     });
 
+    const tunnelName = settings.tunnelName ? { name: settings.tunnelName } : {}
     const tunnelCredentials = {
       user: username,
-      key: accesskey
+      key: accesskey,
+      ...tunnelName
     };
 
     const tunnel = await Tunnel.prepareConnection(servicePort, remoteWebdriver, sishDomain, tunnelCredentials);
     shutdownServices.push(tunnel.shutdown);
     const location = tunnel.url.href;
 
-    console.log('Creating webdriver...');
+    console.log('Creating webdriver... v2');
     if (remoteWebdriver == 'aws') {
         console.log('INFO: Webdriver creation waits for device farm session to activate. Takes 30-45s.');
     }
+    console.log('Auto: creating driver')
     const driver = await Driver.create({
       browser: browserName,
       basedir: settings.basedir,
@@ -71,10 +74,13 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       devicefarmRegion: settings.devicefarmRegion,
       deviceFarmArn: settings.devicefarmArn,
       browserVersion: settings.browserVersion,
-      platformName: settings.platformName
-    });
+      platformName: settings.platformName,
+      tunnelName: settings.tunnelName
+    }, tunnel);
 
     const webdriver = driver.webdriver;
+    console.log('Auto: webdriver: ', webdriver);
+    console.log('Auto: Starting Service');
     const service = await Serve.start({
       ...settings,
       driver: Attempt.passed(webdriver),

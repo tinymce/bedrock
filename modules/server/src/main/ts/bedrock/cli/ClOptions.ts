@@ -395,3 +395,10 @@ export const webdriverPort: ClOption = {
   defaultValue: 4444,
   uncommon: true
 };
+
+export const tunnelName: ClOption = {
+  name: 'tunnelName',
+  type: String,
+  description: 'Select the tunnel name',
+  validate: Extraction.any
+}

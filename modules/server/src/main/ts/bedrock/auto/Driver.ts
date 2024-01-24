@@ -29,6 +29,7 @@ export interface DriverSettings {
   devicefarmRegion?: string;
   deviceFarmArn?: string;
   platformName?: string;
+  tunnelName?: string;
   browserVersion: string;
 }
 
@@ -262,7 +263,7 @@ const driverSetup = async (driver: WebdriverIO.Browser, settings: DriverSettings
  * webdriverPort: port to use for the webdriver server
  * webdriverTimeout: how long to wait for the webdriver server to start
  */
-export const create = async (settings: DriverSettings): Promise<Driver> => {
+export const create = async (settings: DriverSettings, tunnel: any): Promise<Driver> => {
   const webdriverTimeout = settings.webdriverTimeout || 30000;
 
   const browserName = browserVariants[settings.browser] || settings.browser;
@@ -274,8 +275,10 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
   console.log('Webdriver options:', webdriverOptions);
 
   if (settings.remoteWebdriver) {
-    const remoteDriver = await RemoteDriver.getApi(settings, browserName, webdriverOptions);
+    console.log('getting remote driver api');
+    const remoteDriver = await RemoteDriver.getApi(settings, browserName, webdriverOptions, tunnel);
     await driverSetup(remoteDriver.webdriver, settings, debuggingPort);
+    console.log('Driver setup ready...');
     return remoteDriver;
   } else {
     // Local
