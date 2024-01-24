@@ -76,10 +76,8 @@ export const getApi = async (settings: DriverSettings, browser: string, opts: We
       driver = await WebdriverIO.remote(opts);
     } catch(e) {
       console.log('Failed to create webdriver');
-      if (tunnel.tunnel.isRunning()) {
-        console.log('tunnel is still running?');
-        tunnel.tunnel.stop();
-      }
+      await tunnel.tunnel.stop();
+      console.log('stopped tunnel');
       console.log(e);
       throw new Error(e)
     }
