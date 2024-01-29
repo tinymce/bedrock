@@ -12,6 +12,10 @@ const exitDelay = (driver: Browser, delayExiting: boolean) => {
   return delayExiting ? driver.pause(17 * 60 * 1000) : Promise.resolve();
 };
 
+const markLambdaTest = async (driver: Browser, status: 'failed' | 'passed') => {
+  await driver.executeScript("lambda-status=" + status, []);
+}
+
 export const exit = (gruntDone: GruntDoneFn, exitCode: number): void => {
   if (gruntDone !== undefined) {
     gruntDone(exitCode === 0);
@@ -23,10 +27,12 @@ export const exit = (gruntDone: GruntDoneFn, exitCode: number): void => {
 export const done = async (result: Attempt<string[], TestResult[]>, driver: Browser, shutdown: ShutdownFn, gruntDone: GruntDoneFn, delayExiting: boolean): Promise<void> => {
   // Only delay exiting if tests failed.
   const exitCode = await Attempt.cata(result, async (errs) => {
+    await markLambdaTest(driver, 'failed');
     await exitDelay(driver, delayExiting);
     console.log(chalk.red(errs.join('\n')));
     return ExitCodes.failures.tests;
   }, async () => {
+    await markLambdaTest(driver, 'passed');
     console.log(chalk.green('All tests passed.'));
     return ExitCodes.success;
   });
