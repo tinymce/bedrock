@@ -13,8 +13,8 @@ const exitDelay = (driver: Browser, delayExiting: boolean) => {
 };
 
 const markLambdaTest = async (driver: Browser, status: 'failed' | 'passed') => {
-  await driver.executeScript("lambda-status=" + status, []);
-}
+  await driver.executeScript('lambda-status=' + status, []);
+};
 
 export const exit = (gruntDone: GruntDoneFn, exitCode: number): void => {
   if (gruntDone !== undefined) {

@@ -86,9 +86,9 @@ const addDriverSpecificOpts = (opts: WebdriverIO.RemoteOptions, settings: Driver
           project: names[0],
           build: names[1],
           ...(names.length > 2 ? { name: names[2] } : {})
-        }
+        };
       } else {
-        return { build: names[0] }
+        return { build: names[0] };
       }
     };
     const names = settings.name ? getProjectNaming(settings.name) : {};
