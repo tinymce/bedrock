@@ -9,6 +9,7 @@ import * as DriverLoader from './DriverLoader';
 import * as RemoteDriver from './RemoteDriver';
 import deepmerge = require('deepmerge');
 import { RemoteOptions } from 'webdriverio';
+import { Tunnel } from './Tunnel';
 
 export interface DriverSettings {
   basedir: string;
@@ -30,6 +31,8 @@ export interface DriverSettings {
   deviceFarmArn?: string;
   platformName?: string;
   browserVersion: string;
+  tunnel?: Tunnel;
+  name?: string;
 }
 
 export interface Driver {

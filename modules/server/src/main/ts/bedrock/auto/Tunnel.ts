@@ -6,6 +6,7 @@ import { Tunnel as LambdaTunnel } from '@lambdatest/node-tunnel';
 
 export interface Tunnel {
   url: URL;
+  name?: string;
   shutdown: () => Promise<void>;
 }
 
@@ -85,8 +86,11 @@ const createSSH = async (port: number | string, domain: string): Promise<Tunnel>
 // and no proper typing for it. Excuse the hard type casting
 const createLambda = async (port: number | string, credentials: LambdaCredentials): Promise<Tunnel> => {
   const tunnel = new LambdaTunnel();
+  const suffix = crypto.randomUUID();
+  const tunnelName = "bedrock-tunnel-" + suffix;
 
   const tunnelArguments = {
+    tunnelName,
     user: credentials.user,
     key: credentials.key,
     port: port.toString()
@@ -99,6 +103,7 @@ const createLambda = async (port: number | string, credentials: LambdaCredential
 
   const result: Tunnel = {
     url: new URL('http://localhost:' + port),
+    name: tunnelName,
     shutdown
   };
 

@@ -52,7 +52,7 @@ const createFarm = async (browserName: string, remoteOpts: WebdriverIO.RemoteOpt
       webdriver: driver,
       shutdown: (_: boolean | undefined) => {
         console.log('Shutting down Device Farm. This currently does nothing.');
-        return Promise.resolve();
+        return driver.deleteSession();
       }
     };
   } catch (e) {
@@ -70,7 +70,7 @@ export const getApi = async (settings: DriverSettings, browser: string, opts: We
     const driver = await WebdriverIO.remote(opts);
     return {
       webdriver: driver,
-      shutdown: () => Promise.resolve()
+      shutdown: () => driver.deleteSession()
     };
   }
   return Promise.reject('Unrecognized remote provider: [' + remoteWebdriver + ']');
@@ -78,6 +78,21 @@ export const getApi = async (settings: DriverSettings, browser: string, opts: We
 
 const addDriverSpecificOpts = (opts: WebdriverIO.RemoteOptions, settings: DriverSettings): WebdriverIO.RemoteOptions => {
   if (settings.remoteWebdriver === 'lambdatest') {
+    // For naming in LT we use PROJECT_BUILD[_NAME] or BUILD
+    const getProjectNaming = (name: string) => {
+      const names = name.split('_');
+      if (names.length > 1) {
+        return {
+          project: names[0],
+          build: names[1],
+          ...(names.length > 2 ? { name: names[2] } : {})
+        }
+      } else {
+        return { build: names[0] }
+      }
+    };
+    const names = settings.name ? getProjectNaming(settings.name) : {};
+    const tunnelName = settings.tunnel?.name ? { tunnelName: settings.tunnel.name } : {};
     const platformName = settings.platformName ? { platformName: settings.platformName } : {};
     return deepmerge(opts, {
       user: settings.username,
@@ -90,7 +105,9 @@ const addDriverSpecificOpts = (opts: WebdriverIO.RemoteOptions, settings: Driver
           console: true,
           w3c: true,
           plugin: 'node_js-webdriverio',
-          ...platformName
+          ...platformName,
+          ...tunnelName,
+          ...names
         }
       }
     });

@@ -32,8 +32,10 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
 
   const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
+  const shutdownServices: (() => Promise<any>)[] = [];
+  const shutdown = (services: (() => Promise<any>)[]) => () => Promise.allSettled(services.map((fn) => fn()));
+
   routes.then(async (runner) => {
-    const shutdownServices: (() => Promise<any>)[] = [];
 
     // LambdaTest Tunnel must know dev server port, but tunnel must be created before dev server.
     const servicePort = await portfinder.getPortPromise({
@@ -54,6 +56,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
     if (remoteWebdriver == 'aws') {
         console.log('INFO: Webdriver creation waits for device farm session to activate. Takes 30-45s.');
     }
+
     const driver = await Driver.create({
       browser: browserName,
       basedir: settings.basedir,
@@ -71,7 +74,9 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       devicefarmRegion: settings.devicefarmRegion,
       deviceFarmArn: settings.devicefarmArn,
       browserVersion: settings.browserVersion,
-      platformName: settings.platformName
+      platformName: settings.platformName,
+      tunnel,
+      name: settings.name ? settings.name : 'bedrock-auto'
     });
 
     const webdriver = driver.webdriver;
@@ -84,8 +89,6 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
       port: servicePort
     });
     shutdownServices.push(service.shutdown, driver.shutdown);
-
-    const shutdown = () => Promise.allSettled(shutdownServices.map((shutdown_fn) => shutdown_fn()));
 
     try {
       if (!isHeadless) {
@@ -106,13 +109,15 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
         return Reporter.writePollExit(settings, data);
       });
 
-      return Lifecycle.done(result, webdriver, shutdown, settings.gruntDone, settings.delayExit);
+      return Lifecycle.done(result, webdriver, shutdown(shutdownServices), settings.gruntDone, settings.delayExit);
     } catch (e) {
-      return Lifecycle.error(e, webdriver, shutdown, settings.gruntDone, settings.delayExit);
+      return Lifecycle.error(e, webdriver, shutdown(shutdownServices), settings.gruntDone, settings.delayExit);
     }
-  }).catch((err) => {
+  }).catch(async (err) => {
     // Chalk does not use a formatter. Using node's built-in to expand Objects, etc.
     console.error(chalk.red('Error creating webdriver', format(err)));
+    // Shutdown tunnels in case webdriver fails
+    await shutdown(shutdownServices)();
     Lifecycle.exit(settings.gruntDone, ExitCodes.failures.unexpected);
   });
 };
