@@ -87,7 +87,7 @@ const createSSH = async (port: number | string, domain: string): Promise<Tunnel>
 const createLambda = async (port: number | string, credentials: LambdaCredentials): Promise<Tunnel> => {
   const tunnel = new LambdaTunnel();
   const suffix = crypto.randomUUID();
-  const tunnelName = "bedrock-tunnel-" + suffix;
+  const tunnelName = 'bedrock-tunnel-' + suffix;
 
   const tunnelArguments = {
     tunnelName,
