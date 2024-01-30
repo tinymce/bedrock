@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+- LambdaTest tunnel now correctly shutdowns if Webdriver creation fails
+- Webdriver now uses tunnel name for LambdaTest tunnels #TINY-10604
+
+### Improved
+- Tests now correctly reflect their status in LambdaTest dashboards
+- Tests use the `--name` argument to correclty name test runs in LambdaTest dashboards
+
 ## 14.1.1 - 2024-01-09
 
 ### Added
