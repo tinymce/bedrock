@@ -12,7 +12,10 @@ const exitDelay = (driver: Browser, delayExiting: boolean) => {
   return delayExiting ? driver.pause(17 * 60 * 1000) : Promise.resolve();
 };
 
+// TINY-10604: Mark test runs for LambdaTest dashboard
 const markLambdaTest = async (driver: Browser, status: 'failed' | 'passed') => {
+  // Tests running on LambdaTests machines should have access to the `lambda_status` var.
+  // Setting this var will mark the result of the test for the LT dashboard
   await driver.executeScript('if (window.lambda_status) { lambda_status=' + status + ' }', []);
 };
 

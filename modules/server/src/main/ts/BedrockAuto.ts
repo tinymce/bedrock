@@ -32,8 +32,8 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
 
   const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
-  const shutdownServices: (() => Promise<any>)[] = [];
-  const shutdown = (services: (() => Promise<any>)[]) => () => Promise.allSettled(services.map((fn) => fn()));
+  const shutdownServices: (() => Promise<void>)[] = [];
+  const shutdown = (services: (() => Promise<void>)[]) => () => Promise.allSettled(services.map((fn) => fn()));
 
   routes.then(async (runner) => {
 
