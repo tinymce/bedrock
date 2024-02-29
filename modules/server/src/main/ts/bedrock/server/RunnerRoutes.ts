@@ -57,11 +57,13 @@ export const generate = async (mode: string, projectdir: string, basedir: string
         if (err) reject(err);
         else if (stderr) reject(stderr);
         else {
-          resolve(
-            (JSON.parse(stdout) as { name: string; path: string }[])
-              .map((p) => ({ name: p.name, folder: path.relative(projectdir, p.path) }))
-              .filter((p) => p.folder)
-          );
+          const result: WorkspaceRoot[] = [];
+          for (const p of JSON.parse(stdout) as { name: string; path: string }[]) {
+            const folder = path.relative(projectdir, p.path);
+            if (!folder.length) continue;
+            result.push({ name: p.name, folder });
+          }
+          resolve(result);
         }
       })
     );
