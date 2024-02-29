@@ -12,6 +12,11 @@ interface PackageJson {
   readonly workspaces: string[];
 }
 
+interface WorkspaceRoot {
+  name: string;
+  folder: string;
+}
+
 export const generate = async (mode: string, projectdir: string, basedir: string, configFile: string, bundler: 'webpack' | 'rollup', testfiles: string[], chunk: number,
                                retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[], polyfills: string[]): Promise<Routes.Runner> => {
   const files = testfiles.map((filePath) => {
@@ -32,7 +37,7 @@ export const generate = async (mode: string, projectdir: string, basedir: string
   const pkjson: PackageJson = FileUtils.readFileAsJson(`${projectdir}/package.json`);
 
   // Search for yarn workspace projects to use as resource folders
-  const findWorkspaceResources = (moduleFolder: string): Array<{name: string; folder: string}> => {
+  const findWorkspaceResources = (moduleFolder: string): Array<WorkspaceRoot> => {
     const moduleJson = `${moduleFolder}/package.json`;
     if (fs.statSync(moduleJson)) {
       const workspaceJson = FileUtils.readFileAsJson(moduleJson);
@@ -42,12 +47,12 @@ export const generate = async (mode: string, projectdir: string, basedir: string
     }
   };
 
-  const findPnpmWorkspaces = async () => {
+  const findPnpmWorkspaces = async (): Promise<WorkspaceRoot[]> => {
     if (!fs.existsSync(path.join(projectdir, 'pnpm-workspace.yaml'))) {
       return [];
     }
 
-    return new Promise<{ name: string; folder: string }[]>((resolve, reject) =>
+    return new Promise<WorkspaceRoot[]>((resolve, reject) =>
       childProcess.exec('pnpm list -r --only-projects --json', (err, stdout, stderr) => {
         if (err) reject(err);
         else if (stderr) reject(stderr);
@@ -62,7 +67,7 @@ export const generate = async (mode: string, projectdir: string, basedir: string
     );
   };
 
-  const workspaceRoots = (
+  const workspaceRoots: WorkspaceRoot[] = (
     pkjson.workspaces
       ? Arr.bind2(pkjson.workspaces, (w) => glob.sync(w), findWorkspaceResources)
       : await findPnpmWorkspaces()
