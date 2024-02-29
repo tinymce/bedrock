@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
+import * as childProcess from 'child_process';
 import * as glob from 'glob';
 import * as Routes from './Routes';
 import * as Compiler from '../compiler/Compiler';
@@ -41,10 +42,30 @@ export const generate = async (mode: string, projectdir: string, basedir: string
     }
   };
 
+  const findPnpmWorkspaces = async () => {
+    if (!fs.existsSync(path.join(projectdir, 'pnpm-workspace.yaml'))) {
+      return [];
+    }
+
+    return new Promise<{ name: string; folder: string }[]>((resolve, reject) =>
+      childProcess.exec('pnpm list -r --only-projects --json', (err, stdout, stderr) => {
+        if (err) reject(err);
+        else if (stderr) reject(stderr);
+        else {
+          resolve(
+            (JSON.parse(stdout) as { name: string; path: string }[])
+              .map((p) => ({ name: p.name, folder: path.relative(projectdir, p.path) }))
+              .filter((p) => p.folder)
+          );
+        }
+      })
+    );
+  };
+
   const workspaceRoots = (
     pkjson.workspaces
       ? Arr.bind2(pkjson.workspaces, (w) => glob.sync(w), findWorkspaceResources)
-      : []
+      : await findPnpmWorkspaces()
   );
 
   const resourceRoots = [{name: pkjson.name, folder: '.'}].concat(workspaceRoots);
