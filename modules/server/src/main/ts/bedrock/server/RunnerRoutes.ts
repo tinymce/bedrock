@@ -54,17 +54,19 @@ export const generate = async (mode: string, projectdir: string, basedir: string
 
     return new Promise<WorkspaceRoot[]>((resolve, reject) =>
       childProcess.exec('pnpm list -r --only-projects --json', (err, stdout, stderr) => {
-        if (err) reject(err);
-        else if (stderr) reject(stderr);
-        else {
-          const result: WorkspaceRoot[] = [];
-          for (const p of JSON.parse(stdout) as { name: string; path: string }[]) {
-            const folder = path.relative(projectdir, p.path);
-            if (!folder.length) continue;
-            result.push({ name: p.name, folder });
-          }
-          resolve(result);
+        if (stderr) console.error(stderr);
+        if (err) {
+          reject(err);
+          return;
         }
+
+        const result: WorkspaceRoot[] = [];
+        for (const p of JSON.parse(stdout) as { name: string; path: string }[]) {
+          const folder = path.relative(projectdir, p.path);
+          if (!folder.length) continue;
+          result.push({ name: p.name, folder });
+        }
+        resolve(result);
       })
     );
   };
