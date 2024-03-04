@@ -57,8 +57,8 @@ export interface Controller {
 
 // allow a little extra time for a test timeout so the runner can handle it gracefully
 const timeoutGrace = 2000;
-export const create = (stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced'): Controller => {
-  const hud = Hud.create(testfiles, loglevel);
+export const create = (stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced', remote: string): Controller => {
+  const hud = Hud.create(testfiles, { loglevel, remote });
   const sessions: Record<string, TestSession> = {};
   let stickyId: string | null = null;
   let timeoutError = false;
@@ -107,9 +107,16 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     outputToHud = true;
   };
 
+  const shouldUpdateHud = (session: TestSession): boolean => {
+    if (!outputToHud) return false;
+    if (stickyFirstSession && (timeoutError || session.id !== stickyId)) return false;
+    if (!remote || session.done) return true;
+    // Only update the HUD at 10% intervals on remote:
+    return session.results.length % Math.round(session.totalTests * 0.1) === 0;
+  };
+
   const updateHud = (session: TestSession) => {
-    if (!outputToHud) return;
-    if (stickyFirstSession && (timeoutError || session.id !== stickyId)) return;
+    if (!shouldUpdateHud(session)) return;
     const id = session.id;
     const numFailed = session.results.reduce((sum, res) => sum + (res.passed || res.skipped ? 0 : 1), 0);
     const numSkipped = session.results.reduce((sum, res) => sum + (res.skipped ? 1 : 0), 0);

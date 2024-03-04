@@ -111,7 +111,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
 
       return Lifecycle.done(result, webdriver, shutdown(shutdownServices), settings.gruntDone, settings.delayExit);
     } catch (e) {
-      return Lifecycle.error(e, webdriver, shutdown(shutdownServices), settings.gruntDone, settings.delayExit);
+      return Lifecycle.error(e as any, webdriver, shutdown(shutdownServices), settings.gruntDone, settings.delayExit);
     }
   }).catch(async (err) => {
     // Chalk does not use a formatter. Using node's built-in to expand Objects, etc.

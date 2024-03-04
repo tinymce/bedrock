@@ -28,6 +28,7 @@ export interface ServeSettings {
   readonly stickyFirstSession: boolean;
   readonly testfiles: string[];
   readonly port?: number;
+  readonly remote?: string;
 }
 
 export interface ServeService {
@@ -71,7 +72,7 @@ export const startCustom = async (settings: ServeSettings, createServer: (port: 
   const resetMousePosition = !pref('skipResetMousePosition');
 
   const runner = pref('runner');
-  const api = Apis.create(master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, settings.loglevel, resetMousePosition);
+  const api = Apis.create(master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, settings.loglevel, resetMousePosition, settings.remote ?? '');
 
   const routers = runner.routers.concat(
     api.routers,
