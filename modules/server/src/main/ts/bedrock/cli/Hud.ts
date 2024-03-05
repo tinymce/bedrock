@@ -1,5 +1,5 @@
 import * as readline from 'readline';
-import * as Cmp from '../util/Cmp';
+import * as Env from '../util/Env';
 
 interface ResultData {
   readonly done: boolean;
@@ -17,19 +17,12 @@ export interface Hud {
   readonly complete: () => Promise<void>;
 }
 
-export interface HudOptions {
-  readonly loglevel: 'simple' | 'advanced';
-  readonly remote?: string;
-}
-
-export const create = (testfiles: string[], { loglevel, remote = '' }: HudOptions): Hud => {
+export const create = (testfiles: string[], loglevel: 'simple' | 'advanced'): Hud => {
   let started = false;
 
   const stream = process.stdout;
 
   const numFiles = testfiles.length > 0 ? testfiles.length : '?';
-
-  let lastDataWritten: ResultData | null = null;
 
   const writeProgress = (id: string, stopped: boolean, numPassed: number, numSkipped: number, numFailed: number, total: number | '?') => {
     const numRun = numPassed + numFailed + numSkipped;
@@ -39,25 +32,20 @@ export const create = (testfiles: string[], { loglevel, remote = '' }: HudOption
       'Session: ' + id + ', Status: ' + status + ', Progress: ' + numRun + '/' + total +
       ', Failed: ' + numFailed + ', Skipped: ' + numSkipped + ' ... ' + '\n'
     );
-    if (!remote) {
+    if (!Env.IS_CI) {
       readline.clearLine(stream, 1);
     }
     return Promise.resolve();
   };
 
   const advUpdate = async (data: ResultData) => {
-    if (lastDataWritten && Cmp.deepEq(lastDataWritten, data)) {
-      return;
-    }
-    lastDataWritten = data;
-
-    if (started && !remote) {
+    if (started && !Env.IS_CI) {
       // Note, this writes over the above line, which is why we only do this after the first update.
       readline.moveCursor(stream, 0, -2);
     } else {
       started = true;
     }
-    if (!remote) {
+    if (!Env.IS_CI) {
       readline.clearLine(stream, 0);
       readline.cursorTo(stream, 0);
     }

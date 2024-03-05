@@ -1,6 +1,7 @@
 import { ErrorData } from '@ephox/bedrock-common';
 import * as Hud from '../cli/Hud';
 import * as Type from '../util/Type';
+import * as Env from '../util/Env';
 
 export interface TestErrorData {
   readonly data: ErrorData;
@@ -57,8 +58,8 @@ export interface Controller {
 
 // allow a little extra time for a test timeout so the runner can handle it gracefully
 const timeoutGrace = 2000;
-export const create = (stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced', remote: string): Controller => {
-  const hud = Hud.create(testfiles, { loglevel, remote });
+export const create = (stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced'): Controller => {
+  const hud = Hud.create(testfiles, loglevel);
   const sessions: Record<string, TestSession> = {};
   let stickyId: string | null = null;
   let timeoutError = false;
@@ -110,7 +111,7 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
   const shouldUpdateHud = (session: TestSession): boolean => {
     if (!outputToHud) return false;
     if (stickyFirstSession && (timeoutError || session.id !== stickyId)) return false;
-    if (!remote || session.done) return true;
+    if (!Env.IS_CI || session.done) return true;
     // Only update the HUD at 10% intervals on remote:
     return session.results.length % Math.round(session.totalTests * 0.1) === 0;
   };

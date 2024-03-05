@@ -42,7 +42,7 @@ const pollRate = 200;
 const maxInvalidAttempts = 300;
 
 // TODO: Do not use files here.
-export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Browser>, projectdir: string, basedir: string, stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced', resetMousePosition: boolean, remote: string): Apis => {
+export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Browser>, projectdir: string, basedir: string, stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced', resetMousePosition: boolean): Apis => {
   let pageHasLoaded = false;
   let needsMousePositionReset = true;
 
@@ -119,7 +119,7 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
     pageHasLoaded = true;
   };
 
-  const c = Controller.create(stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel, remote);
+  const c = Controller.create(stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel);
 
   const routers = [
     driverRouter('/keys', 'Keys', KeyEffects.executor, false),
