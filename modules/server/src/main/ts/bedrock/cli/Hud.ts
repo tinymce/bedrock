@@ -26,7 +26,7 @@ export const create = (testfiles: string[], loglevel: 'simple' | 'advanced'): Hu
 
   const writeProgress = (id: string, stopped: boolean, numPassed: number, numSkipped: number, numFailed: number, total: number | '?') => {
     const numRun = numPassed + numFailed + numSkipped;
-    total = total === '?' ? -Infinity : total - numSkipped;
+    total = total === '?' ? -Infinity : total;
     const status = stopped ? (numRun < total ? 'STOPPED' : 'COMPLETE') : 'RUNNING';
     stream.write(
       'Session: ' + id + ', Status: ' + status + ', Progress: ' + numRun + '/' + total +
