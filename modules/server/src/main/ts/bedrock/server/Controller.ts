@@ -138,7 +138,10 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     session.updated = Date.now();
     session.totalTests = totalTests;
     session.done = false;
-    updateHud(session);
+    if (!session.results.length || !Env.IS_CI) {
+      // Update HUD on test starts when in CI only on the very first update i.e. `progress: 0/0`, otherwise skip them.
+      updateHud(session);
+    }
   };
 
   const recordTestResult = (id: string, name: string, file: string, passed: boolean, time: string, error: TestErrorData | null, skipped: string) => {
