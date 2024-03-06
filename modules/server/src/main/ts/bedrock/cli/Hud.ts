@@ -38,7 +38,7 @@ export const create = (testfiles: string[], loglevel: 'simple' | 'advanced'): Hu
     return Promise.resolve();
   };
 
-  const advUpdate = async (data: ResultData) => {
+  const advUpdate = (data: ResultData) => {
     if (started && !Env.IS_CI) {
       // Note, this writes over the above line, which is why we only do this after the first update.
       readline.moveCursor(stream, 0, -2);
