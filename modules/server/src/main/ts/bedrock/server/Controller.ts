@@ -111,7 +111,7 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
   const shouldUpdateHud = (session: TestSession): boolean => {
     if (!outputToHud) return false;
     if (stickyFirstSession && (timeoutError || session.id !== stickyId)) return false;
-    if (!Env.IS_CI || session.done) return true;
+    if (!Env.IS_CI || session.done || !session.results.at(-1)?.passed) return true;
     // Only update the HUD at 10% intervals on remote:
     return session.results.length % Math.round(session.totalTests * 0.1) === 0;
   };
