@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
+import * as childProcess from 'child_process';
 import * as glob from 'glob';
 import * as Routes from './Routes';
 import * as Compiler from '../compiler/Compiler';
@@ -9,6 +10,11 @@ import * as Arr from '../util/Arr';
 interface PackageJson {
   readonly name: string;
   readonly workspaces: string[];
+}
+
+interface WorkspaceRoot {
+  name: string;
+  folder: string;
 }
 
 export const generate = async (mode: string, projectdir: string, basedir: string, configFile: string, bundler: 'webpack' | 'rollup', testfiles: string[], chunk: number,
@@ -31,7 +37,7 @@ export const generate = async (mode: string, projectdir: string, basedir: string
   const pkjson: PackageJson = FileUtils.readFileAsJson(`${projectdir}/package.json`);
 
   // Search for yarn workspace projects to use as resource folders
-  const findWorkspaceResources = (moduleFolder: string): Array<{name: string; folder: string}> => {
+  const findWorkspaceResources = (moduleFolder: string): Array<WorkspaceRoot> => {
     const moduleJson = `${moduleFolder}/package.json`;
     if (fs.statSync(moduleJson)) {
       const workspaceJson = FileUtils.readFileAsJson(moduleJson);
@@ -41,10 +47,34 @@ export const generate = async (mode: string, projectdir: string, basedir: string
     }
   };
 
-  const workspaceRoots = (
+  const findPnpmWorkspaces = async (): Promise<WorkspaceRoot[]> => {
+    if (!fs.existsSync(path.join(projectdir, 'pnpm-workspace.yaml'))) {
+      return [];
+    }
+
+    return new Promise<WorkspaceRoot[]>((resolve, reject) =>
+      childProcess.exec('pnpm list -r --only-projects --json', (err, stdout, stderr) => {
+        if (stderr) console.error(stderr);
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const result: WorkspaceRoot[] = [];
+        for (const p of JSON.parse(stdout) as { name: string; path: string }[]) {
+          const folder = path.relative(projectdir, p.path);
+          if (!folder.length) continue;
+          result.push({ name: p.name, folder });
+        }
+        resolve(result);
+      })
+    );
+  };
+
+  const workspaceRoots: WorkspaceRoot[] = (
     pkjson.workspaces
       ? Arr.bind2(pkjson.workspaces, (w) => glob.sync(w), findWorkspaceResources)
-      : []
+      : await findPnpmWorkspaces()
   );
 
   const resourceRoots = [{name: pkjson.name, folder: '.'}].concat(workspaceRoots);
