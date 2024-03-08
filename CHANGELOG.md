@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Improved
 
-- Reduced progress logs when on CI to 10% intervals #TINY10708
+- Reduced progress logs when on CI to 10% intervals #TINY-10708
 
 ## 14.1.2 - 2024-01-31
 
