@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Improved
+
+- Reduced progress logs when on CI to 10% intervals #TINY-10708
 - Now supports using `pnpm-workspace.yaml` to fetch workspaces #TINY-10688
 
 ## 14.1.2 - 2024-01-31

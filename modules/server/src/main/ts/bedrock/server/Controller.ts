@@ -1,6 +1,7 @@
 import { ErrorData } from '@ephox/bedrock-common';
 import * as Hud from '../cli/Hud';
 import * as Type from '../util/Type';
+import * as Env from '../util/Env';
 
 export interface TestErrorData {
   readonly data: ErrorData;
@@ -107,9 +108,16 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     outputToHud = true;
   };
 
+  const shouldUpdateHud = (session: TestSession): boolean => {
+    if (!outputToHud) return false;
+    if (stickyFirstSession && (timeoutError || session.id !== stickyId)) return false;
+    if (!Env.IS_CI || session.done || !session.results.at(-1)?.passed) return true;
+    // Only update the HUD at 10% intervals on remote:
+    return session.results.length % Math.round(session.totalTests * 0.1) === 0;
+  };
+
   const updateHud = (session: TestSession) => {
-    if (!outputToHud) return;
-    if (stickyFirstSession && (timeoutError || session.id !== stickyId)) return;
+    if (!shouldUpdateHud(session)) return;
     const id = session.id;
     const numFailed = session.results.reduce((sum, res) => sum + (res.passed || res.skipped ? 0 : 1), 0);
     const numSkipped = session.results.reduce((sum, res) => sum + (res.skipped ? 1 : 0), 0);
@@ -130,7 +138,10 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     session.updated = Date.now();
     session.totalTests = totalTests;
     session.done = false;
-    updateHud(session);
+    if (!session.results.length || !Env.IS_CI) {
+      // Update HUD on test starts when in CI only on the very first update i.e. `progress: 0/0`, otherwise skip them.
+      updateHud(session);
+    }
   };
 
   const recordTestResult = (id: string, name: string, file: string, passed: boolean, time: string, error: TestErrorData | null, skipped: string) => {

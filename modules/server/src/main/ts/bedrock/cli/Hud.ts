@@ -1,4 +1,5 @@
 import * as readline from 'readline';
+import * as Env from '../util/Env';
 
 interface ResultData {
   readonly done: boolean;
@@ -25,24 +26,29 @@ export const create = (testfiles: string[], loglevel: 'simple' | 'advanced'): Hu
 
   const writeProgress = (id: string, stopped: boolean, numPassed: number, numSkipped: number, numFailed: number, total: number | '?') => {
     const numRun = numPassed + numFailed + numSkipped;
+    total = total === '?' ? -Infinity : total;
     const status = stopped ? (numRun < total ? 'STOPPED' : 'COMPLETE') : 'RUNNING';
     stream.write(
       'Session: ' + id + ', Status: ' + status + ', Progress: ' + numRun + '/' + total +
       ', Failed: ' + numFailed + ', Skipped: ' + numSkipped + ' ... ' + '\n'
     );
-    readline.clearLine(stream, 1);
+    if (!Env.IS_CI) {
+      readline.clearLine(stream, 1);
+    }
     return Promise.resolve();
   };
 
   const advUpdate = (data: ResultData) => {
-    if (started) {
+    if (started && !Env.IS_CI) {
       // Note, this writes over the above line, which is why we only do this after the first update.
       readline.moveCursor(stream, 0, -2);
     } else {
       started = true;
     }
-    readline.clearLine(stream, 0);
-    readline.cursorTo(stream, 0);
+    if (!Env.IS_CI) {
+      readline.clearLine(stream, 0);
+      readline.cursorTo(stream, 0);
+    }
     stream.write('Current test: ' + (data.test !== undefined ? data.test.substring(0, 60) : 'Unknown') + '\n');
     const totalFiles = data.totalFiles !== undefined ? data.totalFiles : numFiles;
     const totalTests = data.totalTests !== undefined ? data.totalTests : totalFiles;
