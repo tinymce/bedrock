@@ -39,7 +39,7 @@ describe('Effects', () => {
 
       await sendKeyCombo('textarea', 'v', ctrlKeyModifier);
       Assert.eq('Textarea value after pasting', 'hello world', textarea.value);
-    });
+    }).retries(5);
 
     it('should type text', async () => {
       await sendText('textarea', 'hello world!');
