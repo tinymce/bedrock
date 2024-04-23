@@ -17,15 +17,19 @@ export interface Runner {
   readonly fallback: Route;
 }
 
-const createServer = (root: string) => {
+const createServer = (root: string, options?: server.ServeStaticOptions) => {
   // Note: The serve-static types appear to be wrong here, so just force it back to what it should be
-  return server(root) as (request: IncomingMessage, response: ServerResponse, done: (err?: any) => void) => void;
+  return server(root, options) as (request: IncomingMessage, response: ServerResponse, done: (err?: any) => void) => void;
 };
+
+const createCachingServer = (source: string) => createServer(source, { setHeaders: (res => res.setHeader('Cache-Control', 'public, max-age=3600')) });
 
 const doResponse = (request: IncomingMessage, response: ServerResponse, status: number, contentType: string, data: any) => {
   response.setHeader('ETag', RouteUtils.generateETag(data));
   if (status === 304 || RouteUtils.isCachable(status) && RouteUtils.isFresh(request, response)) {
-    response.writeHead(304, { });
+    response.writeHead(304, {
+      'Cache-Control': 'public, max-age=3600'
+    });
     response.end();
   } else {
     response.writeHead(status, {
@@ -36,8 +40,8 @@ const doResponse = (request: IncomingMessage, response: ServerResponse, status: 
   }
 };
 
-export const routing = (method: HTTPMethod, prefix: string, source: string): Route => {
-  const router = createServer(source);
+export const routing = (method: HTTPMethod, prefix: string, source: string, cache = false): Route => {
+  const router = (cache ? createCachingServer : createServer)(source);
 
   const go: RouteGoFunc = (request, response, done) => {
     if (request.url) {
@@ -197,7 +201,8 @@ export const nodeResolve = (method: HTTPMethod, prefix: string, source: string):
     try {
       if (modulePath) {
         const moduleResolvedPath = require.resolve(modulePath, { paths: [ source ] });
-        const router = createServer(path.dirname(moduleResolvedPath));
+        // assume node_modules doesn't change while bedrock is open
+        const router = createCachingServer(path.dirname(moduleResolvedPath));
         request.url = '/' + path.basename(moduleResolvedPath);
         router(request, response, done);
       } else {

@@ -97,10 +97,10 @@ export const generate = async (mode: string, projectdir: string, basedir: string
       Routes.routing('GET', '/project', projectdir),
 
       // bedrock resources
-      Routes.routing('GET', '/runner', path.join(require.resolve('@ephox/bedrock-runner'), '../../../../../dist')),
-      Routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery'))),
-      Routes.routing('GET', '/lib/core-js-bundle', path.dirname(require.resolve('core-js-bundle'))),
-      Routes.routing('GET', '/css', path.join(basedir, 'src/resources/css')),
+      Routes.routing('GET', '/runner', path.join(require.resolve('@ephox/bedrock-runner'), '../../../../../dist'), true),
+      Routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery')), true),
+      Routes.routing('GET', '/lib/core-js-bundle', path.dirname(require.resolve('core-js-bundle')), true),
+      Routes.routing('GET', '/css', path.join(basedir, 'src/resources/css'), true),
 
       // test code
       Routes.asyncJs('GET', '/compiled/tests.js', (done) => {
