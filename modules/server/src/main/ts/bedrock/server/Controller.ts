@@ -45,12 +45,13 @@ interface TestSession {
   done: boolean;
   error?: string;
   totalTests: number;
+  currentTest: number;
 }
 
 export interface Controller {
   readonly enableHud: () => void;
   readonly recordAlive: (sessionId: string) => void;
-  readonly recordTestStart: (id: string, name: string, file: string, totalTests: number) => void;
+  readonly recordTestStart: (id: string, name: string, file: string, currentCount: number, totalTests: number) => void;
   readonly recordTestResult: (id: string, name: string, file: string, passed: boolean, time: string, error: TestErrorData | null, skipped: string) => void;
   readonly recordDone: (id: string, error?: string) => void;
   readonly awaitDone: () => Promise<TestResults>;
@@ -96,7 +97,8 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
         inflight: null,
         previous: null,
         done: false,
-        totalTests: testfiles.length
+        totalTests: testfiles.length,
+        currentTest: 0
       };
       sessions[sessionId] = session;
     }
@@ -121,7 +123,7 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     const id = session.id;
     const numFailed = session.results.reduce((sum, res) => sum + (res.passed || res.skipped ? 0 : 1), 0);
     const numSkipped = session.results.reduce((sum, res) => sum + (res.skipped ? 1 : 0), 0);
-    const numPassed = session.results.length - numFailed - numSkipped;
+    const numPassed = session.currentTest - numFailed - numSkipped;
     const test = session.inflight !== null ? session.inflight.name : (session.previous !== null ? session.previous.name : '');
     const done = session.done;
     hud.update({id, test, numPassed, numSkipped, numFailed, done, totalTests: session.totalTests});
@@ -131,12 +133,13 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     getSession(sessionId);
   };
 
-  const recordTestStart = (id: string, name: string, file: string, totalTests: number) => {
+  const recordTestStart = (id: string, name: string, file: string, currentCount: number, totalTests: number) => {
     const session = getSession(id);
     const start = Date.now();
     session.inflight = {name, file, start};
     session.updated = Date.now();
     session.totalTests = totalTests;
+    session.currentTest = currentCount;
     session.done = false;
     if (!session.results.length || !Env.IS_CI) {
       // Update HUD on test starts when in CI only on the very first update i.e. `progress: 0/0`, otherwise skip them.
@@ -174,6 +177,9 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     const session = getSession(id);
     session.done = true;
     session.error = error;
+    if (!error) {
+      session.currentTest = session.totalTests;
+    }
     session.updated = Date.now();
     updateHud(session);
   };
