@@ -1,5 +1,5 @@
 import { ErrorData, Global } from '@ephox/bedrock-common';
-import Promise from '@ephox/wrap-promise-polyfill';
+
 import { HarnessResponse } from '../core/ServerTypes';
 
 export interface TestErrorData {

@@ -1,5 +1,4 @@
 import { Suite } from '@ephox/bedrock-common';
-import Promise from '@ephox/wrap-promise-polyfill';
 import { HarnessResponse } from '../core/ServerTypes';
 import { UrlParams } from '../core/UrlParams';
 import { noop } from '../core/Utils';

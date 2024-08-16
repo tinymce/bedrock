@@ -1,5 +1,4 @@
 import { UnitTest } from '@ephox/bedrock-client';
-import Promise from '@ephox/wrap-promise-polyfill';
 
 UnitTest.asyncTest('AsyncFail Test 1', (success, failure) => {
   setTimeout(() => {

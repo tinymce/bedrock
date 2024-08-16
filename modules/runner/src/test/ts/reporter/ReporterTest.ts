@@ -1,5 +1,4 @@
 import { Failure, LoggedError } from '@ephox/bedrock-common';
-import Promise from '@ephox/wrap-promise-polyfill';
 import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { beforeEach, describe, it } from 'mocha';
