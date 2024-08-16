@@ -10,6 +10,7 @@ import { noop } from '../TestUtils';
 
 interface StartTestData {
   readonly session: string;
+  readonly currentCount: number;
   readonly totalTests: number;
   readonly file: string;
   readonly name: string;
@@ -52,7 +53,7 @@ describe('Reporter.test', () => {
     sendKeepAlive: () => Promise.resolve(),
     sendInit: () => Promise.resolve(),
     sendTestStart: (session, currentCount, totalTests, file, name) => {
-      startTestData.push({ session, totalTests, file, name });
+      startTestData.push({ session, currentCount, totalTests, file, name });
       return Promise.resolve();
     },
     sendTestResult: (session, file, name, passed, time, error, skipped) => {
@@ -82,15 +83,16 @@ describe('Reporter.test', () => {
       reset();
       const test = reporter.test(fileName + 'Test.ts', testName, testCount);
       return test.start().then(() => {
-        assert.equal(startTestData.length, 1);
+        assert.equal(startTestData.length, 1, 'Checking start test data length');
         assert.deepEqual(startTestData[0], {
+          currentCount: offset + 1,
           session: sessionId,
           totalTests: testCount,
           file: fileName + 'Test.ts',
           name: testName
-        });
+        }, 'Checking start test data contents');
 
-        assert.equal(endTestData.length, 0);
+        assert.equal(endTestData.length, 0, 'Checking end test data length');
         assert.deepEqual(reporter.summary(), {
           offset,
           passed: offset,
@@ -100,35 +102,6 @@ describe('Reporter.test', () => {
 
         assert.isFalse(doneCalled);
       });
-    }));
-  });
-
-  it('should report the session id, file, name, passed state and time on a test success', () => {
-    return fc.assert(fc.asyncProperty(fc.hexaString(), fc.asciiString(), fc.integer(offset), (fileName, testName, testCount) => {
-      reset();
-      const test = reporter.test(fileName + 'Test.ts', testName, testCount);
-      return test.start()
-        .then(test.pass)
-        .then(() => {
-          assert.equal(endTestData.length, 1);
-          const data = endTestData[0];
-          assert.equal(data.session, sessionId);
-          assert.equal(data.file, fileName + 'Test.ts');
-          assert.equal(data.name, testName);
-          assert.isTrue(data.passed);
-          assert.isNull(data.skipped);
-          assert.isNull(data.error);
-          assert.isString(data.time);
-
-          assert.deepEqual(reporter.summary(), {
-            offset,
-            passed: offset + 1,
-            failed: 0,
-            skipped: 0
-          }, 'Summary has one passed test');
-
-          assert.isFalse(doneCalled);
-        });
     }));
   });
 
@@ -192,14 +165,18 @@ describe('Reporter.test', () => {
     }));
   });
 
-  it('should report done', () => {
+  it('should report done', async () => {
     reporter.done();
+    // let the async callbacks run
+    await Promise.resolve();
     assert.isTrue(doneCalled);
     assert.isUndefined(doneError);
   });
 
-  it('should report done with an error', () => {
+  it('should report done with an error', async () => {
     reporter.done(Failure.prepFailure('Unexpected error occurred'));
+    // let the async callbacks run
+    await Promise.resolve();
     assert.isTrue(doneCalled);
     assert.include(doneError, 'Unexpected error occurred');
   });

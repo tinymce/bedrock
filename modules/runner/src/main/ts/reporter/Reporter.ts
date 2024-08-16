@@ -47,7 +47,8 @@ const mapError = (e: LoggedError) => mapStackTrace(e.stack).then((mappedStack) =
 
 export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi): Reporter => {
   const initial = new Date();
-  let currentCount = params.offset || 0;
+  const initialOffset = params.offset || 0;
+  let currentCount = initialOffset;
   let passCount = 0;
   let skipCount = 0;
   let failCount = 0;
@@ -84,7 +85,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
         startNotification = () => callbacks.sendTestStart(params.session, currentCount, totalNumTests, file, name);
 
         // once at test start and again every 50 tests (a number chosen without any particular reason)
-        if (currentCount === 1 || currentCount % 50 === 0) {
+        if (currentCount === initialOffset + 1 || currentCount % 50 === 0) {
           // run immediately and cache the result for use later
           const callback = startNotification();
           reportsInFlight.push(callback);
