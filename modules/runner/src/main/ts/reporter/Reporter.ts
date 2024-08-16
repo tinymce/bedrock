@@ -52,6 +52,8 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
   let skipCount = 0;
   let failCount = 0;
 
+  const reportsInFlight: Promise<void>[] = [];
+
   const summary = () => ({
     offset: Math.max(0, currentCount - 1),
     passed: passCount + (params.offset - params.failed - params.skipped),
@@ -65,6 +67,8 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     let started = false;
     const testUi = ui.test();
 
+    let startNotification: () => Promise<void>;
+
     const start = (): Promise<void> => {
       if (started) {
         return Promise.resolve();
@@ -74,7 +78,17 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
         currentCount++;
 
         testUi.start(file, name);
-        return callbacks.sendTestStart(params.session, totalNumTests, file, name);
+        startNotification = () => callbacks.sendTestStart(params.session, currentCount, totalNumTests, file, name);
+
+        // once at test start and again every 50 test blocks
+        if (currentCount === 1 || currentCount % 50 === 0) {
+          // run immediately and cache the result for use later
+          const callback = startNotification();
+          reportsInFlight.push(callback);
+          startNotification = () => callback;
+        }
+        // don't block, ever ever ever
+        return Promise.resolve();
       }
     };
 
@@ -92,7 +106,9 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
         const testTime = elapsed(starttime);
 
         testUi.pass(testTime, currentCount);
-        return callbacks.sendTestResult(params.session, file, name, true, testTime, null, null);
+
+        // don't block, ever ever ever
+        return Promise.resolve();
       }
     };
 
@@ -105,7 +121,9 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
         const testTime = elapsed(starttime);
 
         testUi.skip(testTime, currentCount);
-        return callbacks.sendTestResult(params.session, file, name, false, testTime, null, reason);
+
+        // don't block, ever ever ever
+        return Promise.resolve();
       }
     };
 
@@ -125,7 +143,11 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
           };
 
           testUi.fail(err, testTime, currentCount);
-          return callbacks.sendTestResult(params.session, file, name, false, testTime, error, null);
+          // make sure we have sent a `start` before we report a failure
+          // this can block, because the data is critical for the console
+          return startNotification().then(() =>
+            callbacks.sendTestResult(params.session, file, name, false, testTime, error, null)
+          );
         });
       }
     };
@@ -146,7 +168,11 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     };
 
     const textError = error !== undefined ? ErrorReporter.text(error) : undefined;
-    callbacks.sendDone(params.session, textError).then(setAsDone, setAsDone);
+
+    // make sure any in progress updates are sent before we clean up
+    Promise.all(reportsInFlight).then(() =>
+      callbacks.sendDone(params.session, textError).then(setAsDone, setAsDone)
+    );
   };
 
   return {

@@ -51,7 +51,7 @@ describe('Reporter.test', () => {
     loadHarness: () => Promise.resolve({ retries: 0, chunk: 100, stopOnFailure: true, mode: 'manual', timeout: 10000 }),
     sendKeepAlive: () => Promise.resolve(),
     sendInit: () => Promise.resolve(),
-    sendTestStart: (session, totalTests, file, name) => {
+    sendTestStart: (session, currentCount, totalTests, file, name) => {
       startTestData.push({ session, totalTests, file, name });
       return Promise.resolve();
     },
