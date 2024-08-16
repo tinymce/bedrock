@@ -52,6 +52,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
   let skipCount = 0;
   let failCount = 0;
 
+  // A global list of reports that were sent to the server, we must wait for these before sending `/done` or it may confuse the HUD
   const reportsInFlight: Promise<void>[] = [];
 
   const summary = () => ({
@@ -67,6 +68,8 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     let started = false;
     const testUi = ui.test();
 
+    // In order to prevent overloading the browser's parallel connection count, we only send start notifications when necessary.
+    // And when we do, we want any subsequent report to be blocked until the start notification has completed.
     let startNotification: () => Promise<void>;
 
     const start = (): Promise<void> => {
@@ -80,7 +83,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
         testUi.start(file, name);
         startNotification = () => callbacks.sendTestStart(params.session, currentCount, totalNumTests, file, name);
 
-        // once at test start and again every 50 test blocks
+        // once at test start and again every 50 tests (a number chosen without any particular reason)
         if (currentCount === 1 || currentCount % 50 === 0) {
           // run immediately and cache the result for use later
           const callback = startNotification();
@@ -122,6 +125,11 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
 
         testUi.skip(testTime, currentCount);
 
+        const report = startNotification().then(() =>
+           callbacks.sendTestResult(params.session, file, name, false, testTime, null, reason)
+        );
+        reportsInFlight.push(report);
+
         // don't block, ever ever ever
         return Promise.resolve();
       }
@@ -143,8 +151,8 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
           };
 
           testUi.fail(err, testTime, currentCount);
-          // make sure we have sent a `start` before we report a failure
-          // this can block, because the data is critical for the console
+          // make sure we have sent a `start` before we report a failure, otherwise the HUD goes all weird
+          // this can block, because failure data is critical for the console
           return startNotification().then(() =>
             callbacks.sendTestResult(params.session, file, name, false, testTime, error, null)
           );
