@@ -107,10 +107,12 @@ export const startCustom = async (settings: ServeSettings, createServer: (port: 
 export const start = (settings: ServeSettings): Promise<ServeService> => {
   return startCustom(settings, (port, listener) => {
     const server = http.createServer(listener);
+    server.requestTimeout = 120000;
     return {
       start: () => {
         return new Promise((resolve) => {
           server.listen(port, resolve);
+          server.keepAliveTimeout = 120000;
         });
       },
       stop: () => new Promise((resolve, reject) => {
