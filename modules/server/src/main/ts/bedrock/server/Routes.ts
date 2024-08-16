@@ -30,7 +30,8 @@ const doResponse = (request: IncomingMessage, response: ServerResponse, status: 
   } else {
     response.writeHead(status, {
       'Content-Type': contentType,
-      'Cache-Control': 'public, max-age=0'
+      'Cache-Control': 'public, max-age=0',
+      'Keep-Alive': 'timeout=120' // Avoid 502 errors
     });
     response.end(data);
   }
