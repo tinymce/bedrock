@@ -55,8 +55,8 @@ describe('Reporter.test', () => {
       startTestData.push({ session, currentCount, totalTests, file, name });
       return Promise.resolve();
     },
-    sendTestResult: (session, file, name, passed, time, error, skipped) => {
-      endTestData.push({ session, file, name, passed, time, error, skipped });
+    sendTestResults: (session, results) => {
+      results.forEach(r => endTestData.push({session, ...r}));
       return Promise.resolve();
     },
     sendDone: (session, error) => {
@@ -81,7 +81,8 @@ describe('Reporter.test', () => {
     return fc.assert(fc.asyncProperty(fc.hexaString(), fc.asciiString(), fc.integer(offset), (fileName, testName, testCount) => {
       reset();
       const test = reporter.test(fileName + 'Test.ts', testName, testCount);
-      return test.start().then(() => {
+      test.start();
+      return reporter.waitForResults().then(() => {
         assert.equal(startTestData.length, 1, 'Checking start test data length');
         assert.deepEqual(startTestData[0], {
           currentCount: offset + 1,
@@ -108,8 +109,9 @@ describe('Reporter.test', () => {
     return fc.assert(fc.asyncProperty(fc.hexaString(), fc.asciiString(), fc.asciiString(), fc.integer(offset), (fileName, testName, skippedMessage, testCount) => {
       reset();
       const test = reporter.test(fileName + 'Test.ts', testName, testCount);
-      return test.start()
-        .then(() => test.skip(skippedMessage))
+      test.start();
+      test.skip(skippedMessage);
+      return reporter.waitForResults()
         .then(() => {
           assert.equal(endTestData.length, 1);
           const data = endTestData[0];
@@ -139,8 +141,9 @@ describe('Reporter.test', () => {
       const test = reporter.test(fileName + 'Test.ts', testName, testCount);
       const error = LoggedError.loggedError(new Error('Failed'), [ 'Log Message' ]);
 
-      return test.start()
-        .then(() => test.fail(error))
+      test.start();
+      test.fail(error);
+      return reporter.waitForResults()
         .then(() => {
           assert.equal(endTestData.length, 1);
           const data = endTestData[ 0 ];

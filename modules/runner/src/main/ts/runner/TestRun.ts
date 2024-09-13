@@ -39,7 +39,8 @@ const runTestWithRetry = (test: Test, state: RunState, report: TestReporter, ret
       .catch((e: LoggedError | InternalError) => {
         if (retryCount < test.retries() && !isInternalError(e)) {
           test.setResult(RunnableState.NotRun);
-          return report.retry().then(() => runTestWithRetry(test, state, report, retryCount + 1));
+          report.retry();
+          return runTestWithRetry(test, state, report, retryCount + 1);
         } else {
           return Promise.reject(e);
         }
@@ -51,17 +52,21 @@ export const runTest = (test: Test, state: RunState, actions: RunActions, report
   const fail = (report: TestReporter, e: LoggedError) => {
     test.setResult(RunnableState.Failed, e);
     console.error(e);
-    return report.fail(e).then(actions.onFailure).then(() => Promise.reject());
+    report.fail(e);
+    actions.onFailure();
+    return Promise.reject(e);
   };
 
   const skip = (report: TestReporter) => {
     test.setResult(RunnableState.Skipped);
-    return report.skip(test.title).then(actions.onSkip);
+    report.skip(test.title);
+    actions.onSkip();
   };
 
   const pass = (report: TestReporter) => {
     test.setResult(RunnableState.Passed);
-    return report.pass().then(actions.onPass);
+    report.pass();
+    actions.onPass();
   };
 
   state.testCount++;
@@ -75,8 +80,8 @@ export const runTest = (test: Test, state: RunState, actions: RunActions, report
     const report = reporter.test(test.file || 'Unknown', test.fullTitle(), state.totalTests);
 
     actions.onStart(test);
-    return report.start()
-      .then(() => runTestWithRetry(test, state, report, 0))
+    report.start();
+    return runTestWithRetry(test, state, report, 0)
       .then(() => pass(report), (e: LoggedError | InternalError) => {
         if (e instanceof SkipError) {
           return skip(report);

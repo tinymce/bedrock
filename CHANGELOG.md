@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Fixed
 - Reverted TINY-10708 which was a server-side fix
 - Reduced logging from client to server, and stopped waiting for log requests to complete between tests #TINY-11177
+- Removed server-side monitoring of single test timeouts. This is still monitored client side. #TINY-11177
 
 ## Removed
 - The Promise polyfill is no longer allowed on modern NodeJS frameworks so it has been removed. #TINY-11177

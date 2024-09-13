@@ -53,11 +53,12 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
     } else if (params.retry < retries) {
       retryTest(params.retry + 1);
     } else {
-      loadNextTest();
+      // show the failure for 1 second for the purposes of showing the failure on video
+      setTimeout(loadNextTest, 1000);
     }
   };
 
-  const init = (): Promise<HarnessResponse> => {
+  const init = async (): Promise<HarnessResponse> => {
     // Filter the tests to ensure we have an accurate total test count
     filterOnly(rootSuite);
     numTests = countTests(rootSuite);
@@ -65,15 +66,20 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
     // Render the initial UI
     ui.render(params.offset, numTests, actions.restartTests, retryTest, loadNextTest);
 
-    // delay this ajax call until after the reporter status elements are in the page
-    const keepAliveTimer = setInterval(() => {
-      callbacks.sendKeepAlive(params.session).catch(() => {
-        // if the server shuts down stop trying to send messages
-        clearInterval(keepAliveTimer);
-      });
-    }, KEEP_ALIVE_INTERVAL);
+    return Promise.all([callbacks.sendInit(params.session), callbacks.loadHarness()]).then(([_, harness]) => {
+      // we don't need a keep-alive timer in auto mode,
+      if (harness.mode === 'manual') {
+        // delay this ajax call until after the reporter status elements are in the page
+        const keepAliveTimer = setInterval(() => {
+          callbacks.sendKeepAlive(params.session).catch(() => {
+            // if the server shuts down stop trying to send messages
+            clearInterval(keepAliveTimer);
+          });
+        }, KEEP_ALIVE_INTERVAL);
+      }
 
-    return callbacks.sendInit(params.session).then(() => callbacks.loadHarness());
+      return harness;
+    });
   };
 
   const run = (chunk: number, retries: number, timeout: number, stopOnFailure: boolean): Promise<void> => {
