@@ -23,13 +23,9 @@ export interface TestResults {
   readonly now: number;
 }
 
-interface InflightTest {
+interface PreviousTest {
   readonly name: string;
   readonly file: string;
-  readonly start: number;
-}
-
-interface PreviousTest extends InflightTest {
   readonly end: number;
 }
 
@@ -39,7 +35,6 @@ interface TestSession {
   readonly lookup: Record<string, Record<string, number>>;
   alive: number;
   updated: number;
-  inflight: InflightTest | null;
   previous: PreviousTest | null;
   done: boolean;
   error?: string;
@@ -52,13 +47,12 @@ export interface Controller {
   readonly recordAlive: (sessionId: string) => void;
   readonly recordTestStart: (id: string, name: string, file: string, currentCount: number, totalTests: number) => void;
   readonly recordTestResult: (id: string, name: string, file: string, passed: boolean, time: string, error: TestErrorData | null, skipped: string) => void;
+  readonly recordTestResults: (id: string, results: TestResult[]) => void;
   readonly recordDone: (id: string, error?: string) => void;
   readonly awaitDone: () => Promise<TestResults>;
 }
 
-// allow a little extra time for a test timeout so the runner can handle it gracefully
-const timeoutGrace = 2000;
-export const create = (stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced'): Controller => {
+export const create = (stickyFirstSession: boolean, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced'): Controller => {
   const hud = Hud.create(testfiles, loglevel);
   const sessions: Record<string, TestSession> = {};
   let stickyId: string | null = null;
@@ -93,7 +87,6 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
         updated: now,
         results: [],
         lookup: {},
-        inflight: null,
         previous: null,
         done: false,
         totalTests: testfiles.length,
@@ -123,7 +116,7 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
      * We use this to calculate the number of passing tests, assuming every non-reported result is a pass.
      */
     const numPassed = session.currentTest - numFailed - numSkipped;
-    const test = session.inflight !== null ? session.inflight.name : (session.previous !== null ? session.previous.name : '');
+    const test = session.previous !== null ? session.previous.name : '';
     const done = session.done;
     hud.update({id, test, numPassed, numSkipped, numFailed, done, totalTests: session.totalTests});
   };
@@ -134,8 +127,6 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
 
   const recordTestStart = (id: string, name: string, file: string, currentCount: number, totalTests: number) => {
     const session = getSession(id);
-    const start = Date.now();
-    session.inflight = {name, file, start};
     session.updated = Date.now();
     session.totalTests = totalTests;
     session.currentTest = currentCount;
@@ -156,17 +147,26 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
       session.lookup[file][name] = session.results.length;
       session.results.push(record);
     }
-    // this check is just in case the test start arrives before the result of the previous
-    if (session.inflight !== null && session.inflight.file === file && session.inflight.name === name) {
-      session.previous = {
-        ...session.inflight,
-        end: now
-      };
-      session.inflight = null;
-    }
     session.updated = now;
     session.done = false;
     updateHud(session);
+  };
+
+  const recordTestResults = (id: string, results: TestResult[]) => {
+    const now = Date.now();
+    const session = getSession(id);
+    if (results.length > 0) {
+      const {name, file} = results.slice(-1)[0];
+      session.previous = {
+        name,
+        file,
+        end: now
+      };
+    }
+    results.forEach(
+      ({name, file, passed, time, error, skipped}) =>
+        recordTestResult(id, name, file, passed, time, error, skipped)
+    );
   };
 
   const recordDone = (id: string, error?: string) => {
@@ -216,20 +216,10 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
             }
             clearInterval(poller);
           } else {
-            if (session.inflight !== null && (now - session.inflight.start) > (singleTimeout + timeoutGrace)) {
-              // one test took too long
-              const elapsed = formatTime(now - session.inflight.start);
-              const message = 'Test: ' + testName(session.inflight) + ' ran too long (' + elapsed + '). Limit for an individual test is set to: ' + formatTime(singleTimeout);
-              reject({message, results, start, now});
-              clearInterval(poller);
-              timeoutError = true;
-            } else if (allElapsed > overallTimeout) {
+            if (allElapsed > overallTimeout) {
               // combined tests took too long
               let lastTest;
-              if (session.inflight !== null) {
-                const runningTime = now - session.inflight.start;
-                lastTest = 'Current test: ' + testName(session.inflight) + ' running ' + formatTime(runningTime) + '.';
-              } else if (session.previous !== null) {
+              if (session.previous !== null) {
                 const sincePrevious = now - session.previous.end;
                 lastTest = 'Previous test: ' + testName(session.previous) + ' finished ' + formatTime(sincePrevious) + ' ago.';
               } else {
@@ -264,6 +254,7 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     recordAlive,
     recordTestStart,
     recordTestResult,
+    recordTestResults,
     recordDone,
     awaitDone
   };

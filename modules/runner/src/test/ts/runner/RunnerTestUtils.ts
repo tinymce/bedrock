@@ -52,6 +52,7 @@ export const MockReporter = (): MockReporter => {
     test,
     summary: () => ({ offset: 0, passed, failed: failures.length, skipped }),
     done: noop,
+    waitForResults: Promise.resolve,
     failures: () => failures
   };
 };
