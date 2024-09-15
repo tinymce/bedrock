@@ -46,7 +46,6 @@ export interface Controller {
   readonly enableHud: () => void;
   readonly recordAlive: (sessionId: string) => void;
   readonly recordTestStart: (id: string, name: string, file: string, currentCount: number, totalTests: number) => void;
-  readonly recordTestResult: (id: string, name: string, file: string, passed: boolean, time: string, error: TestErrorData | null, skipped: string) => void;
   readonly recordTestResults: (id: string, results: TestResult[]) => void;
   readonly recordDone: (id: string, error?: string) => void;
   readonly awaitDone: () => Promise<TestResults>;
@@ -253,7 +252,6 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
     enableHud,
     recordAlive,
     recordTestStart,
-    recordTestResult,
     recordTestResults,
     recordDone,
     awaitDone
