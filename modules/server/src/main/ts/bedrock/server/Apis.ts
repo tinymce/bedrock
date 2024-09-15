@@ -27,10 +27,6 @@ interface StartData {
   readonly totalTests: number;
 }
 
-interface ResultData extends Controller.TestResult {
-  readonly session: string;
-}
-
 export interface ResultsData {
   readonly session: string;
   readonly results: Controller.TestResult[];
@@ -138,10 +134,6 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
     Routes.effect('POST', '/tests/start', (data: StartData) => {
       c.recordTestStart(data.session, data.name, data.file, data.number, data.totalTests);
       return resetMousePositionAction();
-    }),
-    Routes.effect('POST', '/tests/result', (data: ResultData) => {
-      c.recordTestResult(data.session, data.name, data.file, data.passed, data.time, data.error, data.skipped);
-      return Promise.resolve();
     }),
     Routes.effect('POST', '/tests/results', (data: ResultsData) => {
       c.recordTestResults(data.session, data.results);
