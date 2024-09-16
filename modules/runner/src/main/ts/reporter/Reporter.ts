@@ -214,12 +214,9 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     const textError = error !== undefined ? ErrorReporter.text(error) : undefined;
 
     // make sure any in progress updates are sent before we clean up
-    waitForResults().then(() => {
-      // wait juuuust a little bit longer. In auto mode this will close the browser.
-      setTimeout(() => {
-        callbacks.sendDone(params.session, textError).then(setAsDone, setAsDone);
-      }, 100);
-    });
+    waitForResults().then(() =>
+      callbacks.sendDone(params.session, textError).then(setAsDone, setAsDone)
+    );
   };
 
   return {
