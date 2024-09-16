@@ -137,6 +137,10 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
   const recordTestResult = (session: TestSession, record: TestResult) => {
     const {name, file} = record;
     if (session.lookup[file] !== undefined && session.lookup[file][name] !== undefined) {
+      const existing = session.results[session.lookup[file][name]];
+      if (existing.passed) {
+        hud.warn(`WARNING: overwriting passing test!`, file, '::', name);
+      }
       // rerunning a test
       session.results[session.lookup[file][name]] = record;
     } else {
