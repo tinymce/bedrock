@@ -14,11 +14,18 @@ interface ResultData {
 
 export interface Hud {
   readonly update: (data: ResultData) => Promise<void>;
+  readonly warn: (...messages: any[]) => void;
   readonly complete: () => Promise<void>;
 }
 
 export const create = (testfiles: string[], loglevel: 'simple' | 'advanced'): Hud => {
   let started = false;
+
+  const warn = (...messages: any[]): void => {
+    // disable the next cursor movement so the message isn't overwritten
+    started = false;
+    console.warn(...messages);
+  };
 
   const stream = process.stdout;
 
@@ -72,6 +79,7 @@ export const create = (testfiles: string[], loglevel: 'simple' | 'advanced'): Hu
 
   return {
     update: loglevel === 'advanced' && supportsAdvanced ? advUpdate : basicUpdate,
+    warn,
     complete
   };
 };
