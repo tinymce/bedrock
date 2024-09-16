@@ -66,8 +66,8 @@ describe('Reporter.test', () => {
     }
   };
 
-  const reset = () => {
-    offset = Math.floor(Math.random() * 1000);
+  const reset = (newOffset: number = Math.floor(Math.random() * 1000)) => {
+    offset = newOffset;
     reporter = Reporter({ ...params, offset }, callbacks, ui);
     startTestData = [];
     endTestData = [];
@@ -75,11 +75,11 @@ describe('Reporter.test', () => {
     doneError = undefined;
   };
 
-  beforeEach(reset);
+  beforeEach(() => reset());
 
   it('should report the session id, number tests, file and name on start', () => {
     return fc.assert(fc.asyncProperty(fc.hexaString(), fc.asciiString(), fc.integer(offset), (fileName, testName, testCount) => {
-      reset();
+      reset(0);
       const test = reporter.test(fileName + 'Test.ts', testName, testCount);
       test.start();
       return reporter.waitForResults().then(() => {

@@ -126,10 +126,17 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
 
   const recordTestStart = (id: string, name: string, file: string, currentCount: number, totalTests: number) => {
     const session = getSession(id);
-    session.updated = Date.now();
+    const now = Date.now();
+    session.updated = now;
     session.totalTests = totalTests;
     session.currentTest = currentCount;
     session.done = false;
+    // a bit of a lie, but we only ever get 1 start now
+    session.previous = {
+      name,
+      file,
+      end: now
+    };
     updateHud(session);
   };
 

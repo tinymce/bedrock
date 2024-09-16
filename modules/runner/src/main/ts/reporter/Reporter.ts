@@ -47,8 +47,8 @@ const mapError = (e: LoggedError) => mapStackTrace(e.stack).then((mappedStack) =
 
 export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi): Reporter => {
   const initial = new Date();
-  const initialOffset = params.offset || 0;
-  let currentCount = initialOffset;
+  let timeSinceLastReport = initial;
+  let currentCount = params.offset || 0;
   let passCount = 0;
   let skipCount = 0;
   let failCount = 0;
@@ -87,13 +87,13 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
 
         testUi.start(file, name);
 
-        if (currentCount === initialOffset + 1) {
+        if (currentCount === 1) {
           // we need to send test start once to establish the session
-          const callback = callbacks.sendTestStart(params.session, currentCount, totalNumTests, file, name);
-          requestsInFlight.push(callback);
-        } else if (starttime.getTime() - initial.getTime() > 30 * 1000) {
+          requestsInFlight.push(callbacks.sendTestStart(params.session, currentCount, totalNumTests, file, name));
+        } else if (starttime.getTime() - timeSinceLastReport.getTime() > 30 * 1000) {
           // ping the server with results every 30 seconds or so, otherwise the result data could be gigantic
           sendCurrentResults();
+          timeSinceLastReport = new Date();
         }
       }
     };
