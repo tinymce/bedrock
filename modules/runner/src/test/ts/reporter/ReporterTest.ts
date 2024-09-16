@@ -5,7 +5,7 @@ import { beforeEach, describe, it } from 'mocha';
 import { UrlParams } from '../../../main/ts/core/UrlParams';
 import { Callbacks, TestErrorData } from '../../../main/ts/reporter/Callbacks';
 import { Reporter } from '../../../main/ts/reporter/Reporter';
-import { noop } from '../TestUtils';
+import {noop, wait} from '../TestUtils';
 
 interface StartTestData {
   readonly session: string;
@@ -169,15 +169,16 @@ describe('Reporter.test', () => {
 
   it('should report done', async () => {
     reporter.done();
-    // let the async callbacks run
-    await Promise.resolve();
+    // done waits about 100ms, so we have to wait 150
+    await wait(150);
     assert.isTrue(doneCalled);
     assert.isUndefined(doneError);
   });
 
   it('should report done with an error', async () => {
     reporter.done(Failure.prepFailure('Unexpected error occurred'));
-    // let the async callbacks run
+    // done waits about 100ms, so we have to wait 150
+    await wait(150);
     await Promise.resolve();
     assert.isTrue(doneCalled);
     assert.include(doneError, 'Unexpected error occurred');

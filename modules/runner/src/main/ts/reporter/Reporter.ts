@@ -185,7 +185,6 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
       const currentRequests = requestsInFlight.slice(0);
       requestsInFlight.length = 0;
       return Promise.all(currentRequests).then(() => {
-        console.log('requests', requestsInFlight, 'tests', testResults);
         // if more things have been queued, such as a failing test stack trace, wait for those as well
         waitForResults();
       });

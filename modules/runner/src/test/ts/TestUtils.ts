@@ -8,3 +8,5 @@ export const range = <T>(count: number, fn: (idx: number) => T): T[] => {
   }
   return r;
 };
+
+export const wait = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
