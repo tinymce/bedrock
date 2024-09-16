@@ -1,13 +1,13 @@
-import { Suite } from '@ephox/bedrock-common';
-import { HarnessResponse } from '../core/ServerTypes';
-import { UrlParams } from '../core/UrlParams';
-import { noop } from '../core/Utils';
-import { Callbacks } from '../reporter/Callbacks';
-import { Reporter } from '../reporter/Reporter';
-import { Actions } from '../ui/Actions';
-import { Ui } from '../ui/Ui';
-import { RunActions, RunState, runSuite } from './TestRun';
-import { countTests, filterOnly } from './Utils';
+import {Suite} from '@ephox/bedrock-common';
+import {HarnessResponse} from '../core/ServerTypes';
+import {UrlParams} from '../core/UrlParams';
+import {noop} from '../core/Utils';
+import {Callbacks} from '../reporter/Callbacks';
+import {Reporter} from '../reporter/Reporter';
+import {Actions} from '../ui/Actions';
+import {Ui} from '../ui/Ui';
+import {RunActions, RunState, runSuite} from './TestRun';
+import {countTests, filterOnly} from './Utils';
 
 export interface Runner {
   readonly init: () => Promise<HarnessResponse>;
@@ -29,8 +29,10 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
   };
 
   const runNextChunk = (offset: number) => {
-    const sum = reporter.summary();
-    actions.reloadPage(offset, sum.failed, sum.skipped);
+    reporter.waitForResults().then(() => {
+      const sum = reporter.summary();
+      actions.reloadPage(offset, sum.failed, sum.skipped);
+    });
   };
 
   const retryTest = withSum(actions.retryTest);
@@ -50,11 +52,19 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
       reporter.done();
       // make it easy to restart at this test
       stopTest();
-    } else if (params.retry < retries) {
-      retryTest(params.retry + 1);
     } else {
-      // show the failure for 1 second for the purposes of showing the failure on video
-      setTimeout(loadNextTest, 1000);
+      if (params.retry < retries) {
+        // post all results except the failure, and retry
+        reporter.retry().then(() => {
+          retryTest(params.retry + 1);
+        });
+      } else {
+        // post the failure to the server and move on
+        reporter.waitForResults().then(() => {
+          // wait for 2 seconds for the purposes of showing the failure on video
+          setTimeout(loadNextTest, 2000);
+        });
+      }
     }
   };
 
@@ -110,7 +120,8 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
         // So if we have an error, it means an unexpected/unhandled error occurred in the promise
         // chain. If we have no error then the runner has finished due to a test failure.
         if (e !== undefined) {
-          return Promise.reject(e);
+          // hope and pray that waitForResults doesn't throw an error
+          return reporter.waitForResults().then(() => Promise.reject(e));
         } else {
           return Promise.resolve();
         }

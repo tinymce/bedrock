@@ -53,6 +53,7 @@ export const MockReporter = (): MockReporter => {
     summary: () => ({ offset: 0, passed, failed: failures.length, skipped }),
     done: noop,
     waitForResults: Promise.resolve,
+    retry: Promise.resolve,
     failures: () => failures
   };
 };
