@@ -82,8 +82,8 @@ describe('Reporter.test', () => {
       reset();
       const test = reporter.test(fileName + 'Test.ts', testName, testCount);
       test.start();
-      return reporter.waitForResults().then(() => {
-        assert.equal(startTestData.length, 1, 'Checking start test data length');
+      return Promise.resolve().then(() => {
+        assert.equal(startTestData.length, 1, 'Checking there is start test data');
         assert.deepEqual(startTestData[0], {
           currentCount: offset + 1,
           session: sessionId,
@@ -92,7 +92,7 @@ describe('Reporter.test', () => {
           name: testName
         }, 'Checking start test data contents');
 
-        assert.equal(endTestData.length, 0, 'Checking end test data length');
+        assert.equal(endTestData.length, 0, 'Checking there is no end test data');
         assert.deepEqual(reporter.summary(), {
           offset,
           passed: offset,
