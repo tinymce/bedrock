@@ -150,6 +150,8 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
   const recordTestResults = (id: string, results: TestResult[]) => {
     const now = Date.now();
     const session = getSession(id);
+    session.updated = now;
+    session.done = false;
     if (results.length > 0) {
       const {name, file} = results.slice(-1)[0];
       session.previous = {
@@ -157,14 +159,12 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
         file,
         end: now
       };
+      results.forEach(
+        (record) =>
+          recordTestResult(session, record)
+      );
+      updateHud(session);
     }
-    results.forEach(
-      (record) =>
-        recordTestResult(session, record)
-    );
-    session.updated = now;
-    session.done = false;
-    updateHud(session);
   };
 
   const recordDone = (id: string, error?: string) => {
