@@ -35,7 +35,10 @@ timestamps {
         [ browser: 'firefox', provider: 'lambdatest', os: 'macOS Sonoma', buckets: 1 ],
         [ browser: 'safari', provider: 'lambdatest', os: 'macOS Sonoma', buckets: 1 ],
       ],
-      prepareTests: {},
+      prepareTests: {
+        yarnInstall()
+        sh 'yarn build'
+      },
       testDirs: [ 'modules/sample/src/test/ts/**/pass' ],
       custom: '--config modules/sample/tsconfig.json --customRoutes modules/sample/routes.json --polyfills Promise Symbol'
     )
