@@ -54,7 +54,8 @@ export const runTest = (test: Test, state: RunState, actions: RunActions, report
     console.error(e);
     report.fail(e);
     actions.onFailure();
-    return Promise.reject(e);
+    // Test failures must be an empty reject, otherwise the error management thinks it's a bedrock error
+    return Promise.reject();
   };
 
   const skip = (report: TestReporter) => {
@@ -75,6 +76,7 @@ export const runTest = (test: Test, state: RunState, actions: RunActions, report
   } else if (state.testCount > state.offset + state.chunk) {
     actions.runNextChunk(state.offset + state.chunk);
     // Reject so no other tests are run
+    // Test failures must be an empty reject, otherwise the error management thinks it's a bedrock error
     return Promise.reject();
   } else {
     const report = reporter.test(test.file || 'Unknown', test.fullTitle(), state.totalTests);
