@@ -133,10 +133,8 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
     updateHud(session);
   };
 
-  const recordTestResult = (id: string, name: string, file: string, passed: boolean, time: string, error: TestErrorData | null, skipped: string) => {
-    const now = Date.now();
-    const session = getSession(id);
-    const record = { name, file, passed, time, error, skipped };
+  const recordTestResult = (session: TestSession, record: TestResult) => {
+    const {name, file} = record;
     if (session.lookup[file] !== undefined && session.lookup[file][name] !== undefined) {
       // rerunning a test
       session.results[session.lookup[file][name]] = record;
@@ -146,9 +144,6 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
       session.lookup[file][name] = session.results.length;
       session.results.push(record);
     }
-    session.updated = now;
-    session.done = false;
-    updateHud(session);
   };
 
   const recordTestResults = (id: string, results: TestResult[]) => {
@@ -163,9 +158,12 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
       };
     }
     results.forEach(
-      ({name, file, passed, time, error, skipped}) =>
-        recordTestResult(id, name, file, passed, time, error, skipped)
+      (record) =>
+        recordTestResult(session, record)
     );
+    session.updated = now;
+    session.done = false;
+    updateHud(session);
   };
 
   const recordDone = (id: string, error?: string) => {
