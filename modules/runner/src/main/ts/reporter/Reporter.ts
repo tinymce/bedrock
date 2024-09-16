@@ -1,7 +1,7 @@
-import { LoggedError, Reporter as ErrorReporter } from '@ephox/bedrock-common';
-import { Callbacks, TestReport } from './Callbacks';
-import { UrlParams } from '../core/UrlParams';
-import { formatElapsedTime, mapStackTrace, setStack } from '../core/Utils';
+import {LoggedError, Reporter as ErrorReporter} from '@ephox/bedrock-common';
+import {Callbacks, TestReport} from './Callbacks';
+import {UrlParams} from '../core/UrlParams';
+import {formatElapsedTime, mapStackTrace, setStack} from '../core/Utils';
 
 type LoggedError = LoggedError.LoggedError;
 
@@ -17,6 +17,7 @@ export interface Reporter {
   readonly summary: () => { offset: number; passed: number; failed: number; skipped: number };
   readonly test: (file: string, name: string, totalNumTests: number) => TestReporter;
   readonly waitForResults: () => Promise<void>;
+  readonly retry: () => Promise<void>;
   readonly done: (error?: LoggedError) => void;
 }
 
@@ -99,6 +100,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     };
 
     const retry = (): void => {
+      // a test has used `this.retries()` and wants to retry without reloading the page
       starttime = new Date();
     };
 
@@ -164,8 +166,6 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
           });
 
           testUi.fail(err, testTime, currentCount);
-
-          sendCurrentResults();
         }));
       }
     };
@@ -184,10 +184,26 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     if (requestsInFlight.length > 0) {
       const currentRequests = requestsInFlight.slice(0);
       requestsInFlight.length = 0;
-      await Promise.all(currentRequests);
-      // if more things have been queued, such as a failing test stack trace, wait for those as well
-      return waitForResults();
+      return Promise.all(currentRequests).then(() => {
+        console.log('requests', requestsInFlight, 'tests', testResults);
+        // if more things have been queued, such as a failing test stack trace, wait for those as well
+        waitForResults();
+      });
     }
+  };
+
+  // the page is about to reload to retry a test
+  const retry = (): Promise<void> => {
+    // remove the last test failure from the stack so we don't confuse the server
+    return Promise.all(requestsInFlight).then(() => {
+      const last = testResults.pop();
+      if (last && last.error === null) {
+        // something isn't right, the last test didn't fail, put it back
+        testResults.push(last);
+      }
+      // now push the results to the server
+      return waitForResults();
+    });
   };
 
   const done = (error?: LoggedError): void => {
@@ -199,14 +215,18 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     const textError = error !== undefined ? ErrorReporter.text(error) : undefined;
 
     // make sure any in progress updates are sent before we clean up
-    waitForResults().then(() =>
-      callbacks.sendDone(params.session, textError).then(setAsDone, setAsDone)
-    );
+    waitForResults().then(() => {
+      // wait juuuust a little bit longer. In auto mode this will close the browser.
+      setTimeout(() => {
+        callbacks.sendDone(params.session, textError).then(setAsDone, setAsDone);
+      }, 100);
+    });
   };
 
   return {
     summary,
     test,
+    retry,
     waitForResults,
     done
   };

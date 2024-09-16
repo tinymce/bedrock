@@ -37,6 +37,7 @@ const runTestWithRetry = (test: Test, state: RunState, report: TestReporter, ret
       // Ensure we run the afterEach hooks no matter if the test failed
       .then(runAfterHooks(false), runAfterHooks(true))
       .catch((e: LoggedError | InternalError) => {
+        // This is unique to `this.retries()` within a test, not the general page reload to retry system
         if (retryCount < test.retries() && !isInternalError(e)) {
           test.setResult(RunnableState.NotRun);
           report.retry();
@@ -53,6 +54,7 @@ export const runTest = (test: Test, state: RunState, actions: RunActions, report
     test.setResult(RunnableState.Failed, e);
     console.error(e);
     report.fail(e);
+    // this is where the page reloads if the global retry system is active
     actions.onFailure();
     // Test failures must be an empty reject, otherwise the error management thinks it's a bedrock error
     return Promise.reject();
