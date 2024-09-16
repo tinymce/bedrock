@@ -179,17 +179,15 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     };
   };
 
-  const waitForResults = (): Promise<void> => {
+  const waitForResults = async (): Promise<void> => {
     sendCurrentResults();
-    const currentRequests = requestsInFlight.slice(0);
-    requestsInFlight.length = 0;
-    Promise.all(currentRequests).then(() => {
+    if (requestsInFlight.length > 0) {
+      const currentRequests = requestsInFlight.slice(0);
+      requestsInFlight.length = 0;
+      await Promise.all(currentRequests);
       // if more things have been queued, such as a failing test stack trace, wait for those as well
-      if (requestsInFlight.length !== 0) {
-        return waitForResults();
-      }
-    });
-    return Promise.resolve();
+      return waitForResults();
+    }
   };
 
   const done = (error?: LoggedError): void => {
