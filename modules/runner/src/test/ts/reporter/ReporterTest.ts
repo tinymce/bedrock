@@ -82,7 +82,7 @@ describe('Reporter.test', () => {
       reset();
       const test = reporter.test(fileName + 'Test.ts', testName, testCount);
       test.start();
-      return Promise.resolve().then(() => {
+      return reporter.waitForResults().then(() => {
         assert.equal(startTestData.length, 1, 'Checking there is start test data');
         assert.deepEqual(startTestData[0], {
           currentCount: offset + 1,
@@ -113,15 +113,15 @@ describe('Reporter.test', () => {
       test.skip(skippedMessage);
       return reporter.waitForResults()
         .then(() => {
-          assert.equal(endTestData.length, 1);
+          assert.equal(endTestData.length, 1, 'Checking there is end test data');
           const data = endTestData[0];
-          assert.equal(data.session, sessionId);
-          assert.equal(data.file, fileName + 'Test.ts');
-          assert.equal(data.name, testName);
-          assert.isFalse(data.passed);
-          assert.equal(data.skipped, skippedMessage);
-          assert.isNull(data.error);
-          assert.isString(data.time);
+          assert.equal(data.session, sessionId, 'Checking session ID');
+          assert.equal(data.file, fileName + 'Test.ts', 'Checking filename');
+          assert.equal(data.name, testName, 'Checking testname');
+          assert.isFalse(data.passed, 'Checking passed state');
+          assert.equal(data.skipped, skippedMessage, 'Checking skipped message');
+          assert.isNull(data.error, 'Checking no error');
+          assert.isString(data.time, 'Checking time');
 
           assert.deepEqual(reporter.summary(), {
             offset,
@@ -145,15 +145,15 @@ describe('Reporter.test', () => {
       test.fail(error);
       return reporter.waitForResults()
         .then(() => {
-          assert.equal(endTestData.length, 1);
+          assert.equal(endTestData.length, 1, 'Checking there is end test data');
           const data = endTestData[ 0 ];
-          assert.equal(data.session, sessionId);
-          assert.equal(data.file, fileName + 'Test.ts');
-          assert.equal(data.name, testName);
-          assert.isFalse(data.passed);
-          assert.isNull(data.skipped);
-          assert.isString(data.time);
-          assert.equal(data.error?.text, 'Error: Failed\n\nLogs:\nLog Message');
+          assert.equal(data.session, sessionId, 'Checking session ID');
+          assert.equal(data.file, fileName + 'Test.ts', 'Checking filename');
+          assert.equal(data.name, testName, 'Checking testname');
+          assert.isFalse(data.passed, 'Checking passed state');
+          assert.isNull(data.skipped, 'Checking skipped state');
+          assert.isString(data.time, 'Checking time');
+          assert.equal(data.error?.text, 'Error: Failed\n\nLogs:\nLog Message', 'Checking error text');
 
           assert.deepEqual(reporter.summary(), {
             offset,
