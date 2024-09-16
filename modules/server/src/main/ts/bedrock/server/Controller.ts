@@ -107,14 +107,8 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
     const id = session.id;
     const numFailed = session.results.reduce((sum, res) => sum + (res.passed || res.skipped ? 0 : 1), 0);
     const numSkipped = session.results.reduce((sum, res) => sum + (res.skipped ? 1 : 0), 0);
+    const numPassed = session.results.length - numFailed - numSkipped;
 
-    /*
-     * Due to TINY-11177 we no longer receive a result for every passing test.
-     * In order for the HUD numbers to make sense, the "current test" number is now sent with status reports.
-     *
-     * We use this to calculate the number of passing tests, assuming every non-reported result is a pass.
-     */
-    const numPassed = session.currentTest - numFailed - numSkipped;
     const test = session.previous !== null ? session.previous.name : '';
     const done = session.done;
     hud.update({id, test, numPassed, numSkipped, numFailed, done, totalTests: session.totalTests});
