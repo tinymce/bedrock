@@ -56,7 +56,8 @@ export const create = (testfiles: string[], loglevel: 'simple' | 'advanced'): Hu
       readline.clearLine(stream, 0);
       readline.cursorTo(stream, 0);
     }
-    stream.write('Current test: ' + (data.test !== undefined ? data.test.substring(0, 60) : 'Unknown') + '\n');
+    const currentTestMessage = 'Current test: ' + (data.test !== undefined ? data.test : 'Unknown') + '\n'
+    stream.write(currentTestMessage.substring(0, Env.IS_CI ? undefined : process.stdout.columns));
     const totalFiles = data.totalFiles !== undefined ? data.totalFiles : numFiles;
     const totalTests = data.totalTests !== undefined ? data.totalTests : totalFiles;
     return writeProgress(data.id, data.done, data.numPassed, data.numSkipped, data.numFailed, totalTests);
