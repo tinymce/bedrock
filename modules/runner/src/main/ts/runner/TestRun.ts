@@ -25,7 +25,7 @@ export interface RunActions {
   readonly runNextChunk: (offset: number) => void;
 }
 
-const runTestWithRetry = (test: Test, state: RunState, report: TestReporter, retryCount: number): Promise<void> => {
+const runTestWithRetry = (test: Test, state: RunState, testReport: TestReporter, retryCount: number): Promise<void> => {
   if (test.isSkipped()) {
     return Promise.reject(new SkipError());
   } else {
@@ -40,8 +40,9 @@ const runTestWithRetry = (test: Test, state: RunState, report: TestReporter, ret
         // This is unique to `this.retries()` within a test, not the general page reload to retry system
         if (retryCount < test.retries() && !isInternalError(e)) {
           test.setResult(RunnableState.NotRun);
-          report.retry();
-          return runTestWithRetry(test, state, report, retryCount + 1);
+          testReport.retry();
+          // don't fail the page
+          return runTestWithRetry(test, state, testReport, retryCount + 1);
         } else {
           return Promise.reject(e);
         }
@@ -60,15 +61,15 @@ export const runTest = (test: Test, state: RunState, actions: RunActions, report
     return Promise.reject();
   };
 
-  const skip = (report: TestReporter) => {
+  const skip = (testReport: TestReporter) => {
     test.setResult(RunnableState.Skipped);
-    report.skip(test.title);
+    testReport.skip(test.title);
     actions.onSkip();
   };
 
-  const pass = (report: TestReporter) => {
+  const pass = (testReport: TestReporter) => {
     test.setResult(RunnableState.Passed);
-    report.pass();
+    testReport.pass();
     actions.onPass();
   };
 
@@ -81,16 +82,16 @@ export const runTest = (test: Test, state: RunState, actions: RunActions, report
     // Test failures must be an empty reject, otherwise the error management thinks it's a bedrock error
     return Promise.reject();
   } else {
-    const report = reporter.test(test.file || 'Unknown', test.fullTitle(), state.totalTests);
+    const testReport = reporter.test(test.file || 'Unknown', test.fullTitle(), state.totalTests);
 
     actions.onStart(test);
-    report.start();
-    return runTestWithRetry(test, state, report, 0)
-      .then(() => pass(report), (e: LoggedError | InternalError) => {
+    testReport.start();
+    return runTestWithRetry(test, state, testReport, 0)
+      .then(() => pass(testReport), (e: LoggedError | InternalError) => {
         if (e instanceof SkipError) {
-          return skip(report);
+          return skip(testReport);
         } else {
-          return fail(report, Failure.prepFailure(e));
+          return fail(testReport, Failure.prepFailure(e));
         }
       });
   }
