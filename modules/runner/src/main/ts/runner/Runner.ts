@@ -120,8 +120,7 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
         // So if we have an error, it means an unexpected/unhandled error occurred in the promise
         // chain. If we have no error then the runner has finished due to a test failure.
         if (e !== undefined) {
-          // hope and pray that waitForResults doesn't throw an error
-          return reporter.waitForResults().then(() => Promise.reject(e));
+          return Promise.reject(e);
         } else {
           return Promise.resolve();
         }
