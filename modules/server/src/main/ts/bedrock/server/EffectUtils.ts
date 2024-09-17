@@ -39,8 +39,10 @@ const performActionOnFrame = async <T>(driver: Browser, selector: string, action
     await driver.switchToFrame(null);
     return result;
   } catch (err: any) {
-    await driver.switchToFrame(null);
-    return Promise.reject(err);
+    return driver.status().then(status => {
+      console.log('webdriver failed with status', status);
+      return Promise.reject(err);
+    });
   }
 };
 
