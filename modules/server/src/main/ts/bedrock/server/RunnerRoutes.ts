@@ -101,6 +101,7 @@ export const generate = async (mode: string, projectdir: string, basedir: string
       Routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery'))),
       Routes.routing('GET', '/lib/core-js-bundle', path.dirname(require.resolve('core-js-bundle'))),
       Routes.routing('GET', '/css', path.join(basedir, 'src/resources/css')),
+      Routes.rewrite('GET', '/', '/mockServiceWorker.js', path.join(basedir, 'src/resources/js/mockServiceWorker.js')),
 
       // test code
       Routes.asyncJs('GET', '/compiled/tests.js', (done) => {
