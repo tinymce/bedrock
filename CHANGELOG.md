@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added static mock service worker js file. #TINY-11415
+- Added static mock service worker js file mapping. #TINY-11415
 
 ## 14.1.4 - 2024-03-27
 
