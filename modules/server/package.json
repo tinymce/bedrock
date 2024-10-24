@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock-server",
-  "version": "14.1.4",
+  "version": "14.1.5",
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
   "bin": {
