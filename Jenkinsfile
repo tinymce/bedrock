@@ -6,7 +6,7 @@
 standardProperties()
 
 timestamps {
-  tinyPods.node() {
+  tinyPods.node(tag: '20') {
     stage("clean") {
       exec('yarn clean')
     }
