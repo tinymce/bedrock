@@ -104,6 +104,8 @@ const addDriverSpecificOpts = (opts: WebdriverIO.RemoteOptions, settings: Driver
           tunnel: true,
           console: true,
           w3c: true,
+          network: true,
+          terminal: true,
           plugin: 'node_js-webdriverio',
           ...platformName,
           ...tunnelName,
