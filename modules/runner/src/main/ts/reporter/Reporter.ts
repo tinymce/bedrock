@@ -1,22 +1,23 @@
-import { LoggedError, Reporter as ErrorReporter } from '@ephox/bedrock-common';
-import Promise from '@ephox/wrap-promise-polyfill';
-import { Callbacks } from './Callbacks';
-import { UrlParams } from '../core/UrlParams';
-import { formatElapsedTime, mapStackTrace, setStack } from '../core/Utils';
+import {LoggedError, Reporter as ErrorReporter} from '@ephox/bedrock-common';
+import {Callbacks, TestReport} from './Callbacks';
+import {UrlParams} from '../core/UrlParams';
+import {formatElapsedTime, mapStackTrace, setStack} from '../core/Utils';
 
 type LoggedError = LoggedError.LoggedError;
 
 export interface TestReporter {
-  readonly start: () => Promise<void>;
-  readonly retry: () => Promise<void>;
-  readonly pass: () => Promise<void>;
-  readonly skip: (reason: string) => Promise<void>;
-  readonly fail: (e: LoggedError) => Promise<void>;
+  readonly start: () => void;
+  readonly retry: () => void;
+  readonly pass: () => void;
+  readonly skip: (reason: string) => void;
+  readonly fail: (e: LoggedError) => void;
 }
 
 export interface Reporter {
   readonly summary: () => { offset: number; passed: number; failed: number; skipped: number };
   readonly test: (file: string, name: string, totalNumTests: number) => TestReporter;
+  readonly waitForResults: () => Promise<void>;
+  readonly retry: () => Promise<void>;
   readonly done: (error?: LoggedError) => void;
 }
 
@@ -42,15 +43,29 @@ const mapError = (e: LoggedError) => mapStackTrace(e.stack).then((mappedStack) =
     e.logs = logs.replace(originalStack, mappedStack).split('\n');
   }
 
-  return Promise.resolve(e);
+  return e;
 });
 
 export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi): Reporter => {
   const initial = new Date();
+  let timeSinceLastReport = initial;
   let currentCount = params.offset || 0;
   let passCount = 0;
   let skipCount = 0;
   let failCount = 0;
+
+  // A list of test results we are going to send as a batch to the server
+  const testResults: TestReport[] = [];
+
+  // A global list of requests that were sent to the server, we must wait for these before sending `/done` or it may confuse the HUD
+  const requestsInFlight: Promise<void>[] = [];
+
+  const sendCurrentResults = () => {
+    if (testResults.length > 0) {
+      requestsInFlight.push(callbacks.sendTestResults(params.session, testResults));
+      testResults.length = 0;
+    }
+  };
 
   const summary = () => ({
     offset: Math.max(0, currentCount - 1),
@@ -60,73 +75,98 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
   });
 
   const test = (file: string, name: string, totalNumTests: number) => {
-    let starttime: Date;
+    let starttime = new Date();
     let reported = false;
     let started = false;
     const testUi = ui.test();
 
-    const start = (): Promise<void> => {
-      if (started) {
-        return Promise.resolve();
-      } else {
+    const start = (): void => {
+      if (!started) {
         started = true;
         starttime = new Date();
         currentCount++;
 
         testUi.start(file, name);
-        return callbacks.sendTestStart(params.session, totalNumTests, file, name);
+
+        if (currentCount === 1) {
+          // we need to send test start once to establish the session
+          requestsInFlight.push(callbacks.sendTestStart(params.session, currentCount, totalNumTests, file, name));
+        } else if (starttime.getTime() - timeSinceLastReport.getTime() > 30 * 1000) {
+          // ping the server with results every 30 seconds or so, otherwise the result data could be gigantic
+          sendCurrentResults();
+          timeSinceLastReport = new Date();
+        }
       }
     };
 
-    const retry = (): Promise<void> => {
+    const retry = (): void => {
+      // a test has used `this.retries()` and wants to retry without reloading the page
       starttime = new Date();
-      return Promise.resolve();
     };
 
-    const pass = (): Promise<void> => {
-      if (reported) {
-        return Promise.resolve();
-      } else {
+    const pass = (): void => {
+      if (!reported) {
         reported = true;
         passCount++;
         const testTime = elapsed(starttime);
 
         testUi.pass(testTime, currentCount);
-        return callbacks.sendTestResult(params.session, file, name, true, testTime, null, null);
+        testResults.push({
+          file,
+          name,
+          passed: true,
+          time: testTime,
+          error: null,
+          skipped: null,
+        });
       }
     };
 
-    const skip = (reason: string): Promise<void> => {
-      if (reported) {
-        return Promise.resolve();
-      } else {
+    const skip = (reason: string): void => {
+      if (!reported) {
         reported = true;
         skipCount++;
         const testTime = elapsed(starttime);
 
         testUi.skip(testTime, currentCount);
-        return callbacks.sendTestResult(params.session, file, name, false, testTime, null, reason);
+
+        testResults.push({
+          file,
+          name,
+          passed: false,
+          time: testTime,
+          error: null,
+          skipped: reason,
+        });
       }
     };
 
-    const fail = (e: LoggedError): Promise<void> => {
-      if (reported) {
-        return Promise.resolve();
-      } else {
+    const fail = (e: LoggedError): void => {
+      if (!reported) {
         reported = true;
         failCount++;
 
         const testTime = elapsed(starttime);
-        return mapError(e).then((err) => {
+
+        // `sourcemapped-stacktrace` is async, so we need to wait for it
+        requestsInFlight.push(mapError(e).then((err) => {
           const errorData = ErrorReporter.data(err);
           const error = {
             data: errorData,
             text: ErrorReporter.dataText(errorData)
           };
 
+          testResults.push({
+            file,
+            name,
+            passed: false,
+            time: testTime,
+            error,
+            skipped: null,
+          });
+
           testUi.fail(err, testTime, currentCount);
-          return callbacks.sendTestResult(params.session, file, name, false, testTime, error, null);
-        });
+        }));
       }
     };
 
@@ -139,6 +179,32 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     };
   };
 
+  const waitForResults = async (): Promise<void> => {
+    sendCurrentResults();
+    if (requestsInFlight.length > 0) {
+      const currentRequests = requestsInFlight.slice(0);
+      requestsInFlight.length = 0;
+      return Promise.all(currentRequests).then(() => {
+        // if more things have been queued, such as a failing test stack trace, wait for those as well
+        waitForResults();
+      });
+    }
+  };
+
+  // the page is about to reload to retry a test
+  const retry = (): Promise<void> => {
+    // remove the last test failure from the stack so we don't confuse the server
+    return Promise.all(requestsInFlight).then(() => {
+      const last = testResults.pop();
+      if (last && last.error === null) {
+        // something isn't right, the last test didn't fail, put it back
+        testResults.push(last);
+      }
+      // now push the results to the server
+      return waitForResults();
+    });
+  };
+
   const done = (error?: LoggedError): void => {
     const setAsDone = (): void => {
       const totalTime = elapsed(initial);
@@ -146,12 +212,18 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     };
 
     const textError = error !== undefined ? ErrorReporter.text(error) : undefined;
-    callbacks.sendDone(params.session, textError).then(setAsDone, setAsDone);
+
+    // make sure any in progress updates are sent before we clean up
+    waitForResults().then(() =>
+      callbacks.sendDone(params.session, textError).then(setAsDone, setAsDone)
+    );
   };
 
   return {
     summary,
     test,
+    retry,
+    waitForResults,
     done
   };
 };

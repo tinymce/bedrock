@@ -1,5 +1,4 @@
 import { Failure, LoggedError, RunnableState, Suite, Test } from '@ephox/bedrock-common';
-import Promise from '@ephox/wrap-promise-polyfill';
 import * as Context from '../core/Context';
 import { InternalError, isInternalError, SkipError } from '../errors/Errors';
 import { Reporter, TestReporter } from '../reporter/Reporter';
@@ -26,7 +25,7 @@ export interface RunActions {
   readonly runNextChunk: (offset: number) => void;
 }
 
-const runTestWithRetry = (test: Test, state: RunState, report: TestReporter, retryCount: number): Promise<void> => {
+const runTestWithRetry = (test: Test, state: RunState, testReport: TestReporter, retryCount: number): Promise<void> => {
   if (test.isSkipped()) {
     return Promise.reject(new SkipError());
   } else {
@@ -38,9 +37,12 @@ const runTestWithRetry = (test: Test, state: RunState, report: TestReporter, ret
       // Ensure we run the afterEach hooks no matter if the test failed
       .then(runAfterHooks(false), runAfterHooks(true))
       .catch((e: LoggedError | InternalError) => {
+        // This is unique to `this.retries()` within a test, not the general page reload to retry system
         if (retryCount < test.retries() && !isInternalError(e)) {
           test.setResult(RunnableState.NotRun);
-          return report.retry().then(() => runTestWithRetry(test, state, report, retryCount + 1));
+          testReport.retry();
+          // don't fail the page
+          return runTestWithRetry(test, state, testReport, retryCount + 1);
         } else {
           return Promise.reject(e);
         }
@@ -52,17 +54,23 @@ export const runTest = (test: Test, state: RunState, actions: RunActions, report
   const fail = (report: TestReporter, e: LoggedError) => {
     test.setResult(RunnableState.Failed, e);
     console.error(e);
-    return report.fail(e).then(actions.onFailure).then(() => Promise.reject());
+    report.fail(e);
+    // this is where the page reloads if the global retry system is active
+    actions.onFailure();
+    // Test failures must be an empty reject, otherwise the error management thinks it's a bedrock error
+    return Promise.reject();
   };
 
-  const skip = (report: TestReporter) => {
+  const skip = (testReport: TestReporter) => {
     test.setResult(RunnableState.Skipped);
-    return report.skip(test.title).then(actions.onSkip);
+    testReport.skip(test.title);
+    actions.onSkip();
   };
 
-  const pass = (report: TestReporter) => {
+  const pass = (testReport: TestReporter) => {
     test.setResult(RunnableState.Passed);
-    return report.pass().then(actions.onPass);
+    testReport.pass();
+    actions.onPass();
   };
 
   state.testCount++;
@@ -71,18 +79,19 @@ export const runTest = (test: Test, state: RunState, actions: RunActions, report
   } else if (state.testCount > state.offset + state.chunk) {
     actions.runNextChunk(state.offset + state.chunk);
     // Reject so no other tests are run
+    // Test failures must be an empty reject, otherwise the error management thinks it's a bedrock error
     return Promise.reject();
   } else {
-    const report = reporter.test(test.file || 'Unknown', test.fullTitle(), state.totalTests);
+    const testReport = reporter.test(test.file || 'Unknown', test.fullTitle(), state.totalTests);
 
     actions.onStart(test);
-    return report.start()
-      .then(() => runTestWithRetry(test, state, report, 0))
-      .then(() => pass(report), (e: LoggedError | InternalError) => {
+    testReport.start();
+    return runTestWithRetry(test, state, testReport, 0)
+      .then(() => pass(testReport), (e: LoggedError | InternalError) => {
         if (e instanceof SkipError) {
-          return skip(report);
+          return skip(testReport);
         } else {
-          return fail(report, Failure.prepFailure(e));
+          return fail(testReport, Failure.prepFailure(e));
         }
       });
   }

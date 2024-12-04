@@ -14,11 +14,18 @@ interface ResultData {
 
 export interface Hud {
   readonly update: (data: ResultData) => Promise<void>;
+  readonly warn: (...messages: any[]) => void;
   readonly complete: () => Promise<void>;
 }
 
 export const create = (testfiles: string[], loglevel: 'simple' | 'advanced'): Hud => {
   let started = false;
+
+  const warn = (...messages: any[]): void => {
+    // disable the next cursor movement so the message isn't overwritten
+    started = false;
+    console.warn(...messages);
+  };
 
   const stream = process.stdout;
 
@@ -49,7 +56,8 @@ export const create = (testfiles: string[], loglevel: 'simple' | 'advanced'): Hu
       readline.clearLine(stream, 0);
       readline.cursorTo(stream, 0);
     }
-    stream.write('Current test: ' + (data.test !== undefined ? data.test.substring(0, 60) : 'Unknown') + '\n');
+    const currentTestMessage = 'Current test: ' + (data.test !== undefined ? data.test : 'Unknown') + '\n';
+    stream.write(currentTestMessage.substring(0, Env.IS_CI ? undefined : process.stdout.columns));
     const totalFiles = data.totalFiles !== undefined ? data.totalFiles : numFiles;
     const totalTests = data.totalTests !== undefined ? data.totalTests : totalFiles;
     return writeProgress(data.id, data.done, data.numPassed, data.numSkipped, data.numFailed, totalTests);
@@ -72,6 +80,7 @@ export const create = (testfiles: string[], loglevel: 'simple' | 'advanced'): Hu
 
   return {
     update: loglevel === 'advanced' && supportsAdvanced ? advUpdate : basicUpdate,
+    warn,
     complete
   };
 };
