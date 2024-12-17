@@ -1,5 +1,4 @@
 import { Context, ExecuteFn, Failure, Runnable, RunnableState, TestThrowable } from '@ephox/bedrock-common';
-import Promise from '@ephox/wrap-promise-polyfill';
 import { isInternalError, MultipleDone, SkipError } from '../errors/Errors';
 import { ErrorCatcher } from '../errors/ErrorCatcher';
 import { Timer } from './Timer';

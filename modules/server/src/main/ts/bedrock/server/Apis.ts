@@ -23,11 +23,13 @@ interface StartData {
   readonly session: string;
   readonly name: string;
   readonly file: string;
+  readonly number: number;
   readonly totalTests: number;
 }
 
-interface ResultData extends Controller.TestResult {
+export interface ResultsData {
   readonly session: string;
+  readonly results: Controller.TestResult[];
 }
 
 interface DoneData {
@@ -42,7 +44,7 @@ const pollRate = 200;
 const maxInvalidAttempts = 300;
 
 // TODO: Do not use files here.
-export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Browser>, projectdir: string, basedir: string, stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced', resetMousePosition: boolean): Apis => {
+export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Browser>, projectdir: string, basedir: string, stickyFirstSession: boolean, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced', resetMousePosition: boolean): Apis => {
   let pageHasLoaded = false;
   let needsMousePositionReset = true;
 
@@ -119,7 +121,7 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
     pageHasLoaded = true;
   };
 
-  const c = Controller.create(stickyFirstSession, singleTimeout, overallTimeout, testfiles, loglevel);
+  const c = Controller.create(stickyFirstSession, overallTimeout, testfiles, loglevel);
 
   const routers = [
     driverRouter('/keys', 'Keys', KeyEffects.executor, false),
@@ -130,11 +132,11 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
     }),
     Routes.effect('POST', '/tests/init', () => Promise.all([ resetMousePositionAction(true), keepAliveAction() ])),
     Routes.effect('POST', '/tests/start', (data: StartData) => {
-      c.recordTestStart(data.session, data.name, data.file, data.totalTests);
+      c.recordTestStart(data.session, data.name, data.file, data.number, data.totalTests);
       return resetMousePositionAction();
     }),
-    Routes.effect('POST', '/tests/result', (data: ResultData) => {
-      c.recordTestResult(data.session, data.name, data.file, data.passed, data.time, data.error, data.skipped);
+    Routes.effect('POST', '/tests/results', (data: ResultsData) => {
+      c.recordTestResults(data.session, data.results);
       return Promise.resolve();
     }),
     Routes.effect('POST', '/tests/done', (data: DoneData) => {
