@@ -97,6 +97,9 @@ const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
 const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): WebdriverIO.RemoteOptions => {
   const options: WebdriverIO.RemoteOptions = {
     logLevel: 'warn' as const,
+    // if the parallel count is full this timeout is how long WDIO waits for LambdaTest to spin up.
+    // 10 minute timeout, defaults to 3 connection attempts
+    connectionRetryTimeout: 10 * 60 * 1000,
     capabilities: {
       browserName
     }
@@ -254,7 +257,7 @@ const driverSetup = async (driver: WebdriverIO.Browser, settings: DriverSettings
   } else {
     await driver.maximizeWindow();
   }
-  
+
   return Promise.resolve();
 };
 
@@ -293,7 +296,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
 
       // Wait for the driver to start up and then start the webdriver session
       await DriverLoader.startAndWaitForAlive(driverSpec, port, webdriverTimeout);
-      
+
       const driver = await WebdriverIO.remote(webdriverOptions);
 
       // IEDriverServer ignores a delete session call if done too quickly so it needs a small delay
@@ -315,7 +318,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
       try {
         driverSpec.driverApi.stop();
       } catch {
-       // Ignore 
+       // Ignore
       }
       return Promise.reject(e);
     }
