@@ -130,7 +130,7 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
       c.recordAlive(data.session);
       return keepAliveAction();
     }),
-    Routes.effect('POST', '/tests/init', () => Promise.all([ resetMousePositionAction(true), keepAliveAction() ])),
+    Routes.effect('POST', '/tests/init', () => resetMousePositionAction(true)),
     Routes.effect('POST', '/tests/start', (data: StartData) => {
       c.recordTestStart(data.session, data.name, data.file, data.number, data.totalTests);
       return resetMousePositionAction();
