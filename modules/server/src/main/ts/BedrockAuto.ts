@@ -90,6 +90,11 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
     });
     shutdownServices.push(service.shutdown, driver.shutdown);
 
+    const cancelEverything = Lifecycle.cancel(webdriver, shutdown(shutdownServices), settings.gruntDone);
+    process.on('SIGINT', cancelEverything);
+    process.on('SIGQUIT', cancelEverything);
+    process.on('SIGTERM', cancelEverything);
+
     try {
       if (!isHeadless) {
         console.log('bedrock-auto ' + Version.get() + ' available at: ' + location);

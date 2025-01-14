@@ -50,3 +50,16 @@ export const error = async (err: Error | string, driver: Browser, shutdown: Shut
   await shutdown(true);
   exit(gruntDone, ExitCodes.failures.unexpected);
 };
+
+export const cancel = (driver: Browser, shutdown: ShutdownFn, gruntDone: GruntDoneFn): () => Promise<void> => {
+  let cancelled = false;
+  return async () => {
+    if (cancelled) {
+      return;
+    }
+    cancelled = true;
+    console.error(chalk.red('********** Cancelling test run **********'));
+    await shutdown(true);
+    exit(gruntDone, ExitCodes.failures.unexpected);
+  };
+};
