@@ -197,7 +197,7 @@ const setupShutdown = (driver: WebdriverIO.Browser, driverApi: DriverLoader.Driv
   const driverShutdown = async (immediate?: boolean) => {
     try {
       if (immediate) {
-        driver.deleteSession();
+        await driver.deleteSession();
       } else {
         await driver.pause(shutdownDelay);
         await driver.deleteSession();

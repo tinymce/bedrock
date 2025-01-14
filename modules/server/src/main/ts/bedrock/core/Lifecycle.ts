@@ -4,7 +4,7 @@ import { TestResult } from '../server/Controller';
 import { ExitCodes } from '../util/ExitCodes';
 import { Attempt } from './Attempt';
 
-type ShutdownFn = () => Promise<any>;
+type ShutdownFn = (immediate?: boolean) => Promise<any>;
 type GruntDoneFn = ((success: boolean) => void) | undefined;
 
 const exitDelay = (driver: Browser, delayExiting: boolean) => {
@@ -47,6 +47,6 @@ export const error = async (err: Error | string, driver: Browser, shutdown: Shut
   await exitDelay(driver, delayExiting);
   console.error(chalk.red('********** Unexpected Bedrock Error -> Server Quitting **********'));
   console.error(err);
-  await shutdown();
+  await shutdown(true);
   exit(gruntDone, ExitCodes.failures.unexpected);
 };

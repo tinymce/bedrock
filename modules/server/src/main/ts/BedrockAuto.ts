@@ -32,8 +32,8 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
 
   const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
-  const shutdownServices: (() => Promise<void>)[] = [];
-  const shutdown = (services: (() => Promise<void>)[]) => () => Promise.allSettled(services.map((fn) => fn()));
+  const shutdownServices: ((immediate?: boolean) => Promise<void>)[] = [];
+  const shutdown = (services: ((immediate?: boolean) => Promise<void>)[]) => (immediate?: boolean) => Promise.allSettled(services.map((fn) => fn(immediate)));
 
   routes.then(async (runner) => {
 
@@ -117,7 +117,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
     // Chalk does not use a formatter. Using node's built-in to expand Objects, etc.
     console.error(chalk.red('Error creating webdriver', format(err)));
     // Shutdown tunnels in case webdriver fails
-    await shutdown(shutdownServices)();
+    await shutdown(shutdownServices)(true);
     Lifecycle.exit(settings.gruntDone, ExitCodes.failures.unexpected);
   });
 };
