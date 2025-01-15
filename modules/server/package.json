@@ -58,7 +58,7 @@
     "xml-writer": "^1.6.0"
   },
   "devDependencies": {
-    "@ephox/dispute": "^1.0.3",
+    "@ephox/dispute": "1.0.15-feature.20250115100755050.sha958e4c6",
     "@types/command-line-args": "^5.0.0",
     "@types/command-line-usage": "^5.0.1",
     "@types/cross-spawn": "^6.0.0",
