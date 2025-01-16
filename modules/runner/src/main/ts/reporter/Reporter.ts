@@ -48,7 +48,7 @@ const mapError = (e: LoggedError) => mapStackTrace(e.stack).then((mappedStack) =
 
 export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi): Reporter => {
   const initial = new Date();
-  let timeSinceLastReport = initial;
+  let timeOfLastReport = initial;
   let currentCount = params.offset || 0;
   let passCount = 0;
   let skipCount = 0;
@@ -60,10 +60,21 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
   // A global list of requests that were sent to the server, we must wait for these before sending `/done` or it may confuse the HUD
   const requestsInFlight: Promise<void>[] = [];
 
-  const sendCurrentResults = () => {
+  const sendCurrentResults = (): boolean => {
     if (testResults.length > 0) {
       requestsInFlight.push(callbacks.sendTestResults(params.session, testResults));
       testResults.length = 0;
+      return true;
+    }
+    return false;
+  };
+
+  const reportResult = (result: TestReport): void => {
+    testResults.push(result);
+    if (new Date().getTime() - timeOfLastReport.getTime() > 30 * 1000) {
+      // ping the server with results every 30 seconds or so, as a form of keep-alive
+      sendCurrentResults();
+      timeOfLastReport = new Date();
     }
   };
 
@@ -91,10 +102,6 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
         if (currentCount === 1) {
           // we need to send test start once to establish the session
           requestsInFlight.push(callbacks.sendTestStart(params.session, currentCount, totalNumTests, file, name));
-        } else if (starttime.getTime() - timeSinceLastReport.getTime() > 30 * 1000) {
-          // ping the server with results every 30 seconds or so, otherwise the result data could be gigantic
-          sendCurrentResults();
-          timeSinceLastReport = new Date();
         }
       }
     };
@@ -111,7 +118,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
         const testTime = elapsed(starttime);
 
         testUi.pass(testTime, currentCount);
-        testResults.push({
+        reportResult({
           file,
           name,
           passed: true,
@@ -130,7 +137,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
 
         testUi.skip(testTime, currentCount);
 
-        testResults.push({
+        reportResult({
           file,
           name,
           passed: false,
@@ -156,7 +163,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
             text: ErrorReporter.dataText(errorData)
           };
 
-          testResults.push({
+          reportResult({
             file,
             name,
             passed: false,
@@ -184,25 +191,21 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     if (requestsInFlight.length > 0) {
       const currentRequests = requestsInFlight.slice(0);
       requestsInFlight.length = 0;
-      return Promise.all(currentRequests).then(() => {
-        // if more things have been queued, such as a failing test stack trace, wait for those as well
-        waitForResults();
-      });
+      await Promise.all(currentRequests);
+      // if more things have been queued, such as a failing test stack trace, wait for those as well
+      await waitForResults();
     }
   };
 
   // the page is about to reload to retry a test
   const retry = (): Promise<void> => {
     // remove the last test failure from the stack so we don't confuse the server
-    return Promise.all(requestsInFlight).then(() => {
-      const last = testResults.pop();
-      if (last && last.error === null) {
-        // something isn't right, the last test didn't fail, put it back
-        testResults.push(last);
-      }
-      // now push the results to the server
-      return waitForResults();
-    });
+    const last = testResults.pop();
+    if (last && last.error === null) {
+      // something isn't right, the last test didn't fail, put it back
+      testResults.push(last);
+    }
+    return waitForResults();
   };
 
   const done = (error?: LoggedError): void => {
