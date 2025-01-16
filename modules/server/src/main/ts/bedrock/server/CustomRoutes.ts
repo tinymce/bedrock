@@ -82,13 +82,14 @@ const parseJsonFromFile = (filePath: string, configPath: string) => {
 };
 
 const concludeJson = (response: ServerResponse, status: number, headers: Record<string, string>, json: any) => {
+  const jsonString = serializeJson(json);
   response.writeHead(status, {
     'Content-Type': 'application/json',
     'Cache-Control': 'public, max-age=60',
-    'ETag': RouteUtils.generateETag(json),
+    'ETag': RouteUtils.generateETag(jsonString),
     ...headers
   });
-  response.end(serializeJson(json));
+  response.end(jsonString);
 };
 
 const concludeBinary = (response: ServerResponse, status: number, headers: Record<string, string>, filepath: string) => {
