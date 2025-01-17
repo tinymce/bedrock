@@ -4,6 +4,8 @@ import * as deepmerge from 'deepmerge';
 import { DeviceFarmClient, CreateTestGridUrlCommand } from '@aws-sdk/client-device-farm';
 import { Driver, DriverSettings } from './Driver';
 
+export const REMOTE_IDLE_TIMEOUT_SECONDS = 360;
+
 const getFarmUrl = async (awsRegion: string, projectArn: string, expires = 5000): Promise<URL> => {
   console.log('Creating DeviceFarmClient...');
   const client = new DeviceFarmClient({region: awsRegion});
@@ -101,7 +103,7 @@ const addDriverSpecificOpts = (opts: WebdriverIO.RemoteOptions, settings: Driver
         'LT:Options': {
           username: settings.username,
           accesskey: settings.accesskey,
-          idleTimeout: '360',
+          idleTimeout: REMOTE_IDLE_TIMEOUT_SECONDS,
           tunnel: true,
           console: true,
           w3c: true,

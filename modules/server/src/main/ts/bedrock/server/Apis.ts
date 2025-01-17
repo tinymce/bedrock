@@ -9,6 +9,7 @@ import { DriverMaster } from './DriverMaster';
 import * as KeyEffects from './KeyEffects';
 import * as MouseEffects from './MouseEffects';
 import * as Routes from './Routes';
+import {REMOTE_IDLE_TIMEOUT_SECONDS} from '../auto/RemoteDriver';
 
 type Executor<D, T> = (driver: Browser) => (data: D) => Promise<T>;
 
@@ -75,7 +76,7 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
     };
   };
 
-  const sendKeepAlive = (driver: Browser) => Promise.resolve(void driver.execute(() => console.info('keep-alive', Date.now())));
+  const sendKeepAlive = (driver: Browser) => Promise.resolve(void driver.execute(() => console.info('server keep-alive', Date.now())));
 
   const keepAliveAction = () => Attempt.cata(maybeDriver, () => Promise.resolve(),
     (driver) => waitForDriverReady(maxInvalidAttempts, () => sendKeepAlive(driver)));
@@ -123,6 +124,25 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
 
   const c = Controller.create(stickyFirstSession, overallTimeout, testfiles, loglevel);
 
+  const maybeSendKeepAlive: () => Promise<void> = (() => {
+    let lastKeepAlive = Date.now();
+    /*
+     * If we're within a minute of the remote driver timeout, send a keep-alive.
+     *
+     * In theory this is only required if no other action has been taken in the last x minutes,
+     * but this happens so rarely it should be fine.
+     */
+    const keepAliveTimer = (Math.max(120, REMOTE_IDLE_TIMEOUT_SECONDS - 60)) * 1000;
+    return () => {
+      if (Date.now() - lastKeepAlive > keepAliveTimer) {
+        lastKeepAlive = Date.now();
+        return keepAliveAction();
+      } else {
+        return Promise.resolve();
+      }
+    };
+  })();
+
   const routers = [
     driverRouter('/keys', 'Keys', KeyEffects.executor, false),
     driverRouter('/mouse', 'Mouse', MouseEffects.executor, true),
@@ -137,7 +157,7 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
     }),
     Routes.effect('POST', '/tests/results', (data: ResultsData) => {
       c.recordTestResults(data.session, data.results);
-      return Promise.resolve();
+      return maybeSendKeepAlive();
     }),
     Routes.effect('POST', '/tests/done', (data: DoneData) => {
       Coverage.writeCoverageData(data.coverage);
