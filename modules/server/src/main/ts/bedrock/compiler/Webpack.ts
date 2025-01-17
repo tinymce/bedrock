@@ -343,7 +343,6 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
       },
       // Static content is handled via the bedrock middleware below
       static: false,
-      magicHtml: false,
       setupMiddlewares: (middlewares) => {
         const bedrockHandler: WebpackDevServer.RequestHandler = (request, response, next) => {
           return isCompiledRequest(request) ? next() : handler(request, response);
