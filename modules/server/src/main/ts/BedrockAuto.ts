@@ -52,7 +52,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
     shutdownServices.push(tunnel.shutdown);
     const location = tunnel.url.href;
 
-    console.log('Creating webdriver...');
+    console.log(`Creating ${remoteWebdriver ?? 'local'} webdriver...`);
     if (remoteWebdriver == 'aws') {
         console.log('INFO: Webdriver creation waits for device farm session to activate. Takes 30-45s.');
     }
