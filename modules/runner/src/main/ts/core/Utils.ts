@@ -19,8 +19,8 @@ export const makeUrl = (session: string, offset: number, failed: number, skipped
   return baseUrl + makeQueryParams(session, offset, failed, skipped, retry);
 };
 
-export const formatElapsedTime = (start: Date, end: Date): string => {
-  const millis = end.getTime() - start.getTime();
+export const formatElapsedTime = (start: number, end: number): string => {
+  const millis = end - start;
   const seconds = Math.floor(millis / 1000);
   const point = Math.floor(millis - (seconds * 1000) / 100);
   const printable =

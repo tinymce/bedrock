@@ -31,7 +31,7 @@ export interface ReporterUi {
   readonly done: (totalTime: string) => void;
 }
 
-const elapsed = (since: Date): string => formatElapsedTime(since, new Date());
+const elapsed = (since: number): string => formatElapsedTime(since, Date.now());
 
 const mapError = (e: LoggedError) => mapStackTrace(e.stack).then((mappedStack) => {
   const originalStack = e.stack;
@@ -47,7 +47,7 @@ const mapError = (e: LoggedError) => mapStackTrace(e.stack).then((mappedStack) =
 });
 
 export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi): Reporter => {
-  const initial = new Date();
+  const initial = Date.now();
   let timeOfLastReport = initial;
   let currentCount = params.offset || 0;
   let passCount = 0;
@@ -71,10 +71,10 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
 
   const reportResult = (result: TestReport): void => {
     testResults.push(result);
-    if (new Date().getTime() - timeOfLastReport.getTime() > 30 * 1000) {
+    if (Date.now() - timeOfLastReport > 30 * 1000) {
       // ping the server with results every 30 seconds or so, as a form of keep-alive
       sendCurrentResults();
-      timeOfLastReport = new Date();
+      timeOfLastReport = Date.now();
     }
   };
 
@@ -86,7 +86,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
   });
 
   const test = (file: string, name: string, totalNumTests: number) => {
-    let starttime = new Date();
+    let starttime = Date.now();
     let reported = false;
     let started = false;
     const testUi = ui.test();
@@ -94,7 +94,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     const start = (): void => {
       if (!started) {
         started = true;
-        starttime = new Date();
+        starttime = Date.now();
         currentCount++;
 
         testUi.start(file, name);
@@ -108,7 +108,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
 
     const retry = (): void => {
       // a test has used `this.retries()` and wants to retry without reloading the page
-      starttime = new Date();
+      starttime = Date.now();
     };
 
     const pass = (): void => {
