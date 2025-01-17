@@ -218,9 +218,9 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
             }
             clearInterval(poller);
           } else {
-            if (now - session.updated > 55 * 1000) {
+             if ((now - session.updated) > (55 * 1000)) {
               // sticky sessions have longer before they time out, but we still can't sit around if the driver has failed
-              const message = 'No updates from the browser in 55 seconds, assuming driver has failed.';
+              const message = `No updates from the browser in ${formatTime(now - session.updated)}, assuming driver has failed.`;
               reject({message, results, start, now});
               clearInterval(poller);
               timeoutError = true;
