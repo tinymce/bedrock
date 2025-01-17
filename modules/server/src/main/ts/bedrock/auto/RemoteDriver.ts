@@ -101,6 +101,7 @@ const addDriverSpecificOpts = (opts: WebdriverIO.RemoteOptions, settings: Driver
         'LT:Options': {
           username: settings.username,
           accesskey: settings.accesskey,
+          idleTimeout: '360',
           tunnel: true,
           console: true,
           w3c: true,
