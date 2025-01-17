@@ -44,7 +44,7 @@
     "mkdirp": "^1.0.0",
     "portfinder": "^1.0.25",
     "recursive-readdir-sync": "^1.0.6",
-    "rollup": "^1.23.1",
+    "rollup": "^2.0.0",
     "rollup-plugin-typescript2": "^0.24.0",
     "serve-static": "^1.10.2",
     "source-map-loader": "^3.0.0",
