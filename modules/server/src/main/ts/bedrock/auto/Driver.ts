@@ -1,4 +1,3 @@
-
 import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
@@ -33,6 +32,7 @@ export interface DriverSettings {
   browserVersion: string;
   tunnel?: Tunnel;
   name?: string;
+  clipboardPermission?: boolean;
 }
 
 export interface Driver {
@@ -112,6 +112,9 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
   const caps: Record<string, any> = options.capabilities;
   if (browserName === 'chrome') {
     addArguments(caps, 'goog:chromeOptions', ['--start-maximized', '--disable-extensions']);
+    if (settings.clipboardPermission) {
+      addArguments(caps, 'goog:chromeOptions', ['--enable-clipboard']);
+    }
     addArguments(caps, 'goog:chromeOptions', extraCaps);
   } else if (browserName === 'firefox') {
     addArguments(caps, 'moz:firefoxOptions', extraCaps);
@@ -254,7 +257,7 @@ const driverSetup = async (driver: WebdriverIO.Browser, settings: DriverSettings
   } else {
     await driver.maximizeWindow();
   }
-  
+
   return Promise.resolve();
 };
 
@@ -293,7 +296,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
 
       // Wait for the driver to start up and then start the webdriver session
       await DriverLoader.startAndWaitForAlive(driverSpec, port, webdriverTimeout);
-      
+
       const driver = await WebdriverIO.remote(webdriverOptions);
 
       // IEDriverServer ignores a delete session call if done too quickly so it needs a small delay
@@ -315,7 +318,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
       try {
         driverSpec.driverApi.stop();
       } catch {
-       // Ignore 
+       // Ignore
       }
       return Promise.reject(e);
     }

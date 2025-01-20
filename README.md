@@ -91,12 +91,14 @@ You can start a remote selenium docker but bedrock does not play nice with this 
 
 ## Why is the junit XML output not pretty-printed?
 
-It's to do with "escaping" CDATA end tokens ("]]>") in the output. 
-If we pretty-print it, we get extraneous whitespace in the junit output rendered in Jenkins. 
+It's to do with "escaping" CDATA end tokens ("]]>") in the output.
+If we pretty-print it, we get extraneous whitespace in the junit output rendered in Jenkins.
 
 See the comment in modules/server/src/main/ts/bedrock/core/Reporter.ts
 
 # Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)
+
+* `--clipboardPermission` to enable clipboard permission for Chromium.
 
