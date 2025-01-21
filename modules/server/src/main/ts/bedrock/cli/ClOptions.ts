@@ -211,7 +211,7 @@ export const chunk: ClOption = {
   type: Number,
   description: 'Run tests in groups of this size, reload page between.',
   validate: Extraction.any,
-  defaultValue: 100,
+  defaultValue: 2000,
   uncommon: true
 };
 
