@@ -11,7 +11,7 @@ import {countTests, filterOnly} from './Utils';
 
 export interface Runner {
   readonly init: () => Promise<HarnessResponse>;
-  readonly run: (chunk: number, retries: number, timeout: number, stopOnFailure: boolean) => Promise<void>;
+  readonly run: (chunk: number, retries: number, timeout: number, stopOnFailure: boolean, autoMode: boolean) => Promise<void>;
 }
 
 // 5sec interval for the server to know the client hasn't disconnected
@@ -92,13 +92,15 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
     });
   };
 
-  const run = (chunk: number, retries: number, timeout: number, stopOnFailure: boolean): Promise<void> => {
+  const run = (chunk: number, retries: number, timeout: number, stopOnFailure: boolean, auto: boolean): Promise<void> => {
     const runState: RunState = {
       totalTests: numTests,
       offset: params.offset,
       chunk,
       timeout,
-      testCount: 0
+      testCount: 0,
+      checkSiblings: () => ui.siblings(),
+      auto
     };
 
     const runActions: RunActions = {

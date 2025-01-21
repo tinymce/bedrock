@@ -63,5 +63,7 @@ export const createRunState = (offset: number, chunk: number, count = 0): RunSta
   offset,
   chunk,
   timeout: TEST_TIMEOUT,
-  testCount: count
+  testCount: count,
+  checkSiblings: () => [],
+  auto: false
 });

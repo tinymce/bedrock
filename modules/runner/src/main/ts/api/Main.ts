@@ -22,16 +22,16 @@ const setupAndRun = (loadError?: Error) => {
 
   const runner = Runner(Globals.rootSuite(), params, callbacks, reporter, ui);
   runner.init().then((data) => {
-    if (data.mode === 'auto') {
-      // Try to ensure the page has focus
-      window.focus();
-    }
-
     // Run the tests if an error didn't occur during loading
     if (loadError !== undefined) {
       return Promise.reject(loadError);
     } else {
-      return runner.run(data.chunk, data.retries, data.timeout, data.stopOnFailure);
+      const autoMode = data.mode === 'auto';
+      if (autoMode) {
+        // Try to ensure the page has focus
+        window.focus();
+      }
+      return runner.run(data.chunk, data.retries, data.timeout, data.stopOnFailure, autoMode);
     }
   }).catch((e: Error) => {
     console.error('Unexpected error occurred', e);
@@ -42,7 +42,7 @@ const setupAndRun = (loadError?: Error) => {
 };
 
 const run = () => setupAndRun();
-const runError = (e: Error) => setupAndRun(e);
+const runError = (e: Error) => setupAndRun(Failure.prepFailure(e));
 
 const loadAndRun = (scripts: string[]) => {
   // Load the scripts and then run
