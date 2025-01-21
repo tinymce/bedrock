@@ -79,6 +79,9 @@ export const afterEach = (title: TitleOrExecuteFn, fn?: ExecuteFn): void => {
 
 export const it = (title: string, fn: ExecuteFn): Test => {
   const suite = getCurrentSuiteOrDie();
+  if (suite === root) {
+    throw new Error('Tests must be in a `describe` block');
+  }
   const test = createTest(title, fn, suite);
 
   suite.tests.push(test);
