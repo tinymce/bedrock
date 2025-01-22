@@ -399,7 +399,7 @@ export const webdriverPort: ClOption = {
 export const clipboardPermission: ClOption = {
   name: 'clipboardPermission',
   type: Boolean,
-  defaultValue: false,
+  defaultValue: true,
   description: 'Enable clipboard permission for Chromium',
   validate: Extraction.any
 };
