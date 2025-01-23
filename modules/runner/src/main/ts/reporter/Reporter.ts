@@ -1,7 +1,7 @@
-import {LoggedError, Reporter as ErrorReporter} from '@ephox/bedrock-common';
-import {Callbacks, TestReport} from './Callbacks';
-import {UrlParams} from '../core/UrlParams';
-import {formatElapsedTime, mapStackTrace, setStack} from '../core/Utils';
+import { LoggedError, Reporter as ErrorReporter } from '@ephox/bedrock-common';
+import { Callbacks, TestReport } from './Callbacks';
+import { UrlParams } from '../core/UrlParams';
+import { formatElapsedTime, mapStackTrace, setStack } from '../core/Utils';
 
 type LoggedError = LoggedError.LoggedError;
 
