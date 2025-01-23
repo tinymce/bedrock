@@ -111,10 +111,7 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
   // https://stackoverflow.com/questions/43261516/selenium-chrome-i-just-cant-use-driver-maximize-window-to-maximize-window
   const caps: Record<string, any> = options.capabilities;
   if (browserName === 'chrome') {
-    const chromeArgs = ['--start-maximized', '--disable-extensions'];
-    if (settings.clipboardPermission) {
-      chromeArgs.push('--enable-clipboard');
-    }
+    const chromeArgs = ['--start-maximized', '--disable-extensions', '--enable-clipboard'];
     addArguments(caps, 'goog:chromeOptions', chromeArgs);
     addArguments(caps, 'goog:chromeOptions', extraCaps);
   } else if (browserName === 'firefox') {
