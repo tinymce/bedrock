@@ -1,4 +1,3 @@
-
 import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
@@ -33,6 +32,7 @@ export interface DriverSettings {
   browserVersion: string;
   tunnel?: Tunnel;
   name?: string;
+  clipboardPermission?: boolean;
 }
 
 export interface Driver {
@@ -111,7 +111,8 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
   // https://stackoverflow.com/questions/43261516/selenium-chrome-i-just-cant-use-driver-maximize-window-to-maximize-window
   const caps: Record<string, any> = options.capabilities;
   if (browserName === 'chrome') {
-    addArguments(caps, 'goog:chromeOptions', ['--start-maximized', '--disable-extensions']);
+    const chromeArgs = ['--start-maximized', '--disable-extensions', '--enable-clipboard'];
+    addArguments(caps, 'goog:chromeOptions', chromeArgs);
     addArguments(caps, 'goog:chromeOptions', extraCaps);
   } else if (browserName === 'firefox') {
     addArguments(caps, 'moz:firefoxOptions', extraCaps);
@@ -136,9 +137,10 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
         'devtools.chrome.enabled': true
       };
     } else if (browserName === 'chrome') {
-      addArguments(caps, 'goog:chromeOptions', [ '--headless', '--remote-debugging-port=' + debuggingPort ]);
+      const headlessArgs = ['--headless', '--remote-debugging-port=' + debuggingPort];
+      addArguments(caps, 'goog:chromeOptions', headlessArgs);
       if (settings.useSandboxForHeadless) {
-        addArguments(caps, 'goog:chromeOptions', [ '--no-sandbox' ]);
+        addArguments(caps, 'goog:chromeOptions', ['--no-sandbox']);
       }
     }
   }
@@ -159,20 +161,20 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
 };
 
 const logDriverDetails = (driver: WebdriverIO.Browser, headless: boolean, debuggingPort: number) => {
-  const caps: Record<string, any> = driver.capabilities;
+  const caps = driver.capabilities as any;
   const browserName = caps.browserName;
   const browserVersion = caps.browserVersion || caps.version;
 
   if (browserName === 'chrome') {
-    console.log('chrome version:', browserVersion, 'driver:', caps.chrome.chromedriverVersion);
+    console.log('chrome version:', browserVersion);
   } else if (browserName === 'firefox') {
-    console.log('firefox version:', browserVersion, 'driver:', caps['moz:geckodriverVersion']);
+    console.log('firefox version:', browserVersion);
   } else if (browserName === 'phantomjs') {
-    console.log('phantom version:', browserVersion, 'driver:', caps.driverVersion);
+    console.log('phantom version:', browserVersion);
   } else if (browserName === 'MicrosoftEdge') {
     console.log('Edge version:', browserVersion);
   } else if (browserName === 'msedge') {
-    console.log('MSEdge version:', browserVersion, 'driver:', caps.msedge.msedgedriverVersion);
+    console.log('MSEdge version:', browserVersion);
   }
 
   if (headless) {
@@ -194,9 +196,9 @@ const setupShutdown = (driver: WebdriverIO.Browser, driverApi: DriverLoader.Driv
   const driverShutdown = async (immediate?: boolean) => {
     try {
       if (immediate) {
-        driver.deleteSession();
+        await driver.deleteSession();
       } else {
-        await driver.pause(shutdownDelay);
+        await new Promise(resolve => setTimeout(resolve, shutdownDelay));
         await driver.deleteSession();
       }
     } finally {
@@ -240,22 +242,14 @@ const getDriverSpec = (settings: DriverSettings, browserName: string): DriverLoa
 
 const driverSetup = async (driver: WebdriverIO.Browser, settings: DriverSettings, debuggingPort: number): Promise<void> => {
   // Browsers have a habit of reporting via the webdriver that they're ready before they are (particularly FireFox).
-
   // setTimeout is a temporary solution, VAN-66 has been logged to investigate properly
-  await driver.pause(1500);
+  await new Promise(resolve => setTimeout(resolve, 1500));
 
   // Log driver details
   logDriverDetails(driver, settings.headless, debuggingPort);
 
-  // Some tests require large windows, so make it as large as it can be.
-  // Headless modes can't use maximize, so just set the dimensions to 1280x1024
-  if (settings.headless) {
-    await driver.setWindowSize(1280, 1024);
-  } else {
-    await driver.maximizeWindow();
-  }
-  
-  return Promise.resolve();
+  // Focus the browser window
+  await focusBrowser((driver.capabilities as any).browserName, settings);
 };
 
 /* Settings:
@@ -293,7 +287,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
 
       // Wait for the driver to start up and then start the webdriver session
       await DriverLoader.startAndWaitForAlive(driverSpec, port, webdriverTimeout);
-      
+
       const driver = await WebdriverIO.remote(webdriverOptions);
 
       // IEDriverServer ignores a delete session call if done too quickly so it needs a small delay
@@ -304,7 +298,6 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
       const driverShutdown = setupShutdown(driver, driverSpec.driverApi, shutdownDelay);
 
       await driverSetup(driver, settings, debuggingPort);
-      await focusBrowser(browserName, settings);
 
       // Return the public driver api
       return {
@@ -315,7 +308,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
       try {
         driverSpec.driverApi.stop();
       } catch {
-       // Ignore 
+       // Ignore
       }
       return Promise.reject(e);
     }
