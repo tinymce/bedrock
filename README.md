@@ -99,6 +99,3 @@ See the comment in modules/server/src/main/ts/bedrock/core/Reporter.ts
 # Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)
-
-* `--clipboardPermission` to enable clipboard permission for Chromium.
-
