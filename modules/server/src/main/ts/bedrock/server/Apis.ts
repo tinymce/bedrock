@@ -132,7 +132,7 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
      * In theory this is only required if no other action has been taken in the last x minutes,
      * but this happens so rarely it should be fine.
      */
-    const keepAliveTimer = (Math.max(120, REMOTE_IDLE_TIMEOUT_SECONDS - 60)) * 1000;
+    const keepAliveTimer = Math.max(120, REMOTE_IDLE_TIMEOUT_SECONDS - 60) * 1000;
     return () => {
       if (Date.now() - lastKeepAlive > keepAliveTimer) {
         lastKeepAlive = Date.now();

@@ -3,12 +3,12 @@ import { ErrorData, Global } from '@ephox/bedrock-common';
 import { HarnessResponse } from '../core/ServerTypes';
 
 export interface TestReport {
-  file: string;
-  name: string;
-  passed: boolean;
-  time: string;
-  skipped: string | null;
-  error: TestErrorData | null
+  readonly file: string;
+  readonly name: string;
+  readonly passed: boolean;
+  readonly time: string;
+  readonly skipped: string | null;
+  readonly error: TestErrorData | null
 }
 
 export interface TestErrorData {

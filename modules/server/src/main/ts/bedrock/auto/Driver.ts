@@ -2,12 +2,12 @@ import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
 import * as WebdriverIO from 'webdriverio';
-import {RemoteOptions} from 'webdriverio';
+import { RemoteOptions } from 'webdriverio';
 import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
 import * as DriverLoader from './DriverLoader';
 import * as RemoteDriver from './RemoteDriver';
-import {Tunnel} from './Tunnel';
+import { Tunnel } from './Tunnel';
 import deepmerge = require('deepmerge');
 
 export interface DriverSettings {

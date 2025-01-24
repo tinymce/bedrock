@@ -40,7 +40,7 @@ const performActionOnFrame = async <T>(driver: Browser, selector: string, action
     return result;
   } catch (err: any) {
     return driver.status().then(status => {
-      console.log('webdriver failed with status', status);
+      console.error('webdriver failed with status', status);
       return Promise.reject(err);
     });
   }

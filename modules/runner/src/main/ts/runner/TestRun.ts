@@ -69,7 +69,7 @@ export const runTest = (test: Test, state: RunState, actions: RunActions, report
     actions.onSkip();
   };
 
-  const pass = async (testReport: TestReporter) => {
+  const pass = (testReport: TestReporter) => {
     test.setResult(RunnableState.Passed);
     testReport.pass();
     actions.onPass();

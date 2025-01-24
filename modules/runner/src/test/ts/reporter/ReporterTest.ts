@@ -5,7 +5,7 @@ import { beforeEach, describe, it } from 'mocha';
 import { UrlParams } from '../../../main/ts/core/UrlParams';
 import { Callbacks, TestErrorData } from '../../../main/ts/reporter/Callbacks';
 import { Reporter } from '../../../main/ts/reporter/Reporter';
-import {noop, wait} from '../TestUtils';
+import { noop, wait } from '../TestUtils';
 
 interface StartTestData {
   readonly session: string;
