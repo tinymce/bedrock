@@ -3,6 +3,10 @@ import { Attempt } from './bedrock/core/Attempt';
 import * as Clis from './bedrock/cli/Clis';
 import { BedrockSettings } from './bedrock/core/Settings';
 
+// set NodeJS console logging of objects to be actually useful
+import * as Util from 'util';
+Util.inspect.defaultOptions.depth = null;
+
 type Program = {
   go: <T extends BedrockSettings>(settings: T, directories: { current: string; bin: string }) => void;
   mode: 'forAuto' | 'forManual';

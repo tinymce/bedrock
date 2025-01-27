@@ -1,5 +1,4 @@
 import { Failure, LoggedError, RunnableState, Suite, Test } from '@ephox/bedrock-common';
-import Promise from '@ephox/wrap-promise-polyfill';
 import * as Context from '../core/Context';
 import { InternalError, isInternalError, SkipError } from '../errors/Errors';
 import { Reporter, TestReporter } from '../reporter/Reporter';
@@ -16,6 +15,8 @@ export interface RunState {
   readonly chunk: number;
   readonly timeout: number;
   testCount: number;
+  readonly checkSiblings: () => string[];
+  readonly auto: boolean;
 }
 
 export interface RunActions {
@@ -26,7 +27,7 @@ export interface RunActions {
   readonly runNextChunk: (offset: number) => void;
 }
 
-const runTestWithRetry = (test: Test, state: RunState, report: TestReporter, retryCount: number): Promise<void> => {
+const runTestWithRetry = (test: Test, state: RunState, testReport: TestReporter, retryCount: number): Promise<void> => {
   if (test.isSkipped()) {
     return Promise.reject(new SkipError());
   } else {
@@ -38,9 +39,12 @@ const runTestWithRetry = (test: Test, state: RunState, report: TestReporter, ret
       // Ensure we run the afterEach hooks no matter if the test failed
       .then(runAfterHooks(false), runAfterHooks(true))
       .catch((e: LoggedError | InternalError) => {
+        // This is unique to `this.retries()` within a test, not the general page reload to retry system
         if (retryCount < test.retries() && !isInternalError(e)) {
           test.setResult(RunnableState.NotRun);
-          return report.retry().then(() => runTestWithRetry(test, state, report, retryCount + 1));
+          testReport.retry();
+          // don't fail the page
+          return runTestWithRetry(test, state, testReport, retryCount + 1);
         } else {
           return Promise.reject(e);
         }
@@ -52,17 +56,23 @@ export const runTest = (test: Test, state: RunState, actions: RunActions, report
   const fail = (report: TestReporter, e: LoggedError) => {
     test.setResult(RunnableState.Failed, e);
     console.error(e);
-    return report.fail(e).then(actions.onFailure).then(() => Promise.reject());
+    report.fail(e);
+    // this is where the page reloads if the global retry system is active
+    actions.onFailure();
+    // Test failures must be an empty reject, otherwise the error management thinks it's a bedrock error
+    return Promise.reject();
   };
 
-  const skip = (report: TestReporter) => {
+  const skip = (testReport: TestReporter) => {
     test.setResult(RunnableState.Skipped);
-    return report.skip(test.title).then(actions.onSkip);
+    testReport.skip(test.title);
+    actions.onSkip();
   };
 
-  const pass = (report: TestReporter) => {
+  const pass = (testReport: TestReporter) => {
     test.setResult(RunnableState.Passed);
-    return report.pass().then(actions.onPass);
+    testReport.pass();
+    actions.onPass();
   };
 
   state.testCount++;
@@ -71,25 +81,58 @@ export const runTest = (test: Test, state: RunState, actions: RunActions, report
   } else if (state.testCount > state.offset + state.chunk) {
     actions.runNextChunk(state.offset + state.chunk);
     // Reject so no other tests are run
+    // Test failures must be an empty reject, otherwise the error management thinks it's a bedrock error
     return Promise.reject();
   } else {
-    const report = reporter.test(test.file || 'Unknown', test.fullTitle(), state.totalTests);
+    const testReport = reporter.test(test.file || 'Unknown', test.fullTitle(), state.totalTests);
 
     actions.onStart(test);
-    return report.start()
-      .then(() => runTestWithRetry(test, state, report, 0))
-      .then(() => pass(report), (e: LoggedError | InternalError) => {
+    if (!state.auto) {
+      console.log(`Starting test ${state.testCount} of ${state.totalTests}: ${test.fullTitle()} (${test.file})`);
+    }
+    testReport.start();
+    return runTestWithRetry(test, state, testReport, 0)
+      .then(() => pass(testReport), (e: LoggedError | InternalError) => {
         if (e instanceof SkipError) {
-          return skip(report);
+          return skip(testReport);
         } else {
-          return fail(report, Failure.prepFailure(e));
+          return fail(testReport, Failure.prepFailure(e));
         }
       });
   }
 };
 
-export const runTests = (tests: Test[], state: RunState, actions: RunActions, reporter: RunReporter): Promise<void> => {
+const runTests = (tests: Test[], state: RunState, actions: RunActions, reporter: RunReporter): Promise<void> => {
   return loop(tests, (test) => runTest(test, state, actions, reporter));
+};
+
+const checkSiblings = (suite: Suite, state: RunState, actions: RunActions, reporter: RunReporter) => () => {
+  // we only want to verify this for things directly in the root test suite.
+  // test files often have nested context blocks; shared state is allowed within a single file.
+  if (!suite.root) {
+    return Promise.resolve();
+  }
+  // if there are no siblings, that's a pass
+  const siblings = state.checkSiblings();
+  if (siblings.length === 0) {
+    return Promise.resolve();
+  }
+
+  // rogue sibling elements have been detected, generate a fake test and then report it as failed
+  const tests = suite.tests.length === 0 ? suite.suites[0].tests : suite.tests;
+  const filename = tests[0]?.file || 'Unknown';
+  const fakeReporter = reporter.test(filename.substring(filename.lastIndexOf('/') + 1) + ' DOM validation', suite.fullTitle(), state.totalTests + 1);
+  fakeReporter.start();
+  const fakeFailure = LoggedError.loggedError(new Error(`File ${filename} did not clean up after itself, extra elements were left in the DOM`), siblings);
+
+  // This is mostly duplicate of `fakeReporter.fail()`, but the "test" doesn't really exist
+  // so the UI gets confused and shows two errors if we do that
+  console.error(fakeFailure);
+  fakeReporter.fail(fakeFailure);
+  // this is where the page reloads if the global retry system is active
+  actions.onFailure();
+  // Test failures must be an empty reject, otherwise the error management thinks it's a bedrock error
+  return Promise.reject();
 };
 
 export const runSuite = (suite: Suite, state: RunState, actions: RunActions, reporter: RunReporter): Promise<void> => {
@@ -104,11 +147,11 @@ export const runSuite = (suite: Suite, state: RunState, actions: RunActions, rep
     return Hooks.runBefore(suite)
       .then(() => runTests(suite.tests, state, actions, reporter))
       .then(() => runSuites(suite.suites, state, actions, reporter))
+      .then(checkSiblings(suite, state, actions, reporter))
       // Ensure we run the after hooks no matter if the tests/suites fail
       .then(runAfterHooks(false), runAfterHooks(true));
   }
 };
 
-export const runSuites = (suites: Suite[], state: RunState, actions: RunActions, reporter: RunReporter): Promise<void> => {
-  return loop(suites, (suite) => runSuite(suite, state, actions, reporter));
-};
+const runSuites = (suites: Suite[], state: RunState, actions: RunActions, reporter: RunReporter): Promise<void> =>
+  loop(suites, (suite) => runSuite(suite, state, actions, reporter));

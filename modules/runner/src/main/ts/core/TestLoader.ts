@@ -1,4 +1,3 @@
-import Promise from '@ephox/wrap-promise-polyfill';
 import { ErrorCatcher } from '../errors/ErrorCatcher';
 
 export const load = (scriptUrl: string): Promise<void> =>

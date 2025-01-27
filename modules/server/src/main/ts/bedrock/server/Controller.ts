@@ -1,7 +1,6 @@
 import { ErrorData } from '@ephox/bedrock-common';
 import * as Hud from '../cli/Hud';
 import * as Type from '../util/Type';
-import * as Env from '../util/Env';
 
 export interface TestErrorData {
   readonly data: ErrorData;
@@ -24,13 +23,9 @@ export interface TestResults {
   readonly now: number;
 }
 
-interface InflightTest {
+interface PreviousTest {
   readonly name: string;
   readonly file: string;
-  readonly start: number;
-}
-
-interface PreviousTest extends InflightTest {
   readonly end: number;
 }
 
@@ -40,25 +35,23 @@ interface TestSession {
   readonly lookup: Record<string, Record<string, number>>;
   alive: number;
   updated: number;
-  inflight: InflightTest | null;
   previous: PreviousTest | null;
   done: boolean;
   error?: string;
   totalTests: number;
+  currentTest: number;
 }
 
 export interface Controller {
   readonly enableHud: () => void;
   readonly recordAlive: (sessionId: string) => void;
-  readonly recordTestStart: (id: string, name: string, file: string, totalTests: number) => void;
-  readonly recordTestResult: (id: string, name: string, file: string, passed: boolean, time: string, error: TestErrorData | null, skipped: string) => void;
+  readonly recordTestStart: (id: string, name: string, file: string, currentCount: number, totalTests: number) => void;
+  readonly recordTestResults: (id: string, results: TestResult[]) => void;
   readonly recordDone: (id: string, error?: string) => void;
   readonly awaitDone: () => Promise<TestResults>;
 }
 
-// allow a little extra time for a test timeout so the runner can handle it gracefully
-const timeoutGrace = 2000;
-export const create = (stickyFirstSession: boolean, singleTimeout: number, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced'): Controller => {
+export const create = (stickyFirstSession: boolean, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced'): Controller => {
   const hud = Hud.create(testfiles, loglevel);
   const sessions: Record<string, TestSession> = {};
   let stickyId: string | null = null;
@@ -93,10 +86,10 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
         updated: now,
         results: [],
         lookup: {},
-        inflight: null,
         previous: null,
         done: false,
-        totalTests: testfiles.length
+        totalTests: testfiles.length,
+        currentTest: 0
       };
       sessions[sessionId] = session;
     }
@@ -108,21 +101,15 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     outputToHud = true;
   };
 
-  const shouldUpdateHud = (session: TestSession): boolean => {
-    if (!outputToHud) return false;
-    if (stickyFirstSession && (timeoutError || session.id !== stickyId)) return false;
-    if (!Env.IS_CI || session.done || !session.results.at(-1)?.passed) return true;
-    // Only update the HUD at 10% intervals on remote:
-    return session.results.length % Math.round(session.totalTests * 0.1) === 0;
-  };
-
   const updateHud = (session: TestSession) => {
-    if (!shouldUpdateHud(session)) return;
+    if (!outputToHud) return;
+    if (stickyFirstSession && (timeoutError || session.id !== stickyId)) return;
     const id = session.id;
     const numFailed = session.results.reduce((sum, res) => sum + (res.passed || res.skipped ? 0 : 1), 0);
     const numSkipped = session.results.reduce((sum, res) => sum + (res.skipped ? 1 : 0), 0);
     const numPassed = session.results.length - numFailed - numSkipped;
-    const test = session.inflight !== null ? session.inflight.name : (session.previous !== null ? session.previous.name : '');
+
+    const test = session.previous !== null ? session.previous.name : '';
     const done = session.done;
     hud.update({id, test, numPassed, numSkipped, numFailed, done, totalTests: session.totalTests});
   };
@@ -131,24 +118,29 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     getSession(sessionId);
   };
 
-  const recordTestStart = (id: string, name: string, file: string, totalTests: number) => {
+  const recordTestStart = (id: string, name: string, file: string, currentCount: number, totalTests: number) => {
     const session = getSession(id);
-    const start = Date.now();
-    session.inflight = {name, file, start};
-    session.updated = Date.now();
+    const now = Date.now();
+    session.updated = now;
     session.totalTests = totalTests;
+    session.currentTest = currentCount;
     session.done = false;
-    if (!session.results.length || !Env.IS_CI) {
-      // Update HUD on test starts when in CI only on the very first update i.e. `progress: 0/0`, otherwise skip them.
-      updateHud(session);
-    }
+    // a bit of a lie, but we only ever get 1 start now
+    session.previous = {
+      name,
+      file,
+      end: now
+    };
+    updateHud(session);
   };
 
-  const recordTestResult = (id: string, name: string, file: string, passed: boolean, time: string, error: TestErrorData | null, skipped: string) => {
-    const now = Date.now();
-    const session = getSession(id);
-    const record = { name, file, passed, time, error, skipped };
+  const recordTestResult = (session: TestSession, record: TestResult) => {
+    const {name, file} = record;
     if (session.lookup[file] !== undefined && session.lookup[file][name] !== undefined) {
+      const existing = session.results[session.lookup[file][name]];
+      if (!existing.error) {
+        hud.warn(`WARNING: overwriting test that didn't fail!`, file, '::', name);
+      }
       // rerunning a test
       session.results[session.lookup[file][name]] = record;
     } else {
@@ -157,23 +149,35 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
       session.lookup[file][name] = session.results.length;
       session.results.push(record);
     }
-    // this check is just in case the test start arrives before the result of the previous
-    if (session.inflight !== null && session.inflight.file === file && session.inflight.name === name) {
-      session.previous = {
-        ...session.inflight,
-        end: now
-      };
-      session.inflight = null;
-    }
+  };
+
+  const recordTestResults = (id: string, results: TestResult[]) => {
+    const now = Date.now();
+    const session = getSession(id);
     session.updated = now;
     session.done = false;
-    updateHud(session);
+    if (results.length > 0) {
+      const {name, file} = results.slice(-1)[0];
+      session.previous = {
+        name,
+        file,
+        end: now
+      };
+      results.forEach(
+        (record) =>
+          recordTestResult(session, record)
+      );
+      updateHud(session);
+    }
   };
 
   const recordDone = (id: string, error?: string) => {
     const session = getSession(id);
     session.done = true;
     session.error = error;
+    if (!error) {
+      session.currentTest = session.totalTests;
+    }
     session.updated = Date.now();
     updateHud(session);
   };
@@ -214,20 +218,16 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
             }
             clearInterval(poller);
           } else {
-            if (session.inflight !== null && (now - session.inflight.start) > (singleTimeout + timeoutGrace)) {
-              // one test took too long
-              const elapsed = formatTime(now - session.inflight.start);
-              const message = 'Test: ' + testName(session.inflight) + ' ran too long (' + elapsed + '). Limit for an individual test is set to: ' + formatTime(singleTimeout);
+             if ((now - session.updated) > (55 * 1000)) {
+              // sticky sessions have longer before they time out, but we still can't sit around if the driver has failed
+              const message = `No updates from the browser in ${formatTime(now - session.updated)}, assuming driver has failed.`;
               reject({message, results, start, now});
               clearInterval(poller);
               timeoutError = true;
             } else if (allElapsed > overallTimeout) {
               // combined tests took too long
               let lastTest;
-              if (session.inflight !== null) {
-                const runningTime = now - session.inflight.start;
-                lastTest = 'Current test: ' + testName(session.inflight) + ' running ' + formatTime(runningTime) + '.';
-              } else if (session.previous !== null) {
+              if (session.previous !== null) {
                 const sincePrevious = now - session.previous.end;
                 lastTest = 'Previous test: ' + testName(session.previous) + ' finished ' + formatTime(sincePrevious) + ' ago.';
               } else {
@@ -261,7 +261,7 @@ export const create = (stickyFirstSession: boolean, singleTimeout: number, overa
     enableHud,
     recordAlive,
     recordTestStart,
-    recordTestResult,
+    recordTestResults,
     recordDone,
     awaitDone
   };

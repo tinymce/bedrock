@@ -1,5 +1,4 @@
 import { Suite } from '@ephox/bedrock-common';
-import Promise from '@ephox/wrap-promise-polyfill';
 import { HarnessResponse } from '../core/ServerTypes';
 import { UrlParams } from '../core/UrlParams';
 import { noop } from '../core/Utils';
@@ -12,7 +11,7 @@ import { countTests, filterOnly } from './Utils';
 
 export interface Runner {
   readonly init: () => Promise<HarnessResponse>;
-  readonly run: (chunk: number, retries: number, timeout: number, stopOnFailure: boolean) => Promise<void>;
+  readonly run: (chunk: number, retries: number, timeout: number, stopOnFailure: boolean, autoMode: boolean) => Promise<void>;
 }
 
 // 5sec interval for the server to know the client hasn't disconnected
@@ -30,8 +29,10 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
   };
 
   const runNextChunk = (offset: number) => {
-    const sum = reporter.summary();
-    actions.reloadPage(offset, sum.failed, sum.skipped);
+    reporter.waitForResults().then(() => {
+      const sum = reporter.summary();
+      actions.reloadPage(offset, sum.failed, sum.skipped);
+    });
   };
 
   const retryTest = withSum(actions.retryTest);
@@ -51,14 +52,23 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
       reporter.done();
       // make it easy to restart at this test
       stopTest();
-    } else if (params.retry < retries) {
-      retryTest(params.retry + 1);
     } else {
-      loadNextTest();
+      if (params.retry < retries) {
+        // post all results except the failure, and retry
+        reporter.retry().then(() => {
+          retryTest(params.retry + 1);
+        });
+      } else {
+        // post the failure to the server and move on
+        reporter.waitForResults().then(() => {
+          // wait for 2 seconds for the purposes of showing the failure on video
+          setTimeout(loadNextTest, 2000);
+        });
+      }
     }
   };
 
-  const init = (): Promise<HarnessResponse> => {
+  const init = async (): Promise<HarnessResponse> => {
     // Filter the tests to ensure we have an accurate total test count
     filterOnly(rootSuite);
     numTests = countTests(rootSuite);
@@ -66,24 +76,31 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
     // Render the initial UI
     ui.render(params.offset, numTests, actions.restartTests, retryTest, loadNextTest);
 
-    // delay this ajax call until after the reporter status elements are in the page
-    const keepAliveTimer = setInterval(() => {
-      callbacks.sendKeepAlive(params.session).catch(() => {
-        // if the server shuts down stop trying to send messages
-        clearInterval(keepAliveTimer);
-      });
-    }, KEEP_ALIVE_INTERVAL);
+    return Promise.all([callbacks.sendInit(params.session), callbacks.loadHarness()]).then(([_, harness]) => {
+      // we don't need a keep-alive timer in auto mode,
+      if (harness.mode === 'manual') {
+        // delay this ajax call until after the reporter status elements are in the page
+        const keepAliveTimer = setInterval(() => {
+          callbacks.sendKeepAlive(params.session).catch(() => {
+            // if the server shuts down stop trying to send messages
+            clearInterval(keepAliveTimer);
+          });
+        }, KEEP_ALIVE_INTERVAL);
+      }
 
-    return callbacks.sendInit(params.session).then(() => callbacks.loadHarness());
+      return harness;
+    });
   };
 
-  const run = (chunk: number, retries: number, timeout: number, stopOnFailure: boolean): Promise<void> => {
+  const run = (chunk: number, retries: number, timeout: number, stopOnFailure: boolean, auto: boolean): Promise<void> => {
     const runState: RunState = {
       totalTests: numTests,
       offset: params.offset,
       chunk,
       timeout,
-      testCount: 0
+      testCount: 0,
+      checkSiblings: () => ui.siblings(),
+      auto
     };
 
     const runActions: RunActions = {

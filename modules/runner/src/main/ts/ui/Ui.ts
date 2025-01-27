@@ -11,6 +11,7 @@ export interface Ui extends ReporterUi {
   readonly render: (offset: number, totalNumTests: number, onRestart: () => void, onRetry: () => void, onSkip: () => void) => void;
   readonly error: (e: LoggedError) => void;
   readonly setStopOnFailure: (stopOnFailure: boolean) => void;
+  readonly siblings: () => string[];
 }
 
 declare const $: JQueryStatic;
@@ -24,7 +25,7 @@ export const Ui = (container: JQuery<HTMLElement>): Ui => {
   let skipBtn: JQuery<HTMLElement>;
 
   const render = (offset: number, totalNumTests: number, onRestart: () => void, onRetry: () => void, onSkip: () => void) => {
-    ui = $('<div></div>');
+    ui = $('<div data-container="bedrock"></div>');
     current = $('<span />').addClass('progress').text(offset);
     restartBtn = $('<button />').text('Restart').on('click', onRestart);
     retryBtn = $('<button />').text('Retry').on('click', onRetry).hide();
@@ -121,11 +122,17 @@ export const Ui = (container: JQuery<HTMLElement>): Ui => {
     stopOnFailure = flag;
   };
 
+  const siblings = (): string[] =>
+    // TODO: This only picks up elements added to the body.
+    // some tests add elements to the head, which would be nice to check, but it's harder to keep track of
+    ui.nextAll().toArray().map(e => e.outerHTML);
+
   return {
     render,
     test,
     error,
     done,
+    siblings,
     hideSkip: () => skipBtn.hide(),
     showSkip: () => skipBtn.show(),
     hideRetry: () => retryBtn.show(),

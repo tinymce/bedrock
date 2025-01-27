@@ -7,6 +7,7 @@ import * as Obj from '../util/Obj';
 import * as Type from '../util/Type';
 import * as Routes from './Routes';
 import * as FileUtils from '../util/FileUtils';
+import * as RouteUtils from '../util/RouteUtils';
 
 interface CustomRequest {
   readonly headers?: Record<string, string>;
@@ -81,16 +82,25 @@ const parseJsonFromFile = (filePath: string, configPath: string) => {
 };
 
 const concludeJson = (response: ServerResponse, status: number, headers: Record<string, string>, json: any) => {
-  response.writeHead(status, { 'Content-Type': 'application/json', ...headers });
-  response.end(serializeJson(json));
+  const jsonString = serializeJson(json);
+  response.writeHead(status, {
+    'Content-Type': 'application/json',
+    'Cache-Control': 'public, max-age=60',
+    'ETag': RouteUtils.generateETag(jsonString),
+    ...headers
+  });
+  response.end(jsonString);
 };
 
 const concludeBinary = (response: ServerResponse, status: number, headers: Record<string, string>, filepath: string) => {
   const contentType = mime.contentType(path.extname(filepath)) || 'application/octet-stream';
-  const size = fs.statSync(filepath).size;
+  const stats = fs.statSync(filepath);
   response.writeHead(status, {
     'Content-Type': contentType,
-    'Content-Length': size,
+    'Content-Length': stats.size,
+    'ETag': RouteUtils.generateETag(stats),
+    'Last-Modified': stats.mtime.toUTCString(),
+    'Cache-Control': 'public, max-age=60',
     ...headers
   });
   const stream = fs.createReadStream(filepath);

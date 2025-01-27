@@ -46,14 +46,14 @@ describe('Utils.formatElapsedTime', () => {
     const now = new Date();
     const fiveSeconds = new Date(now.getTime() + 5000);
     fc.assert(fc.property(fc.date({ max: now }), fc.date({ min: fiveSeconds }), (start, end) => {
-      const result = parseFloat(Utils.formatElapsedTime(start, end));
+      const result = parseFloat(Utils.formatElapsedTime(start.getTime(), end.getTime()));
       assert.isAtLeast(result, 5.0);
     }));
   });
 
   it('should be 0 if same dates', () => {
     const now = new Date();
-    const result = Utils.formatElapsedTime(now, now);
+    const result = Utils.formatElapsedTime(now.getTime(), now.getTime());
     assert.equal(parseFloat(result), 0.0);
     assert.equal(result, '0.000s');
   });

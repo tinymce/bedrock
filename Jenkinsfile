@@ -40,7 +40,7 @@ timestamps {
         sh 'yarn build'
       },
       testDirs: [ 'modules/sample/src/test/ts/**/pass' ],
-      custom: '--config modules/sample/tsconfig.json --customRoutes modules/sample/routes.json --polyfills Promise Symbol'
+      custom: '--config modules/sample/tsconfig.json --customRoutes modules/sample/routes.json'
     )
   }
 

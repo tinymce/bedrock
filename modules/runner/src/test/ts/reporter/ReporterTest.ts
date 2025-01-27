@@ -1,15 +1,15 @@
 import { Failure, LoggedError } from '@ephox/bedrock-common';
-import Promise from '@ephox/wrap-promise-polyfill';
 import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { beforeEach, describe, it } from 'mocha';
 import { UrlParams } from '../../../main/ts/core/UrlParams';
 import { Callbacks, TestErrorData } from '../../../main/ts/reporter/Callbacks';
 import { Reporter } from '../../../main/ts/reporter/Reporter';
-import { noop } from '../TestUtils';
+import { noop, wait } from '../TestUtils';
 
 interface StartTestData {
   readonly session: string;
+  readonly currentCount: number;
   readonly totalTests: number;
   readonly file: string;
   readonly name: string;
@@ -51,12 +51,12 @@ describe('Reporter.test', () => {
     loadHarness: () => Promise.resolve({ retries: 0, chunk: 100, stopOnFailure: true, mode: 'manual', timeout: 10000 }),
     sendKeepAlive: () => Promise.resolve(),
     sendInit: () => Promise.resolve(),
-    sendTestStart: (session, totalTests, file, name) => {
-      startTestData.push({ session, totalTests, file, name });
+    sendTestStart: (session, currentCount, totalTests, file, name) => {
+      startTestData.push({ session, currentCount, totalTests, file, name });
       return Promise.resolve();
     },
-    sendTestResult: (session, file, name, passed, time, error, skipped) => {
-      endTestData.push({ session, file, name, passed, time, error, skipped });
+    sendTestResults: (session, results) => {
+      results.forEach(r => endTestData.push({session, ...r}));
       return Promise.resolve();
     },
     sendDone: (session, error) => {
@@ -66,8 +66,8 @@ describe('Reporter.test', () => {
     }
   };
 
-  const reset = () => {
-    offset = Math.floor(Math.random() * 1000);
+  const reset = (newOffset: number = Math.floor(Math.random() * 1000)) => {
+    offset = newOffset;
     reporter = Reporter({ ...params, offset }, callbacks, ui);
     startTestData = [];
     endTestData = [];
@@ -75,22 +75,24 @@ describe('Reporter.test', () => {
     doneError = undefined;
   };
 
-  beforeEach(reset);
+  beforeEach(() => reset());
 
   it('should report the session id, number tests, file and name on start', () => {
     return fc.assert(fc.asyncProperty(fc.hexaString(), fc.asciiString(), fc.integer(offset), (fileName, testName, testCount) => {
-      reset();
+      reset(0);
       const test = reporter.test(fileName + 'Test.ts', testName, testCount);
-      return test.start().then(() => {
-        assert.equal(startTestData.length, 1);
+      test.start();
+      return reporter.waitForResults().then(() => {
+        assert.equal(startTestData.length, 1, 'Checking there is start test data');
         assert.deepEqual(startTestData[0], {
+          currentCount: offset + 1,
           session: sessionId,
           totalTests: testCount,
           file: fileName + 'Test.ts',
           name: testName
-        });
+        }, 'Checking start test data contents');
 
-        assert.equal(endTestData.length, 0);
+        assert.equal(endTestData.length, 0, 'Checking there is no end test data');
         assert.deepEqual(reporter.summary(), {
           offset,
           passed: offset,
@@ -103,51 +105,23 @@ describe('Reporter.test', () => {
     }));
   });
 
-  it('should report the session id, file, name, passed state and time on a test success', () => {
-    return fc.assert(fc.asyncProperty(fc.hexaString(), fc.asciiString(), fc.integer(offset), (fileName, testName, testCount) => {
-      reset();
-      const test = reporter.test(fileName + 'Test.ts', testName, testCount);
-      return test.start()
-        .then(test.pass)
-        .then(() => {
-          assert.equal(endTestData.length, 1);
-          const data = endTestData[0];
-          assert.equal(data.session, sessionId);
-          assert.equal(data.file, fileName + 'Test.ts');
-          assert.equal(data.name, testName);
-          assert.isTrue(data.passed);
-          assert.isNull(data.skipped);
-          assert.isNull(data.error);
-          assert.isString(data.time);
-
-          assert.deepEqual(reporter.summary(), {
-            offset,
-            passed: offset + 1,
-            failed: 0,
-            skipped: 0
-          }, 'Summary has one passed test');
-
-          assert.isFalse(doneCalled);
-        });
-    }));
-  });
-
   it('should report the session id, file, name, passed state and time on a skipped test', () => {
     return fc.assert(fc.asyncProperty(fc.hexaString(), fc.asciiString(), fc.asciiString(), fc.integer(offset), (fileName, testName, skippedMessage, testCount) => {
       reset();
       const test = reporter.test(fileName + 'Test.ts', testName, testCount);
-      return test.start()
-        .then(() => test.skip(skippedMessage))
+      test.start();
+      test.skip(skippedMessage);
+      return reporter.waitForResults()
         .then(() => {
-          assert.equal(endTestData.length, 1);
+          assert.equal(endTestData.length, 1, 'Checking there is end test data');
           const data = endTestData[0];
-          assert.equal(data.session, sessionId);
-          assert.equal(data.file, fileName + 'Test.ts');
-          assert.equal(data.name, testName);
-          assert.isFalse(data.passed);
-          assert.equal(data.skipped, skippedMessage);
-          assert.isNull(data.error);
-          assert.isString(data.time);
+          assert.equal(data.session, sessionId, 'Checking session ID');
+          assert.equal(data.file, fileName + 'Test.ts', 'Checking filename');
+          assert.equal(data.name, testName, 'Checking testname');
+          assert.isFalse(data.passed, 'Checking passed state');
+          assert.equal(data.skipped, skippedMessage, 'Checking skipped message');
+          assert.isNull(data.error, 'Checking no error');
+          assert.isString(data.time, 'Checking time');
 
           assert.deepEqual(reporter.summary(), {
             offset,
@@ -167,18 +141,19 @@ describe('Reporter.test', () => {
       const test = reporter.test(fileName + 'Test.ts', testName, testCount);
       const error = LoggedError.loggedError(new Error('Failed'), [ 'Log Message' ]);
 
-      return test.start()
-        .then(() => test.fail(error))
+      test.start();
+      test.fail(error);
+      return reporter.waitForResults()
         .then(() => {
-          assert.equal(endTestData.length, 1);
+          assert.equal(endTestData.length, 1, 'Checking there is end test data');
           const data = endTestData[ 0 ];
-          assert.equal(data.session, sessionId);
-          assert.equal(data.file, fileName + 'Test.ts');
-          assert.equal(data.name, testName);
-          assert.isFalse(data.passed);
-          assert.isNull(data.skipped);
-          assert.isString(data.time);
-          assert.equal(data.error?.text, 'Error: Failed\n\nLogs:\nLog Message');
+          assert.equal(data.session, sessionId, 'Checking session ID');
+          assert.equal(data.file, fileName + 'Test.ts', 'Checking filename');
+          assert.equal(data.name, testName, 'Checking testname');
+          assert.isFalse(data.passed, 'Checking passed state');
+          assert.isNull(data.skipped, 'Checking skipped state');
+          assert.isString(data.time, 'Checking time');
+          assert.equal(data.error?.text, 'Error: Failed\n\nLogs:\nLog Message', 'Checking error text');
 
           assert.deepEqual(reporter.summary(), {
             offset,
@@ -192,14 +167,19 @@ describe('Reporter.test', () => {
     }));
   });
 
-  it('should report done', () => {
+  it('should report done', async () => {
     reporter.done();
+    // done waits about 100ms, so we have to wait 150
+    await wait(150);
     assert.isTrue(doneCalled);
     assert.isUndefined(doneError);
   });
 
-  it('should report done with an error', () => {
+  it('should report done with an error', async () => {
     reporter.done(Failure.prepFailure('Unexpected error occurred'));
+    // done waits about 100ms, so we have to wait 150
+    await wait(150);
+    await Promise.resolve();
     assert.isTrue(doneCalled);
     assert.include(doneError, 'Unexpected error occurred');
   });
