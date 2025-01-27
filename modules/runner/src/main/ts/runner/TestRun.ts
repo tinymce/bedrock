@@ -102,14 +102,26 @@ export const runTest = (test: Test, state: RunState, actions: RunActions, report
   }
 };
 
-export const runTests = (tests: Test[], state: RunState, actions: RunActions, reporter: RunReporter): Promise<void> => {
+const runTests = (tests: Test[], state: RunState, actions: RunActions, reporter: RunReporter): Promise<void> => {
   return loop(tests, (test) => runTest(test, state, actions, reporter));
 };
 
-const fakeFailure = (reporter: RunReporter, suite: Suite, state: RunState, siblings: string[], actions: RunActions) => {
+const checkSiblings = (suite: Suite, state: RunState, actions: RunActions, reporter: RunReporter) => () => {
+  // we only want to verify this for things directly in the root test suite.
+  // test files often have nested context blocks; shared state is allowed within a single file.
+  if (!suite.root) {
+    return Promise.resolve();
+  }
+  // if there are no siblings, that's a pass
+  const siblings = state.checkSiblings();
+  if (siblings.length === 0) {
+    return Promise.resolve();
+  }
+
+  // rogue sibling elements have been detected, generate a fake test and then report it as failed
   const tests = suite.tests.length === 0 ? suite.suites[0].tests : suite.tests;
   const filename = tests[0]?.file || 'Unknown';
-  const fakeReporter = reporter.test(filename.substring(filename.lastIndexOf('/') + 1) + ' DOM validation', suite.fullTitle(), state.totalTests);
+  const fakeReporter = reporter.test(filename.substring(filename.lastIndexOf('/') + 1) + ' DOM validation', suite.fullTitle(), state.totalTests + 1);
   fakeReporter.start();
   const fakeFailure = LoggedError.loggedError(new Error(`File ${filename} did not clean up after itself, extra elements were left in the DOM`), siblings);
 
@@ -132,33 +144,14 @@ export const runSuite = (suite: Suite, state: RunState, actions: RunActions, rep
     const runAfterHooks = <T>(error: boolean) => (result: T): Promise<T> =>
       Hooks.runAfter(suite).then(() => error ? Promise.reject(result) : Promise.resolve(result));
 
-    const checkSiblings = !suite.root ? undefined :
-      () => {
-        const siblings = state.checkSiblings();
-        if (siblings.length > 0) {
-          return fakeFailure(reporter, suite, state, siblings, actions);
-        }
-      };
-
     return Hooks.runBefore(suite)
       .then(() => runTests(suite.tests, state, actions, reporter))
       .then(() => runSuites(suite.suites, state, actions, reporter))
-      .then(checkSiblings)
+      .then(checkSiblings(suite, state, actions, reporter))
       // Ensure we run the after hooks no matter if the tests/suites fail
       .then(runAfterHooks(false), runAfterHooks(true));
   }
 };
 
-export const runSuites = (suites: Suite[], state: RunState, actions: RunActions, reporter: RunReporter): Promise<void> => {
-  return loop(suites, (suite) => {
-
-    const checkSiblings = !suite.parent?.root ? undefined :
-      () => {
-        const siblings = state.checkSiblings();
-        if (siblings.length > 0) {
-          return fakeFailure(reporter, suite, state, siblings, actions);
-        }
-      };
-    return runSuite(suite, state, actions, reporter).then(checkSiblings);
-  });
-};
+const runSuites = (suites: Suite[], state: RunState, actions: RunActions, reporter: RunReporter): Promise<void> =>
+  loop(suites, (suite) => runSuite(suite, state, actions, reporter));
