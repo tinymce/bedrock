@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## Fixed
+- AWS remote testing idle timeout was not set
+
+## 15.0.0 - 2025-01-27
+
 ## Added
 - New server-side APIs to accept a batch of results instead of a single result #TINY-11177
 
@@ -14,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Client no longer waits for log requests to complete between tests, which should speed up remote testing #TINY-11177
 - Console HUD no longer updates for individual tests #TINY-11177
 - Client now posts test status only in batches every 30 seconds, this is the only time the console HUD will update #TINY-11177
+- Server now controls the remote webdriver idle timeout, and makes sure a keep-alive command is sent regularly
 
 ## Removed
 - Single result server-side API #TINY-11177
