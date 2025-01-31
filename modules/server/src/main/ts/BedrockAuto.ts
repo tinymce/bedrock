@@ -80,6 +80,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
     });
 
     const webdriver = driver.webdriver;
+    console.log('Started webdriver session: ', webdriver.sessionId);
     const service = await Serve.start({
       ...settings,
       driver: Attempt.passed(webdriver),
