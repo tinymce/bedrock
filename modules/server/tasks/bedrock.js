@@ -43,6 +43,7 @@ module.exports = function(grunt) {
     this.requiresConfig([this.name, this.target, 'testfiles']);
 
     const manualSettings = enrichSettings(settings);
+    grunt.log.verbose.writeln('Bedrock manual settings', manualSettings);
 
     try {
       bedrockManual.go(manualSettings);
@@ -68,7 +69,8 @@ module.exports = function(grunt) {
     autoSettings.gruntDone = function (passed) {
       done(passed);
     };
-    autoSettings.stopOnFailure = options.stopOnFailure;
+    autoSettings.stopOnFailure = options.stopOnFailure || autoSettings.stopOnFailure;
+    grunt.log.verbose.writeln('Bedrock auto settings', autoSettings);
 
     try {
       bedrockAuto.go(autoSettings);

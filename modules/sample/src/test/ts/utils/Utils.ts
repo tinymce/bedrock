@@ -1,4 +1,3 @@
-import Promise from '@ephox/wrap-promise-polyfill';
 
 const post = (url: string, data: Record<string, any>): Promise<void> => {
   return new Promise((onSuccess, onFailure) => {

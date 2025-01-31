@@ -23,7 +23,6 @@ export interface ServeSettings {
   readonly overallTimeout: number;
   readonly projectdir: string;
   readonly runner: Routes.Runner;
-  readonly singleTimeout: number;
   readonly skipResetMousePosition: boolean;
   readonly stickyFirstSession: boolean;
   readonly testfiles: string[];
@@ -66,12 +65,11 @@ export const startCustom = async (settings: ServeSettings, createServer: (port: 
   const maybeDriver = pref('driver');
   const master = pref('master');
   const stickyFirstSession = settings.stickyFirstSession;
-  const singleTimeout = pref('singleTimeout');
   const overallTimeout = pref('overallTimeout');
   const resetMousePosition = !pref('skipResetMousePosition');
 
   const runner = pref('runner');
-  const api = Apis.create(master, maybeDriver, projectdir, basedir, stickyFirstSession, singleTimeout, overallTimeout, testfiles, settings.loglevel, resetMousePosition);
+  const api = Apis.create(master, maybeDriver, projectdir, basedir, stickyFirstSession, overallTimeout, testfiles, settings.loglevel, resetMousePosition);
 
   const routers = runner.routers.concat(
     api.routers,
@@ -107,10 +105,12 @@ export const startCustom = async (settings: ServeSettings, createServer: (port: 
 export const start = (settings: ServeSettings): Promise<ServeService> => {
   return startCustom(settings, (port, listener) => {
     const server = http.createServer(listener);
+    server.requestTimeout = 120000;
     return {
       start: () => {
         return new Promise((resolve) => {
           server.listen(port, resolve);
+          server.keepAliveTimeout = 120000;
         });
       },
       stop: () => new Promise((resolve, reject) => {

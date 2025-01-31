@@ -1,8 +1,9 @@
-
 import * as WebdriverIO from 'webdriverio';
 import * as deepmerge from 'deepmerge';
-import { DeviceFarmClient, CreateTestGridUrlCommand } from '@aws-sdk/client-device-farm';
+import { CreateTestGridUrlCommand, DeviceFarmClient } from '@aws-sdk/client-device-farm';
 import { Driver, DriverSettings } from './Driver';
+
+export const REMOTE_IDLE_TIMEOUT_SECONDS = 360;
 
 const getFarmUrl = async (awsRegion: string, projectArn: string, expires = 5000): Promise<URL> => {
   console.log('Creating DeviceFarmClient...');
@@ -33,14 +34,16 @@ const createFarm = async (browserName: string, remoteOpts: WebdriverIO.RemoteOpt
 
     const url = await getFarmUrl(region, projectArn);
 
-    // aws:maxDurationSecs is the maximum duration of the session before it is forcibly closed. (180 - 2400)
     const options = deepmerge(remoteOpts, {
       hostname: url.host,
       path: url.pathname,
       protocol: 'https',
       port: 443,
       capabilities: {
+        // aws:maxDurationSecs is the maximum duration of the session before it is forcibly closed. (180 - 2400)
         'aws:maxDurationSecs': 2400,
+        // aws:idleTimeoutSecs is the maximum delay between WebDriver commands before the session is forcibly closed. (30 - 900)
+        'aws:idleTimeoutSecs': REMOTE_IDLE_TIMEOUT_SECONDS
       },
     });
 
@@ -101,9 +104,12 @@ const addDriverSpecificOpts = (opts: WebdriverIO.RemoteOptions, settings: Driver
         'LT:Options': {
           username: settings.username,
           accesskey: settings.accesskey,
+          idleTimeout: REMOTE_IDLE_TIMEOUT_SECONDS,
           tunnel: true,
           console: true,
           w3c: true,
+          network: true,
+          terminal: true,
           plugin: 'node_js-webdriverio',
           ...platformName,
           ...tunnelName,
@@ -136,7 +142,5 @@ export const getOpts = (browserName: string, settings: DriverSettings): Webdrive
     }
   };
   const withBrowserOpts = addDriverSpecificOpts(driverOpts, settings);
-  const withDriverOpts = addBrowserSpecificOpts(withBrowserOpts, browserName);
-
-  return withDriverOpts;
+  return addBrowserSpecificOpts(withBrowserOpts, browserName);
 };

@@ -32,8 +32,8 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
 
   const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
-  const shutdownServices: (() => Promise<void>)[] = [];
-  const shutdown = (services: (() => Promise<void>)[]) => () => Promise.allSettled(services.map((fn) => fn()));
+  const shutdownServices: ((immediate?: boolean) => Promise<void>)[] = [];
+  const shutdown = (services: ((immediate?: boolean) => Promise<void>)[]) => (immediate?: boolean) => Promise.allSettled(services.map((fn) => fn(immediate)));
 
   routes.then(async (runner) => {
 
@@ -52,7 +52,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
     shutdownServices.push(tunnel.shutdown);
     const location = tunnel.url.href;
 
-    console.log('Creating webdriver...');
+    console.log(`Creating ${remoteWebdriver ?? 'local'} webdriver...`);
     if (remoteWebdriver == 'aws') {
         console.log('INFO: Webdriver creation waits for device farm session to activate. Takes 30-45s.');
     }
@@ -91,6 +91,11 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
     });
     shutdownServices.push(service.shutdown, driver.shutdown);
 
+    const cancelEverything = Lifecycle.cancel(webdriver, shutdown(shutdownServices), settings.gruntDone);
+    process.on('SIGINT', cancelEverything);
+    process.on('SIGQUIT', cancelEverything);
+    process.on('SIGTERM', cancelEverything);
+
     try {
       if (!isHeadless) {
         console.log('bedrock-auto ' + Version.get() + ' available at: ' + location);
@@ -118,7 +123,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
     // Chalk does not use a formatter. Using node's built-in to expand Objects, etc.
     console.error(chalk.red('Error creating webdriver', format(err)));
     // Shutdown tunnels in case webdriver fails
-    await shutdown(shutdownServices)();
+    await shutdown(shutdownServices)(true);
     Lifecycle.exit(settings.gruntDone, ExitCodes.failures.unexpected);
   });
 };

@@ -30,7 +30,8 @@ const doResponse = (request: IncomingMessage, response: ServerResponse, status: 
   } else {
     response.writeHead(status, {
       'Content-Type': contentType,
-      'Cache-Control': 'public, max-age=0'
+      'Cache-Control': 'public, max-age=0',
+      'Keep-Alive': 'timeout=120' // Avoid 502 errors
     });
     response.end(data);
   }
@@ -210,6 +211,29 @@ export const nodeResolve = (method: HTTPMethod, prefix: string, source: string):
 
   return {
     matches: [Matchers.methodMatch(method), Matchers.prefixMatch(prefix)],
+    go
+  };
+};
+
+export const nodeResolveFile = (method: HTTPMethod, url: string, projectDir: string, moduleName: string, subPath: string): Route => {
+  const go: RouteGoFunc = (request, response, done) => {
+    const failure = (status: number, data: string) => {
+      doResponse(request, response, status, 'text/plain', data);
+      done();
+    };
+
+    try {
+      const moduleResolvedPath = require.resolve(path.join(moduleName, 'package.json'), { paths: [ projectDir ] });
+      const router = createServer(path.dirname(moduleResolvedPath));
+      request.url = '/' + subPath;
+      router(request, response, done);
+    } catch (e) {
+      failure(404, `Failed to resolve static node file for module path: ${moduleName}/${subPath}`);
+    }
+  };
+
+  return {
+    matches: [Matchers.methodMatch(method), Matchers.urlMatch(url)],
     go
   };
 };

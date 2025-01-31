@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock-runner",
-  "version": "14.1.1",
+  "version": "15.0.0",
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
   "scripts": {
@@ -10,8 +10,7 @@
     "buildAndTest": "yarn prepublishOnly && yarn test"
   },
   "dependencies": {
-    "@ephox/bedrock-common": "^14.1.1",
-    "@ephox/wrap-promise-polyfill": "^2.2.0",
+    "@ephox/bedrock-common": "^15.0.0",
     "jquery": "^3.4.1",
     "querystringify": "^2.1.1"
   },
@@ -19,10 +18,10 @@
     "@types/diff": "^5.0.0",
     "@types/jquery": "^3.5.3",
     "@types/querystringify": "^2.0.0",
-    "rollup": "^1.20.2",
+    "rollup": "^4.30.1",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-sourcemaps": "^0.4.2",
+    "rollup-plugin-sourcemaps": "^0.6.3",
     "sourcemapped-stacktrace": "^1.1.11"
   },
   "main": "./lib/main/ts/api/Main.js",

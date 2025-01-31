@@ -1,6 +1,6 @@
 {
   "name": "@ephox/bedrock-server",
-  "version": "14.1.4",
+  "version": "15.0.1",
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
   "bin": {
@@ -18,9 +18,9 @@
   },
   "dependencies": {
     "@aws-sdk/client-device-farm": "^3.354.0",
-    "@ephox/bedrock-client": "^14.1.1",
-    "@ephox/bedrock-common": "^14.1.1",
-    "@ephox/bedrock-runner": "^14.1.1",
+    "@ephox/bedrock-client": "^15.0.0",
+    "@ephox/bedrock-common": "^15.0.0",
+    "@ephox/bedrock-runner": "^15.0.0",
     "@jsdevtools/coverage-istanbul-loader": "^3.0.5",
     "@lambdatest/node-tunnel": "^4.0.4",
     "@wdio/globals": "^8.14.1",
@@ -44,7 +44,7 @@
     "mkdirp": "^1.0.0",
     "portfinder": "^1.0.25",
     "recursive-readdir-sync": "^1.0.6",
-    "rollup": "^1.23.1",
+    "rollup": "^2.0.0",
     "rollup-plugin-typescript2": "^0.24.0",
     "serve-static": "^1.10.2",
     "source-map-loader": "^3.0.0",
@@ -52,8 +52,8 @@
     "ts-loader": "^9.0.0",
     "tsconfig-paths-webpack-plugin": "^3.2.0",
     "webdriverio": "^8.0.0",
-    "webpack": "^5.40.0",
-    "webpack-dev-server": "^4.7.0",
+    "webpack": "^5.97.1",
+    "webpack-dev-server": "^5.2.0",
     "which": "^2.0.0",
     "xml-writer": "^1.6.0"
   },

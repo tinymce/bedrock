@@ -1,5 +1,4 @@
 import { Hook, HookType, LoggedError, Suite } from '@ephox/bedrock-common';
-import Promise from '@ephox/wrap-promise-polyfill';
 import { createHook } from '../../../main/ts/core/Hook';
 import { Reporter, TestReporter } from '../../../main/ts/reporter/Reporter';
 import { RunState } from '../../../main/ts/runner/TestRun';
@@ -53,6 +52,8 @@ export const MockReporter = (): MockReporter => {
     test,
     summary: () => ({ offset: 0, passed, failed: failures.length, skipped }),
     done: noop,
+    waitForResults: Promise.resolve,
+    retry: Promise.resolve,
     failures: () => failures
   };
 };
@@ -62,5 +63,7 @@ export const createRunState = (offset: number, chunk: number, count = 0): RunSta
   offset,
   chunk,
   timeout: TEST_TIMEOUT,
-  testCount: count
+  testCount: count,
+  checkSiblings: () => [],
+  auto: false
 });

@@ -1,15 +1,14 @@
-
 import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
 import * as WebdriverIO from 'webdriverio';
+import { RemoteOptions } from 'webdriverio';
 import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
 import * as DriverLoader from './DriverLoader';
 import * as RemoteDriver from './RemoteDriver';
-import deepmerge = require('deepmerge');
-import { RemoteOptions } from 'webdriverio';
 import { Tunnel } from './Tunnel';
+import deepmerge = require('deepmerge');
 
 export interface DriverSettings {
   basedir: string;
@@ -97,6 +96,9 @@ const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
 const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): WebdriverIO.RemoteOptions => {
   const options: WebdriverIO.RemoteOptions = {
     logLevel: 'warn' as const,
+    // if the parallel count is full this timeout is how long WDIO waits for LambdaTest to spin up.
+    // 10 minute timeout, defaults to 3 connection attempts
+    connectionRetryTimeout: 10 * 60 * 1000,
     capabilities: {
       browserName
     }
@@ -143,7 +145,7 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
     }
   }
 
-  const driverOpts = deepmerge(
+  return deepmerge(
     options,
     settings.remoteWebdriver ?
       RemoteDriver.getOpts(browserName, settings) :
@@ -153,9 +155,6 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
         port
       }
   ) as RemoteOptions;
-  console.log('Print Opts: ', driverOpts);
-
-  return driverOpts;
 };
 
 const logDriverDetails = (driver: WebdriverIO.Browser, headless: boolean, debuggingPort: number) => {
@@ -194,7 +193,7 @@ const setupShutdown = (driver: WebdriverIO.Browser, driverApi: DriverLoader.Driv
   const driverShutdown = async (immediate?: boolean) => {
     try {
       if (immediate) {
-        driver.deleteSession();
+        await driver.deleteSession();
       } else {
         await driver.pause(shutdownDelay);
         await driver.deleteSession();
@@ -254,7 +253,7 @@ const driverSetup = async (driver: WebdriverIO.Browser, settings: DriverSettings
   } else {
     await driver.maximizeWindow();
   }
-  
+
   return Promise.resolve();
 };
 
@@ -293,7 +292,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
 
       // Wait for the driver to start up and then start the webdriver session
       await DriverLoader.startAndWaitForAlive(driverSpec, port, webdriverTimeout);
-      
+
       const driver = await WebdriverIO.remote(webdriverOptions);
 
       // IEDriverServer ignores a delete session call if done too quickly so it needs a small delay
@@ -315,7 +314,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
       try {
         driverSpec.driverApi.stop();
       } catch {
-       // Ignore 
+       // Ignore
       }
       return Promise.reject(e);
     }
