@@ -58,8 +58,7 @@ export const forAuto = (directories: Directories, argv: string[] = process.argv)
     ClOptions.devicefarmRegion,
     ClOptions.browserVersion,
     ClOptions.platformName,
-    ClOptions.useSelenium,
-    ClOptions.clipboardPermission
+    ClOptions.useSelenium
   ]), argv) as Attempt<cli.CliError, BedrockAutoSettings>;
 };
 
