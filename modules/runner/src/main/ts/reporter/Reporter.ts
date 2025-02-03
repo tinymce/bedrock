@@ -60,20 +60,18 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
   // A global list of requests that were sent to the server, we must wait for these before sending `/done` or it may confuse the HUD
   const requestsInFlight: Promise<void>[] = [];
 
-  const sendCurrentResults = (): boolean => {
+  const forceReportResults = (): void => {
     if (testResults.length > 0) {
       requestsInFlight.push(callbacks.sendTestResults(params.session, testResults));
       testResults.length = 0;
-      return true;
     }
-    return false;
   };
 
   const reportResult = (result: TestReport): void => {
     testResults.push(result);
     if (Date.now() - timeOfLastReport > 30 * 1000) {
       // ping the server with results every 30 seconds or so, as a form of keep-alive
-      sendCurrentResults();
+      forceReportResults();
       timeOfLastReport = Date.now();
     }
   };
@@ -126,6 +124,11 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
           error: null,
           skipped: null,
         });
+        if (params.retry > 0) {
+          // a test that was under reload/retry status has now passed.
+          // this needs to be reported immediately, otherwise we might bump up against server timeouts.
+          forceReportResults();
+        }
       }
     };
 
@@ -187,7 +190,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
   };
 
   const waitForResults = async (): Promise<void> => {
-    sendCurrentResults();
+    forceReportResults();
     if (requestsInFlight.length > 0) {
       const currentRequests = requestsInFlight.slice(0);
       requestsInFlight.length = 0;
