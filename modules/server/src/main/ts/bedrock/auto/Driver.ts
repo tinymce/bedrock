@@ -115,6 +115,7 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
   if (browserName === 'chrome') {
     addArguments(caps, 'goog:chromeOptions', ['--start-maximized', '--disable-extensions']);
     addArguments(caps, 'goog:chromeOptions', extraCaps);
+    caps['goog:loggingPrefs'] = { browser: 'ALL' };
   } else if (browserName === 'firefox') {
     addArguments(caps, 'moz:firefoxOptions', extraCaps);
   } else if (browserName === 'MicrosoftEdge') {
@@ -147,10 +148,12 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
 
   return deepmerge(
     options,
-    settings.remoteWebdriver ?
-      RemoteDriver.getOpts(browserName, settings) :
-      {
+    settings.remoteWebdriver
+      ? RemoteDriver.getOpts(browserName, settings)
+      : {
         path: settings.useSelenium ? '/wd/hub' : '/',
+        logLevel: settings.useSelenium ? 'info' as const : options.logLevel,
+        outputDir: 'scratch',
         hostname: '127.0.0.1',
         port
       }

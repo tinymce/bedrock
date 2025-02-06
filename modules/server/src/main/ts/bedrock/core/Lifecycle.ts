@@ -43,10 +43,33 @@ export const done = async (result: Attempt<string[], TestResult[]>, driver: Brow
   exit(gruntDone, exitCode);
 };
 
+export const printRecentLogs = async (driver: Browser): Promise<void> => {
+  if (!driver.getLogs) {
+    console.error('+++ Unfortunately this browser does not support downloading console log messages');
+    return;
+  }
+  try {
+    const logs = await driver.getLogs('browser') as any[];
+    if (logs.length > 0) {
+      console.error(chalk.red('********** Recent browser logs: **********'));
+      logs.slice(0, 20).forEach(({level, message, source}) => {
+        if (source === 'console-api') {
+          if (level === 'WARNING') level = 'WARN';
+          console.log(`[${level}]\t${message}`);
+        }
+      });
+    }
+  } catch (e) {
+    console.error('Unable to retrieve browser logs!');
+    console.error(e);
+  }
+};
+
 export const error = async (err: Error | string, driver: Browser, shutdown: ShutdownFn, gruntDone: GruntDoneFn, delayExiting: boolean): Promise<void> => {
   await exitDelay(driver, delayExiting);
   console.error(chalk.red('********** Unexpected Bedrock Error -> Server Quitting **********'));
   console.error(err);
+  await printRecentLogs(driver);
   await shutdown(true);
   exit(gruntDone, ExitCodes.failures.unexpected);
 };

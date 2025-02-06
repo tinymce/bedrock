@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## Improved
+- When bedrock fails due to an unknown error, it will attempt to download recent browser log messages through the webdriver #TINY-11177
+
 ## 15.0.2 - 2025-02-03
 
 ## Improved
