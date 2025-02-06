@@ -123,7 +123,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
     // Chalk does not use a formatter. Using node's built-in to expand Objects, etc.
     console.error(chalk.red('Error creating webdriver', format(err)));
     // Shutdown tunnels in case webdriver fails
-    await shutdown(shutdownServices)(true);
+    await shutdown(shutdownServices)(false);
     Lifecycle.exit(settings.gruntDone, ExitCodes.failures.unexpected);
   });
 };
