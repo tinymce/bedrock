@@ -254,6 +254,8 @@ const driverSetup = async (driver: WebdriverIO.Browser, settings: DriverSettings
     await driver.maximizeWindow();
   }
 
+  driver.setPermissions({ name: 'clipboard-read' }, 'granted');
+
   return Promise.resolve();
 };
 
