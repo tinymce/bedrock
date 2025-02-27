@@ -254,6 +254,13 @@ const driverSetup = async (driver: WebdriverIO.Browser, settings: DriverSettings
     await driver.maximizeWindow();
   }
 
+  const caps: Record<string, any> = driver.capabilities;
+  const browserName = caps.browserName;
+  if (browserName === 'chrome' || browserName === 'MicrosoftEdge') {
+    console.log('Setting clipboard read permission');
+    driver.setPermissions({ name: 'clipboard-read' }, 'granted');
+  }
+
   return Promise.resolve();
 };
 

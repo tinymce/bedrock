@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Improved
+- Chrome and Edge now have have the `clipboard-read` permission set to allow use of the native clipboard API. #TINY-11431
+
 ## 15.0.2 - 2025-02-03
 
 ## Improved
