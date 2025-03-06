@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 15.0.3 - 2025-03-06
+
+## Changed
+- Changed so tests on AWS device farm uses https instead of http. #TINY-11924
+
 ## 15.0.2 - 2025-02-03
 
 ## Improved
