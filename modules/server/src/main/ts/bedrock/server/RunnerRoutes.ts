@@ -85,8 +85,6 @@ export const generate = async (mode: string, projectdir: string, basedir: string
 
   const resourceRoutes = resourceRoots.map(({name, folder}) => Routes.routing('GET', `/project/${name}`, path.join(projectdir, folder)));
 
-  const precompiledTests = mode === 'auto' ? await testGenerator.generate() : null;
-
   const routers = [
     ...nodeModuleRoutes,
     ...resourceRoutes,
@@ -104,13 +102,7 @@ export const generate = async (mode: string, projectdir: string, basedir: string
       Routes.nodeResolveFile('GET', '/mockServiceWorker.js', projectdir, 'msw', 'lib/mockServiceWorker.js'),
 
       // test code
-      Routes.asyncJs('GET', '/compiled/tests.js', (done) => {
-        if (precompiledTests !== null) {
-          done(precompiledTests);
-        } else {
-          testGenerator.generate().then(done);
-        }
-      }),
+      Routes.asyncJs('GET', '/compiled/tests.js', testGenerator.generate()),
       Routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
 
       // harness API
