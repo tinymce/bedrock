@@ -8,36 +8,34 @@ import { ExitCodes } from './bedrock/util/ExitCodes';
 import * as SettingsResolver from './bedrock/core/SettingsResolver';
 import { DevServerServeSettings } from './bedrock/compiler/Types';
 
-export const go = (bedrockManualSettings: BedrockManualSettings): void => {
+export const go = async (bedrockManualSettings: BedrockManualSettings): Promise<void> => {
   console.log('bedrock-manual ' + Version.get() + ' starting...');
 
   const settings = SettingsResolver.resolveAndLog(bedrockManualSettings);
   const basePage = 'src/resources/html/bedrock.html';
   const routes = RunnerRoutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, 0, settings.singleTimeout, true, basePage, settings.coverage, settings.polyfills);
 
-  routes.then(async (runner) => {
-    const serveSettings: DevServerServeSettings = {
-      ...settings,
-      // There is no driver for manual mode.
-      driver: Attempt.failed('There is no webdriver for manual mode'),
-      master: null, // there is no need for master,
-      runner,
-      // sticky session is used by auto mode only
-      stickyFirstSession: false,
-      // reset mouse position will never work on manual
-      skipResetMousePosition: true,
-    };
+  const serveSettings: DevServerServeSettings = {
+    ...settings,
+    // There is no driver for manual mode.
+    driver: Promise.resolve(Attempt.failed('There is no webdriver for manual mode')),
+    master: null, // there is no need for master,
+    runner: routes,
+    // sticky session is used by auto mode only
+    stickyFirstSession: false,
+    // reset mouse position will never work on manual
+    skipResetMousePosition: true
+  };
 
-    try {
-      const devServer = settings.bundler === 'rspack' ? Rspack.devserver : Webpack.devserver;
-      const service = await devServer(serveSettings);
-      service.enableHud();
-      console.log('bedrock-manual ' + Version.get() + ' available at: http://localhost:' + service.port);
-    } catch (err) {
-      console.error(err);
-      process.exit(ExitCodes.failures.error);
-    }
-  });
+  try {
+    const devServer = settings.bundler === 'rspack' ? Rspack.devserver : Webpack.devserver;
+    const service = await devServer(serveSettings);
+    service.enableHud();
+    console.log('bedrock-manual ' + Version.get() + ' available at: http://localhost:' + service.port);
+  } catch (err) {
+    console.error(err);
+    process.exit(ExitCodes.failures.error);
+  }
 };
 
 export const mode = 'forManual';

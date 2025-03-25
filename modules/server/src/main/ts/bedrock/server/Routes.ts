@@ -68,9 +68,9 @@ export const json = (method: HTTPMethod, prefix: string, data: any): Route => {
   };
 };
 
-export const asyncJs = (method: HTTPMethod, url: string, fn: ((data: any) => void)): Route => {
+export const asyncJs = (method: HTTPMethod, url: string, pData: Promise<any>): Route => {
   const go: RouteGoFunc = (request, response/* , done */) => {
-    fn((data: any) => {
+    pData.then((data: any) => {
       doResponse(request, response, 200, 'application/javascript', data);
     });
   };
