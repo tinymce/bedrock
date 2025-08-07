@@ -18,7 +18,7 @@ interface WorkspaceRoot {
 }
 
 export const generate = async (mode: string, projectdir: string, basedir: string, configFile: string, bundler: 'webpack' | 'rollup', testfiles: string[], chunk: number,
-                               retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[], polyfills: string[]): Promise<Routes.Runner> => {
+                               retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[], polyfills: string[], useTurbo?: boolean): Promise<Routes.Runner> => {
   const files = testfiles.map((filePath) => {
     return path.relative(projectdir, filePath);
   });
@@ -30,7 +30,8 @@ export const generate = async (mode: string, projectdir: string, basedir: string
     mode === 'auto',
     files,
     coverage,
-    polyfills
+    polyfills,
+    useTurbo
   );
 
   // read the project json file to determine the project name to expose resources as `/project/${name}`

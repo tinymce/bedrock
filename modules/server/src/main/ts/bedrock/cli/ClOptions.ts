@@ -395,3 +395,11 @@ export const webdriverPort: ClOption = {
   defaultValue: 4444,
   uncommon: true
 };
+
+export const turbo: ClOption = {
+  name: 'turbo',
+  type: Boolean,
+  defaultValue: false,
+  description: 'Use Bun for ultra-fast TypeScript compilation and nx affected testing',
+  validate: Extraction.any
+};

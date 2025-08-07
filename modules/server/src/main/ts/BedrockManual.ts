@@ -11,7 +11,7 @@ export const go = (bedrockManualSettings: BedrockManualSettings): void => {
 
   const settings = SettingsResolver.resolveAndLog(bedrockManualSettings);
   const basePage = 'src/resources/html/bedrock.html';
-  const routes = RunnerRoutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, 0, settings.singleTimeout, true, basePage, settings.coverage, settings.polyfills);
+  const routes = RunnerRoutes.generate('manual', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, 0, settings.singleTimeout, true, basePage, settings.coverage, settings.polyfills, settings.turbo);
 
   routes.then(async (runner) => {
     const serveSettings: Webpack.WebpackServeSettings = {
