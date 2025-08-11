@@ -248,8 +248,8 @@ const isPreCompiledJs = (srcFiles: string[]): boolean => {
 // NEW: Skip compilation mode - just concatenate pre-compiled JS files
 const skipCompilation = (compileInfo: CompileInfo, srcFiles: string[], polyfills: string[]): Promise<string> => {
   return new Promise((resolve) => {
-    console.log(`⚡ Skipping webpack compilation for ${srcFiles.length} pre-compiled JS files!`);
-    console.log(`🚀 Using fast Bun-compiled JavaScript directly`);
+    console.log(`Skipping webpack compilation for ${srcFiles.length} pre-compiled JS files`);
+    console.log(`Using pre-compiled JavaScript directly`);
     
     mkdirp.sync(path.dirname(compileInfo.scratchFile));
     
@@ -353,9 +353,11 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
     });
 
     // Prevents webpack from doing a recompilation of a change of tests.ts over and over
-    compiler.hooks.emit.tap('bedrock', (compilation) => {
-      compilation.fileDependencies.delete(scratchFile);
-    });
+    if (compiler) {
+      compiler.hooks.emit.tap('bedrock', (compilation) => {
+        compilation.fileDependencies.delete(scratchFile);
+      });
+    }
 
     const server = new WebpackDevServer({
       port,
@@ -395,7 +397,7 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
           ...middlewares
         ];
       }
-    }, compiler);
+    }, compiler!);
 
     return {
       start: () => server.start(),

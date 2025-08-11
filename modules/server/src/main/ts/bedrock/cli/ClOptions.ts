@@ -305,9 +305,9 @@ export const polyfills: ClOption = {
   name: 'polyfills',
   type: String,
   multiple: true,
-  defaultValue: [ 'Symbol' ],
-  description: 'CoreJS polyfills to apply when running tests',
-  validate: Extraction.inSet([ 'ArrayBuffer', 'Map', 'Object', 'Promise', 'Set', 'Symbol', 'TypedArray', 'WeakMap', 'WeakSet' ]),
+  defaultValue: [ 'Symbol', 'tinymce' ],
+  description: 'CoreJS polyfills and globals to apply when running tests',
+  validate: Extraction.inSet([ 'ArrayBuffer', 'Map', 'Object', 'Promise', 'Set', 'Symbol', 'TypedArray', 'WeakMap', 'WeakSet', 'tinymce' ]),
   uncommon: true
 };
 

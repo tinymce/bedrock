@@ -30,8 +30,7 @@ export const generate = async (mode: string, projectdir: string, basedir: string
     mode === 'auto',
     files,
     coverage,
-    polyfills,
-    useTurbo
+    polyfills
   );
 
   // read the project json file to determine the project name to expose resources as `/project/${name}`
@@ -86,7 +85,8 @@ export const generate = async (mode: string, projectdir: string, basedir: string
 
   const resourceRoutes = resourceRoots.map(({name, folder}) => Routes.routing('GET', `/project/${name}`, path.join(projectdir, folder)));
 
-  const precompiledTests = mode === 'auto' ? await testGenerator.generate() : null;
+  // Use precompiled tests for both auto and manual mode (Bun compilation is fast!)
+  const precompiledTests = await testGenerator.generate();
 
   const routers = [
     ...nodeModuleRoutes,

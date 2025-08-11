@@ -23,7 +23,7 @@ A global install will put the bedrock commands (e.g. `bedrock-auto`) automatical
 A local install will not put the bedrock commands automatically on your path. After installing locally, you can access the commands via:
 
 1. adding `node_modules/.bin` to your path
-2. using `npm run ${command}` from the bedrock source directory
+2. using `bun run ${command}` from the bedrock source directory
 
 ### Install from npm
 
@@ -61,11 +61,11 @@ Use `bedrock --help` to see all arguments possible.
 
 You can run bedrock's tests by executing:
 
-`$ npm run test`
+`$ bun test`
 
 This will not run `test-samples-fail` which will need to be run and verified manually. (All should fail)
 
-If you just want to run the basic tests (not property-based), use `$ npm run test-atomic`. If you want to run only the property-based tests, use `$ npm run test-props`. If you want to run the sample tests use `$ npm run test-samples-pass` and `$ npm run test-samples-fail`.
+If you just want to run the basic tests (not property-based), use `$ bun run test-atomic`. If you want to run only the property-based tests, use `$ bun run test-props`. If you want to run the sample tests use `$ bun run test-samples-pass` and `$ bun run test-samples-fail`.
 
 ## Docker
 
