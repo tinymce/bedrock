@@ -49,19 +49,36 @@ const reactAliasPlugin = {
   }
 };
 
-await Bun.build({
+const result = await Bun.build({
   entrypoints: ['${scratchFile.replace(/\\/g, '/')}'],
   outdir: '${path.dirname(dest).replace(/\\/g, '/')}',
   target: 'browser',
   format: 'iife',
   sourcemap: 'external',
-  naming: '${path.basename(dest)}',
   plugins: [reactAliasPlugin],
   define: {
     'process.env.NODE_ENV': '"development"',
     'global': 'globalThis'
-  }
+  },
+  splitting: false,
+  minify: false
 });
+
+if (!result.success) {
+  throw new Error('Bun build failed: ' + result.logs.map(log => log.message).join(', '));
+}
+
+// Move the output to the expected location
+const fs = require('fs');
+const path = require('path');
+
+// Find the generated file - Bun will output with a default name
+const outputDir = '${path.dirname(dest)}';
+const files = fs.readdirSync(outputDir).filter(f => f.endsWith('.js') && !f.endsWith('.map'));
+if (files.length > 0) {
+  const generatedFile = path.join(outputDir, files[0]);
+  fs.renameSync(generatedFile, '${dest}');
+}
 `;
 
 /**
