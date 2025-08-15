@@ -29,6 +29,27 @@ export const go = (bedrockManualSettings: BedrockManualSettings): void => {
       const service = await BunDevServer.startBunDevServer(serveSettings);
       service.enableHud();
       console.log('bedrock-manual ' + Version.get() + ' available at: http://localhost:' + service.port);
+      
+      // Setup graceful shutdown handlers
+      const shutdown = async (signal: string) => {
+        console.log(`\n${signal} received, shutting down gracefully...`);
+        try {
+          await service.shutdown();
+          console.log('Server closed successfully');
+          process.exit(0);
+        } catch (error) {
+          console.error('Error during shutdown:', error);
+          process.exit(1);
+        }
+      };
+
+      process.on('SIGINT', () => shutdown('SIGINT'));
+      process.on('SIGTERM', () => shutdown('SIGTERM'));
+      process.on('SIGQUIT', () => shutdown('SIGQUIT'));
+      
+      // Prevent the process from exiting
+      process.stdin.resume();
+      
     } catch (err) {
       console.error(err);
       process.exit(ExitCodes.failures.error);

@@ -168,22 +168,32 @@ export const startBunDevServer = async (settings: BunDevServerSettings): Promise
       }
       
       if (url.pathname === '/compiled/tests.js') {
-        const testsPath = path.join(projectdir, 'scratch/compiled/tests.js');
-        if (fs.existsSync(testsPath)) {
-          const content = await fs.promises.readFile(testsPath, 'utf8');
+        try {
+          // Use the same compilation logic as RunnerRoutes for consistency
+          const compiledPath = await BunCompiler.compile(
+            settings.config || 'tsconfig.json',
+            path.join(projectdir, 'scratch'),
+            basedir,
+            false, // Don't exit on error in manual mode
+            settings.testfiles,
+            settings.coverage || [],
+            settings.polyfills || []
+          );
+          
+          const content = await fs.promises.readFile(compiledPath, 'utf8');
           response.writeHead(200, { 
             'Content-Type': 'application/javascript',
-            'Cache-Control': 'no-cache, no-store, must-revalidate', // Always fresh
+            'Cache-Control': 'no-cache, no-store, must-revalidate', // Always fresh for dev
             'Pragma': 'no-cache',
             'Expires': '0'
           });
           response.end(content);
           return;
-        } else {
-          const errorPage = createErrorPage(404, 'Tests Not Compiled', 
-            'The compiled tests file was not found. This might happen if compilation failed.',
-            'Try restarting the server or check the compilation logs.');
-          response.writeHead(404, { 'Content-Type': 'text/html' });
+        } catch (error: any) {
+          const errorPage = createErrorPage(500, 'Test Compilation Failed', 
+            'Failed to compile tests for manual mode.',
+            `Compilation error: ${error.message}`);
+          response.writeHead(500, { 'Content-Type': 'text/html' });
           response.end(errorPage);
           return;
         }

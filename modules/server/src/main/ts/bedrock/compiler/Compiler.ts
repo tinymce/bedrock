@@ -1,8 +1,7 @@
-import * as fs from 'fs';
 import * as BunCompiler from '../compiler/BunCompiler';
 
 export interface Compiler {
-  readonly generate: () => Promise<Buffer | string>;
+  readonly generate: () => Promise<string>;
 }
 
 export const compile = (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, files: string[], coverage: string[], polyfills: string[]): Compiler => {
@@ -11,7 +10,7 @@ export const compile = (tsConfigFile: string, scratchDir: string, basedir: strin
     return BunCompiler.compile;
   };
 
-  const generate = async (): Promise<Buffer | string> => {
+  const generate = async (): Promise<string> => {
     const compile = getCompileFunc();
     const compiledJsFilePath = await compile(
       tsConfigFile,
@@ -22,7 +21,9 @@ export const compile = (tsConfigFile: string, scratchDir: string, basedir: strin
       coverage,
       polyfills
     );
-    return fs.readFileSync(compiledJsFilePath);
+    // Return the file path instead of reading the content
+    // The content will be read by the route handler when needed
+    return compiledJsFilePath;
   };
 
   return {
