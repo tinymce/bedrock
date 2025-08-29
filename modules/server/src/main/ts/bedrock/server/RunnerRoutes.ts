@@ -30,7 +30,8 @@ export const generate = async (mode: string, projectdir: string, basedir: string
     mode === 'auto',
     files,
     coverage,
-    polyfills
+    polyfills,
+    useTurbo
   );
 
   // read the project json file to determine the project name to expose resources as `/project/${name}`

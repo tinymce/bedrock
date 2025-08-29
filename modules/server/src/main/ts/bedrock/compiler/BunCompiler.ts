@@ -105,7 +105,7 @@ const saveCacheInfo = (dest: string, cacheKey: string, srcFiles: string[], polyf
     fs.writeFileSync(cacheInfoPath, JSON.stringify(cacheInfo, null, 2));
   } catch (error) {
     // Ignore cache info write errors
-    console.warn('Failed to write cache info:', error.message);
+    console.warn('Failed to write cache info:', (error as any)?.message || error);
   }
 };
 
@@ -214,7 +214,7 @@ export const cleanupOldCache = (scratchDir: string, maxAgeMs: number = 24 * 60 *
     
     walk(compiledDir);
   } catch (error) {
-    console.warn('Cache cleanup failed:', error.message);
+    console.warn('Cache cleanup failed:', (error as any)?.message || error);
   }
 };
 
