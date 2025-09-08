@@ -23,6 +23,8 @@
     "@ephox/bedrock-runner": "^15.0.2",
     "@jsdevtools/coverage-istanbul-loader": "^3.0.5",
     "@lambdatest/node-tunnel": "^4.0.4",
+    "@rspack/core": "^1.5.2",
+    "@rspack/dev-server": "^1.1.4",
     "@wdio/globals": "^8.14.1",
     "async": "^3.0.0",
     "chalk": "^4.1.1",
