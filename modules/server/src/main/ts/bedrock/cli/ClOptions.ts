@@ -60,7 +60,8 @@ export const bundler: ClOption = {
   description: 'DISABLED: The name bundler to use webpack/rollup (forced webpack in this build)',
   validate: Extraction.inSet([
     'webpack',
-    'rollup'
+    'rollup',
+    'rspack'
   ])
 };
 
