@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## Added
+- Add rspack dev server support. #TINY-12824
+
 ## 15.0.2 - 2025-02-03
 
 ## Improved
