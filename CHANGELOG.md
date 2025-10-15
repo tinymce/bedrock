@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 15.0.3 - 2025-10-15
+
 ## Fixed
 - Fixed an issue where `remapper` was still referenced in the webpack config. #TINY-12932
 
