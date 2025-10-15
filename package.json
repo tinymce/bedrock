@@ -57,5 +57,8 @@
   },
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
-  "files": []
+  "files": [],
+  "dependencies": {
+    "chokidar": "^4.0.3"
+  }
 }

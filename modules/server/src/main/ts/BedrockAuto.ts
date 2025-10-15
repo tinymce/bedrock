@@ -30,7 +30,7 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
   const username = settings.username ?? process.env.LT_USERNAME;
   const accesskey = settings.accesskey ?? process.env.LT_ACCESS_KEY;
 
-  const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
+  const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills, settings.turbo);
 
   const shutdownServices: ((immediate?: boolean) => Promise<void>)[] = [];
   const shutdown = (services: ((immediate?: boolean) => Promise<void>)[]) => (immediate?: boolean) => Promise.allSettled(services.map((fn) => fn(immediate)));

@@ -4,6 +4,49 @@ import readdirSyncRec = require('recursive-readdir-sync');
 import { Attempt } from '../core/Attempt';
 import * as Qstring from '../util/Qstring';
 
+/**
+ * Constants for file deduplication
+ */
+const SOURCE_DIR_INDICATOR = '/src/';
+const COMPILED_DIR_INDICATOR = '/lib/';
+
+/**
+ * Removes duplicate test files, preferring compiled JavaScript over TypeScript sources
+ */
+const deduplicateTestFiles = (files: string[]): string[] => {
+  // Create a map of base names to their file paths for quick lookups
+  const filesByBaseName = new Map<string, string[]>();
+  
+  files.forEach(file => {
+    const baseName = file.split('/').pop()?.replace(/\.(ts|js)$/, '') || '';
+    if (!filesByBaseName.has(baseName)) {
+      filesByBaseName.set(baseName, []);
+    }
+    filesByBaseName.get(baseName)!.push(file);
+  });
+  
+  const result: string[] = [];
+  
+  filesByBaseName.forEach((filePaths) => {
+    if (filePaths.length === 1) {
+      // No duplicates, include the single file
+      result.push(filePaths[0]);
+    } else {
+      // Multiple files with same base name - prefer compiled JS over TS source
+      const compiledJs = filePaths.find(f => f.includes(COMPILED_DIR_INDICATOR) && f.endsWith('.js'));
+      if (compiledJs) {
+        result.push(compiledJs);
+      } else {
+        // No compiled version found, use the first TypeScript source
+        const tsSource = filePaths.find(f => f.includes(SOURCE_DIR_INDICATOR) && f.endsWith('.ts'));
+        result.push(tsSource || filePaths[0]);
+      }
+    }
+  });
+  
+  return result;
+};
+
 export const file = (name: string, rawValue: string): Attempt<string[], string> => {
   // Ignore any query strings when checking if a file exists
   const parsed = Qstring.parse(rawValue);
@@ -71,13 +114,21 @@ export const files = (patterns: string[]) => {
         const scanned = dirs.reduce((result, d) => result.concat(readdirSyncRec(d)), [] as string[]);
 
         const filtered = scanned.filter((f) => {
+          // Skip source map files
+          if (f.endsWith('.js.map')) {
+            return false;
+          }
+          
           const matches = patterns.filter((p) => {
             return f.indexOf(p) > -1;
           });
 
           return matches.length > 0 && fs.lstatSync(f).isFile();
         });
-        return Attempt.passed(filtered);
+        
+        // Remove duplicates: prefer compiled JavaScript files over TypeScript source files for performance
+        const deduped = deduplicateTestFiles(filtered);
+        return Attempt.passed(deduped);
       } catch (err) {
         return Attempt.failed([
           `Error scanning [${value}] for files matching pattern: [${patterns.join(', ')}]`

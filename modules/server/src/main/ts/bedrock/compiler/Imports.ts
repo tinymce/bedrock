@@ -2,6 +2,11 @@ import * as path from 'path';
 import { hasTs } from './TsUtils';
 
 export const convertPolyfillNameToPath = (name: string): string => {
+  // Special case for tinymce - use the actual tinymce module
+  if (name === 'tinymce') {
+    return 'tinymce';
+  }
+  
   const path = name.slice(0, 1).toLowerCase() +
                name.slice(1).replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
   return `core-js/es/${path}`;
@@ -26,6 +31,12 @@ addTest("${filePath}");`;
 };
 
 const generatePolyfillImport = (useRequire: boolean, importPath: string) => {
+  // Special handling for tinymce - assign to global
+  if (importPath === 'tinymce') {
+    return useRequire ? 
+      `window.tinymce = require('${importPath}');` : 
+      `import tinymce from '${importPath}'; window.tinymce = tinymce;`;
+  }
   return useRequire ? `require('${importPath}');` : `import '${importPath}';`;
 };
 
@@ -59,8 +70,8 @@ const addTest = (testFilePath: string) => {
         test.file = testFilePath;
       });
     } else if (lastTest.file === testFilePath) {
-      // repeated test, duplicate the test entry
-      __tests.push(__tests.slice(__lastTestIndex + 1));
+      // File already processed, skip duplicate registration
+      return;
     } else {
       console.warn('file ' + testFilePath + ' did not add a new test to the list, ignoring');
     }
@@ -107,8 +118,8 @@ var addTest = function (testFilePath) {
         test.file = testFilePath;
       });
     } else if (lastTest.file === testFilePath) {
-      // repeated test, duplicate the test entry
-      __tests.push(__tests.slice(__lastTestIndex + 1));
+      // File already processed, skip duplicate registration
+      return;
     } else {
       console.warn('file ' + testFilePath + ' did not add a new test to the list, ignoring');
     }

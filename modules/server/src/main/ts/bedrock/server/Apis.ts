@@ -1,4 +1,3 @@
-import { Capabilities } from '@wdio/types';
 import { Browser } from 'webdriverio';
 import { Attempt } from '../core/Attempt';
 import * as Coverage from '../core/Coverage';
@@ -88,7 +87,7 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
         (driver) => waitForDriverReady(maxInvalidAttempts, async () => {
           const shouldResetMousePos = force || needsMousePositionReset;
           // TODO re-enable resetting the mouse on other browsers when mouseMove gets fixed on Firefox/IE
-          const browserName = (driver.capabilities as Capabilities.Capabilities).browserName;
+          const browserName = (driver.capabilities as any).browserName;
           if (shouldResetMousePos && (browserName === 'chrome' || browserName === 'msedge')) {
             // Reset the mouse position to the top left of the window
             await driver.performActions([{

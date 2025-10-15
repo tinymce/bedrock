@@ -1,5 +1,3 @@
-import * as Reporter from './Reporter';
-
 export interface JsError extends Error {
   toString?: () => string;
 }
@@ -38,7 +36,8 @@ export const pprintAssertionError = (message: string, expected: string, actual: 
     expected
   };
   e.toString = (): string => {
-    return Reporter.pprintAssertionError(e as PprintAssertionError);
+    // Break circular dependency by inlining basic formatting
+    return `${message}\nExpected: ${expected}\nActual: ${actual}`;
   };
   return e as PprintAssertionError;
 };
