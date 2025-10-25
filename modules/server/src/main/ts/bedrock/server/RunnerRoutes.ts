@@ -18,7 +18,7 @@ interface WorkspaceRoot {
 }
 
 export const generate = async (mode: string, projectdir: string, basedir: string, configFile: string, bundler: 'webpack' | 'rollup', testfiles: string[], chunk: number,
-                               retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[], polyfills: string[]): Promise<Routes.Runner> => {
+                               retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[], polyfills: string[], useTurbo?: boolean): Promise<Routes.Runner> => {
   const files = testfiles.map((filePath) => {
     return path.relative(projectdir, filePath);
   });
@@ -30,7 +30,8 @@ export const generate = async (mode: string, projectdir: string, basedir: string
     mode === 'auto',
     files,
     coverage,
-    polyfills
+    polyfills,
+    useTurbo
   );
 
   // read the project json file to determine the project name to expose resources as `/project/${name}`
@@ -85,7 +86,8 @@ export const generate = async (mode: string, projectdir: string, basedir: string
 
   const resourceRoutes = resourceRoots.map(({name, folder}) => Routes.routing('GET', `/project/${name}`, path.join(projectdir, folder)));
 
-  const precompiledTests = mode === 'auto' ? await testGenerator.generate() : null;
+  // Don't precompile - always compile on demand for proper cache invalidation
+  // This ensures different plugin tests don't interfere with each other
 
   const routers = [
     ...nodeModuleRoutes,
@@ -103,13 +105,23 @@ export const generate = async (mode: string, projectdir: string, basedir: string
       Routes.routing('GET', '/css', path.join(basedir, 'src/resources/css')),
       Routes.nodeResolveFile('GET', '/agar-sw.js', projectdir, '@ephox/agar-sw', 'dist/agar-sw.js'),
 
-      // test code
+      // test code - always compile fresh to ensure proper cache invalidation
       Routes.asyncJs('GET', '/compiled/tests.js', (done) => {
-        if (precompiledTests !== null) {
-          done(precompiledTests);
-        } else {
-          testGenerator.generate().then(done);
-        }
+        // Always generate fresh - the BunCompiler handles caching internally with proper invalidation
+        testGenerator.generate().then((compiledPath) => {
+          const fs = require('fs');
+          try {
+            const content = fs.readFileSync(compiledPath);
+            // File read successfully
+            done(content);
+          } catch (error) {
+            console.error('Failed to read compiled tests:', error);
+            done(Buffer.from('console.error("Test file read failed: ' + error.message + '");'));
+          }
+        }).catch((err) => {
+          console.error('Failed to compile tests:', err);
+          done(Buffer.from('console.error("Test compilation failed: ' + err.message + '");'));
+        });
       }),
       Routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
 

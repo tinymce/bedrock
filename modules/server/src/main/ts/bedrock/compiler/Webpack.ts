@@ -30,6 +30,9 @@ const webpackSharedRules = ([] as any[]).concat([
   {
     test: /\.(mjs)$/,
     type: 'javascript/auto',
+    resolve: {
+      fullySpecified: false  // This is critical for .mjs files to resolve React aliases!
+    },
     use: []
   },
   {
@@ -76,6 +79,14 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
 
     resolve: {
       extensions: [ '.ts', '.tsx', '.js', '.mjs' ],
+      fullySpecified: false, // Disable strict ESM resolution for better alias support
+      alias: {
+        // Add React → Preact aliasing for proper compatibility
+        // Use exact matching without $ to handle .mjs imports
+        'react': path.resolve(basedir, 'node_modules/preact/compat/index.js'),
+        'react-dom': path.resolve(basedir, 'node_modules/preact/compat/index.js'),
+        'react/jsx-runtime': path.resolve(basedir, 'node_modules/preact/jsx-runtime/index.js')
+      },
       plugins: [
         new TsConfigPathsPlugin({
           configFile: tsConfigFile,
@@ -210,7 +221,39 @@ const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[
   };
 };
 
+// NEW: Check if files are already compiled JS (from Bun) in a compiled directory
+const isPreCompiledJs = (srcFiles: string[]): boolean => {
+  // If all files are .js and they're in a compiled directory, assume pre-compiled
+  const allJs = srcFiles.every((file) => file.endsWith('.js'));
+  const inCompiledDir = srcFiles.some((file) => file.includes('.bedrock-turbo-compiled') || file.includes('/compiled/'));
+  return allJs && inCompiledDir;
+};
+
+// NEW: Skip compilation mode - just concatenate pre-compiled JS files
+const skipCompilation = (compileInfo: CompileInfo, srcFiles: string[], polyfills: string[]): Promise<string> => {
+  return new Promise((resolve) => {
+    console.log(`Skipping webpack compilation for ${srcFiles.length} pre-compiled JS files`);
+    console.log(`Using pre-compiled JavaScript directly`);
+    
+    mkdirp.sync(path.dirname(compileInfo.scratchFile));
+    
+    // Create a simple import file that loads all the pre-compiled JS files
+    const imports = Imports.generateImports(false, compileInfo.scratchFile, srcFiles, polyfills);
+    fs.writeFileSync(compileInfo.scratchFile, imports);
+    
+    // Copy the import file as the final result - no webpack compilation needed!
+    fs.copyFileSync(compileInfo.scratchFile, compileInfo.dest);
+    
+    resolve(compileInfo.dest);
+  });
+};
+
 const compileTests = (compileInfo: CompileInfo, exitOnCompileError: boolean, srcFiles: string[], polyfills: string[]): Promise<string> => {
+  // NEW: Check if we can skip webpack compilation entirely
+  if (isPreCompiledJs(srcFiles)) {
+    return skipCompilation(compileInfo, srcFiles, polyfills);
+  }
+
   return new Promise((resolve) => {
     console.log(`Compiling ${srcFiles.length} tests...`);
 
@@ -294,9 +337,11 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
     });
 
     // Prevents webpack from doing a recompilation of a change of tests.ts over and over
-    compiler.hooks.emit.tap('bedrock', (compilation) => {
-      compilation.fileDependencies.delete(scratchFile);
-    });
+    if (compiler) {
+      compiler.hooks.emit.tap('bedrock', (compilation) => {
+        compilation.fileDependencies.delete(scratchFile);
+      });
+    }
 
     const server = new WebpackDevServer({
       port,
@@ -336,7 +381,7 @@ export const devserver = async (settings: WebpackServeSettings): Promise<Serve.S
           ...middlewares
         ];
       }
-    }, compiler);
+    }, compiler!);
 
     return {
       start: () => server.start(),
