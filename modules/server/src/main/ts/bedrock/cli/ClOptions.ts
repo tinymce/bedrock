@@ -57,7 +57,7 @@ export const bundler: ClOption = {
   type: String,
   required: false,
   defaultValue: 'webpack',
-  description: 'DISABLED: The name bundler to use webpack/rollup (forced webpack in this build)',
+  description: 'Specify the bundler (webpack, rspack, rollup). Rollup will be forced to webpack.',
   validate: Extraction.inSet([
     'webpack',
     'rollup',
