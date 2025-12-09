@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Added
 - Add rspack dev server support. #TINY-12824
 
+## 15.0.4 - 2025-10-22
+
+## Changed
+- Swapped out `msw` for `agar-sw`. #TINY-13085
+
+## 15.0.3 - 2025-10-15
+
+## Fixed
+- Fixed an issue where `remapper` was still referenced in the webpack config. #TINY-12932
+
 ## 15.0.2 - 2025-02-03
 
 ## Improved

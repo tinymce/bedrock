@@ -18,7 +18,7 @@
     "@ephox/bedrock-client": "^15.0.0"
   },
   "devDependencies": {
-    "@ephox/bedrock-server": "^15.0.2"
+    "@ephox/bedrock-server": "^15.0.4"
   },
   "files": [],
   "private": true,

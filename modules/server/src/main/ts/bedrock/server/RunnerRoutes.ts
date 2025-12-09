@@ -102,7 +102,7 @@ export const generate = async (mode: string, projectdir: string, basedir: string
       Routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery'))),
       Routes.routing('GET', '/lib/core-js-bundle', path.dirname(require.resolve('core-js-bundle'))),
       Routes.routing('GET', '/css', path.join(basedir, 'src/resources/css')),
-      Routes.nodeResolveFile('GET', '/mockServiceWorker.js', projectdir, 'msw', 'lib/mockServiceWorker.js'),
+      Routes.nodeResolveFile('GET', '/agar-sw.js', projectdir, '@ephox/agar-sw', 'dist/agar-sw.js'),
 
       // test code
       Routes.asyncJs('GET', '/compiled/tests.js', (done) => {

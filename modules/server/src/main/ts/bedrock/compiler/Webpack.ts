@@ -9,23 +9,7 @@ import * as Imports from './Imports';
 import { hasTs } from './TsUtils';
 import { WebpackCompileInfo, DevServerServeSettings } from './Types';
 
-const moduleAvailable = (name: string) => {
-  try {
-    require.resolve(name);
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
-
-const webpackRemap: Array<Record<string, any>> = moduleAvailable('@ephox/swag') ? [
-  {
-    test: /\.(js|mjs|tsx?)$/,
-    use: [ '@ephox/swag/webpack/remapper' ]
-  }
-] : [];
-
-const webpackSharedRules = webpackRemap.concat([
+const webpackSharedRules = ([] as any[]).concat([
   {
     test: /\.js$/,
     resolve: {
