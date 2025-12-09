@@ -8,7 +8,7 @@ import { rspack, RspackOptions } from '@rspack/core';
 import { RspackDevServer } from '@rspack/dev-server';
 import { RspackCompileInfo, DevServerServeSettings } from './Types';
 
-const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, coverage: string[], manualMode: boolean, basedir: string): RspackOptions => {
+const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, manualMode: boolean, basedir: string): RspackOptions => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { TsCheckerRspackPlugin } = require('ts-checker-rspack-plugin');
 
@@ -160,7 +160,7 @@ const compileTests = (compileInfo: RspackCompileInfo, exitOnCompileError: boolea
   });
 };
 
-const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean, coverage: string[]): Promise<RspackCompileInfo> => {
+const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean): Promise<RspackCompileInfo> => {
   return new Promise((resolve, reject) => {
     const scratchFile = path.join(scratchDir, 'compiled/tests-imports.ts');
     const dest = path.join(scratchDir, 'compiled/tests.js');
@@ -168,18 +168,18 @@ const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: str
     if (!fs.existsSync(tsConfigFile)) {
       reject(`Could not find the required tsconfig file: ${tsConfigFile}`);
     } else {
-      const config = getWebPackConfigTs(tsConfigFile, scratchFile, dest, coverage, manualMode, basedir);
+      const config = getWebPackConfigTs(tsConfigFile, scratchFile, dest, manualMode, basedir);
       resolve({ scratchFile, dest, config });
     }
   });
 };
 
-const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean, srcFiles: string[], coverage: string[]): Promise<RspackCompileInfo> => {
-  return getTsCompileInfo(tsConfigFile, scratchDir, basedir, manualMode, coverage);
+const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean): Promise<RspackCompileInfo> => {
+  return getTsCompileInfo(tsConfigFile, scratchDir, basedir, manualMode);
 };
 
-export const compile = async (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], coverage: string[], polyfills: string[]): Promise<string> => {
-  const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, basedir, false, srcFiles, coverage);
+export const compile = async (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], polyfills: string[]): Promise<string> => {
+  const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, basedir, false);
   return compileTests(compileInfo, exitOnCompileError, srcFiles, polyfills);
 };
 
@@ -189,7 +189,7 @@ export const devserver = async (settings: DevServerServeSettings): Promise<Serve
   const scratchDir = path.resolve('scratch');
   const tsConfigFile = settings.config;
 
-  const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, settings.basedir, true, settings.testfiles, settings.coverage);
+  const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, settings.basedir, true);
   return Serve.startCustom(settings, (port, handler) => {
     const scratchFile = compileInfo.scratchFile;
     console.log(`Loading ${settings.testfiles.length} test files...`);
