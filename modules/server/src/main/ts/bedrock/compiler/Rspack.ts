@@ -12,17 +12,8 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { TsCheckerRspackPlugin } = require('ts-checker-rspack-plugin');
 
-  const modulesDir = path.resolve(process.cwd(), 'modules');
-  const ephoxAliases = fs.existsSync(modulesDir)
-    ? Object.fromEntries(fs.readdirSync(modulesDir).map((name) => {
-        if (name === 'persona') {
-          return [`@tinymce/${name}`, path.join(modulesDir, name, 'src/main/ts/main.ts')];
-        }
-        return [`@ephox/${name}`, path.join(modulesDir, name, 'src/main/ts/ephox', name, 'api/Main.ts')];
-      }))
-    : {};
-
    const getTsConfigFile = () => path.isAbsolute(tsConfigFile) ? tsConfigFile : path.resolve(process.cwd(), tsConfigFile);
+  console.log(`Using tsconfig file: ${getTsConfigFile()}`);
 
   return {
     entry: scratchFile,
@@ -41,10 +32,10 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
     ],
 
     resolve: {
+      conditionNames: [ 'tiny:internal', 'default', 'import', 'browser'],
       extensions: ['.ts', '.tsx', '.js', '.mjs'],
       tsConfig: getTsConfigFile(),
       alias: {
-        ...ephoxAliases,
         // https://github.com/rspack-contrib/rstack-examples/blob/main/rspack/preact/rspack.config.js
         react: 'preact/compat',
         'react-dom/test-utils': 'preact/test-utils',
@@ -133,7 +124,6 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
 
 const compileTests = (compileInfo: RspackCompileInfo, exitOnCompileError: boolean, srcFiles: string[], polyfills: string[]): Promise<string> => {
   return new Promise((resolve) => {
-    console.log(`Compiling ${srcFiles.length} tests...`);
 
     mkdirp.sync(path.dirname(compileInfo.scratchFile));
     fs.writeFileSync(compileInfo.scratchFile, Imports.generateImports(true, compileInfo.scratchFile, srcFiles, polyfills));
