@@ -32,7 +32,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
     ],
 
     resolve: {
-      conditionNames: [ 'tiny:internal', 'default', 'import', 'browser'],
+      conditionNames: [ 'tiny:source', '...' ],
       extensions: ['.ts', '.tsx', '.js', '.mjs'],
       tsConfig: getTsConfigFile(),
       alias: {
