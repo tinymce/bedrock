@@ -6,7 +6,11 @@
 standardProperties()
 
 timestamps {
-  tinyPods.node(tag: '20') {
+  tinyPods.node(
+    tag: '20',
+    resourceRequestMemory: '2Gi',
+    resourceLimitMemory: '2Gi'
+) {
     stage("clean") {
       exec('yarn clean')
     }
@@ -27,6 +31,10 @@ timestamps {
   // Testing
   stage("bedrock testing") {
     bedrockRemoteBrowsers(
+      testContainer: [
+        resourceRequestMemory: '2Gi',
+        resourceLimitMemory: '2Gi',
+      ],
       platforms: [
         [ browser: 'chrome', provider: 'aws', buckets: 2 ],
         [ browser: 'firefox', provider: 'aws', buckets: 2 ],
