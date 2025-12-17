@@ -7,18 +7,7 @@ import * as Serve from '../server/Serve';
 import { ExitCodes } from '../util/ExitCodes';
 import * as Imports from './Imports';
 import { hasTs } from './TsUtils';
-
-export interface WebpackServeSettings extends Serve.ServeSettings {
-  readonly config: string;
-  readonly coverage: string[];
-  readonly polyfills: string[];
-}
-
-interface CompileInfo {
-  readonly scratchFile: string;
-  readonly dest: string;
-  readonly config: webpack.Configuration;
-}
+import { WebpackCompileInfo, DevServerServeSettings } from './Types';
 
 const webpackSharedRules = ([] as any[]).concat([
   {
@@ -210,7 +199,7 @@ const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[
   };
 };
 
-const compileTests = (compileInfo: CompileInfo, exitOnCompileError: boolean, srcFiles: string[], polyfills: string[]): Promise<string> => {
+const compileTests = (compileInfo: WebpackCompileInfo, exitOnCompileError: boolean, srcFiles: string[], polyfills: string[]): Promise<string> => {
   return new Promise((resolve) => {
     console.log(`Compiling ${srcFiles.length} tests...`);
 
@@ -239,7 +228,7 @@ const compileTests = (compileInfo: CompileInfo, exitOnCompileError: boolean, src
   });
 };
 
-const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean, coverage: string[]): Promise<CompileInfo> => {
+const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean, coverage: string[]): Promise<WebpackCompileInfo> => {
   return new Promise((resolve, reject) => {
     const scratchFile = path.join(scratchDir, 'compiled/tests-imports.ts');
     const dest = path.join(scratchDir, 'compiled/tests.js');
@@ -253,7 +242,7 @@ const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: str
   });
 };
 
-const getJsCompileInfo = (scratchDir: string, basedir: string, manualMode: boolean, coverage: string[]): Promise<CompileInfo> => {
+const getJsCompileInfo = (scratchDir: string, basedir: string, manualMode: boolean, coverage: string[]): Promise<WebpackCompileInfo> => {
   const scratchFile = path.join(scratchDir, 'compiled/tests-imports.js');
   const dest = path.join(scratchDir, 'compiled/tests.js');
   const config = getWebPackConfigJs(scratchFile, dest, coverage, manualMode, basedir);
@@ -261,7 +250,7 @@ const getJsCompileInfo = (scratchDir: string, basedir: string, manualMode: boole
   return Promise.resolve({ scratchFile, dest, config });
 };
 
-const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean, srcFiles: string[], coverage: string[]): Promise<CompileInfo> => {
+const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean, srcFiles: string[], coverage: string[]): Promise<WebpackCompileInfo> => {
   if (hasTs(srcFiles)) {
     return getTsCompileInfo(tsConfigFile, scratchDir, basedir, manualMode, coverage);
   } else {
@@ -276,7 +265,7 @@ export const compile = async (tsConfigFile: string, scratchDir: string, basedir:
 
 const isCompiledRequest = (request: { url: string }) => request.url.startsWith('/compiled/');
 
-export const devserver = async (settings: WebpackServeSettings): Promise<Serve.ServeService> => {
+export const devserver = async (settings: DevServerServeSettings): Promise<Serve.ServeService> => {
   const scratchDir = path.resolve('scratch');
   const tsConfigFile = settings.config;
 
