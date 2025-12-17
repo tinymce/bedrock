@@ -1,8 +1,5 @@
 {
   "npmClient": "yarn",
-  "useWorkspaces": true,
   "version": "15.1.0",
-  "publish": {
-    "push": false
-  }
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json"
 }
