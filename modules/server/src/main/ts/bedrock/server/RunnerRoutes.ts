@@ -17,7 +17,7 @@ interface WorkspaceRoot {
   folder: string;
 }
 
-export const generate = async (mode: string, projectdir: string, basedir: string, configFile: string, bundler: 'webpack' | 'rollup' | 'rspack', testfiles: string[], chunk: number,
+export const generate = async (mode: string, projectdir: string, basedir: string, configFile: string, bundler: 'webpack' | 'rspack', testfiles: string[], chunk: number,
                                retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[], polyfills: string[]): Promise<Routes.Runner> => {
   const files = testfiles.map((filePath) => {
     return path.relative(projectdir, filePath);

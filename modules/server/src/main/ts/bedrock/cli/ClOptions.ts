@@ -57,10 +57,9 @@ export const bundler: ClOption = {
   type: String,
   required: false,
   defaultValue: 'webpack',
-  description: 'Specify the bundler (webpack, rspack, rollup). Rollup will be forced to webpack.',
+  description: 'Specify the bundler (webpack, rspack).',
   validate: Extraction.inSet([
     'webpack',
-    'rollup',
     'rspack'
   ])
 };

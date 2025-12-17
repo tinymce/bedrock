@@ -13,7 +13,6 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
   const { TsCheckerRspackPlugin } = require('ts-checker-rspack-plugin');
 
    const getTsConfigFile = () => path.isAbsolute(tsConfigFile) ? tsConfigFile : path.resolve(process.cwd(), tsConfigFile);
-  console.log(`Using tsconfig file: ${getTsConfigFile()}`);
 
   return {
     entry: scratchFile,

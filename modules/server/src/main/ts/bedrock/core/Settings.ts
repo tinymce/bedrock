@@ -2,7 +2,7 @@
 
 export interface BedrockSettings {
   readonly basedir: string;
-  readonly bundler: 'webpack' | 'rollup' | 'rspack';
+  readonly bundler: 'webpack' | 'rspack';
   readonly chunk: number;
   readonly loglevel: 'simple' | 'advanced';
   readonly overallTimeout: number;

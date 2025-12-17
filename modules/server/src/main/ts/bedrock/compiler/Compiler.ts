@@ -6,13 +6,12 @@ export interface Compiler {
   readonly generate: () => Promise<Buffer | string>;
 }
 
-export const compile = (bundler: 'webpack' | 'rollup' | 'rspack', tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, files: string[], coverage: string[], polyfills: string[]): Compiler => {
+export const compile = (bundler: 'webpack' | 'rspack', tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, files: string[], coverage: string[], polyfills: string[]): Compiler => {
   const getCompileFunc = () => {
     switch (bundler) {
       case 'rspack':
         return Rspack.compile;
       case 'webpack':
-      case 'rollup':
         return Webpack.compile;
     }
   };
