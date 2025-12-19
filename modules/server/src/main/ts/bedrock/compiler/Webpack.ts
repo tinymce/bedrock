@@ -7,7 +7,7 @@ import * as Serve from '../server/Serve';
 import { ExitCodes } from '../util/ExitCodes';
 import * as Imports from './Imports';
 import { hasTs } from './TsUtils';
-import { WebpackCompileInfo, DevServerServeSettings } from './Types';
+import { WebpackCompileInfo, DevServerServeSettings, CompileFn } from './Types';
 
 const webpackSharedRules = ([] as any[]).concat([
   {
@@ -258,7 +258,7 @@ const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: strin
   }
 };
 
-export const compile = async (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], coverage: string[], polyfills: string[]): Promise<string> => {
+export const compile: CompileFn = async (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], coverage: string[], polyfills: string[]): Promise<string> => {
   const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, basedir, false, srcFiles, coverage);
   return compileTests(compileInfo, exitOnCompileError, srcFiles, polyfills);
 };
