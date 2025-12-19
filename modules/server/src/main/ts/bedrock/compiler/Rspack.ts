@@ -60,6 +60,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
           options: {
             jsc: {
               parser: { syntax: 'typescript', tsx: true },
+              target: 'es2022',
               transform: {
                 react: {
                   runtime: 'automatic',
@@ -167,7 +168,7 @@ const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: strin
   return getTsCompileInfo(tsConfigFile, scratchDir, basedir, manualMode);
 };
 
-export const compile = async (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], polyfills: string[]): Promise<string> => {
+export const compile = async (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], _coverage: string[], polyfills: string[]): Promise<string> => {
   const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, basedir, false);
   return compileTests(compileInfo, exitOnCompileError, srcFiles, polyfills);
 };
