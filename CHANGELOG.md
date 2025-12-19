@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+- Fixed an issue where using bedrock-auto with rspack bundling resulted in an error. #TINY-13550
+
+# 15.1.0 - 2025-12-17
 
 ## Added
 - Add rspack dev server support. #TINY-12824

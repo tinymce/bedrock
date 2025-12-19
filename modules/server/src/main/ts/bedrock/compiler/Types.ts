@@ -17,3 +17,14 @@ export interface CompileInfo<T> {
   readonly config: T;
 }
 
+export type CompileFn = (
+  tsConfigFile: string,
+  scratchDir: string,
+  basedir: string,
+  exitOnCompileError: boolean,
+  srcFiles: string[],
+  coverage: string[],
+  polyfills: string[]
+) => Promise<string>;
+
+export type Bundler = 'rspack' | 'webpack';

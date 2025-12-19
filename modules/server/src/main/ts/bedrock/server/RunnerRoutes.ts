@@ -6,6 +6,7 @@ import * as Routes from './Routes';
 import * as Compiler from '../compiler/Compiler';
 import * as FileUtils from '../util/FileUtils';
 import * as Arr from '../util/Arr';
+import * as Types from '../compiler/Types';
 
 interface PackageJson {
   readonly name: string;
@@ -17,22 +18,22 @@ interface WorkspaceRoot {
   folder: string;
 }
 
-export const generate = async (mode: string, projectdir: string, basedir: string, configFile: string, bundler: 'webpack' | 'rspack', testfiles: string[], chunk: number,
+export const generate = async (mode: string, projectdir: string, basedir: string, configFile: string, bundler: Types.Bundler, testfiles: string[], chunk: number,
                                retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[], polyfills: string[]): Promise<Routes.Runner> => {
   const files = testfiles.map((filePath) => {
     return path.relative(projectdir, filePath);
   });
 
-  const testGenerator = Compiler.compile(
+  const testGenerator = Compiler.compile({
     bundler,
-    path.join(projectdir, configFile),
-    path.join(projectdir, 'scratch'),
+    tsConfigFile: path.join(projectdir, configFile),
+    scratchDir: path.join(projectdir, 'scratch'),
     basedir,
-    mode === 'auto',
+    exitOnCompileError: mode === 'auto',
     files,
     coverage,
     polyfills
-  );
+  });
 
   // read the project json file to determine the project name to expose resources as `/project/${name}`
   const pkjson: PackageJson = FileUtils.readFileAsJson(`${projectdir}/package.json`);
