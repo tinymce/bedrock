@@ -67,7 +67,7 @@ export const forManual = (directories: Directories, argv: string[] = process.arg
     commonOptions(directories), argv) as Attempt<cli.CliError, BedrockManualSettings>;
 };
 
-export const logAndExit = (errs: cli.CliError): void => {
+export const logAndExit = async (errs: cli.CliError): Promise<void> => {
   console.error(chalk.red('\n****\nError while processing command line for ' + errs.command));
   const messages = errs.errors.join('\n');
   console.error(chalk.red(messages));

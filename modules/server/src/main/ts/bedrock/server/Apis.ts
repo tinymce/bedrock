@@ -14,7 +14,7 @@ import {REMOTE_IDLE_TIMEOUT_SECONDS} from '../auto/RemoteDriver';
 type Executor<D, T> = (driver: Browser) => (data: D) => Promise<T>;
 
 export interface Apis {
-  readonly routers: Routes.Route[];
+  readonly routers: Promise<Routes.Route[]>;
   readonly markLoaded: () => void;
   readonly enableHud: () => void;
   readonly awaitDone: () => Promise<Controller.TestResults>;
@@ -45,7 +45,7 @@ const pollRate = 200;
 const maxInvalidAttempts = 300;
 
 // TODO: Do not use files here.
-export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Browser>, projectdir: string, basedir: string, stickyFirstSession: boolean, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced', resetMousePosition: boolean): Apis => {
+export const create = (master: DriverMaster | null, pMaybeDriver: Promise<Attempt<unknown, Browser>>, projectdir: string, basedir: string, stickyFirstSession: boolean, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced', resetMousePosition: boolean): Apis => {
   let pageHasLoaded = false;
   let needsMousePositionReset = true;
 
@@ -78,95 +78,98 @@ export const create = (master: DriverMaster | null, maybeDriver: Attempt<any, Br
 
   const sendKeepAlive = (driver: Browser) => Promise.resolve(void driver.execute(() => console.info('server keep-alive', Date.now())));
 
-  const keepAliveAction = () => Attempt.cata(maybeDriver, () => Promise.resolve(),
-    (driver) => waitForDriverReady(maxInvalidAttempts, () => sendKeepAlive(driver)));
-
-  const resetMousePositionAction = (force = false): Promise<void> => {
-    if (resetMousePosition) {
-      return Attempt.cata(maybeDriver,
-        () => Promise.reject('Resetting mouse position not supported without webdriver running. Use bedrock-auto to get this feature.'),
-        (driver) => waitForDriverReady(maxInvalidAttempts, async () => {
-          const shouldResetMousePos = force || needsMousePositionReset;
-          // TODO re-enable resetting the mouse on other browsers when mouseMove gets fixed on Firefox/IE
-          const browserName = (driver.capabilities as Capabilities.Capabilities).browserName;
-          if (shouldResetMousePos && (browserName === 'chrome' || browserName === 'msedge')) {
-            // Reset the mouse position to the top left of the window
-            await driver.performActions([{
-              type: 'pointer',
-              id: 'finger1',
-              parameters: { pointerType: 'mouse' },
-              actions: [{ type: 'pointerMove', duration: 0, x: 0, y: 0 }]
-            }]);
-            needsMousePositionReset = false;
-          }
-        })
-      );
-    } else {
-      return Promise.resolve();
-    }
-  };
-
-  const driverRouter = <D>(url: string, apiLabel: string, executor: Executor<D, void>, effectChangesMouse: boolean) => {
-    return Attempt.cata(maybeDriver, () => {
-      return Routes.unsupported(
-        'POST',
-        url,
-        apiLabel + ' API not supported without webdriver running. Use bedrock-auto to get this feature.'
-      );
-    }, (driver) => {
-      return Routes.effect('POST', url, effect(executor, driver, effectChangesMouse));
-    });
-  };
-
   const markLoaded = () => {
     pageHasLoaded = true;
   };
 
   const c = Controller.create(stickyFirstSession, overallTimeout, testfiles, loglevel);
 
-  const maybeSendKeepAlive: () => Promise<void> = (() => {
-    let lastKeepAlive = Date.now();
-    /*
-     * If we're within a minute of the remote driver timeout, send a keep-alive.
-     *
-     * In theory this is only required if no other action has been taken in the last x minutes,
-     * but this happens so rarely it should be fine.
-     */
-    const keepAliveTimer = Math.max(120, REMOTE_IDLE_TIMEOUT_SECONDS - 60) * 1000;
-    return () => {
-      if (Date.now() - lastKeepAlive > keepAliveTimer) {
-        lastKeepAlive = Date.now();
-        return keepAliveAction();
+  const routers = pMaybeDriver.then((maybeDriver) => {
+
+    const keepAliveAction = async () => Attempt.cata(maybeDriver, () => Promise.resolve(),
+      (driver) => waitForDriverReady(maxInvalidAttempts, () => sendKeepAlive(driver)));
+
+    const maybeSendKeepAlive: () => Promise<void> = (() => {
+      let lastKeepAlive = Date.now();
+      /*
+       * If we're within a minute of the remote driver timeout, send a keep-alive.
+       *
+       * In theory this is only required if no other action has been taken in the last x minutes,
+       * but this happens so rarely it should be fine.
+       */
+      const keepAliveTimer = Math.max(120, REMOTE_IDLE_TIMEOUT_SECONDS - 60) * 1000;
+      return () => {
+        if (Date.now() - lastKeepAlive > keepAliveTimer) {
+          lastKeepAlive = Date.now();
+          return keepAliveAction();
+        } else {
+          return Promise.resolve();
+        }
+      };
+    })();
+
+    const resetMousePositionAction = async (force = false): Promise<void> => {
+      if (resetMousePosition) {
+        return Attempt.cata(maybeDriver,
+          () => Promise.reject('Resetting mouse position not supported without webdriver running. Use bedrock-auto to get this feature.'),
+          (driver) => waitForDriverReady(maxInvalidAttempts, async () => {
+            const shouldResetMousePos = force || needsMousePositionReset;
+            // TODO re-enable resetting the mouse on other browsers when mouseMove gets fixed on Firefox/IE
+            const browserName = (driver.capabilities as Capabilities.Capabilities).browserName;
+            if (shouldResetMousePos && (browserName === 'chrome' || browserName === 'msedge')) {
+              // Reset the mouse position to the top left of the window
+              await driver.performActions([{
+                type: 'pointer',
+                id: 'finger1',
+                parameters: { pointerType: 'mouse' },
+                actions: [{ type: 'pointerMove', duration: 0, x: 0, y: 0 }]
+              }]);
+              needsMousePositionReset = false;
+            }
+          })
+        );
       } else {
         return Promise.resolve();
       }
     };
-  })();
 
-  const routers = [
-    driverRouter('/keys', 'Keys', KeyEffects.executor, false),
-    driverRouter('/mouse', 'Mouse', MouseEffects.executor, true),
-    Routes.effect('POST', '/tests/alive', (data: { session: string }) => {
-      c.recordAlive(data.session);
-      return keepAliveAction();
-    }),
-    Routes.effect('POST', '/tests/init', () => resetMousePositionAction(true)),
-    Routes.effect('POST', '/tests/start', (data: StartData) => {
-      c.recordTestStart(data.session, data.name, data.file, data.number, data.totalTests);
-      return resetMousePositionAction();
-    }),
-    Routes.effect('POST', '/tests/results', (data: ResultsData) => {
-      c.recordTestResults(data.session, data.results);
-      return maybeSendKeepAlive();
-    }),
-    Routes.effect('POST', '/tests/done', (data: DoneData) => {
-      Coverage.writeCoverageData(data.coverage);
-      c.recordDone(data.session, data.error);
-      return Promise.resolve();
-    }),
-    // This does not need the webdriver.
-    Routes.effect('POST', '/clipboard', ClipboardEffects.route(basedir, projectdir))
-  ];
+    const driverRouter = <D>(url: string, apiLabel: string, executor: Executor<D, void>, effectChangesMouse: boolean) => {
+      return Attempt.cata(maybeDriver, () => {
+        return Routes.unsupported(
+          'POST',
+          url,
+          apiLabel + ' API not supported without webdriver running. Use bedrock-auto to get this feature.'
+        );
+      }, (driver) => {
+        return Routes.effect('POST', url, effect(executor, driver, effectChangesMouse));
+      });
+    };
+
+    return [
+      driverRouter('/keys', 'Keys', KeyEffects.executor, false),
+      driverRouter('/mouse', 'Mouse', MouseEffects.executor, true),
+      Routes.effect('POST', '/tests/alive', (data: { session: string }) => {
+        c.recordAlive(data.session);
+        return keepAliveAction();
+      }),
+      Routes.effect('POST', '/tests/init', () => resetMousePositionAction(true)),
+      Routes.effect('POST', '/tests/start', (data: StartData) => {
+        c.recordTestStart(data.session, data.name, data.file, data.number, data.totalTests);
+        return resetMousePositionAction();
+      }),
+      Routes.effect('POST', '/tests/results', (data: ResultsData) => {
+        c.recordTestResults(data.session, data.results);
+        return maybeSendKeepAlive();
+      }),
+      Routes.effect('POST', '/tests/done', (data: DoneData) => {
+        Coverage.writeCoverageData(data.coverage);
+        c.recordDone(data.session, data.error);
+        return Promise.resolve();
+      }),
+      // This does not need the webdriver.
+      Routes.effect('POST', '/clipboard', ClipboardEffects.route(basedir, projectdir))
+    ];
+  });
 
   return {
     routers,
