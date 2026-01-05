@@ -18,7 +18,7 @@ interface WorkspaceRoot {
   folder: string;
 }
 
-export const generate = async (mode: string, projectdir: string, basedir: string, configFile: string, bundler: Types.Bundler, testfiles: string[], chunk: number,
+export const generate = async (mode: string, projectdir: string, basedir: string, scratchDir: string, configFile: string, bundler: Types.Bundler, testfiles: string[], chunk: number,
                                retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[], polyfills: string[]): Promise<Routes.Runner> => {
   const files = testfiles.map((filePath) => {
     return path.relative(projectdir, filePath);
@@ -27,7 +27,7 @@ export const generate = async (mode: string, projectdir: string, basedir: string
   const testGenerator = Compiler.compile({
     bundler,
     tsConfigFile: path.join(projectdir, configFile),
-    scratchDir: path.join(projectdir, 'scratch'),
+    scratchDir: path.join(projectdir, scratchDir),
     basedir,
     exitOnCompileError: mode === 'auto',
     files,
@@ -105,7 +105,7 @@ export const generate = async (mode: string, projectdir: string, basedir: string
 
       // test code
       Routes.asyncJs('GET', '/compiled/tests.js', testGenerator.generate()),
-      Routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
+      Routes.routing('GET', '/compiled', path.join(projectdir, scratchDir, 'compiled')),
 
       // harness API
       Routes.json('GET', '/harness', {

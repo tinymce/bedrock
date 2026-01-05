@@ -81,7 +81,7 @@ export const go = async (bedrockAutoSettings: BedrockAutoSettings): Promise<void
       stopPort: 20000
     });
 
-    const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
+    const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, `scratch_${servicePort}`, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
     const driver = makeWebDriver(settings, servicePort, shutdownServices, browserName, isHeadless);
 
