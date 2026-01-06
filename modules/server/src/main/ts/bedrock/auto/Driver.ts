@@ -1,14 +1,14 @@
 import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
-import * as WebdriverIO from 'webdriverio';
-import { RemoteOptions } from 'webdriverio';
+import { remote } from 'webdriverio';
 import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
 import * as DriverLoader from './DriverLoader';
 import * as RemoteDriver from './RemoteDriver';
 import { Tunnel } from './Tunnel';
 import deepmerge = require('deepmerge');
+import { WebdriverIOConfig } from '@wdio/types/build/Capabilities';
 
 export interface DriverSettings {
   basedir: string;
@@ -93,8 +93,8 @@ const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
   }
 };
 
-const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): WebdriverIO.RemoteOptions => {
-  const options: WebdriverIO.RemoteOptions = {
+const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): WebdriverIOConfig => {
+  const options: WebdriverIOConfig = {
     logLevel: 'warn' as const,
     // if the parallel count is full this timeout is how long WDIO waits for LambdaTest to spin up.
     // 10 minute timeout, defaults to 3 connection attempts
@@ -154,7 +154,8 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
         hostname: '127.0.0.1',
         port
       }
-  ) as RemoteOptions;
+  // ) as RemoteOptions;
+  ) as WebdriverIOConfig;
 };
 
 const logDriverDetails = (driver: WebdriverIO.Browser, headless: boolean, debuggingPort: number) => {
@@ -293,7 +294,8 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
       // Wait for the driver to start up and then start the webdriver session
       await DriverLoader.startAndWaitForAlive(driverSpec, port, webdriverTimeout);
 
-      const driver = await WebdriverIO.remote(webdriverOptions);
+      // const driver = await WebdriverIO.remote(webdriverOptions);
+      const driver = await remote(webdriverOptions);
 
       // IEDriverServer ignores a delete session call if done too quickly so it needs a small delay
       const shutdownDelay = browserName === 'internet explorer' ? 500 : 0;

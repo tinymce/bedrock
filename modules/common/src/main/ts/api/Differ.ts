@@ -1,9 +1,8 @@
 import * as JsDiff from 'diff';
-import { ArrayChange } from 'diff';
 import { htmlentities } from './StringUtils';
 
 export const diffPrettyHtml = (text1: string, text2: string): string => {
-  const changes: ArrayChange<string>[] = JsDiff.diffArrays(text1.split('\n'), text2.split('\n'));
+  const changes: ReturnType<typeof JsDiff.diffArrays<string>> = JsDiff.diffArrays(text1.split('\n'), text2.split('\n'));
   const lines = changes.map((c) => {
     const prefix = (c.removed ? '<del style="background:#ffe6e6;">' : c.added ? '<ins style="background:#e6ffe6;">' : '<span>');
     const suffix = (c.removed ? '</del>' : c.added ? '</ins>' : '</span>');
@@ -15,7 +14,7 @@ export const diffPrettyHtml = (text1: string, text2: string): string => {
 };
 
 export const diffPrettyText = (text1: string, text2: string): string => {
-  const changes: ArrayChange<string>[] = JsDiff.diffArrays(text1.split('\n'), text2.split('\n'));
+  const changes: ReturnType<typeof JsDiff.diffArrays<string>> = JsDiff.diffArrays(text1.split('\n'), text2.split('\n'));
   const lines = changes.map((c) => {
     const prefix = (c.removed ? '-' : c.added ? '+' : ' ') + ' | ';
     const texts = c.value;

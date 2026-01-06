@@ -39,7 +39,7 @@ describe('Utils.countTests', () => {
   };
 
   it('should work with nested suites', () => {
-    fc.assert(fc.property(fc.integer(0, 10), fc.integer(0, 10), (numRootTests, numNestedTests) => {
+    fc.assert(fc.property(fc.integer({ min: 0, max: 10 }), fc.integer({ min: 0, max: 10 }), (numRootTests, numNestedTests) => {
       const root = createRootSuite('root');
       const nested = createSuite('nested', root);
       root.suites.push(nested);
@@ -105,7 +105,7 @@ describe('Utils.getSuites', () => {
 
 describe('Utils.filterOnly', () => {
   it('should remove all other tests/suites for only test', () => {
-    fc.assert(fc.property(fc.nat(50), fc.integer(1, 50), fc.integer(1, 50), (numRoot, numChild1, numChild2) => {
+    fc.assert(fc.property(fc.nat(50), fc.integer({ min: 1, max: 50 }), fc.integer({ min: 1, max: 50 }), (numRoot, numChild1, numChild2) => {
       const { root, child1, child2, child2Tests } = setupTestSuite(numRoot, numChild1, numChild2);
       const randomTestNum = Math.floor(Math.random() * numChild2);
       const randomTest = child2Tests[randomTestNum];
@@ -122,7 +122,7 @@ describe('Utils.filterOnly', () => {
   });
 
   it('should remove all nested suites for only test', () => {
-    fc.assert(fc.property(fc.nat(50), fc.integer(1, 50), fc.integer(1, 50), (numRoot, numChild1, numChild2) => {
+    fc.assert(fc.property(fc.nat(50), fc.integer({ min: 1, max: 50 }), fc.integer({ min: 1, max: 50 }), (numRoot, numChild1, numChild2) => {
       const { root, child1, child1Tests } = setupTestSuite(numRoot, numChild1, numChild2);
       const randomTestNum = Math.floor(Math.random() * numChild1);
       const randomTest = child1Tests[randomTestNum];
@@ -137,7 +137,7 @@ describe('Utils.filterOnly', () => {
   });
 
   it('should remove all other suites for only suite', () => {
-    fc.assert(fc.property(fc.nat(50), fc.integer(1, 50), fc.integer(1, 50), (numRoot, numChild1, numChild2) => {
+    fc.assert(fc.property(fc.nat(50), fc.integer({ min: 1, max: 50 }), fc.integer({ min: 1, max: 50 }), (numRoot, numChild1, numChild2) => {
       const { root, child1, child2 } = setupTestSuite(numRoot, numChild1, numChild2);
       child1._only = true;
 

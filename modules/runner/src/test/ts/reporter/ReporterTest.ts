@@ -5,7 +5,7 @@ import { beforeEach, describe, it } from 'mocha';
 import { UrlParams } from '../../../main/ts/core/UrlParams';
 import { Callbacks, TestErrorData } from '../../../main/ts/reporter/Callbacks';
 import { Reporter } from '../../../main/ts/reporter/Reporter';
-import { noop, wait } from '../TestUtils';
+import { hexChar, noop, wait } from '../TestUtils';
 
 interface StartTestData {
   readonly session: string;
@@ -78,7 +78,7 @@ describe('Reporter.test', () => {
   beforeEach(() => reset());
 
   it('should report the session id, number tests, file and name on start', () => {
-    return fc.assert(fc.asyncProperty(fc.hexaString(), fc.asciiString(), fc.integer(offset), (fileName, testName, testCount) => {
+    return fc.assert(fc.asyncProperty(fc.string({ unit: hexChar }), fc.string({ unit: 'grapheme-ascii'}), fc.integer({ max: offset }), (fileName, testName, testCount) => {
       reset(0);
       const test = reporter.test(fileName + 'Test.ts', testName, testCount);
       test.start();
@@ -106,7 +106,7 @@ describe('Reporter.test', () => {
   });
 
   it('should report the session id, file, name, passed state and time on a skipped test', () => {
-    return fc.assert(fc.asyncProperty(fc.hexaString(), fc.asciiString(), fc.asciiString(), fc.integer(offset), (fileName, testName, skippedMessage, testCount) => {
+    return fc.assert(fc.asyncProperty(fc.string({ unit: hexChar }), fc.string({ unit: 'grapheme-ascii'}), fc.string({ unit: 'grapheme-ascii'}), fc.integer({ max: offset }), (fileName, testName, skippedMessage, testCount) => {
       reset();
       const test = reporter.test(fileName + 'Test.ts', testName, testCount);
       test.start();
@@ -136,7 +136,7 @@ describe('Reporter.test', () => {
   });
 
   it('should report the session id, file, name, passed state, time and error on a test failure', () => {
-    return fc.assert(fc.asyncProperty(fc.hexaString(), fc.asciiString(), fc.integer(offset), (fileName, testName, testCount) => {
+    return fc.assert(fc.asyncProperty(fc.string({ unit: hexChar }), fc.string({ unit: 'grapheme-ascii'}), fc.integer({ max: offset }), (fileName, testName, testCount) => {
       reset();
       const test = reporter.test(fileName + 'Test.ts', testName, testCount);
       const error = LoggedError.loggedError(new Error('Failed'), [ 'Log Message' ]);

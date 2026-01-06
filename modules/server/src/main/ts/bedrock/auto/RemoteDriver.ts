@@ -1,7 +1,8 @@
-import * as WebdriverIO from 'webdriverio';
+import { remote } from 'webdriverio';
 import * as deepmerge from 'deepmerge';
 import { CreateTestGridUrlCommand, DeviceFarmClient } from '@aws-sdk/client-device-farm';
 import { Driver, DriverSettings } from './Driver';
+import { WebdriverIOConfig } from '@wdio/types/build/Capabilities';
 
 export const REMOTE_IDLE_TIMEOUT_SECONDS = 360;
 
@@ -19,7 +20,7 @@ const getFarmUrl = async (awsRegion: string, projectArn: string, expires = 5000)
   return new URL(response.url as string);
 };
 
-const createFarm = async (browserName: string, remoteOpts: WebdriverIO.RemoteOptions, settings: DriverSettings): Promise<Driver> => {
+const createFarm = async (browserName: string, remoteOpts: WebdriverIOConfig, settings: DriverSettings): Promise<Driver> => {
   try {
     const validBrowsers = ['firefox', 'chrome', 'MicrosoftEdge'];
     if (!validBrowsers.includes(browserName)) {
@@ -48,7 +49,8 @@ const createFarm = async (browserName: string, remoteOpts: WebdriverIO.RemoteOpt
     });
 
     console.log('Starting Device Farm session with options:', JSON.stringify(options, null, 2));
-    const driver = await WebdriverIO.remote(options);
+    // const driver = await WebdriverIO.remote(options);
+    const driver = await remote(options);
     console.log('Webdriver started.');
 
     return {
@@ -63,14 +65,15 @@ const createFarm = async (browserName: string, remoteOpts: WebdriverIO.RemoteOpt
   }
 };
 
-export const getApi = async (settings: DriverSettings, browser: string, opts: WebdriverIO.RemoteOptions): Promise<Driver> => {
+export const getApi = async (settings: DriverSettings, browser: string, opts: WebdriverIOConfig): Promise<Driver> => {
   const remoteWebdriver = settings.remoteWebdriver;
   if (remoteWebdriver === 'aws') {
     const farmApi = await createFarm(browser, opts, settings);
     return farmApi;
   }
   if (remoteWebdriver == 'lambdatest') {
-    const driver = await WebdriverIO.remote(opts);
+    // const driver = await WebdriverIO.remote(opts);
+    const driver = await remote(opts);
     return {
       webdriver: driver,
       shutdown: () => driver.deleteSession()
@@ -79,7 +82,7 @@ export const getApi = async (settings: DriverSettings, browser: string, opts: We
   return Promise.reject('Unrecognized remote provider: [' + remoteWebdriver + ']');
 };
 
-const addDriverSpecificOpts = (opts: WebdriverIO.RemoteOptions, settings: DriverSettings): WebdriverIO.RemoteOptions => {
+const addDriverSpecificOpts = (opts: WebdriverIOConfig, settings: DriverSettings): WebdriverIOConfig => {
   if (settings.remoteWebdriver === 'lambdatest') {
     // For naming in LT we use PROJECT_BUILD[_NAME] or BUILD
     const getProjectNaming = (name: string) => {
@@ -121,7 +124,7 @@ const addDriverSpecificOpts = (opts: WebdriverIO.RemoteOptions, settings: Driver
   return opts;
 };
 
-const addBrowserSpecificOpts = (opts: WebdriverIO.RemoteOptions, browser: string): WebdriverIO.RemoteOptions => {
+const addBrowserSpecificOpts = (opts: WebdriverIOConfig, browser: string): WebdriverIOConfig => {
   if (browser === 'firefox') {
     // Change firefox log level for readability
     return deepmerge(opts, {
@@ -135,8 +138,8 @@ const addBrowserSpecificOpts = (opts: WebdriverIO.RemoteOptions, browser: string
   return opts;
 };
 
-export const getOpts = (browserName: string, settings: DriverSettings): WebdriverIO.RemoteOptions => {
-  const driverOpts: WebdriverIO.RemoteOptions = {
+export const getOpts = (browserName: string, settings: DriverSettings): WebdriverIOConfig => {
+  const driverOpts: WebdriverIOConfig = {
     capabilities: {
       browserVersion: settings.browserVersion
     }
