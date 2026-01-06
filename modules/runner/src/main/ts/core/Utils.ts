@@ -1,5 +1,5 @@
 import { Suite, Test } from '@ephox/bedrock-common';
-import * as sourceMappedStackTrace from 'sourcemapped-stacktrace';
+import sourceMappedStackTrace from 'sourcemapped-stacktrace';
 
 export const noop = (): void => {};
 
