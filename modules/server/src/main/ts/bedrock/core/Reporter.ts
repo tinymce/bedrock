@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 import XMLWriter = require('xml-writer');
 import * as fs from 'fs';
 import { TestResults, TestResult } from '../server/Controller';
@@ -100,7 +101,7 @@ export const write = (settings: ReporterSettings, data: TestResults): Attempt<st
 
   try {
     fs.accessSync(settings.output);
-  } catch (err) {
+  } catch (_err) {
     fs.mkdirSync(settings.output);
   }
 

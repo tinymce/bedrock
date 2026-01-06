@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 
 const typeOf = (x: any): string => {
   if (x === null) {
@@ -19,10 +18,12 @@ const isType = <T>(type: string) => (value: any): value is T => {
 };
 
 export const isString = isType<string>('string');
+// eslint-disable-next-line @typescript-eslint/no-wrapper-object-types
 export const isObject = isType<Object>('object');
 export const isArray = isType<Array<any>>('array');
 export const isNull = isType<null>('null');
 export const isBoolean = isType<boolean>('boolean');
 export const isUndefined = isType<undefined>('undefined');
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export const isFunction = isType<Function>('function');
 export const isNumber = isType<number>('number');

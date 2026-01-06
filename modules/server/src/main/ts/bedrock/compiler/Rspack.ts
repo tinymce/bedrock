@@ -9,7 +9,7 @@ import { RspackDevServer } from '@rspack/dev-server';
 import { RspackCompileInfo, DevServerServeSettings, CompileFn } from './Types';
 
 const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, manualMode: boolean, basedir: string): RspackOptions => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { TsCheckerRspackPlugin } = require('ts-checker-rspack-plugin');
 
    const getTsConfigFile = () => path.isAbsolute(tsConfigFile) ? tsConfigFile : path.resolve(process.cwd(), tsConfigFile);

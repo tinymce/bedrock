@@ -17,5 +17,5 @@ const isType = <T>(type: string) => (value: any): value is T => {
 };
 
 export const isString = isType<string>('string');
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-wrapper-object-types
 export const isObject = isType<Object>('object');

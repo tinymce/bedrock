@@ -7,6 +7,7 @@ import * as Shutdown from '../util/Shutdown';
 import * as DriverLoader from './DriverLoader';
 import * as RemoteDriver from './RemoteDriver';
 import { Tunnel } from './Tunnel';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 import deepmerge = require('deepmerge');
 import { WebdriverIOConfig } from '@wdio/types/build/Capabilities';
 

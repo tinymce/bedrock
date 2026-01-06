@@ -41,9 +41,9 @@ const webpackSharedRules = ([] as any[]).concat([
 ]);
 
 const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, coverage: string[], manualMode: boolean, basedir: string): webpack.Configuration => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
   return {
@@ -147,7 +147,6 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
 };
 
 const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[], manualMode: boolean, basedir: string): webpack.Configuration => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   return {
     stats: 'none',
     entry: scratchFile,

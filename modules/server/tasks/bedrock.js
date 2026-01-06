@@ -1,9 +1,13 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const cloptions = require('../lib/main/ts/bedrock/cli/ClOptions');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const bedrockManual = require('../lib/main/ts/BedrockManual');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const bedrockAuto = require('../lib/main/ts/BedrockAuto');
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
   const enrichSettings = function (settings) {
     const newSettings = { };

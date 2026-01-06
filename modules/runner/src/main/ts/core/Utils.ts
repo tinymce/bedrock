@@ -1,7 +1,6 @@
 import { Suite, Test } from '@ephox/bedrock-common';
 import * as sourceMappedStackTrace from 'sourcemapped-stacktrace';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
 export const noop = (): void => {};
 
 export const makeQueryParams = (session: string, offset: number, failed: number, skipped: number, retry: number): string => {
@@ -47,7 +46,7 @@ export const mapStackTrace = (stack: string | undefined): Promise<string> => new
     // In that case lets just return the original stack instead.
     try {
       sourceMappedStackTrace.mapStackTrace(stack, (stack: string[]) => resolve(stack.join('\n')));
-    } catch (e) {
+    } catch (_e) {
       resolve(stack);
     }
   } else {
@@ -58,7 +57,7 @@ export const mapStackTrace = (stack: string | undefined): Promise<string> => new
 export const setStack = (error: Error, stack: string | undefined): void => {
   try {
     error.stack = stack;
-  } catch (err) {
+  } catch (_err) {
     // Do nothing
   }
 };

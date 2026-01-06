@@ -62,8 +62,9 @@ const childAPIWrapper = (startFunc: ChildAPI['start'], isNpm: boolean, ...defaul
 
 const findNpmPackage = (driverDeps: string[]): any => Arr.findMap(driverDeps, (driverDep) => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       return require(driverDep);
-    } catch (e) {
+    } catch (_e) {
       return null;
     }
 });
@@ -96,7 +97,6 @@ export const waitForAlive = (proc: ChildProcess | null, url: string, timeout: nu
       if (Date.now() - start > timeout) {
         reject('Timed out waiting for the webdriver server. Error: ' + err);
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         timeoutId = setTimeout(checkServerStatus, 50);
       }
     };

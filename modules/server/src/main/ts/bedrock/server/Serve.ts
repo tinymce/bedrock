@@ -119,7 +119,11 @@ export const start = (settings: ServeSettings): Promise<ServeService> => {
       },
       stop: () => new Promise((resolve, reject) => {
         server.close((err?) => {
-          err ? reject(err) : resolve();
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
         });
       })
     };

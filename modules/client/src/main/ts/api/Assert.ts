@@ -48,7 +48,7 @@ const throwsError = (message: TestLabel, f: () => void, expected?: string): void
 const succeeds = (message: TestLabel, f: () => void): void => {
   try {
     f();
-  } catch (e) {
+  } catch (_e) {
     throw new Error('Expected function to not throw, but it did.\n' + TestLabel.asString(message));
   }
 };

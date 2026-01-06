@@ -1,5 +1,7 @@
 import * as fs from 'fs';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 import glob = require('glob');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 import readdirSyncRec = require('recursive-readdir-sync');
 import { Attempt } from '../core/Attempt';
 import * as Qstring from '../util/Qstring';
@@ -14,7 +16,7 @@ export const file = (name: string, rawValue: string): Attempt<string[], string> 
       return Attempt.failed([`Property: ${name} => Value: ${value} was not a file`]);
     }
     return Attempt.passed(parsed.original);
-  } catch (err) {
+  } catch (_err) {
     return Attempt.failed([`Property [${name}] has value: [${value}]. This file does not exist`]);
   }
 };
@@ -55,7 +57,7 @@ export const directory = (name: string, value: string): Attempt<string[], string
     } else {
       return Attempt.passed(value);
     }
-  } catch (err) {
+  } catch (_err) {
     return Attempt.failed([`[${value}] is not a directory`]);
   }
 };
@@ -78,7 +80,7 @@ export const files = (patterns: string[]) => {
           return matches.length > 0 && fs.lstatSync(f).isFile();
         });
         return Attempt.passed(filtered);
-      } catch (err) {
+      } catch (_err) {
         return Attempt.failed([
           `Error scanning [${value}] for files matching pattern: [${patterns.join(', ')}]`
         ]);
