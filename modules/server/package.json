@@ -39,7 +39,7 @@
     "finalhandler": "^2.1.1",
     "fork-ts-checker-webpack-plugin": "^9.1.0",
     "fresh": "^0.5.2",
-    "glob": "^13.0.0",
+    "glob": "^10.4.5",
     "grunt": "^1.6.1",
     "jquery": "^3.7.1",
     "mime-types": "^3.0.2",
