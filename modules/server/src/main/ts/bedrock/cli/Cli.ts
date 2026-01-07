@@ -1,11 +1,14 @@
-import * as commandLineArgs from 'command-line-args';
 import { Attempt } from '../core/Attempt';
 import * as Version from '../core/Version';
 import * as Validation from './Validation';
 import * as CliUsage from './CliUsage';
 import { ExitCodes } from '../util/ExitCodes';
-import { CommandLineOptions } from 'command-line-args';
+import { CommandLineOptions, OptionDefinition } from 'command-line-args';
 import { ClOption } from './ClOptions';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const commandLineArgs = require('command-line-args').default;
+// v6 moved to ESM internally
 
 export type CliError = {
   command: string;
@@ -13,9 +16,9 @@ export type CliError = {
   usage: string;
 }
 
-const parseCommandLine = (definitions: commandLineArgs.OptionDefinition[], argv: string[]): Attempt<string[], CommandLineOptions> => {
+const parseCommandLine = (definitions: OptionDefinition[], argv: string[]): Attempt<string[], CommandLineOptions> => {
   try {
-    const settings: commandLineArgs.CommandLineOptions = commandLineArgs(definitions, {argv});
+    const settings: CommandLineOptions = commandLineArgs(definitions, {argv});
     return Attempt.passed(settings);
   } catch (err) {
     return Attempt.failed([err.message !== undefined ? err.message : err]);

@@ -1,5 +1,8 @@
-import * as usage from 'command-line-usage';
 import { ClOption } from './ClOptions';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const commandLineUsage = require('command-line-usage').default;
+// v7 moved to ESM internally
 
 export const generateUsage = (command: string, desc: string, definitions: ClOption[]): string => {
   const visibleDefinitions = definitions.filter((defn) => {
@@ -25,7 +28,7 @@ export const generateUsage = (command: string, desc: string, definitions: ClOpti
 
   const options: any[] = [commonOptions].concat(uncommonDefs.length > 0 ? [uncommonOptions] : []);
 
-  return usage(
+  return commandLineUsage(
     [
       {header: command, content: desc}
     ].concat(options)
