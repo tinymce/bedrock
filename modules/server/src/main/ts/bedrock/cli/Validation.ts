@@ -1,7 +1,7 @@
 import { CommandLineOptions } from 'command-line-args';
-import { Attempt } from '../core/Attempt';
-import { ClOption } from './ClOptions';
-import * as Arr from '../util/Arr';
+import { Attempt } from '../core/Attempt.js';
+import { ClOption } from './ClOptions.js';
+import * as Arr from '../util/Arr.js';
 
 const validateOne = (defn: ClOption, settings: CommandLineOptions): Attempt<string[], any[]> => {
   return defn.validate(defn.name, settings[defn.name]);

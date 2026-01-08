@@ -1,7 +1,7 @@
 import * as fc from 'fast-check';
 import { assert } from 'chai';
 import { describe, it } from 'mocha';
-import * as Type from '../../main/ts/bedrock/util/Type';
+import * as Type from '../../main/ts/bedrock/util/Type.js';
 
 describe('Type.isString', () => {
   it('is true for strings', () => {

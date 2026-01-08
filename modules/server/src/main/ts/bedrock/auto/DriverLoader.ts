@@ -1,5 +1,5 @@
-import { DriverSettings } from './Driver';
-import * as ExecUtils from '../util/ExecUtils';
+import { DriverSettings } from './Driver.js';
+import * as ExecUtils from '../util/ExecUtils.js';
 
 export interface DriverSpec {
   driverApi: DriverAPI;

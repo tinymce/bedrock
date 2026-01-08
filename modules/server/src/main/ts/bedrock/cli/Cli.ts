@@ -1,14 +1,11 @@
-import { Attempt } from '../core/Attempt';
-import * as Version from '../core/Version';
-import * as Validation from './Validation';
-import * as CliUsage from './CliUsage';
-import { ExitCodes } from '../util/ExitCodes';
+import { Attempt } from '../core/Attempt.js';
+import * as Version from '../core/Version.js';
+import * as Validation from './Validation.js';
+import * as CliUsage from './CliUsage.js';
+import { ExitCodes } from '../util/ExitCodes.js';
+import commandLineArgs from 'command-line-args';
 import { CommandLineOptions, OptionDefinition } from 'command-line-args';
-import { ClOption } from './ClOptions';
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const commandLineArgs = require('command-line-args').default;
-// v6 moved to ESM internally
+import { ClOption } from './ClOptions.js';
 
 export type CliError = {
   command: string;

@@ -1,2 +1,8 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-export const get = (): string => 'v' + require('../../../../../package.json').version;
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+
+export const get = (): string => {
+  const pkg = require('../../../../../package.json') as { version: string };
+  return `v${pkg.version}`;
+};

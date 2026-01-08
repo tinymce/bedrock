@@ -1,9 +1,9 @@
-import * as chalk from 'chalk';
-import * as cli from './Cli';
-import * as ClOptions from './ClOptions';
-import { ExitCodes } from '../util/ExitCodes';
-import { Attempt } from '../core/Attempt';
-import { BedrockAutoSettings, BedrockManualSettings } from '../core/Settings';
+import chalk from 'chalk';
+import * as cli from './Cli.js';
+import * as ClOptions from './ClOptions.js';
+import { ExitCodes } from '../util/ExitCodes.js';
+import { Attempt } from '../core/Attempt.js';
+import { BedrockAutoSettings, BedrockManualSettings } from '../core/Settings.js';
 
 export interface Directories {
   current: string;

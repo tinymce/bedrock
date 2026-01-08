@@ -1,14 +1,14 @@
 import { Browser } from 'webdriverio';
-import { Attempt } from '../core/Attempt';
-import * as Coverage from '../core/Coverage';
-import * as Waiter from '../util/Waiter';
-import * as ClipboardEffects from './ClipboardEffects';
-import * as Controller from './Controller';
-import { DriverMaster } from './DriverMaster';
-import * as KeyEffects from './KeyEffects';
-import * as MouseEffects from './MouseEffects';
-import * as Routes from './Routes';
-import {REMOTE_IDLE_TIMEOUT_SECONDS} from '../auto/RemoteDriver';
+import { Attempt } from '../core/Attempt.js';
+import * as Coverage from '../core/Coverage.js';
+import * as Waiter from '../util/Waiter.js';
+import * as ClipboardEffects from './ClipboardEffects.js';
+import * as Controller from './Controller.js';
+import { DriverMaster } from './DriverMaster.js';
+import * as KeyEffects from './KeyEffects.js';
+import * as MouseEffects from './MouseEffects.js';
+import * as Routes from './Routes.js';
+import {REMOTE_IDLE_TIMEOUT_SECONDS} from '../auto/RemoteDriver.js';
 
 type Executor<D, T> = (driver: Browser) => (data: D) => Promise<T>;
 

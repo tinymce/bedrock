@@ -1,7 +1,7 @@
 import { IncomingMessage } from 'http';
 import * as url from 'url';
-import * as Cmp from '../util/Cmp';
-import * as Obj from '../util/Obj';
+import * as Cmp from '../util/Cmp.js';
+import * as Obj from '../util/Obj.js';
 
 export type Matcher = (request: IncomingMessage & { originalUrl: string; body?: string }) => boolean;
 

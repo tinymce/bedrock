@@ -2,12 +2,12 @@ import * as fs from 'fs';
 import { IncomingMessage, ServerResponse } from 'http';
 import * as mime from 'mime-types';
 import * as path from 'path';
-import * as Matchers from './Matchers';
-import * as Obj from '../util/Obj';
-import * as Type from '../util/Type';
-import * as Routes from './Routes';
-import * as FileUtils from '../util/FileUtils';
-import * as RouteUtils from '../util/RouteUtils';
+import * as Matchers from './Matchers.js';
+import * as Obj from '../util/Obj.js';
+import * as Type from '../util/Type.js';
+import * as Routes from './Routes.js';
+import * as FileUtils from '../util/FileUtils.js';
+import * as RouteUtils from '../util/RouteUtils.js';
 
 interface CustomRequest {
   readonly headers?: Record<string, string>;

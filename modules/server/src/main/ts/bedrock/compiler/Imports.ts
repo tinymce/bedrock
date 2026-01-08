@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { hasTs } from './TsUtils';
+import { hasTs } from './TsUtils.js';
 
 export const convertPolyfillNameToPath = (name: string): string => {
   const path = name.slice(0, 1).toLowerCase() +

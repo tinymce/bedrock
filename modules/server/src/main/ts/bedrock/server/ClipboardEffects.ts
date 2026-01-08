@@ -1,6 +1,6 @@
 import * as childProcess from 'child_process';
 import * as path from 'path';
-import { ExitCodes } from '../util/ExitCodes';
+import { ExitCodes } from '../util/ExitCodes.js';
 
 /*
  JSON API for data: {

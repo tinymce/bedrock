@@ -1,9 +1,8 @@
 import { IncomingMessage, ServerResponse } from 'http';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import server = require('serve-static');
+import server from 'serve-static';
 import * as path from 'path';
-import * as RouteUtils from '../util/RouteUtils';
-import * as Matchers from './Matchers';
+import * as RouteUtils from '../util/RouteUtils.js';
+import * as Matchers from './Matchers.js';
 
 type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS';
 

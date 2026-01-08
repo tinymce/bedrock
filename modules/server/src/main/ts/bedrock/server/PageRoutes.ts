@@ -1,4 +1,4 @@
-import * as Routes from './Routes';
+import * as Routes from './Routes.js';
 
 export const generate = (projectdir: string, basedir: string): Routes.Runner => {
   const routers = [

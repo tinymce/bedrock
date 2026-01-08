@@ -1,7 +1,7 @@
 import * as path from 'path';
-import * as Extraction from './Extraction';
+import * as Extraction from './Extraction.js';
 import { OptionDefinition } from 'command-line-args';
-import { Attempt } from '../core/Attempt';
+import { Attempt } from '../core/Attempt.js';
 
 export interface ClOption extends OptionDefinition {
   required?: boolean;

@@ -1,6 +1,6 @@
 import { ErrorData } from '@ephox/bedrock-common';
-import * as Hud from '../cli/Hud';
-import * as Type from '../util/Type';
+import * as Hud from '../cli/Hud.js';
+import * as Type from '../util/Type.js';
 
 export interface TestErrorData {
   readonly data: ErrorData;

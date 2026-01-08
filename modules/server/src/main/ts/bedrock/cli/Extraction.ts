@@ -1,10 +1,8 @@
 import * as fs from 'fs';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import glob = require('glob');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import readdirSyncRec = require('recursive-readdir-sync');
-import { Attempt } from '../core/Attempt';
-import * as Qstring from '../util/Qstring';
+import * as glob from 'glob';
+import readdirSyncRec from 'recursive-readdir-sync';
+import { Attempt } from '../core/Attempt.js';
+import * as Qstring from '../util/Qstring.js';
 
 export const file = (name: string, rawValue: string): Attempt<string[], string> => {
   // Ignore any query strings when checking if a file exists

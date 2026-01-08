@@ -1,8 +1,13 @@
 import { describe, it } from 'mocha';
-import * as Clis from '../../main/ts/bedrock/cli/Clis';
-import * as AttemptUtils from './AttemptUtils';
-import { Attempt } from '../../main/ts/bedrock/core/Attempt';
-import { CliError } from '../../main/ts/bedrock/cli/Cli';
+import * as Clis from '../../main/ts/bedrock/cli/Clis.js';
+import * as AttemptUtils from './AttemptUtils.js';
+import { Attempt } from '../../main/ts/bedrock/core/Attempt.js';
+import { CliError } from '../../main/ts/bedrock/cli/Cli.js';
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const directories = {
   current: process.cwd(),

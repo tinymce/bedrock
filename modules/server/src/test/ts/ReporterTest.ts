@@ -1,5 +1,5 @@
 import * as fc from 'fast-check';
-import * as Reporter from '../../main/ts/bedrock/core/Reporter';
+import * as Reporter from '../../main/ts/bedrock/core/Reporter.js';
 import { assert } from 'chai';
 import { Eq } from '@ephox/dispute';
 

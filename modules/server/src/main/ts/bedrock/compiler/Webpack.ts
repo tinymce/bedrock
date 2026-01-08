@@ -1,15 +1,16 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import webpack = require('webpack');
+import webpack from 'webpack';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import WebpackDevServer = require('webpack-dev-server');
-import * as Serve from '../server/Serve';
-import { ExitCodes } from '../util/ExitCodes';
-import * as Imports from './Imports';
-import { hasTs } from './TsUtils';
-import { WebpackCompileInfo, DevServerServeSettings, CompileFn } from './Types';
+import WebpackDevServer from 'webpack-dev-server';
+import * as Serve from '../server/Serve.js';
+import { ExitCodes } from '../util/ExitCodes.js';
+import * as Imports from './Imports.js';
+import { hasTs } from './TsUtils.js';
+import { WebpackCompileInfo, DevServerServeSettings, CompileFn } from './Types.js';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 const webpackSharedRules = ([] as any[]).concat([
   {
@@ -43,9 +44,7 @@ const webpackSharedRules = ([] as any[]).concat([
 ]);
 
 const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, coverage: string[], manualMode: boolean, basedir: string): webpack.Configuration => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
   return {

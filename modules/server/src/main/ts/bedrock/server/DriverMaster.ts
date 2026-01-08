@@ -1,4 +1,4 @@
-import * as Waiter from '../util/Waiter';
+import * as Waiter from '../util/Waiter.js';
 
 type Executor<T> = () => Promise<T>;
 

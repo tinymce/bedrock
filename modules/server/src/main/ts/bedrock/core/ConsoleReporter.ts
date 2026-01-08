@@ -1,6 +1,6 @@
-import * as chalk from 'chalk';
+import chalk from 'chalk';
 import { highlight } from 'cli-highlight';
-import { TestErrorData, TestResults } from '../server/Controller';
+import { TestErrorData, TestResults } from '../server/Controller.js';
 
 const numberOfErrorsToPrint = 5;
 

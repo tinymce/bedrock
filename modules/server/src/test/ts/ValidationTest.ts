@@ -1,9 +1,9 @@
 import { describe, it } from 'mocha';
-import { Attempt } from '../../main/ts/bedrock/core/Attempt';
-import { assertErrors, assertResult } from './AttemptUtils';
-import * as Validation from '../../main/ts/bedrock/cli/Validation';
-import * as Extraction from '../../main/ts/bedrock/cli/Extraction';
-import { ClOption } from '../../main/ts/bedrock/cli/ClOptions';
+import { Attempt } from '../../main/ts/bedrock/core/Attempt.js';
+import { assertErrors, assertResult } from './AttemptUtils.js';
+import * as Validation from '../../main/ts/bedrock/cli/Validation.js';
+import * as Extraction from '../../main/ts/bedrock/cli/Extraction.js';
+import { ClOption } from '../../main/ts/bedrock/cli/ClOptions.js';
 import { CommandLineOptions } from 'command-line-args';
 
 const checkErrors = function (label: string, expected: string[], definitions: ClOption[], settings: CommandLineOptions) {

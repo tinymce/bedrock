@@ -1,5 +1,5 @@
 import { Arbitrary, default as fc } from 'fast-check';
-import { Attempt } from '../../main/ts/bedrock/core/Attempt';
+import { Attempt } from '../../main/ts/bedrock/core/Attempt.js';
 import { assert } from 'chai';
 
 export const arbAttemptFailed = <E, A> (arbe: Arbitrary<E>): Arbitrary<Attempt<E, A>> =>

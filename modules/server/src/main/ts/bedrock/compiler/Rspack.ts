@@ -1,15 +1,17 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
-import * as Serve from '../server/Serve';
-import { ExitCodes } from '../util/ExitCodes';
-import * as Imports from './Imports';
+import * as Serve from '../server/Serve.js';
+import { ExitCodes } from '../util/ExitCodes.js';
+import * as Imports from './Imports.js';
 import { rspack, RspackOptions } from '@rspack/core';
 import { RspackDevServer } from '@rspack/dev-server';
-import { RspackCompileInfo, DevServerServeSettings, CompileFn } from './Types';
+import { RspackCompileInfo, DevServerServeSettings, CompileFn } from './Types.js';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, manualMode: boolean, basedir: string): RspackOptions => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { TsCheckerRspackPlugin } = require('ts-checker-rspack-plugin');
 
    const getTsConfigFile = () => path.isAbsolute(tsConfigFile) ? tsConfigFile : path.resolve(process.cwd(), tsConfigFile);

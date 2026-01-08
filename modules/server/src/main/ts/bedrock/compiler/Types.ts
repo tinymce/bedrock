@@ -1,4 +1,4 @@
-import * as Serve from '../server/Serve';
+import * as Serve from '../server/Serve.js';
 import { RspackOptions } from '@rspack/core';
 import { Configuration } from 'webpack';
 

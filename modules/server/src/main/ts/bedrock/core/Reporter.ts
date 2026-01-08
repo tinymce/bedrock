@@ -1,8 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import XMLWriter = require('xml-writer');
+import XMLWriter from 'xml-writer';
 import * as fs from 'fs';
-import { TestResults, TestResult } from '../server/Controller';
-import { Attempt } from './Attempt';
+import { TestResults, TestResult } from '../server/Controller.js';
+import { Attempt } from './Attempt.js';
 
 export interface ReporterSettings {
   readonly name: string;

@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import * as SettingsResolver from '../../main/ts/bedrock/core/SettingsResolver';
+import * as SettingsResolver from '../../main/ts/bedrock/core/SettingsResolver.js';
 
 describe('SettingsResolver', () => {
   describe('resolve', () => {

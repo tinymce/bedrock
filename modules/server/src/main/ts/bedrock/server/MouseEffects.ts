@@ -1,5 +1,5 @@
 import { Browser } from 'webdriverio';
-import * as EffectUtils from './EffectUtils';
+import * as EffectUtils from './EffectUtils.js';
 
 /*
  JSON API for data: {

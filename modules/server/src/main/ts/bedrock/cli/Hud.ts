@@ -1,5 +1,5 @@
 import * as readline from 'readline';
-import * as Env from '../util/Env';
+import * as Env from '../util/Env.js';
 
 interface ResultData {
   readonly done: boolean;

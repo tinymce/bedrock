@@ -3,13 +3,12 @@ import * as childProcess from 'child_process';
 import * as os from 'os';
 import { remote } from 'webdriverio';
 import * as portfinder from 'portfinder';
-import * as Shutdown from '../util/Shutdown';
-import * as DriverLoader from './DriverLoader';
-import * as RemoteDriver from './RemoteDriver';
-import { Tunnel } from './Tunnel';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import deepmerge = require('deepmerge');
-import { WebdriverIOConfig } from '@wdio/types/build/Capabilities';
+import * as Shutdown from '../util/Shutdown.js';
+import * as DriverLoader from './DriverLoader.js';
+import * as RemoteDriver from './RemoteDriver.js';
+import { Tunnel } from './Tunnel.js';
+import deepmerge from 'deepmerge';
+import type { Capabilities } from '@wdio/types';
 
 export interface DriverSettings {
   basedir: string;
@@ -94,8 +93,8 @@ const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
   }
 };
 
-const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): WebdriverIOConfig => {
-  const options: WebdriverIOConfig = {
+const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): Capabilities.WebdriverIOConfig => {
+  const options: Capabilities.WebdriverIOConfig = {
     logLevel: 'warn' as const,
     // if the parallel count is full this timeout is how long WDIO waits for LambdaTest to spin up.
     // 10 minute timeout, defaults to 3 connection attempts
@@ -156,7 +155,7 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
         port
       }
   // ) as RemoteOptions;
-  ) as WebdriverIOConfig;
+  ) as Capabilities.WebdriverIOConfig;
 };
 
 const logDriverDetails = (driver: WebdriverIO.Browser, headless: boolean, debuggingPort: number) => {

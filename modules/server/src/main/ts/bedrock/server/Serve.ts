@@ -1,14 +1,13 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import finalhandler = require('finalhandler');
+import finalhandler from 'finalhandler';
 import * as http from 'http';
 import * as portfinder from 'portfinder';
 import { Browser} from 'webdriverio';
-import { Attempt } from '../core/Attempt';
-import * as Routes from './Routes';
-import * as Apis from './Apis';
-import * as CustomRoutes from './CustomRoutes';
-import { DriverMaster } from './DriverMaster';
-import { TestResults } from './Controller';
+import { Attempt } from '../core/Attempt.js';
+import * as Routes from './Routes.js';
+import * as Apis from './Apis.js';
+import * as CustomRoutes from './CustomRoutes.js';
+import { DriverMaster } from './DriverMaster.js';
+import { TestResults } from './Controller.js';
 
 interface Server {
   readonly start: () => Promise<void>;

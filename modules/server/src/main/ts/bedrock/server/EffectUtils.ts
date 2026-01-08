@@ -11,7 +11,10 @@ type ElementReference = ReturnType<WebdriverIO.Browser['findElement']>;
 
 const frameSelected = (driver: WebdriverIO.Browser, frame: ElementReference) => async (): Promise<boolean> => {
   try {
-    await driver.switchToFrame(await frame);
+    const frameRef = await frame;
+    const frameEl = await driver.$(frameRef);
+    await driver.switchFrame(frameEl);
+    // await driver.switchToFrame(await frame); -- deprecated
     // await driver.switchFrame(await frame);
     // In order to get rid of swithToFrame we need to figure out if the chainable element
     // would work on Edge first then we can swithFrame(driver.$(frameSelector))
@@ -33,7 +36,6 @@ const getTargetFromFrame = async (driver: WebdriverIO.Browser, selector: string)
   const frame = driver.findElement('css selector', frameSelector);
   await driver.waitUntil(frameSelected(driver, frame), { timeout: 500 });
   const target = await driver.$(targetSelector);
-  target.performActions([]);
   await target.waitForDisplayed({ timeout: 500 });
   return (await target.getElement());
 };
@@ -42,7 +44,8 @@ const performActionOnFrame = async <T>(driver: WebdriverIO.Browser, selector: st
   try {
     const target = await getTargetFromFrame(driver, selector);
     const result = await action(target);
-    await driver.switchToFrame(null);
+    // await driver.switchToFrame(null);
+    await driver.switchFrame(null);
     return result;
   } catch (err: any) {
     return driver.status().then(status => {

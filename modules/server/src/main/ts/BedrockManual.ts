@@ -1,12 +1,12 @@
-import { Attempt } from './bedrock/core/Attempt';
-import * as Version from './bedrock/core/Version';
-import * as RunnerRoutes from './bedrock/server/RunnerRoutes';
-import * as Webpack from './bedrock/compiler/Webpack';
-import * as Rspack from './bedrock/compiler/Rspack';
-import { BedrockManualSettings } from './bedrock/core/Settings';
-import { ExitCodes } from './bedrock/util/ExitCodes';
-import * as SettingsResolver from './bedrock/core/SettingsResolver';
-import { DevServerServeSettings } from './bedrock/compiler/Types';
+import { Attempt } from './bedrock/core/Attempt.js';
+import * as Version from './bedrock/core/Version.js';
+import * as RunnerRoutes from './bedrock/server/RunnerRoutes.js';
+import * as Webpack from './bedrock/compiler/Webpack.js';
+import * as Rspack from './bedrock/compiler/Rspack.js';
+import { BedrockManualSettings } from './bedrock/core/Settings.js';
+import { ExitCodes } from './bedrock/util/ExitCodes.js';
+import * as SettingsResolver from './bedrock/core/SettingsResolver.js';
+import { DevServerServeSettings } from './bedrock/compiler/Types.js';
 
 export const go = async (bedrockManualSettings: BedrockManualSettings): Promise<void> => {
   console.log('bedrock-manual ' + Version.get() + ' starting...');

@@ -1,7 +1,7 @@
 import * as fs from 'fs';
-import * as Webpack from '../compiler/Webpack';
-import * as Rspack from '../compiler/Rspack';
-import * as Types from './Types';
+import * as Webpack from '../compiler/Webpack.js';
+import * as Rspack from '../compiler/Rspack.js';
+import * as Types from './Types.js';
 
 export interface Compiler {
   readonly generate: () => Promise<Buffer | string>;

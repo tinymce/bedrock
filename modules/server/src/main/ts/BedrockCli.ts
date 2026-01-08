@@ -1,7 +1,7 @@
-import { CliError } from './bedrock/cli/Cli';
-import { Attempt } from './bedrock/core/Attempt';
-import * as Clis from './bedrock/cli/Clis';
-import { BedrockSettings } from './bedrock/core/Settings';
+import { CliError } from './bedrock/cli/Cli.js';
+import { Attempt } from './bedrock/core/Attempt.js';
+import * as Clis from './bedrock/cli/Clis.js';
+import { BedrockSettings } from './bedrock/core/Settings.js';
 
 // set NodeJS console logging of objects to be actually useful
 import * as Util from 'util';

@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { describe, it } from 'mocha';
-import { convertPolyfillNameToPath, generateImports } from '../../../main/ts/bedrock/compiler/Imports';
+import { convertPolyfillNameToPath, generateImports } from '../../../main/ts/bedrock/compiler/Imports.js';
 
 const validPolyfills = [ 'ArrayBuffer', 'Map', 'Object', 'Promise', 'Set', 'Symbol', 'TypedArray', 'WeakMap', 'WeakSet' ];
 

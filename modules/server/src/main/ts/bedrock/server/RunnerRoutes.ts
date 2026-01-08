@@ -2,11 +2,14 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as childProcess from 'child_process';
 import * as glob from 'glob';
-import * as Routes from './Routes';
-import * as Compiler from '../compiler/Compiler';
-import * as FileUtils from '../util/FileUtils';
-import * as Arr from '../util/Arr';
-import * as Types from '../compiler/Types';
+import * as Routes from './Routes.js';
+import * as Compiler from '../compiler/Compiler.js';
+import * as FileUtils from '../util/FileUtils.js';
+import * as Arr from '../util/Arr.js';
+import * as Types from '../compiler/Types.js';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 interface PackageJson {
   readonly name: string;

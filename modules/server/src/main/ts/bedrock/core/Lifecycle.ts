@@ -1,8 +1,8 @@
-import * as chalk from 'chalk';
+import chalk from 'chalk';
 import { Browser } from 'webdriverio';
-import { TestResult } from '../server/Controller';
-import { ExitCodes } from '../util/ExitCodes';
-import { Attempt } from './Attempt';
+import { TestResult } from '../server/Controller.js';
+import { ExitCodes } from '../util/ExitCodes.js';
+import { Attempt } from './Attempt.js';
 
 type ShutdownFn = (immediate?: boolean) => Promise<any>;
 type GruntDoneFn = ((success: boolean) => void) | undefined;
