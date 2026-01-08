@@ -1,4 +1,4 @@
-import { makeUrl } from '../core/Utils';
+import { makeUrl } from '../core/Utils.js';
 
 export interface Actions {
   readonly restartTests: () => void;

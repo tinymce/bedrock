@@ -1,6 +1,6 @@
-import * as Differ from './Differ';
-import * as TestError from './TestError';
-import * as LoggedError from './LoggedError';
+import * as Differ from './Differ.js';
+import * as TestError from './TestError.js';
+import * as LoggedError from './LoggedError.js';
 
 type LoggedError = LoggedError.LoggedError;
 
@@ -40,7 +40,7 @@ const extractError = (err?: LoggedError): TestError =>
 const extractStack = (e: TestError): string => {
   if (e.stack) {
     return e.stack.split('\n')
-      .filter((line) => line.indexOf('at') !== -1)
+      .filter((line: string) => line.indexOf('at') !== -1)
       .join('\n');
   } else {
     return '';
@@ -97,7 +97,7 @@ export const getBasicErrorData = (e: TestError): BasicErrorData => {
 
 export const getErrorData = (err: LoggedError): ErrorData => {
   const e = extractError(err);
-  const formattedLogs = err.logs && err.logs.length > 0 ? err.logs.map((log) => log
+  const formattedLogs = err.logs && err.logs.length > 0 ? err.logs.map((log: string) => log
     .replace(/\n/g, '\\n')
     .replace(/\r/g, '\\r')
   ).join('\n') : undefined;

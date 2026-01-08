@@ -1,13 +1,13 @@
 import { Suite } from '@ephox/bedrock-common';
-import { HarnessResponse } from '../core/ServerTypes';
-import { UrlParams } from '../core/UrlParams';
-import { noop } from '../core/Utils';
-import { Callbacks } from '../reporter/Callbacks';
-import { Reporter } from '../reporter/Reporter';
-import { Actions } from '../ui/Actions';
-import { Ui } from '../ui/Ui';
-import { RunActions, RunState, runSuite } from './TestRun';
-import { countTests, filterOnly } from './Utils';
+import { HarnessResponse } from '../core/ServerTypes.js';
+import { UrlParams } from '../core/UrlParams.js';
+import { noop } from '../core/Utils.js';
+import { Callbacks } from '../reporter/Callbacks.js';
+import { Reporter } from '../reporter/Reporter.js';
+import { Actions } from '../ui/Actions.js';
+import { Ui } from '../ui/Ui.js';
+import { RunActions, RunState, runSuite } from './TestRun.js';
+import { countTests, filterOnly } from './Utils.js';
 
 export interface Runner {
   readonly init: () => Promise<HarnessResponse>;

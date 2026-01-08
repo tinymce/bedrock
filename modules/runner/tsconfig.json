@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "strict": true,
     "noUnusedLocals": true,
     "useUnknownInCatchVariables": false,
-    "target": "es2019",
-    "module": "es2020",
+    "target": "es2020",
+    "module": "nodenext",
     "lib": ["es2022", "dom"],
     "declaration": true,
     "sourceMap": true,

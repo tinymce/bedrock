@@ -1,9 +1,11 @@
 import * as which from 'which';
 import * as Arr from './Arr';
-import * as crossSpawn from 'cross-spawn';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import crossSpawn = require('cross-spawn');
 import { ChildProcess } from 'child_process';
 import * as http from 'http';
-import * as deepmerge from 'deepmerge';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import deepmerge = require('deepmerge');
 
 export interface ChildAPI {
   start: (...args: any[]) => Promise<ChildProcess | null> | ChildProcess | null;

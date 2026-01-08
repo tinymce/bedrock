@@ -1,13 +1,13 @@
 import { Failure, Global } from '@ephox/bedrock-common';
-import * as Globals from '../core/Globals';
-import * as TestLoader from '../core/TestLoader';
-import { UrlParams } from '../core/UrlParams';
-import { makeSessionId } from '../core/Utils';
-import { Callbacks } from '../reporter/Callbacks';
-import { Reporter } from '../reporter/Reporter';
-import { Runner } from '../runner/Runner';
-import { loop } from '../runner/Utils';
-import { Ui } from '../ui/Ui';
+import * as Globals from '../core/Globals.js';
+import * as TestLoader from '../core/TestLoader.js';
+import { UrlParams } from '../core/UrlParams.js';
+import { makeSessionId } from '../core/Utils.js';
+import { Callbacks } from '../reporter/Callbacks.js';
+import { Reporter } from '../reporter/Reporter.js';
+import { Runner } from '../runner/Runner.js';
+import { loop } from '../runner/Utils.js';
+import { Ui } from '../ui/Ui.js';
 
 declare const $: JQueryStatic;
 

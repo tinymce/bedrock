@@ -1,5 +1,7 @@
-import * as etag from 'etag';
-import * as fresh from 'fresh';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import etag = require('etag');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import fresh = require('fresh');
 import { IncomingMessage, ServerResponse } from 'http';
 
 export const generateETag = (data: any, weak = true): string =>

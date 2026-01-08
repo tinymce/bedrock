@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { describe, it } from 'mocha';
-import * as Type from '../../../main/ts/api/Type';
+import * as Type from '../../../main/ts/api/Type.js';
 
 describe('Type.typeOf', () => {
   it('is "string" for strings', () => {

@@ -1,6 +1,6 @@
 import { ErrorData, Global } from '@ephox/bedrock-common';
 
-import { HarnessResponse } from '../core/ServerTypes';
+import { HarnessResponse } from '../core/ServerTypes.js';
 
 export interface TestReport {
   readonly file: string;

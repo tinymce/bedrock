@@ -1,4 +1,4 @@
-import { noop } from '../core/Utils';
+import { noop } from '../core/Utils.js';
 
 export interface Timer {
   readonly start: (ms: number, timedOutCallback: () => void) => void;

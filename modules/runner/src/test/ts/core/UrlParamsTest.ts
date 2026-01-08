@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { describe, it } from 'mocha';
-import { UrlParams } from '../../../main/ts/core/UrlParams';
+import { UrlParams } from '../../../main/ts/core/UrlParams.js';
 
 describe('UrlParams.nat', () => {
   it('parses undefined as 0', () => {

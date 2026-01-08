@@ -1,5 +1,5 @@
 import { HookType, Suite } from '@ephox/bedrock-common';
-import { getFullTitle } from './Utils';
+import { getFullTitle } from './Utils.js';
 
 const create = (title: string, root: boolean, parent?: Suite) => {
   const suite: Suite = {

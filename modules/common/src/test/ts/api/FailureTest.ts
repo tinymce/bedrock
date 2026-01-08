@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { describe, it } from 'mocha';
-import * as TestLogs from '../../../main/ts/api/TestLogs';
-import * as Failure from '../../../main/ts/api/Failure';
+import * as TestLogs from '../../../main/ts/api/TestLogs.js';
+import * as Failure from '../../../main/ts/api/Failure.js';
 
 describe('Failure.prepFailure', () => {
   it('should convert a test label to an Error', () => {

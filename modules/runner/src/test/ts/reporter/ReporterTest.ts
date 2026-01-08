@@ -2,10 +2,10 @@ import { Failure, LoggedError } from '@ephox/bedrock-common';
 import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { beforeEach, describe, it } from 'mocha';
-import { UrlParams } from '../../../main/ts/core/UrlParams';
-import { Callbacks, TestErrorData } from '../../../main/ts/reporter/Callbacks';
-import { Reporter } from '../../../main/ts/reporter/Reporter';
-import { hexChar, noop, wait } from '../TestUtils';
+import { UrlParams } from '../../../main/ts/core/UrlParams.js';
+import { Callbacks, TestErrorData } from '../../../main/ts/reporter/Callbacks.js';
+import { Reporter } from '../../../main/ts/reporter/Reporter.js';
+import { hexChar, noop, wait } from '../TestUtils.js';
 
 interface StartTestData {
   readonly session: string;

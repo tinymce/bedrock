@@ -1,4 +1,4 @@
-import * as Reporter from './Reporter';
+import * as Reporter from './Reporter.js';
 
 export interface JsError extends Error {
   toString?: () => string;

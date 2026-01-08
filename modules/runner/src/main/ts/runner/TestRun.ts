@@ -1,10 +1,10 @@
 import { Failure, LoggedError, RunnableState, Suite, Test } from '@ephox/bedrock-common';
-import * as Context from '../core/Context';
-import { InternalError, isInternalError, SkipError } from '../errors/Errors';
-import { Reporter, TestReporter } from '../reporter/Reporter';
-import * as Hooks from './Hooks';
-import { runWithErrorCatcher, runWithTimeout } from './Run';
-import { countTests, loop } from './Utils';
+import * as Context from '../core/Context.js';
+import { InternalError, isInternalError, SkipError } from '../errors/Errors.js';
+import { Reporter, TestReporter } from '../reporter/Reporter.js';
+import * as Hooks from './Hooks.js';
+import { runWithErrorCatcher, runWithTimeout } from './Run.js';
+import { countTests, loop } from './Utils.js';
 
 type LoggedError = LoggedError.LoggedError;
 type RunReporter = Pick<Reporter, 'test'>;

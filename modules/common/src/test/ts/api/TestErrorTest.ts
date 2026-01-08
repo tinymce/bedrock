@@ -1,6 +1,6 @@
 import { describe, it } from 'mocha';
 import { assert } from 'chai';
-import * as TestError from '../../../main/ts/api/TestError';
+import * as TestError from '../../../main/ts/api/TestError.js';
 
 describe('PprintAssertionError.toString()', () => {
   it('includes a diff', () => {

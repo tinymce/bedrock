@@ -1,8 +1,8 @@
 import { HookType, TestGlobals } from '@ephox/bedrock-common';
 import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
-import * as Globals from '../../../main/ts/core/Globals';
-import { noop } from '../TestUtils';
+import * as Globals from '../../../main/ts/core/Globals.js';
+import { noop } from '../TestUtils.js';
 
 const last = <T>(items: T[]): T | undefined => {
   return items[items.length - 1];

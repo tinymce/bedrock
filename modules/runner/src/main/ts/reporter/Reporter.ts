@@ -1,7 +1,7 @@
 import { LoggedError, Reporter as ErrorReporter } from '@ephox/bedrock-common';
-import { Callbacks, TestReport } from './Callbacks';
-import { UrlParams } from '../core/UrlParams';
-import { formatElapsedTime, mapStackTrace, setStack } from '../core/Utils';
+import { Callbacks, TestReport } from './Callbacks.js';
+import { UrlParams } from '../core/UrlParams.js';
+import { formatElapsedTime, mapStackTrace, setStack } from '../core/Utils.js';
 
 type LoggedError = LoggedError.LoggedError;
 
@@ -33,7 +33,7 @@ export interface ReporterUi {
 
 const elapsed = (since: number): string => formatElapsedTime(since, Date.now());
 
-const mapError = (e: LoggedError) => mapStackTrace(e.stack).then((mappedStack) => {
+const mapError = (e: LoggedError) => mapStackTrace(e.stack).then((mappedStack: string) => {
   const originalStack = e.stack;
   setStack(e, mappedStack);
 
@@ -159,7 +159,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
         const testTime = elapsed(starttime);
 
         // `sourcemapped-stacktrace` is async, so we need to wait for it
-        requestsInFlight.push(mapError(e).then((err) => {
+        requestsInFlight.push(mapError(e).then((err: any) => {
           const errorData = ErrorReporter.data(err);
           const error = {
             data: errorData,

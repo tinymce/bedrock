@@ -1,8 +1,8 @@
 import { Hook, HookType, RunnableState, Suite, Test } from '@ephox/bedrock-common';
-import * as Context from '../core/Context';
-import { SkipError } from '../errors/Errors';
-import { runWithErrorCatcher, runWithTimeout } from './Run';
-import { loop } from './Utils';
+import * as Context from '../core/Context.js';
+import { SkipError } from '../errors/Errors.js';
+import { runWithErrorCatcher, runWithTimeout } from './Run.js';
+import { loop } from './Utils.js';
 
 const DEFAULT_HOOK_TIMEOUT = 2000;
 

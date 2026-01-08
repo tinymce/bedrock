@@ -1,8 +1,8 @@
-import * as TestError from './TestError';
-import * as ErrorExtractor from './ErrorExtractor';
-import * as LoggedError from './LoggedError';
-import * as Differ from './Differ';
-import { htmlentities } from './StringUtils';
+import * as TestError from './TestError.js';
+import * as ErrorExtractor from './ErrorExtractor.js';
+import * as LoggedError from './LoggedError.js';
+import * as Differ from './Differ.js';
+import { htmlentities } from './StringUtils.js';
 
 type LoggedError = LoggedError.LoggedError;
 

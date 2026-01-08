@@ -1,6 +1,7 @@
 import { ChildProcess } from 'child_process';
 import * as ExecUtils from '../util/ExecUtils';
-import * as split2 from 'split2';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import split2 = require('split2');
 import * as crypto from 'node:crypto'; // Not needed with Node 19+
 import { Tunnel as LambdaTunnel } from '@lambdatest/node-tunnel';
 

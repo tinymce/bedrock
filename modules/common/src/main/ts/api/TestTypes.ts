@@ -1,5 +1,5 @@
-import { TestError } from './TestError';
-import { TestLabel } from './TestLabel';
+import { TestError } from './TestError.js';
+import { TestLabel } from './TestLabel.js';
 
 export const enum HookType {
   Before = 'before',

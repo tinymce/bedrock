@@ -2,13 +2,13 @@ import { Context, HookType, RunnableState, Suite, Test } from '@ephox/bedrock-co
 import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { beforeEach, describe, it } from 'mocha';
-import { createRootSuite } from '../../../main/ts/core/Suite';
-import { createTest } from '../../../main/ts/core/Test';
-import { Reporter } from '../../../main/ts/reporter/Reporter';
-import * as TestRun from '../../../main/ts/runner/TestRun';
-import { noop } from '../TestUtils';
-import { MockReporter } from './RunnerTestUtils';
-import * as RunnerTestUtils from './RunnerTestUtils';
+import { createRootSuite } from '../../../main/ts/core/Suite.js';
+import { createTest } from '../../../main/ts/core/Test.js';
+import { Reporter } from '../../../main/ts/reporter/Reporter.js';
+import * as TestRun from '../../../main/ts/runner/TestRun.js';
+import { noop } from '../TestUtils.js';
+import { MockReporter } from './RunnerTestUtils.js';
+import * as RunnerTestUtils from './RunnerTestUtils.js';
 
 interface MockTest extends Test {
   hasRun: boolean;

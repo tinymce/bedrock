@@ -1,7 +1,7 @@
-import * as LoggedError from './LoggedError';
-import * as TestError from './TestError';
-import { TestLabel } from './TestLabel';
-import * as TestLogs from './TestLogs';
+import * as LoggedError from './LoggedError.js';
+import * as TestError from './TestError.js';
+import { TestLabel } from './TestLabel.js';
+import * as TestLogs from './TestLogs.js';
 
 type TestLogs = TestLogs.TestLogs;
 type TestLogEntry = TestLogs.TestLogEntry;

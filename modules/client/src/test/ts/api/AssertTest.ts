@@ -3,7 +3,7 @@ import { Testable } from '@ephox/dispute';
 import * as chai from 'chai';
 import * as fc from 'fast-check';
 import { describe, it } from 'mocha';
-import { Assert } from '../../../main/ts/api/Main';
+import { Assert } from '../../../main/ts/api/Main.js';
 
 const { tArray, tString } = Testable;
 

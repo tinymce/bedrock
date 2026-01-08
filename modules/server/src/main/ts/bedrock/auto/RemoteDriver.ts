@@ -1,5 +1,6 @@
 import { remote } from 'webdriverio';
-import * as deepmerge from 'deepmerge';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import deepmerge = require('deepmerge');
 import { CreateTestGridUrlCommand, DeviceFarmClient } from '@aws-sdk/client-device-farm';
 import { Driver, DriverSettings } from './Driver';
 import { WebdriverIOConfig } from '@wdio/types/build/Capabilities';

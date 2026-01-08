@@ -1,5 +1,5 @@
-import { LoggedError, TestLabel } from './Main';
-import { JsError, TestError } from './TestError';
+import { LoggedError, TestLabel } from './Main.js';
+import { JsError, TestError } from './TestError.js';
 
 export interface LoggedError extends JsError {
   logs: string[];

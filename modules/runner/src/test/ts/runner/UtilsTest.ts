@@ -2,10 +2,10 @@ import { Suite } from '@ephox/bedrock-common';
 import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { describe, it } from 'mocha';
-import { createSuite, createRootSuite } from '../../../main/ts/core/Suite';
-import { createTest } from '../../../main/ts/core/Test';
-import * as Utils from '../../../main/ts/runner/Utils';
-import { noop, range } from '../TestUtils';
+import { createSuite, createRootSuite } from '../../../main/ts/core/Suite.js';
+import { createTest } from '../../../main/ts/core/Test.js';
+import * as Utils from '../../../main/ts/runner/Utils.js';
+import { noop, range } from '../TestUtils.js';
 
 const setupTestSuite = (numRoot: number, numChild1: number, numChild2: number) => {
   const root = createRootSuite('root');

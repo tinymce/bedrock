@@ -1,8 +1,8 @@
 import { ExecuteFn, Global, HookType, RunnableState, Suite, Test, TestGlobals } from '@ephox/bedrock-common';
-import * as Hook from './Hook';
-import * as Register from './Register';
-import { createSuite, createRootSuite } from './Suite';
-import { createTest } from './Test';
+import * as Hook from './Hook.js';
+import * as Register from './Register.js';
+import { createSuite, createRootSuite } from './Suite.js';
+import { createTest } from './Test.js';
 
 type TitleOrExecuteFn = string | undefined | ExecuteFn;
 

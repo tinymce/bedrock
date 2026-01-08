@@ -1,5 +1,5 @@
 import { ExecuteFn, Runnable, RunnableState } from '@ephox/bedrock-common';
-import { SkipError } from '../errors/Errors';
+import { SkipError } from '../errors/Errors.js';
 
 export const createRunnable = (title: string, fn: ExecuteFn | undefined): Runnable => {
   let retries = -1;

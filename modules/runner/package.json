@@ -6,7 +6,7 @@
   "scripts": {
     "prepublishOnly": "tsc -b && rollup --config",
     "build": "yarn prepublishOnly",
-    "test": "mocha -r esm 'lib/test/ts/**/*Test.js'",
+    "test": "mocha 'lib/test/ts/**/*Test.js'",
     "buildAndTest": "yarn prepublishOnly && yarn test"
   },
   "dependencies": {
@@ -27,6 +27,7 @@
   "main": "./lib/main/ts/api/Main.js",
   "module": "./lib/main/ts/api/Main.js",
   "types": "./lib/main/ts/api/Main.d.ts",
+  "type": "module",
   "files": [
     "lib/**",
     "dist/**",

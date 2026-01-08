@@ -1,0 +1,170 @@
+diff --git a/node_modules/@ephox/dispute/lib/main/ts/api/Eq.js b/node_modules/@ephox/dispute/lib/main/ts/api/Eq.js
+index c472eca..50ccaac 100644
+--- a/node_modules/@ephox/dispute/lib/main/ts/api/Eq.js
++++ b/node_modules/@ephox/dispute/lib/main/ts/api/Eq.js
+@@ -1,5 +1,5 @@
+-import * as Type from '../core/Type';
+-import * as ArrayUtil from '../core/ArrayUtil';
++import * as Type from '../core/Type.js';
++import * as ArrayUtil from '../core/ArrayUtil.js';
+ export var contramap = function (eqa, f) {
+     return eq(function (x, y) { return eqa.eq(f(x), f(y)); });
+ };
+diff --git a/node_modules/@ephox/dispute/lib/main/ts/api/Main.d.ts b/node_modules/@ephox/dispute/lib/main/ts/api/Main.d.ts
+index 3009af2..53085e6 100644
+--- a/node_modules/@ephox/dispute/lib/main/ts/api/Main.d.ts
++++ b/node_modules/@ephox/dispute/lib/main/ts/api/Main.d.ts
+@@ -1,6 +1,7 @@
+-import * as Eq from './Eq';
+-import * as Show from './Show';
+-import * as Testable from './Testable';
+-import * as Pnode from './Pnode';
+-import * as Pprint from './Pprint';
++// Patched: add explicit .js extension for Node ESM compatibility
++import * as Eq from './Eq.js';
++import * as Show from './Show.js';
++import * as Testable from './Testable.js';
++import * as Pnode from './Pnode.js';
++import * as Pprint from './Pprint.js';
+ export { Eq, Show, Testable, Pnode, Pprint };
+diff --git a/node_modules/@ephox/dispute/lib/main/ts/api/Main.js b/node_modules/@ephox/dispute/lib/main/ts/api/Main.js
+index e9aa80a..69afab6 100644
+--- a/node_modules/@ephox/dispute/lib/main/ts/api/Main.js
++++ b/node_modules/@ephox/dispute/lib/main/ts/api/Main.js
+@@ -1,7 +1,7 @@
+-import * as Eq from './Eq';
+-import * as Show from './Show';
+-import * as Testable from './Testable';
+-import * as Pnode from './Pnode';
+-import * as Pprint from './Pprint';
++import * as Eq from './Eq.js';
++import * as Show from './Show.js';
++import * as Testable from './Testable.js';
++import * as Pnode from './Pnode.js';
++import * as Pprint from './Pprint.js';
+ export { Eq, Show, Testable, Pnode, Pprint };
+ //# sourceMappingURL=Main.js.map
+\ No newline at end of file
+diff --git a/node_modules/@ephox/dispute/lib/main/ts/api/Pnode.js b/node_modules/@ephox/dispute/lib/main/ts/api/Pnode.js
+index e4fe78c..9b3ae8c 100644
+--- a/node_modules/@ephox/dispute/lib/main/ts/api/Pnode.js
++++ b/node_modules/@ephox/dispute/lib/main/ts/api/Pnode.js
+@@ -1,6 +1,6 @@
+ import { __assign } from "tslib";
+-import * as ArrayUtil from '../core/ArrayUtil';
+-import * as StringUtil from '../core/StringUtil';
++import * as ArrayUtil from '../core/ArrayUtil.js';
++import * as StringUtil from '../core/StringUtil.js';
+ export var pnode = function (start, children, end) { return ({
+     start: start,
+     children: children,
+diff --git a/node_modules/@ephox/dispute/lib/main/ts/api/Pprint.d.ts b/node_modules/@ephox/dispute/lib/main/ts/api/Pprint.d.ts
+index 574e378..3ec5bff 100644
+--- a/node_modules/@ephox/dispute/lib/main/ts/api/Pprint.d.ts
++++ b/node_modules/@ephox/dispute/lib/main/ts/api/Pprint.d.ts
+@@ -1,6 +1,6 @@
+-import * as Show from './Show';
+-import { type Show as ShowType } from './Show';
+-import { type Pnode as PnodeType } from './Pnode';
++import * as Show from './Show.js';
++import { type Show as ShowType } from './Show.js';
++import { type Pnode as PnodeType } from './Pnode.js';
+ export interface Pprint<A> {
+     pprint: (a: A) => PnodeType;
+ }
+diff --git a/node_modules/@ephox/dispute/lib/main/ts/api/Pprint.js b/node_modules/@ephox/dispute/lib/main/ts/api/Pprint.js
+index 76e04a4..120d52b 100644
+--- a/node_modules/@ephox/dispute/lib/main/ts/api/Pprint.js
++++ b/node_modules/@ephox/dispute/lib/main/ts/api/Pprint.js
+@@ -1,9 +1,9 @@
+-import * as Show from './Show';
+-import * as ArrayUtil from '../core/ArrayUtil';
+-import * as ObjectUtil from '../core/ObjectUtil';
+-import * as StringUtil from '../core/StringUtil';
+-import * as Type from '../core/Type';
+-import * as Pnode from './Pnode';
++import * as Show from './Show.js';
++import * as ArrayUtil from '../core/ArrayUtil.js';
++import * as ObjectUtil from '../core/ObjectUtil.js';
++import * as StringUtil from '../core/StringUtil.js';
++import * as Type from '../core/Type.js';
++import * as Pnode from './Pnode.js';
+ export var pprint = function (f) { return ({ pprint: f }); };
+ export var render = function (a, pp) {
+     var n = pp.pprint(a);
+diff --git a/node_modules/@ephox/dispute/lib/main/ts/api/Show.js b/node_modules/@ephox/dispute/lib/main/ts/api/Show.js
+index 8f77213..cb1f357 100644
+--- a/node_modules/@ephox/dispute/lib/main/ts/api/Show.js
++++ b/node_modules/@ephox/dispute/lib/main/ts/api/Show.js
+@@ -1,6 +1,6 @@
+-import * as ArrayUtil from '../core/ArrayUtil';
+-import * as ObjectUtil from '../core/ObjectUtil';
+-import { doubleQuote } from '../core/StringUtil';
++import * as ArrayUtil from '../core/ArrayUtil.js';
++import * as ObjectUtil from '../core/ObjectUtil.js';
++import { doubleQuote } from '../core/StringUtil.js';
+ export var show = function (f) {
+     return ({ show: f });
+ };
+diff --git a/node_modules/@ephox/dispute/lib/main/ts/api/Testable.d.ts b/node_modules/@ephox/dispute/lib/main/ts/api/Testable.d.ts
+index 9a4ecff..a7b4034 100644
+--- a/node_modules/@ephox/dispute/lib/main/ts/api/Testable.d.ts
++++ b/node_modules/@ephox/dispute/lib/main/ts/api/Testable.d.ts
+@@ -1,35 +1,35 @@
+-import { Eq } from './Eq';
+-import { Pprint } from './Pprint';
++import { Eq } from './Eq.js';
++import { Pprint } from './Pprint.js';
+ /** To test a type, you should be able to compare 2 values and print them out. */
+ export interface Testable<A> extends Eq<A>, Pprint<A> {
+ }
+ export declare const testable: <A>(eqA: Eq<A>, pprintA: Pprint<A>) => {
+-    pprint: (a: A) => import("./Pnode").Pnode;
++    pprint: (a: A) => import("./Pnode.js").Pnode;
+     eq: (x: A, y: A) => boolean;
+ };
+ export declare const tUndefined: {
+-    pprint: (a: undefined) => import("./Pnode").Pnode;
++    pprint: (a: undefined) => import("./Pnode.js").Pnode;
+     eq: (x: undefined, y: undefined) => boolean;
+ };
+ export declare const tNull: {
+-    pprint: (a: null) => import("./Pnode").Pnode;
++    pprint: (a: null) => import("./Pnode.js").Pnode;
+     eq: (x: null, y: null) => boolean;
+ };
+ export declare const tString: {
+-    pprint: (a: string) => import("./Pnode").Pnode;
++    pprint: (a: string) => import("./Pnode.js").Pnode;
+     eq: (x: string, y: string) => boolean;
+ };
+ export declare const tNumber: {
+-    pprint: (a: number) => import("./Pnode").Pnode;
++    pprint: (a: number) => import("./Pnode.js").Pnode;
+     eq: (x: number, y: number) => boolean;
+ };
+ export declare const tArray: <A>(ta: Testable<A>) => Testable<ArrayLike<A>>;
+ export declare const tRecord: <A>(ta: Testable<A>) => Testable<Record<string, A>>;
+ export declare const tAny: {
+-    pprint: (a: any) => import("./Pnode").Pnode;
++    pprint: (a: any) => import("./Pnode.js").Pnode;
+     eq: (x: any, y: any) => boolean;
+ };
+ export declare const tStrict: {
+-    pprint: (a: any) => import("./Pnode").Pnode;
++    pprint: (a: any) => import("./Pnode.js").Pnode;
+     eq: (x: any, y: any) => boolean;
+ };
+diff --git a/node_modules/@ephox/dispute/lib/main/ts/api/Testable.js b/node_modules/@ephox/dispute/lib/main/ts/api/Testable.js
+index 730e27d..8cf8150 100644
+--- a/node_modules/@ephox/dispute/lib/main/ts/api/Testable.js
++++ b/node_modules/@ephox/dispute/lib/main/ts/api/Testable.js
+@@ -1,6 +1,6 @@
+ import { __assign } from "tslib";
+-import { eqUndefined, eqNull, eqString, eqNumber, eqArray, eqRecord, eqAny, tripleEq } from './Eq';
+-import { pprintUndefined, pprintNull, pprintString, pprintNumber, pprintArray, pprintRecord, pprintAny } from './Pprint';
++import { eqUndefined, eqNull, eqString, eqNumber, eqArray, eqRecord, eqAny, tripleEq } from './Eq.js';
++import { pprintUndefined, pprintNull, pprintString, pprintNumber, pprintArray, pprintRecord, pprintAny } from './Pprint.js';
+ export var testable = function (eqA, pprintA) { return (__assign(__assign({}, eqA), pprintA)); };
+ export var tUndefined = testable(eqUndefined, pprintUndefined);
+ export var tNull = testable(eqNull, pprintNull);

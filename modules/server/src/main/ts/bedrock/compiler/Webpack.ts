@@ -1,8 +1,10 @@
-import * as webpack from 'webpack';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import webpack = require('webpack');
 import * as path from 'path';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
-import * as WebpackDevServer from 'webpack-dev-server';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import WebpackDevServer = require('webpack-dev-server');
 import * as Serve from '../server/Serve';
 import { ExitCodes } from '../util/ExitCodes';
 import * as Imports from './Imports';

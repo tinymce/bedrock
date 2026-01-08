@@ -1,4 +1,4 @@
-import { ErrorCatcher } from '../errors/ErrorCatcher';
+import { ErrorCatcher } from '../errors/ErrorCatcher.js';
 
 export const load = (scriptUrl: string): Promise<void> =>
   new Promise((resolve, reject) => {

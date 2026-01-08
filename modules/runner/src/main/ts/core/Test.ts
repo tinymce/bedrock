@@ -1,6 +1,6 @@
 import { Suite, ExecuteFn, Test } from '@ephox/bedrock-common';
-import * as Runnable from './Runnable';
-import { getFullTitle } from './Utils';
+import * as Runnable from './Runnable.js';
+import { getFullTitle } from './Utils.js';
 
 export const createTest = (title: string, fn: ExecuteFn, parent?: Suite): Test => {
   const runnable = Runnable.createRunnable(title, fn);

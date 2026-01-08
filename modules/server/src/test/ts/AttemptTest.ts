@@ -1,7 +1,8 @@
 import { describe, it } from 'mocha';
 import { Attempt } from '../../main/ts/bedrock/core/Attempt';
 import * as fc from 'fast-check';
-import * as deepEqual from 'fast-deep-equal';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import deepEqual = require('fast-deep-equal');
 import { arbAttempt, arbAttemptFailed, arbAttemptPassed, assertErrors, assertResult } from './AttemptUtils';
 
 describe('attempt.carry', () => {

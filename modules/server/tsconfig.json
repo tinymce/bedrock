@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
+    "esModuleInterop": true,
     "strict": true,
     "noUnusedLocals": true,
     "useUnknownInCatchVariables": false,
-    "target": "es2019",
+    "target": "es2020",
     "module": "commonjs",
     "lib": ["es2019", "dom"],
     "declaration": true,

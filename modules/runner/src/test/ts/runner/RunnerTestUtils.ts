@@ -1,8 +1,8 @@
 import { Hook, HookType, LoggedError, Suite } from '@ephox/bedrock-common';
-import { createHook } from '../../../main/ts/core/Hook';
-import { Reporter, TestReporter } from '../../../main/ts/reporter/Reporter';
-import { RunState } from '../../../main/ts/runner/TestRun';
-import { noop } from '../TestUtils';
+import { createHook } from '../../../main/ts/core/Hook.js';
+import { Reporter, TestReporter } from '../../../main/ts/reporter/Reporter.js';
+import { RunState } from '../../../main/ts/runner/TestRun.js';
+import { noop } from '../TestUtils.js';
 
 type LoggedError = LoggedError.LoggedError;
 

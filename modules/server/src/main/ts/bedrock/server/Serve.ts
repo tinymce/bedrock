@@ -1,4 +1,5 @@
-import * as finalhandler from 'finalhandler';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import finalhandler = require('finalhandler');
 import * as http from 'http';
 import * as portfinder from 'portfinder';
 import { Browser} from 'webdriverio';

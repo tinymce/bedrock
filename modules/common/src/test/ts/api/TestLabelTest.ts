@@ -1,6 +1,6 @@
 import * as fc from 'fast-check';
 import { describe, it } from 'mocha';
-import { TestLabel } from '../../../main/ts/api/TestLabel';
+import { TestLabel } from '../../../main/ts/api/TestLabel.js';
 
 describe('TestLabel.asString', () => {
   it('stringifies strings', () => {

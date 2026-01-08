@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import { describe, it } from 'mocha';
-import * as LoggedError from '../../../main/ts/api/LoggedError';
-import * as Reporter from '../../../main/ts/api/Reporter';
-import { AssertionError, HtmlDiffAssertionError } from '../../../main/ts/api/TestError';
+import * as LoggedError from '../../../main/ts/api/LoggedError.js';
+import * as Reporter from '../../../main/ts/api/Reporter.js';
+import { AssertionError, HtmlDiffAssertionError } from '../../../main/ts/api/TestError.js';
 
 const htmlAssertion = (): HtmlDiffAssertionError => {
   const e: any = new Error('message"');

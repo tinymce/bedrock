@@ -1,7 +1,7 @@
 import { Context, ExecuteFn, Failure, Runnable, RunnableState, TestThrowable } from '@ephox/bedrock-common';
-import { isInternalError, MultipleDone, SkipError } from '../errors/Errors';
-import { ErrorCatcher } from '../errors/ErrorCatcher';
-import { Timer } from './Timer';
+import { isInternalError, MultipleDone, SkipError } from '../errors/Errors.js';
+import { ErrorCatcher } from '../errors/ErrorCatcher.js';
+import { Timer } from './Timer.js';
 
 const isPromiseLike = (value: unknown | undefined): value is PromiseLike<any> =>
   value !== undefined && (value as PromiseLike<any>).then !== undefined;

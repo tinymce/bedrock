@@ -2,10 +2,10 @@ import { Suite, Test } from '@ephox/bedrock-common';
 import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { beforeEach, describe, it } from 'mocha';
-import { createSuite, createRootSuite } from '../../../main/ts/core/Suite';
-import { createTest } from '../../../main/ts/core/Test';
-import * as Utils from '../../../main/ts/core/Utils';
-import { hexChar, noop } from '../TestUtils';
+import { createSuite, createRootSuite } from '../../../main/ts/core/Suite.js';
+import { createTest } from '../../../main/ts/core/Test.js';
+import * as Utils from '../../../main/ts/core/Utils.js';
+import { hexChar, noop } from '../TestUtils.js';
 
 describe('Utils.makeQueryParams', () => {
   it('should be empty if offset and retry is 0', () => {

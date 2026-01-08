@@ -1,5 +1,5 @@
 import { Context, Failure, TestError, TestLabel, TestLogs } from '@ephox/bedrock-common';
-import { describe, it } from './Bdd';
+import { describe, it } from './Bdd.js';
 
 type TestLogs = TestLogs.TestLogs;
 type TestError = TestError.TestError;

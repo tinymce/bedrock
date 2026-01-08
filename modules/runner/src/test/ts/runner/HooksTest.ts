@@ -1,12 +1,12 @@
 import { Context, HookType, Suite } from '@ephox/bedrock-common';
 import { assert } from 'chai';
 import { beforeEach, describe, it } from 'mocha';
-import { createHook } from '../../../main/ts/core/Hook';
-import { createSuite, createRootSuite } from '../../../main/ts/core/Suite';
-import { createTest } from '../../../main/ts/core/Test';
-import * as Hooks from '../../../main/ts/runner/Hooks';
-import { noop } from '../TestUtils';
-import * as RunnerTestUtils from './RunnerTestUtils';
+import { createHook } from '../../../main/ts/core/Hook.js';
+import { createSuite, createRootSuite } from '../../../main/ts/core/Suite.js';
+import { createTest } from '../../../main/ts/core/Test.js';
+import * as Hooks from '../../../main/ts/runner/Hooks.js';
+import { noop } from '../TestUtils.js';
+import * as RunnerTestUtils from './RunnerTestUtils.js';
 
 describe('Hooks.getHooks', () => {
   let root: Suite;

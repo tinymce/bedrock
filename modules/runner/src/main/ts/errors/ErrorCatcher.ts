@@ -1,6 +1,6 @@
 import { Global, Type } from '@ephox/bedrock-common';
-import { setStack } from '../core/Utils';
-import { isInternalError } from './Errors';
+import { setStack } from '../core/Utils.js';
+import { isInternalError } from './Errors.js';
 
 type ErrorHandler = (error: Error) => void
 

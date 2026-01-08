@@ -1,5 +1,5 @@
 import * as JsDiff from 'diff';
-import { htmlentities } from './StringUtils';
+import { htmlentities } from './StringUtils.js';
 
 export const diffPrettyHtml = (text1: string, text2: string): string => {
   const changes: ReturnType<typeof JsDiff.diffArrays<string>> = JsDiff.diffArrays(text1.split('\n'), text2.split('\n'));

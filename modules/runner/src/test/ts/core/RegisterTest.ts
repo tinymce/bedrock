@@ -2,9 +2,9 @@ import { Global } from '@ephox/bedrock-common';
 import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { beforeEach, describe, it } from 'mocha';
-import * as Register from '../../../main/ts/core/Register';
-import * as Test from '../../../main/ts/core/Test';
-import { noop, range } from '../TestUtils';
+import * as Register from '../../../main/ts/core/Register.js';
+import * as Test from '../../../main/ts/core/Test.js';
+import { noop, range } from '../TestUtils.js';
 
 describe('Register.test', () => {
   beforeEach(() => {

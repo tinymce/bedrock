@@ -1,5 +1,5 @@
 import { LoggedError, Reporter } from '@ephox/bedrock-common';
-import { ReporterUi } from '../reporter/Reporter';
+import { ReporterUi } from '../reporter/Reporter.js';
 
 type LoggedError = LoggedError.LoggedError;
 
