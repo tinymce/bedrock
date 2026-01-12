@@ -36,6 +36,10 @@ timestamps {
 
     def processes = [:]
 
+    def cleanBranchName = (env.BRANCH_NAME ?: "").split('/').last()
+    def testPrefix =  "Bedrock_${cleanBranchName}-b${env.BUILD_NUMBER}"
+
+
     for ( int i = 0; i < platforms.size(); i++) {
       def platform = platforms.get(i)
       def buckets = platform.buckets ?: 1

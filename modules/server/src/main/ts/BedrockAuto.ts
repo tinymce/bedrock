@@ -80,6 +80,7 @@ export const go = async (bedrockAutoSettings: BedrockAutoSettings): Promise<void
       port: 8000,
       stopPort: 20000
     });
+    console.log(`Promise on port: ${servicePort}`);
 
     const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, `scratch_${servicePort}`, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
