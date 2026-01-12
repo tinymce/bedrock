@@ -76,11 +76,12 @@ export const go = async (bedrockAutoSettings: BedrockAutoSettings): Promise<void
   const shutdown = (services: ((immediate?: boolean) => Promise<void>)[]) => (immediate?: boolean) => Promise.allSettled(services.map((fn) => fn(immediate)));
 
   try {
+    console.log(`Selecting port: ${process.pid} at ${new Date().toISOString()}`);
     const servicePort = await portfinder.getPortPromise({
       port: 8000,
       stopPort: 20000
     });
-    console.log(`Promise on port: ${servicePort}`);
+    console.log(`Promise on port: ${servicePort} at ${new Date().toISOString()}`);
 
     const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, `scratch_${servicePort}`, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
