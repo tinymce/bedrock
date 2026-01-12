@@ -1,6 +1,6 @@
 import finalhandler from 'finalhandler';
 import * as http from 'http';
-import * as portfinder from 'portfinder';
+// import * as portfinder from 'portfinder';
 import { Browser} from 'webdriverio';
 import { Attempt } from '../core/Attempt.js';
 import * as Routes from './Routes.js';
@@ -12,6 +12,7 @@ import { TestResults } from './Controller.js';
 interface Server {
   readonly start: () => Promise<void>;
   readonly stop: () => Promise<void>;
+  readonly port: () => number;
 }
 
 export interface ServeSettings {
@@ -81,18 +82,16 @@ export const startCustom = async (settings: ServeSettings, createServer: (port: 
   }));
 
   try {
-    const port = settings.port ?? await portfinder.getPortPromise({
-      port: 8000,
-      stopPort: 20000
-    });
+    const reqPort = settings.port ?? 0;
 
-    const server = createServer(port, (request, response) => {
+    const server = createServer(reqPort, (request, response) => {
       const done = finalhandler(request, response);
       serverRoutes.then(({ routers, fallback }) => {
         Routes.route(routers, fallback, request, response, done);
       });
     });
     await server.start();
+    const port = server.port();
 
     return {
       port,
@@ -110,11 +109,21 @@ export const start = (settings: ServeSettings): Promise<ServeService> => {
   return startCustom(settings, (port, listener) => {
     const server = http.createServer(listener);
     server.requestTimeout = 120000;
+    server.keepAliveTimeout = 120000;
     return {
       start: () => {
-        return new Promise((resolve) => {
-          server.listen(port, resolve);
-          server.keepAliveTimeout = 120000;
+        return new Promise((resolve, reject) => {
+          const onError = (err: any) => {
+            server.off('listeninig', onListening);
+            reject(err);
+          };
+          const onListening = () => {
+            server.off('error', onError);
+            resolve();
+          };
+          server.once('error', onError);
+          server.once('listening', onListening);
+          server.listen(port);
         });
       },
       stop: () => new Promise((resolve, reject) => {
@@ -125,7 +134,14 @@ export const start = (settings: ServeSettings): Promise<ServeService> => {
             resolve();
           }
         });
-      })
+      }),
+      port: () => {
+        const addr = server.address();
+        if (!addr || typeof addr === 'string') {
+          throw new Error('Unexpected address type or server not listening');
+        }
+        return addr.port;
+      }
     };
   });
 };
