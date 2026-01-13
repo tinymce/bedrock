@@ -12,7 +12,6 @@ import { BedrockAutoSettings } from './bedrock/core/Settings.js';
 import { ExitCodes } from './bedrock/util/ExitCodes.js';
 import * as ConsoleReporter from './bedrock/core/ConsoleReporter.js';
 import * as SettingsResolver from './bedrock/core/SettingsResolver.js';
-// import * as portfinder from 'portfinder';
 import { format } from 'node:util';
 import { defer } from './bedrock/util/Waiter.js';
 import { Browser } from 'webdriverio';
@@ -78,7 +77,6 @@ export const go = async (bedrockAutoSettings: BedrockAutoSettings): Promise<void
   const shutdown = (services: ((immediate?: boolean) => Promise<void>)[]) => (immediate?: boolean) => Promise.allSettled(services.map((fn) => fn(immediate)));
 
   try {
-
     const driverDeferred = defer<Attempt<unknown, Browser>>();
 
     const scratchDir = settings.name ? `scratch_${settings.name}` : 'bedrock';
@@ -92,13 +90,6 @@ export const go = async (bedrockAutoSettings: BedrockAutoSettings): Promise<void
       runner: routes,
       stickyFirstSession: true
     });
-    // const service = await Serve.start()
-    // console.log(`Selecting port: ${process.pid} at ${new Date().toISOString()}`);
-    // const servicePort = await portfinder.getPortPromise({
-    //   port: 8000,
-    //   stopPort: 20000
-    // });
-    // console.log(`Promise on port: ${servicePort} at ${new Date().toISOString()}`);
 
     const driverPromise = makeWebDriver(settings, service.port, shutdownServices, browserName, isHeadless);
     driverPromise.then(({ webdriver }) => {
@@ -107,14 +98,6 @@ export const go = async (bedrockAutoSettings: BedrockAutoSettings): Promise<void
       driverDeferred.resolve(Attempt.failed(e));
     });
 
-    // const service = await Serve.start({
-    //   ...settings,
-    //   driver: driver.then(d => Attempt.passed(d.webdriver)).catch(e => Attempt.failed(e)),
-    //   master,
-    //   runner: routes,
-    //   stickyFirstSession: true,
-    //   port: servicePort
-    // });
     shutdownServices.push(service.shutdown);
 
     const { location, webdriver } = await driverPromise;
