@@ -18,13 +18,6 @@ export default [
   {
     files: ['**/*.{ts,tsx,js,jsx}'],
 
-    languageOptions: {
-      parser: tsParser,
-      parserOptions: {
-        sourceType: 'module',
-      },
-    },
-
     plugins: {
       '@typescript-eslint': tsPlugin,
     },
