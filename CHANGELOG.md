@@ -4,52 +4,61 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-# 15.1.1 - 2025-12-19
-
 ## Unreleased
+
+### Fixed
+- Port allocation no longer race condition. #TINY-12048
+
+### Changed
+- Migrated to ESM-only modules. #TINY-13539
+- Moved compiled content to scratch directory tied to run name. #TINY-12048
+
+## 15.1.1 - 2025-12-19
+
+### Fixed
 - Fixed an issue where using bedrock-auto with rspack bundling resulted in an error. #TINY-13550
 
-# 15.1.0 - 2025-12-17
+## 15.1.0 - 2025-12-17
 
-## Added
+### Added
 - Add rspack dev server support. #TINY-12824
 
 ## 15.0.4 - 2025-10-22
 
-## Changed
+### Changed
 - Swapped out `msw` for `agar-sw`. #TINY-13085
 
 ## 15.0.3 - 2025-10-15
 
-## Fixed
+### Fixed
 - Fixed an issue where `remapper` was still referenced in the webpack config. #TINY-12932
 
 ## 15.0.2 - 2025-02-03
 
-## Improved
+### Improved
 - Remote webdriver session ID is now logged after connecting #TINY-10835
 
-## Fixed
+### Fixed
 - Failing tests that retry and then pass could exceed the "tests crashed" server timeout #TINY-11177
 
 ## 15.0.1 - 2025-01-27
 
-## Fixed
+### Fixed
 - AWS remote testing idle timeout was not set #TINY-11177
 
 ## 15.0.0 - 2025-01-27
 
-## Added
+### Added
 - New server-side APIs to accept a batch of results instead of a single result #TINY-11177
 
-## Changed
+### Changed
 - Reverted TINY-10708 which was a server-side fix
 - Client no longer waits for log requests to complete between tests, which should speed up remote testing #TINY-11177
 - Console HUD no longer updates for individual tests #TINY-11177
 - Client now posts test status only in batches every 30 seconds, this is the only time the console HUD will update #TINY-11177
 - Server now controls the remote webdriver idle timeout, and makes sure a keep-alive command is sent regularly
 
-## Removed
+### Removed
 - Single result server-side API #TINY-11177
 - Server-side monitoring of single test timeouts. This is still monitored client side. #TINY-11177
 - The Promise polyfill is no longer allowed on modern NodeJS frameworks so it has been removed. #TINY-11177
@@ -103,7 +112,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 13.6.0 - 2023-10-16
 
-## Improved
+### Improved
 
 - Urls like `/project/node_modules` and `/project/<package name>/node_modules` are now using node package resolve to serve files. #TINY-10281
 
@@ -154,7 +163,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Images (svg, png, gif, jpg, etc...) can now be imported by tests, and will be available as data URIs using the `asset/inline` webpack loader.
 
-## Improved
+### Improved
 - The mouse position reset logic now only runs when required, instead of for every test.
 
 ## 13.0.1 - 2022-02-01
