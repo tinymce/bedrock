@@ -12,8 +12,10 @@ import { BedrockAutoSettings } from './bedrock/core/Settings';
 import { ExitCodes } from './bedrock/util/ExitCodes';
 import * as ConsoleReporter from './bedrock/core/ConsoleReporter';
 import * as SettingsResolver from './bedrock/core/SettingsResolver';
-import * as portfinder from 'portfinder';
 import { format } from 'node:util';
+import { Browser } from 'webdriverio';
+import { defer } from './bedrock/util/Waiter';
+import { Runner } from './bedrock/server/Routes';
 
 async function makeWebDriver(settings: BedrockAutoSettings, servicePort: number, shutdownServices: ((immediate?: boolean) => Promise<void>)[], browserName: string, isHeadless: boolean) {
   // Remote settings
@@ -76,26 +78,38 @@ export const go = async (bedrockAutoSettings: BedrockAutoSettings): Promise<void
   const shutdown = (services: ((immediate?: boolean) => Promise<void>)[]) => (immediate?: boolean) => Promise.allSettled(services.map((fn) => fn(immediate)));
 
   try {
-    const servicePort = await portfinder.getPortPromise({
-      port: 8000,
-      stopPort: 20000
-    });
 
-    const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
+    const driverDeferred = defer<Attempt<unknown, Browser>>();
 
-    const driver = makeWebDriver(settings, servicePort, shutdownServices, browserName, isHeadless);
+    const routesDeferred = defer<Runner>();
 
     const service = await Serve.start({
       ...settings,
-      driver: driver.then(d => Attempt.passed(d.webdriver)).catch(e => Attempt.failed(e)),
+      driver: driverDeferred.promise,
       master,
-      runner: routes,
+      runner: routesDeferred.promise,
       stickyFirstSession: true,
-      port: servicePort
     });
+
+    const scratchDir = settings.name ? `scratch_${settings.name}` : `bedrock_${service.port}`;
+
+    const routesPromise = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, scratchDir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
+    routesPromise.then((routes) => {
+      routesDeferred.resolve(routes);
+    }).catch((e) => {
+      routesDeferred.reject(e);
+    });
+
+    const driverPromise = makeWebDriver(settings, service.port, shutdownServices, browserName, isHeadless);
+    driverPromise.then(({ webdriver }) => {
+      driverDeferred.resolve(Attempt.passed(webdriver));
+    }).catch((e) => {
+      driverDeferred.reject(Attempt.failed(e));
+    });
+
     shutdownServices.push(service.shutdown);
 
-    const { location, webdriver } = await driver;
+    const { location, webdriver } = await driverPromise;
     console.log('Started webdriver session: ', webdriver.sessionId);
 
     const cancelEverything = Lifecycle.cancel(webdriver, shutdown(shutdownServices), settings.gruntDone);

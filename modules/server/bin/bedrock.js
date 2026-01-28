@@ -1,7 +1,12 @@
 #!/usr/bin/env node
 
-const BedrockCli = require('../lib/main/ts/BedrockCli');
-const BedrockManual = require('../lib/main/ts/BedrockManual');
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+import BedrockCli from "../lib/main/ts/BedrockCli.js";
+import BedrockManual from "../lib/main/ts/BedrockManual.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 await BedrockCli.run(BedrockManual, {
   current: process.cwd(),
