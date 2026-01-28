@@ -81,25 +81,17 @@ export const go = async (bedrockAutoSettings: BedrockAutoSettings): Promise<void
 
     const driverDeferred = defer<Attempt<unknown, Browser>>();
 
-    const routesDeferred = defer<Runner>();
+    const scratchDir = settings.name ? `scratch_${settings.name}` : `bedrock`;
+
+    const routesPromise = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, scratchDir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
     const service = await Serve.start({
       ...settings,
       driver: driverDeferred.promise,
       master,
-      runner: routesDeferred.promise,
+      runner: routesPromise,
       stickyFirstSession: true,
     });
-
-    const scratchDir = settings.name ? `scratch_${settings.name}` : `bedrock_${service.port}`;
-
-    const routesPromise = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, scratchDir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
-    routesPromise.then((routes) => {
-      routesDeferred.resolve(routes);
-    }).catch((e) => {
-      routesDeferred.reject(e);
-    });
-
     const driverPromise = makeWebDriver(settings, service.port, shutdownServices, browserName, isHeadless);
     driverPromise.then(({ webdriver }) => {
       driverDeferred.resolve(Attempt.passed(webdriver));
