@@ -15,7 +15,6 @@ import * as SettingsResolver from './bedrock/core/SettingsResolver';
 import { format } from 'node:util';
 import { Browser } from 'webdriverio';
 import { defer } from './bedrock/util/Waiter';
-import { Runner } from './bedrock/server/Routes';
 
 async function makeWebDriver(settings: BedrockAutoSettings, servicePort: number, shutdownServices: ((immediate?: boolean) => Promise<void>)[], browserName: string, isHeadless: boolean) {
   // Remote settings
