@@ -4,8 +4,8 @@
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
   "bin": {
-    "bedrock-auto": "./bin/bedrock-auto.js",
-    "bedrock": "./bin/bedrock.js"
+    "bedrock-auto": "./bin/bedrock-auto.cjs",
+    "bedrock": "./bin/bedrock.cjs"
   },
   "scripts": {
     "prepublishOnly": "tsc -b",
