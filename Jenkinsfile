@@ -41,8 +41,8 @@ timestamps {
     def testPrefix = "Bedrock_${cleanBranchName}-b${env.BUILD_NUMBER}"
 
     bedrockLocalBrowsers(
-      testDirs: [ 'modules/sample/src/test/ts/**/pass' ]
-      custom: '--config modules/sample/tsconfig.json --customRoutes modules/sample/routes.json'
+      testDirs: [ 'modules/sample/src/test/ts/**/pass' ],
+      custom: '--config modules/sample/tsconfig.json --customRoutes modules/sample/routes.json',
       platforms: platforms,
       prefix: testPrefix
     )
