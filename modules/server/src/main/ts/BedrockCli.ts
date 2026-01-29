@@ -8,17 +8,17 @@ import * as Util from 'util';
 Util.inspect.defaultOptions.depth = null;
 
 type Program = {
-  go: <T extends BedrockSettings>(settings: T, directories: { current: string; bin: string }) => void;
+  go: <T extends BedrockSettings>(settings: T, directories: { current: string; bin: string }) => Promise<void>;
   mode: 'forAuto' | 'forManual';
 }
 
-export const run = (program: Program, directories: { current: string; bin: string }): void => {
+export const run = async (program: Program, directories: { current: string; bin: string }): Promise<void> => {
   if (Clis[program.mode] === undefined) {
     throw new Error('Bedrock mode not known: ' + program.mode);
   }
 
   const maybeSettings: Attempt<CliError, BedrockSettings> = Clis[program.mode](directories);
-  Attempt.cata(maybeSettings, Clis.logAndExit, (settings) => {
-    program.go(settings, directories);
+  await Attempt.cata(maybeSettings, Clis.logAndExit, async (settings) => {
+    await program.go(settings, directories);
   });
 };

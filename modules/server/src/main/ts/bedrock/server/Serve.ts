@@ -1,6 +1,5 @@
 import * as finalhandler from 'finalhandler';
 import * as http from 'http';
-import * as portfinder from 'portfinder';
 import { Browser} from 'webdriverio';
 import { Attempt } from '../core/Attempt';
 import * as Routes from './Routes';
@@ -10,19 +9,19 @@ import { DriverMaster } from './DriverMaster';
 import { TestResults } from './Controller';
 
 interface Server {
-  readonly start: () => Promise<void>;
+  readonly start: () => Promise<number>;
   readonly stop: () => Promise<void>;
 }
 
 export interface ServeSettings {
   readonly basedir: string;
   readonly customRoutes: string | undefined;
-  readonly driver: Attempt<string, Browser>;
+  readonly driver: Promise<Attempt<unknown, Browser>>;
   readonly loglevel: 'simple' | 'advanced';
   readonly master: DriverMaster | null;
   readonly overallTimeout: number;
   readonly projectdir: string;
-  readonly runner: Routes.Runner;
+  readonly runner: Promise<Routes.Runner>;
   readonly skipResetMousePosition: boolean;
   readonly stickyFirstSession: boolean;
   readonly testfiles: string[];
@@ -71,27 +70,28 @@ export const startCustom = async (settings: ServeSettings, createServer: (port: 
   const runner = pref('runner');
   const api = Apis.create(master, maybeDriver, projectdir, basedir, stickyFirstSession, overallTimeout, testfiles, settings.loglevel, resetMousePosition);
 
-  const routers = runner.routers.concat(
-    api.routers,
-    cr.routers
-  );
-
-  const fallback = runner.fallback;
+  // it is important to not use `await` here so the port opens as fast as possible
+  const serverRoutes = runner.then(async r => ({
+    routers: r.routers.concat(
+      await api.routers,
+      cr.routers
+    ),
+    fallback: r.fallback
+  }));
 
   try {
-    const port = settings.port ?? await portfinder.getPortPromise({
-      port: 8000,
-      stopPort: 20000
-    });
+    const port = settings.port ?? 0;
 
     const server = createServer(port, (request, response) => {
       const done = finalhandler(request, response);
-      Routes.route(routers, fallback, request, response, done);
+      serverRoutes.then(({ routers, fallback }) => {
+        Routes.route(routers, fallback, request, response, done);
+      });
     });
-    await server.start();
+    const serverPort = await server.start();
 
     return {
-      port,
+      port: serverPort,
       markLoaded: api.markLoaded,
       enableHud: api.enableHud,
       awaitDone: api.awaitDone,
@@ -108,8 +108,23 @@ export const start = (settings: ServeSettings): Promise<ServeService> => {
     server.requestTimeout = 120000;
     return {
       start: () => {
-        return new Promise((resolve) => {
-          server.listen(port, resolve);
+        return new Promise((resolve, reject) => {
+          const onError = (err: any) => {
+            server.off('listening', onListening);
+            reject(err);
+          };
+          const onListening = () => {
+            server.off('error', onError);
+            const addr = server.address();
+            if (!addr || typeof addr === 'string') {
+              reject(new Error('Unexpected address type'));
+            } else {
+              resolve(addr.port);
+            }
+          };
+          server.once('error', onError);
+          server.once('listening', onListening);
+          server.listen(port);
           server.keepAliveTimeout = 120000;
         });
       },

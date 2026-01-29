@@ -12,10 +12,58 @@ import { BedrockAutoSettings } from './bedrock/core/Settings';
 import { ExitCodes } from './bedrock/util/ExitCodes';
 import * as ConsoleReporter from './bedrock/core/ConsoleReporter';
 import * as SettingsResolver from './bedrock/core/SettingsResolver';
-import * as portfinder from 'portfinder';
 import { format } from 'node:util';
+import { Browser } from 'webdriverio';
+import { defer } from './bedrock/util/Waiter';
 
-export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
+async function makeWebDriver(settings: BedrockAutoSettings, servicePort: number, shutdownServices: ((immediate?: boolean) => Promise<void>)[], browserName: string, isHeadless: boolean) {
+  // Remote settings
+  const remoteWebdriver = settings.remote;
+  const sishDomain = settings.sishDomain;
+  const username = settings.username ?? process.env.LT_USERNAME;
+  const accesskey = settings.accesskey ?? process.env.LT_ACCESS_KEY;
+  const tunnelCredentials = {
+    user: username,
+    key: accesskey
+  };
+
+  const tunnel = await Tunnel.prepareConnection(servicePort, remoteWebdriver, sishDomain, tunnelCredentials);
+  shutdownServices.push(tunnel.shutdown);
+  const location = tunnel.url.href;
+
+  console.log(`Creating ${ remoteWebdriver ?? 'local' } webdriver...`);
+  if (remoteWebdriver == 'aws') {
+    console.log('INFO: Webdriver creation waits for device farm session to activate. Takes 30-45s.');
+  }
+
+  const driver = await Driver.create({
+    browser: browserName,
+    basedir: settings.basedir,
+    headless: isHeadless,
+    debuggingPort: settings.debuggingPort,
+    useSandboxForHeadless: settings.useSandboxForHeadless,
+    extraBrowserCapabilities: settings.extraBrowserCapabilities,
+    verbose: settings.verbose,
+    wipeBrowserCache: settings.wipeBrowserCache,
+    remoteWebdriver,
+    webdriverPort: settings.webdriverPort,
+    useSelenium: settings.useSelenium,
+    username,
+    accesskey,
+    devicefarmRegion: settings.devicefarmRegion,
+    deviceFarmArn: settings.devicefarmArn,
+    browserVersion: settings.browserVersion,
+    platformName: settings.platformName,
+    tunnel,
+    name: settings.name ? settings.name : 'bedrock-auto'
+  });
+  shutdownServices.push(driver.shutdown);
+
+  const webdriver = driver.webdriver;
+  return { location, webdriver };
+}
+
+export const go = async (bedrockAutoSettings: BedrockAutoSettings): Promise<void> => {
   console.log('bedrock-auto ' + Version.get() + ' starting...');
 
   const settings = SettingsResolver.resolveAndLog(bedrockAutoSettings);
@@ -24,72 +72,36 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
   const isPhantom = browserName === 'phantomjs';
   const isHeadless = settings.browser.endsWith('-headless') || isPhantom;
   const basePage = 'src/resources/html/' + (isPhantom ? 'bedrock-phantom.html' : 'bedrock.html');
-  // Remote settings
-  const remoteWebdriver = settings.remote;
-  const sishDomain = settings.sishDomain;
-  const username = settings.username ?? process.env.LT_USERNAME;
-  const accesskey = settings.accesskey ?? process.env.LT_ACCESS_KEY;
-
-  const routes = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
   const shutdownServices: ((immediate?: boolean) => Promise<void>)[] = [];
   const shutdown = (services: ((immediate?: boolean) => Promise<void>)[]) => (immediate?: boolean) => Promise.allSettled(services.map((fn) => fn(immediate)));
 
-  routes.then(async (runner) => {
+  try {
 
-    // LambdaTest Tunnel must know dev server port, but tunnel must be created before dev server.
-    const servicePort = await portfinder.getPortPromise({
-      port: 8000,
-      stopPort: 20000
-    });
+    const driverDeferred = defer<Attempt<unknown, Browser>>();
 
-    const tunnelCredentials = {
-      user: username,
-      key: accesskey
-    };
+    const scratchDir = settings.name ? `scratch_${settings.name}` : `bedrock`;
 
-    const tunnel = await Tunnel.prepareConnection(servicePort, remoteWebdriver, sishDomain, tunnelCredentials);
-    shutdownServices.push(tunnel.shutdown);
-    const location = tunnel.url.href;
+    const routesPromise = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, scratchDir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
-    console.log(`Creating ${remoteWebdriver ?? 'local'} webdriver...`);
-    if (remoteWebdriver == 'aws') {
-        console.log('INFO: Webdriver creation waits for device farm session to activate. Takes 30-45s.');
-    }
-
-    const driver = await Driver.create({
-      browser: browserName,
-      basedir: settings.basedir,
-      headless: isHeadless,
-      debuggingPort: settings.debuggingPort,
-      useSandboxForHeadless: settings.useSandboxForHeadless,
-      extraBrowserCapabilities: settings.extraBrowserCapabilities,
-      verbose: settings.verbose,
-      wipeBrowserCache: settings.wipeBrowserCache,
-      remoteWebdriver,
-      webdriverPort: settings.webdriverPort,
-      useSelenium: settings.useSelenium,
-      username,
-      accesskey,
-      devicefarmRegion: settings.devicefarmRegion,
-      deviceFarmArn: settings.devicefarmArn,
-      browserVersion: settings.browserVersion,
-      platformName: settings.platformName,
-      tunnel,
-      name: settings.name ? settings.name : 'bedrock-auto'
-    });
-
-    const webdriver = driver.webdriver;
-    console.log('Started webdriver session: ', webdriver.sessionId);
     const service = await Serve.start({
       ...settings,
-      driver: Attempt.passed(webdriver),
+      driver: driverDeferred.promise,
       master,
-      runner,
+      runner: routesPromise,
       stickyFirstSession: true,
-      port: servicePort
     });
-    shutdownServices.push(service.shutdown, driver.shutdown);
+    const driverPromise = makeWebDriver(settings, service.port, shutdownServices, browserName, isHeadless);
+    driverPromise.then(({ webdriver }) => {
+      driverDeferred.resolve(Attempt.passed(webdriver));
+    }).catch((e) => {
+      driverDeferred.reject(Attempt.failed(e));
+    });
+
+    shutdownServices.push(service.shutdown);
+
+    const { location, webdriver } = await driverPromise;
+    console.log('Started webdriver session: ', webdriver.sessionId);
 
     const cancelEverything = Lifecycle.cancel(webdriver, shutdown(shutdownServices), settings.gruntDone);
     process.on('SIGINT', cancelEverything);
@@ -119,13 +131,13 @@ export const go = (bedrockAutoSettings: BedrockAutoSettings): void => {
     } catch (e) {
       return Lifecycle.error(e as any, webdriver, shutdown(shutdownServices), settings.gruntDone, settings.delayExit);
     }
-  }).catch(async (err) => {
+  } catch(err) {
     // Chalk does not use a formatter. Using node's built-in to expand Objects, etc.
     console.error(chalk.red('Error creating webdriver', format(err)));
     // Shutdown tunnels in case webdriver fails
     await shutdown(shutdownServices)(true);
-    Lifecycle.exit(settings.gruntDone, ExitCodes.failures.unexpected);
-  });
+    return Lifecycle.exit(settings.gruntDone, ExitCodes.failures.unexpected);
+  }
 };
 
 export const mode = 'forAuto';
