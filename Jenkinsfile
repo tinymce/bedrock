@@ -8,8 +8,8 @@ standardProperties()
 timestamps {
   tinyPods.nodeBrowser(
     tag: '20',
-    resourceRequestMemory: '3Gi',
-    resourceLimitMemory: '3Gi'
+    resourceRequestMemory: '4Gi',
+    resourceLimitMemory: '4Gi'
 ) {
     stage("clean") {
       exec('yarn clean')
