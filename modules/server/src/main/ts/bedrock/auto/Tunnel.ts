@@ -59,7 +59,7 @@ const createSSH = async (port: number | string, domain: string): Promise<Tunnel>
 
   try {
     await waitForReady(tunnelProc);
-    const urlText = 'http://' + subdomain + '.' + domain;
+    const urlText = 'https://' + subdomain + '.' + domain;
     console.log('Tunnel URL: ' + urlText);
     const url = new URL(urlText);
 
@@ -95,7 +95,7 @@ const createLambda = async (port: number | string, credentials: LambdaCredential
     key: credentials.key,
     port: port.toString()
   };
-  
+
   const shutdown = async (): Promise<void> => {
     console.log('Shutting down tunnel...');
     return tunnel.stop(null as unknown as ((_: boolean) => void));
