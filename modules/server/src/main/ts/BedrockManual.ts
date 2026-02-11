@@ -1,4 +1,5 @@
 import { Attempt } from './bedrock/core/Attempt';
++import * as portfinder from 'portfinder';
 import * as Version from './bedrock/core/Version';
 import * as RunnerRoutes from './bedrock/server/RunnerRoutes';
 import * as Webpack from './bedrock/compiler/Webpack';
@@ -15,6 +16,11 @@ export const go = async (bedrockManualSettings: BedrockManualSettings): Promise<
   const basePage = 'src/resources/html/bedrock.html';
   const routes = RunnerRoutes.generate('manual', settings.projectdir, settings.basedir, 'scratch', settings.config, settings.bundler, settings.testfiles, settings.chunk, 0, settings.singleTimeout, true, basePage, settings.coverage, settings.polyfills);
 
+  const port = await portfinder.getPortPromise({
+    port: 8000,
+    stopPort: 20000
+  });
+
   const serveSettings: DevServerServeSettings = {
     ...settings,
     // There is no driver for manual mode.
@@ -24,7 +30,8 @@ export const go = async (bedrockManualSettings: BedrockManualSettings): Promise<
     // sticky session is used by auto mode only
     stickyFirstSession: false,
     // reset mouse position will never work on manual
-    skipResetMousePosition: true
+    skipResetMousePosition: true,
+    port
   };
 
   try {
