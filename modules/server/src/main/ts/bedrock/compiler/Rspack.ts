@@ -237,7 +237,10 @@ export const devserver = async (settings: DevServerServeSettings): Promise<Serve
     }, compiler);
 
     return {
-      start: () => (server as any).start(),
+      start: async () => {
+        await (server as any).start();
+        return port;
+      },
       stop: () => (server as any).stop()
     };
   });

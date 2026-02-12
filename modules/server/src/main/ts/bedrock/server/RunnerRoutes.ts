@@ -18,7 +18,7 @@ interface WorkspaceRoot {
   folder: string;
 }
 
-export const generate = async (mode: string, projectdir: string, basedir: string, configFile: string, bundler: Types.Bundler, testfiles: string[], chunk: number,
+export const generate = async (mode: string, projectdir: string, basedir: string, scratchdir: string, configFile: string, bundler: Types.Bundler, testfiles: string[], chunk: number,
                                retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[], polyfills: string[]): Promise<Routes.Runner> => {
   const files = testfiles.map((filePath) => {
     return path.relative(projectdir, filePath);
@@ -27,7 +27,7 @@ export const generate = async (mode: string, projectdir: string, basedir: string
   const testGenerator = Compiler.compile({
     bundler,
     tsConfigFile: path.join(projectdir, configFile),
-    scratchDir: path.join(projectdir, 'scratch'),
+    scratchDir: path.join(projectdir, scratchdir),
     basedir,
     exitOnCompileError: mode === 'auto',
     files,
@@ -87,8 +87,6 @@ export const generate = async (mode: string, projectdir: string, basedir: string
 
   const resourceRoutes = resourceRoots.map(({name, folder}) => Routes.routing('GET', `/project/${name}`, path.join(projectdir, folder)));
 
-  const precompiledTests = mode === 'auto' ? await testGenerator.generate() : null;
-
   const routers = [
     ...nodeModuleRoutes,
     ...resourceRoutes,
@@ -106,14 +104,8 @@ export const generate = async (mode: string, projectdir: string, basedir: string
       Routes.nodeResolveFile('GET', '/agar-sw.js', projectdir, '@ephox/agar-sw', 'dist/agar-sw.js'),
 
       // test code
-      Routes.asyncJs('GET', '/compiled/tests.js', (done) => {
-        if (precompiledTests !== null) {
-          done(precompiledTests);
-        } else {
-          testGenerator.generate().then(done);
-        }
-      }),
-      Routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
+      Routes.asyncJs('GET', '/compiled/tests.js', testGenerator.generate()),
+      Routes.routing('GET', '/compiled', path.join(projectdir, scratchdir, 'compiled')),
 
       // harness API
       Routes.json('GET', '/harness', {
