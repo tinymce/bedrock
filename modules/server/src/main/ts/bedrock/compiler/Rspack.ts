@@ -16,7 +16,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
 
   return {
     entry: scratchFile,
-    devtool: manualMode ? 'inline-source-map' : 'source-map',
+    devtool: manualMode ? 'inline-source-map' : false,
     mode: manualMode ? 'development' : 'none',
     target: ['web', 'es5'],
 
