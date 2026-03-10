@@ -104,7 +104,7 @@ export const generate = async (mode: string, projectdir: string, basedir: string
       Routes.nodeResolveFile('GET', '/agar-sw.js', projectdir, '@ephox/agar-sw', 'dist/agar-sw.js'),
 
       // test code
-      Routes.asyncJs('GET', '/compiled/tests.js', testGenerator.generate()),
+      Routes.asyncJs('GET', '/compiled/tests.js', testGenerator.generate(), { gzip: true }),
       Routes.routing('GET', '/compiled', path.join(projectdir, scratchdir, 'compiled')),
 
       // harness API
