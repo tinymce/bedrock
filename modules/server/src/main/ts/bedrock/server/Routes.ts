@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import * as server from 'serve-static';
 import * as path from 'path';
+import { gzipSync } from 'zlib';
 import * as RouteUtils from '../util/RouteUtils';
 import * as Matchers from './Matchers';
 
@@ -17,13 +18,28 @@ export interface Runner {
   readonly fallback: Route;
 }
 
+interface ResponseOptions {
+  readonly gzip?: boolean;
+}
+
 const createServer = (root: string) => {
   // Note: The serve-static types appear to be wrong here, so just force it back to what it should be
   return server(root) as (request: IncomingMessage, response: ServerResponse, done: (err?: any) => void) => void;
 };
 
-const doResponse = (request: IncomingMessage, response: ServerResponse, status: number, contentType: string, data: any) => {
+const doResponse = (request: IncomingMessage, response: ServerResponse, status: number, contentType: string, data: any, options: ResponseOptions = {}) => {
+  const acceptEncoding = request.headers['accept-encoding'];
+  const acceptEncodingHeader = Array.isArray(acceptEncoding) ? acceptEncoding.join(',') : (acceptEncoding ?? '');
+  const shouldGzip = options.gzip === true && /\bgzip\b/i.test(acceptEncodingHeader);
+  const payload = shouldGzip ? gzipSync(data) : data;
+
   response.setHeader('ETag', RouteUtils.generateETag(data));
+  if (options.gzip === true) {
+    response.setHeader('Vary', 'Accept-Encoding');
+    if (shouldGzip) {
+      response.setHeader('Content-Encoding', 'gzip');
+    }
+  }
   if (status === 304 || RouteUtils.isCachable(status) && RouteUtils.isFresh(request, response)) {
     response.writeHead(304, { });
     response.end();
@@ -33,7 +49,7 @@ const doResponse = (request: IncomingMessage, response: ServerResponse, status: 
       'Cache-Control': 'public, max-age=0',
       'Keep-Alive': 'timeout=120' // Avoid 502 errors
     });
-    response.end(data);
+    response.end(payload);
   }
 };
 
@@ -68,10 +84,10 @@ export const json = (method: HTTPMethod, prefix: string, data: any): Route => {
   };
 };
 
-export const asyncJs = (method: HTTPMethod, url: string, fn: ((data: any) => void)): Route => {
+export const asyncJs = (method: HTTPMethod, url: string, fn: ((data: any) => void), options: ResponseOptions = {}): Route => {
   const go: RouteGoFunc = (request, response/* , done */) => {
     fn((data: any) => {
-      doResponse(request, response, 200, 'application/javascript', data);
+      doResponse(request, response, 200, 'application/javascript', data, options);
     });
   };
 
@@ -237,4 +253,3 @@ export const nodeResolveFile = (method: HTTPMethod, url: string, projectDir: str
     go
   };
 };
-

@@ -112,7 +112,7 @@ export const generate = async (mode: string, projectdir: string, basedir: string
         } else {
           testGenerator.generate().then(done);
         }
-      }),
+      }, { gzip: true }),
       Routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
 
       // harness API
