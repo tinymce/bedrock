@@ -116,14 +116,14 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
     },
 
     plugins: [
-      new ForkTsCheckerWebpackPlugin({
+      ...(manualMode ? [ new ForkTsCheckerWebpackPlugin({
         async: manualMode,
         typescript: {
           memoryLimit: manualMode ? 4096 : 2048,
           configFile: tsConfigFile,
           build: true
         }
-      }),
+      }) ] : []),
       new webpack.WatchIgnorePlugin({
         paths: [
           // Ignore generated files. See https://github.com/TypeStrong/ts-loader#usage-with-webpack-watch
