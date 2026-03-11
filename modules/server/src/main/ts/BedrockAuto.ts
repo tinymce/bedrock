@@ -80,7 +80,7 @@ export const go = async (bedrockAutoSettings: BedrockAutoSettings): Promise<void
 
     const driverDeferred = defer<Attempt<unknown, Browser>>();
 
-    const scratchDir = settings.name ? `scratch_${settings.name}` : `bedrock`;
+    const scratchDir = settings.name ? `scratch/${settings.name}` : `scratch/bedrock`;
 
     const routesPromise = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, scratchDir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
 
