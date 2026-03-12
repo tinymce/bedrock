@@ -1,6 +1,6 @@
 import { ErrorCatcher } from '../errors/ErrorCatcher';
 
-const RETRY = 3;
+const RETRY = 5;
 const BASE_DELAY = 1000;
 const DELAY_FACTOR = 2;
 
@@ -20,7 +20,7 @@ const shouldRetry = (error: Error): boolean => {
   return false;
 };
 
-const loadOnce = (scriptUrl: string): Promise<void> =>
+const loadOnce = (scriptUrl: string, attempt: number): Promise<void> =>
   new Promise((resolve, reject) => {
     const script = document.createElement('script');
     script.type = 'text/javascript';
@@ -47,7 +47,7 @@ const loadOnce = (scriptUrl: string): Promise<void> =>
 
     const onError = () => {
       cleanup();
-      reject(new Error(`Failed to load script: ${scriptUrl}`));
+      reject(new Error(`Failed to load script: ${scriptUrl} on ${attempt}`));
     };
 
     script.addEventListener('load', onLoad);
@@ -58,7 +58,7 @@ const loadOnce = (scriptUrl: string): Promise<void> =>
 
 const loadScript = async (url: string, attempt: number): Promise<void> => {
   try {
-    await loadOnce(url);
+    await loadOnce(url, attempt);
   } catch (err) {
     if (attempt >= RETRY || !shouldRetry(err)) {
       throw err;
