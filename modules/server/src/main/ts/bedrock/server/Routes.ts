@@ -68,11 +68,9 @@ export const json = (method: HTTPMethod, prefix: string, data: any): Route => {
   };
 };
 
-export const asyncJs = (method: HTTPMethod, url: string, pData: Promise<any>): Route => {
-  console.log('Creating async JS route for ' + url);
-  const go: RouteGoFunc = (request, response/* , done */) => {
-    pData.then((data: any) => {
-      console.log('responding to request for ' + url);
+export const asyncJs = ( method: HTTPMethod, url: string, fn: (done: (data: any) => void) => void): Route => {
+  const go: RouteGoFunc = (request, response) => {
+    fn((data: any) => {
       doResponse(request, response, 200, 'application/javascript', data);
     });
   };
@@ -239,4 +237,3 @@ export const nodeResolveFile = (method: HTTPMethod, url: string, projectDir: str
     go
   };
 };
-

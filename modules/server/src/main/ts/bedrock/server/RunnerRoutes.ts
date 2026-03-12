@@ -107,7 +107,10 @@ export const generate = async (mode: string, projectdir: string, basedir: string
       Routes.nodeResolveFile('GET', '/agar-sw.js', projectdir, '@ephox/agar-sw', 'dist/agar-sw.js'),
 
       // test code
-      Routes.asyncJs('GET', '/compiled/tests.js', Promise.resolve(compiledTest)),
+      Routes.asyncJs('GET', '/compiled/tests.js', (done) => {
+        console.log('responding to request for /compiled/tests.js in Runner.Routes');
+        done(compiledTest);
+      }),
       Routes.routing('GET', '/compiled', path.join(projectdir, scratchdir, 'compiled')),
 
       // harness API
