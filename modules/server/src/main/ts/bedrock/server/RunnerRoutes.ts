@@ -120,7 +120,8 @@ export const generate = async (mode: string, projectdir: string, basedir: string
 
   const fallback = Routes.constant('GET', basedir, basePage);
 
-  new Promise(resolve => setTimeout(resolve, 20000));
+  console.log('Awaiting sleep in routes');
+  await new Promise(resolve => setTimeout(resolve, 20000));
 
   return {
     routers,
