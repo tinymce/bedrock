@@ -37,6 +37,12 @@ const commonOptions = (directories: Directories) => {
   ];
 };
 
+export const forPrecompile = (directories: Directories, argv: string[] = process.argv): Attempt<cli.CliError, BedrockAutoSettings> => {
+  return cli.extract('bedrock-auto', 'Use ...', commonOptions(directories).concat([
+    ClOptions.name,
+  ]), argv) as Attempt<cli.CliError, BedrockAutoSettings>;
+};
+
 export const forAuto = (directories: Directories, argv: string[] = process.argv): Attempt<cli.CliError, BedrockAutoSettings> => {
   return cli.extract('bedrock-auto', 'Use a Webdriver to launch a browser and run tests against it', commonOptions(directories).concat([
     ClOptions.browser,

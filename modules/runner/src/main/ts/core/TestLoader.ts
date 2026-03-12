@@ -17,7 +17,7 @@ const shouldRetry = (error: Error): boolean => {
   if (message.includes('unhandled promise rejection')) return false;
   if (message.includes('syntax')) return false;
   if (message.includes('unexpected token')) return false;
-  return false;
+  return true;
 };
 
 const loadOnce = (scriptUrl: string, attempt: number): Promise<void> =>
@@ -60,7 +60,8 @@ const loadScript = async (url: string, attempt: number): Promise<void> => {
   try {
     await loadOnce(url, attempt);
   } catch (err) {
-    if (attempt >= RETRY || !shouldRetry(err)) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    if (attempt >= RETRY || !shouldRetry(error)) {
       throw err;
     }
     const waitMs = BASE_DELAY * Math.pow(DELAY_FACTOR, attempt);

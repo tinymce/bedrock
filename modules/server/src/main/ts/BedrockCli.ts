@@ -9,7 +9,7 @@ Util.inspect.defaultOptions.depth = null;
 
 type Program = {
   go: <T extends BedrockSettings>(settings: T, directories: { current: string; bin: string }) => Promise<void>;
-  mode: 'forAuto' | 'forManual';
+  mode: 'forAuto' | 'forManual' | 'forPrecompile';
 }
 
 export const run = async (program: Program, directories: { current: string; bin: string }): Promise<void> => {
