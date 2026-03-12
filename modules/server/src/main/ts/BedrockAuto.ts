@@ -100,6 +100,10 @@ export const go = async (bedrockAutoSettings: BedrockAutoSettings): Promise<void
 
     shutdownServices.push(service.shutdown);
 
+    // make sure the routes are ready
+    await routesPromise;
+    console.log('finished waiting routes');
+
     const { location, webdriver } = await driverPromise;
     console.log('Started webdriver session: ', webdriver.sessionId);
 

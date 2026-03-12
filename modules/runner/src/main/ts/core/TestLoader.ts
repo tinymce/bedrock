@@ -57,7 +57,6 @@ const loadOnce = (scriptUrl: string, attempt: number): Promise<void> =>
   });
 
 const loadScript = async (url: string, attempt: number): Promise<void> => {
-  throw Error('Feedback loop for error');
   try {
     await loadOnce(url, attempt);
   } catch (err) {
