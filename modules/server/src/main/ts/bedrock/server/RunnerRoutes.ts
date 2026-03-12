@@ -88,6 +88,7 @@ export const generate = async (mode: string, projectdir: string, basedir: string
   const resourceRoutes = resourceRoots.map(({name, folder}) => Routes.routing('GET', `/project/${name}`, path.join(projectdir, folder)));
 
   const compiledTest = await testGenerator.generate();
+  console.log('Finished compiling tests');
 
   const routers = [
     ...nodeModuleRoutes,
@@ -106,9 +107,7 @@ export const generate = async (mode: string, projectdir: string, basedir: string
       Routes.nodeResolveFile('GET', '/agar-sw.js', projectdir, '@ephox/agar-sw', 'dist/agar-sw.js'),
 
       // test code
-      Routes.asyncJs('GET', '/compiled/tests.js', new Promise((resolve) => {
-        setTimeout(() => resolve(compiledTest), 0);
-      })),
+      Routes.asyncJs('GET', '/compiled/tests.js', Promise.resolve(compiledTest)),
       Routes.routing('GET', '/compiled', path.join(projectdir, scratchdir, 'compiled')),
 
       // harness API
