@@ -71,22 +71,24 @@ export const startCustom = async (settings: ServeSettings, createServer: (port: 
   const api = Apis.create(master, maybeDriver, projectdir, basedir, stickyFirstSession, overallTimeout, testfiles, settings.loglevel, resetMousePosition);
 
   // it is important to not use `await` here so the port opens as fast as possible
-  const serverRoutes = runner.then(async r => ({
-    routers: r.routers.concat(
-      await api.routers,
+  const resolvedRunner = await runner;
+  const resolvedApiRoutes = await api.routers;
+  const serverRoutes = {
+    routers: resolvedRunner.routers.concat(
+      resolvedApiRoutes,
       cr.routers
     ),
-    fallback: r.fallback
-  }));
+    fallback: resolvedRunner.fallback
+  };
+
 
   try {
     const port = settings.port ?? 0;
 
     const server = createServer(port, (request, response) => {
       const done = finalhandler(request, response);
-      serverRoutes.then(({ routers, fallback }) => {
-        Routes.route(routers, fallback, request, response, done);
-      });
+      const { routers, fallback } = serverRoutes;
+      Routes.route(routers, fallback, request, response, done);
     });
     const serverPort = await server.start();
 
