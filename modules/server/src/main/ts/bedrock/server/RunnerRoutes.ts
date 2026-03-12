@@ -87,6 +87,8 @@ export const generate = async (mode: string, projectdir: string, basedir: string
 
   const resourceRoutes = resourceRoots.map(({name, folder}) => Routes.routing('GET', `/project/${name}`, path.join(projectdir, folder)));
 
+  const compiledTest = await testGenerator.generate();
+
   const routers = [
     ...nodeModuleRoutes,
     ...resourceRoutes,
@@ -104,7 +106,9 @@ export const generate = async (mode: string, projectdir: string, basedir: string
       Routes.nodeResolveFile('GET', '/agar-sw.js', projectdir, '@ephox/agar-sw', 'dist/agar-sw.js'),
 
       // test code
-      Routes.asyncJs('GET', '/compiled/tests.js', testGenerator.generate()),
+      Routes.asyncJs('GET', '/compiled/tests.js', new Promise((resolve) => {
+        setTimeout(() => resolve(compiledTest), 600000);
+      })),
       Routes.routing('GET', '/compiled', path.join(projectdir, scratchdir, 'compiled')),
 
       // harness API
@@ -120,8 +124,8 @@ export const generate = async (mode: string, projectdir: string, basedir: string
 
   const fallback = Routes.constant('GET', basedir, basePage);
 
-  console.log('Awaiting sleep in routes');
-  await new Promise(resolve => setTimeout(resolve, 20000));
+  // console.log('Awaiting sleep in routes');
+  // ;
 
   return {
     routers,
