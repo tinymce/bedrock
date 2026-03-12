@@ -107,7 +107,7 @@ export const generate = async (mode: string, projectdir: string, basedir: string
 
       // test code
       Routes.asyncJs('GET', '/compiled/tests.js', new Promise((resolve) => {
-        setTimeout(() => resolve(compiledTest), 600000);
+        setTimeout(() => resolve(compiledTest), 0);
       })),
       Routes.routing('GET', '/compiled', path.join(projectdir, scratchdir, 'compiled')),
 
