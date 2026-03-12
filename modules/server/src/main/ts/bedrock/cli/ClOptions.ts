@@ -395,3 +395,10 @@ export const webdriverPort: ClOption = {
   defaultValue: 4444,
   uncommon: true
 };
+
+export const cache: ClOption = {
+  name: 'cache',
+  type: String,
+  description: 'Use pre-compiled content from cache dir',
+  validate: Extraction.any
+};

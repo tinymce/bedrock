@@ -4,6 +4,7 @@
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
   "bin": {
+    "bedrock-precompile": "./bin/bedrock-precompile.cjs",
     "bedrock-auto": "./bin/bedrock-auto.cjs",
     "bedrock": "./bin/bedrock.cjs"
   },

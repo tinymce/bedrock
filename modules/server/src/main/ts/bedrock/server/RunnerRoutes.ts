@@ -18,7 +18,7 @@ interface WorkspaceRoot {
   folder: string;
 }
 
-export const generate = async (mode: string, projectdir: string, basedir: string, scratchdir: string, configFile: string, bundler: Types.Bundler, testfiles: string[], chunk: number,
+export const generate = async (mode: string, projectdir: string, basedir: string, scratchdir: string, cache: boolean, configFile: string, bundler: Types.Bundler, testfiles: string[], chunk: number,
                                retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[], polyfills: string[]): Promise<Routes.Runner> => {
   const files = testfiles.map((filePath) => {
     return path.relative(projectdir, filePath);
@@ -32,7 +32,8 @@ export const generate = async (mode: string, projectdir: string, basedir: string
     exitOnCompileError: mode === 'auto',
     files,
     coverage,
-    polyfills
+    polyfills,
+    cache
   });
 
   // read the project json file to determine the project name to expose resources as `/project/${name}`

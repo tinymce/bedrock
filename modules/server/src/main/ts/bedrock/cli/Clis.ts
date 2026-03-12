@@ -37,9 +37,9 @@ const commonOptions = (directories: Directories) => {
   ];
 };
 
-export const forPrecompile = (directories: Directories, argv: string[] = process.argv): Attempt<cli.CliError, BedrockAutoSettings> => {
-  return cli.extract('bedrock-auto', 'Use ...', commonOptions(directories).concat([
-    ClOptions.name,
+export const precompile = (directories: Directories, argv: string[] = process.argv): Attempt<cli.CliError, BedrockAutoSettings> => {
+  return cli.extract('bedrock-precompile', 'Precompile tests for bedrock-auto', commonOptions(directories).concat([
+    ClOptions.cache,
   ]), argv) as Attempt<cli.CliError, BedrockAutoSettings>;
 };
 
@@ -64,7 +64,8 @@ export const forAuto = (directories: Directories, argv: string[] = process.argv)
     ClOptions.devicefarmRegion,
     ClOptions.browserVersion,
     ClOptions.platformName,
-    ClOptions.useSelenium
+    ClOptions.useSelenium,
+    ClOptions.cache,
   ]), argv) as Attempt<cli.CliError, BedrockAutoSettings>;
 };
 

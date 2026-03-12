@@ -8,6 +8,7 @@
   "scripts": {
     "bedrock": "node modules/server/bin/bedrock.cjs",
     "bedrock-auto": "node modules/server/bin/bedrock-auto.cjs",
+    "bedrock-precompile": "node modules/server/bin/bedrock-precompile.cjs",
     "lint": "yarn eslint 'modules/common/src/**/*.ts' 'modules/client/src/**/*.ts' 'modules/runner/src/**/*.ts' 'modules/server/src/**/*.ts' 'modules/server/tasks/**/*.js'",
     "prepublishOnly": "yarn build",
     "postinstall": "patch-package",
