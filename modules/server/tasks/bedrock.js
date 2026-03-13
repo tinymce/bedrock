@@ -1,5 +1,6 @@
 const path = require('path');
 const cloptions = require('../lib/main/ts/bedrock/cli/ClOptions');
+const bedrockPrecompile = require('../lib/main/ts/BedrockCache');
 const bedrockManual = require('../lib/main/ts/BedrockManual');
 const bedrockAuto = require('../lib/main/ts/BedrockAuto');
 
@@ -76,6 +77,23 @@ module.exports = function(grunt) {
       bedrockAuto.go(autoSettings);
     } catch (err) {
       grunt.log.error('Error running bedrock-auto', err);
+    }
+  });
+
+  grunt.registerMultiTask('bedrock-precompile', 'Bedrock precompilation step', function () {
+    const settings = grunt.config([this.name, this.target]);
+    const done = this.async();
+    this.requiresConfig([this.name, this.target, 'config']);
+    this.requiresConfig([this.name, this.target, 'testfiles']);
+    const richSettings = enrichSettings(settings);
+    richSettings.gruntDone = function (passed) {
+      done(passed);
+    };
+    richSettings.stopOnFailure = richSettings.stopOnFailure ?? false;
+    try {
+      bedrockPrecompile.go(richSettings);
+    } catch (err) {
+      grunt.log.error('Error running bedrock-precompile', err);
     }
   });
 };
