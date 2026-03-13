@@ -87,7 +87,13 @@ export const generate = async (mode: string, projectdir: string, basedir: string
 
   const resourceRoutes = resourceRoots.map(({name, folder}) => Routes.routing('GET', `/project/${name}`, path.join(projectdir, folder)));
 
+  const start = process.hrtime.bigint();
   const precompiledTests = mode === 'auto' ? await testGenerator.generate() : null;
+  console.log(
+    `[startup] initial testGenerator.generate() took ${
+      Number(process.hrtime.bigint() - start) / 1_000_000
+    }ms`
+  );
 
   const routers = [
     ...nodeModuleRoutes,
@@ -107,10 +113,17 @@ export const generate = async (mode: string, projectdir: string, basedir: string
 
       // test code
       Routes.asyncJs('GET', '/compiled/tests.js', (done) => {
+        const start = process.hrtime.bigint();
         if (precompiledTests !== null) {
+          const ms = Number(process.hrtime.bigint() - start) / 1_000_000;
+          console.log(`[tests.js] served from cache in ${ms.toFixed(2)}ms`);
           done(precompiledTests);
         } else {
-          testGenerator.generate().then(done);
+          testGenerator.generate().then((result) => {
+          const ms = Number(process.hrtime.bigint() - start) / 1_000_000;
+          console.log(`[tests.js] generated in ${ms.toFixed(2)}ms`);
+           done(result);
+          });
         }
       }, { gzip: true }),
       Routes.routing('GET', '/compiled', path.join(projectdir, 'scratch/compiled')),
