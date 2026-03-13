@@ -116,8 +116,8 @@ export const generate = async (mode: string, projectdir: string, basedir: string
         const start = process.hrtime.bigint();
         if (precompiledTests !== null) {
           const ms = Number(process.hrtime.bigint() - start) / 1_000_000;
-          console.log(`[tests.js] served from cache in ${ms.toFixed(2)}ms`);
           done(precompiledTests);
+          console.log(`[tests.js] served from cache in ${ms.toFixed(2)}ms`);
         } else {
           testGenerator.generate().then((result) => {
           const ms = Number(process.hrtime.bigint() - start) / 1_000_000;
