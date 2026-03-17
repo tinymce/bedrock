@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 16.1.2 - 2026-03-17
+
 ### Fixed
 - `bedrock-auto` now awaits test compilation. #TINY-14037
 
