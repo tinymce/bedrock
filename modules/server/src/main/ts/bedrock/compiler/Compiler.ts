@@ -30,6 +30,9 @@ export const compile = (args: { bundler: Types.Bundler; tsConfigFile: string; sc
   };
 
   const generate = async (): Promise<Buffer | string> => {
+    const start = performance.now();
+
+
     const compile = getCompileFunc();
     const compiledJsFilePath = await compile(
       tsConfigFile,
@@ -40,7 +43,10 @@ export const compile = (args: { bundler: Types.Bundler; tsConfigFile: string; sc
       coverage,
       polyfills
     );
-    return fs.readFileSync(compiledJsFilePath);
+    const result = fs.readFileSync(compiledJsFilePath);
+    const elapsedMs = performance.now() - start;
+    console.log(`Compiler.generate: took ${elapsedMs.toFixed(3)} ms`);
+    return result;
   };
 
   return {
