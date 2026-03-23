@@ -32,7 +32,6 @@ export const compile = (args: { bundler: Types.Bundler; tsConfigFile: string; sc
   const generate = async (): Promise<Buffer | string> => {
     const start = performance.now();
 
-
     const compile = getCompileFunc();
     const compiledJsFilePath = await compile(
       tsConfigFile,

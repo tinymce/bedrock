@@ -43,8 +43,8 @@ const webpackSharedRules = ([] as any[]).concat([
 const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, coverage: string[], manualMode: boolean, basedir: string): webpack.Configuration => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+  // // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
   return {
     stats: 'none',
@@ -116,14 +116,14 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
     },
 
     plugins: [
-      new ForkTsCheckerWebpackPlugin({
-        async: manualMode,
-        typescript: {
-          memoryLimit: manualMode ? 4096 : 2048,
-          configFile: tsConfigFile,
-          build: true
-        }
-      }),
+      // new ForkTsCheckerWebpackPlugin({
+      //   async: manualMode,
+      //   typescript: {
+      //     memoryLimit: manualMode ? 4096 : 2048,
+      //     configFile: tsConfigFile,
+      //     build: true
+      //   }
+      // }),
       new webpack.WatchIgnorePlugin({
         paths: [
           // Ignore generated files. See https://github.com/TypeStrong/ts-loader#usage-with-webpack-watch
