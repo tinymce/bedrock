@@ -9,15 +9,15 @@ import { RspackDevServer } from '@rspack/dev-server';
 import { RspackCompileInfo, DevServerServeSettings, CompileFn } from './Types';
 
 const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, manualMode: boolean, basedir: string): RspackOptions => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { TsCheckerRspackPlugin } = require('ts-checker-rspack-plugin');
+  // // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // const { TsCheckerRspackPlugin } = require('ts-checker-rspack-plugin');
 
    const getTsConfigFile = () => path.isAbsolute(tsConfigFile) ? tsConfigFile : path.resolve(process.cwd(), tsConfigFile);
 
   return {
     entry: scratchFile,
     devtool: manualMode ? 'inline-source-map' : false,
-    mode: manualMode ? 'development' : 'none',
+    mode: manualMode ? 'development' : 'production',
     target: ['web', 'es5'],
 
     optimization: {
@@ -105,14 +105,14 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
       new rspack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('development')
       }),
-      new TsCheckerRspackPlugin({
-        async: manualMode,
-        typescript: {
-          memoryLimit: manualMode ? 4096 : 2048,
-          configFile: getTsConfigFile(),
-          build: true
-        }
-      })
+      // new TsCheckerRspackPlugin({
+      //   async: manualMode,
+      //   typescript: {
+      //     memoryLimit: manualMode ? 4096 : 2048,
+      //     configFile: getTsConfigFile(),
+      //     build: true
+      //   }
+      // })
     ],
 
     output: {
