@@ -56,7 +56,7 @@ export const bundler: ClOption = {
   name: 'bundler',
   type: String,
   required: false,
-  defaultValue: 'rspack',
+  defaultValue: 'webpack',
   description: 'Specify the bundler (webpack, rspack).',
   validate: Extraction.inSet([
     'webpack',
