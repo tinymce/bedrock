@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added a `--skipTypecheck` CLI option to skip typechecking before tests.
 
+### Fixed
+- Fixed an issue where typechecking errors when using rspack would not recover and required restarting the server. #TINY-14130
+
 ## 16.1.2 - 2026-03-17
 
 ### Fixed
@@ -37,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # 15.1.1 - 2025-12-19
 
-## Unreleased
+## Fixed
 - Fixed an issue where using bedrock-auto with rspack bundling resulted in an error. #TINY-13550
 
 # 15.1.0 - 2025-12-17
