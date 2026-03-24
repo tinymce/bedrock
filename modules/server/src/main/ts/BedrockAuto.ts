@@ -77,12 +77,27 @@ export const go = async (bedrockAutoSettings: BedrockAutoSettings): Promise<void
   const shutdown = (services: ((immediate?: boolean) => Promise<void>)[]) => (immediate?: boolean) => Promise.allSettled(services.map((fn) => fn(immediate)));
 
   try {
-
     const driverDeferred = defer<Attempt<unknown, Browser>>();
 
     const scratchDir = settings.name ? `scratch/${settings.name}` : `scratch/bedrock`;
 
-    const routesPromise = RunnerRoutes.generate('auto', settings.projectdir, settings.basedir, scratchDir, settings.config, settings.bundler, settings.testfiles, settings.chunk, settings.retries, settings.singleTimeout, settings.stopOnFailure, basePage, settings.coverage, settings.polyfills);
+    const routesPromise = RunnerRoutes.generate({
+      mode: 'auto',
+      projectdir: settings.projectdir,
+      basedir: settings.basedir,
+      scratchdir: scratchDir,
+      configFile: settings.config,
+      bundler: settings.bundler,
+      testfiles: settings.testfiles,
+      chunk: settings.chunk,
+      retries: settings.retries,
+      singleTimeout: settings.singleTimeout,
+      stopOnFailure: settings.stopOnFailure,
+      basePage,
+      coverage: settings.coverage,
+      polyfills: settings.polyfills,
+      skipTypecheck: settings.skipTypecheck
+    });
 
     const service = await Serve.start({
       ...settings,

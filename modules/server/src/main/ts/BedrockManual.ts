@@ -14,8 +14,23 @@ export const go = async (bedrockManualSettings: BedrockManualSettings): Promise<
 
   const settings = SettingsResolver.resolveAndLog(bedrockManualSettings);
   const basePage = 'src/resources/html/bedrock.html';
-  const routes = RunnerRoutes.generate('manual', settings.projectdir, settings.basedir, 'scratch', settings.config, settings.bundler, settings.testfiles, settings.chunk, 0, settings.singleTimeout, true, basePage, settings.coverage, settings.polyfills);
-
+  const routes = RunnerRoutes.generate({
+    mode: 'manual',
+    projectdir: settings.projectdir,
+    basedir: settings.basedir,
+    scratchdir: 'scratch',
+    configFile: settings.config,
+    bundler: settings.bundler,
+    testfiles: settings.testfiles,
+    chunk: settings.chunk,
+    retries: 0,
+    singleTimeout: settings.singleTimeout,
+    stopOnFailure: true,
+    basePage,
+    coverage: settings.coverage,
+    polyfills: settings.polyfills,
+    skipTypecheck: settings.skipTypecheck
+  });
   const port = await portfinder.getPortPromise({
     port: 8000,
     stopPort: 20000
@@ -46,4 +61,3 @@ export const go = async (bedrockManualSettings: BedrockManualSettings): Promise<
 };
 
 export const mode = 'forManual';
-

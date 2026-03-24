@@ -18,8 +18,43 @@ interface WorkspaceRoot {
   folder: string;
 }
 
-export const generate = async (mode: string, projectdir: string, basedir: string, scratchdir: string, configFile: string, bundler: Types.Bundler, testfiles: string[], chunk: number,
-                               retries: number, singleTimeout: number, stopOnFailure: boolean, basePage: string, coverage: string[], polyfills: string[]): Promise<Routes.Runner> => {
+interface GenerateArgs {
+  readonly mode: string;
+  readonly projectdir: string;
+  readonly basedir: string;
+  readonly scratchdir: string;
+  readonly configFile: string;
+  readonly bundler: Types.Bundler;
+  readonly testfiles: string[];
+  readonly chunk: number;
+  readonly retries: number;
+  readonly singleTimeout: number;
+  readonly stopOnFailure: boolean;
+  readonly basePage: string;
+  readonly coverage: string[];
+  readonly polyfills: string[];
+  readonly skipTypecheck: boolean;
+}
+
+export const generate = async (args: GenerateArgs): Promise<Routes.Runner> => {
+  const {
+    mode,
+    projectdir,
+    basedir,
+    scratchdir,
+    configFile,
+    bundler,
+    testfiles,
+    chunk,
+    retries,
+    singleTimeout,
+    stopOnFailure,
+    basePage,
+    coverage,
+    polyfills,
+    skipTypecheck
+  } = args;
+
   const files = testfiles.map((filePath) => {
     return path.relative(projectdir, filePath);
   });
@@ -30,9 +65,10 @@ export const generate = async (mode: string, projectdir: string, basedir: string
     scratchDir: path.join(projectdir, scratchdir),
     basedir,
     exitOnCompileError: mode === 'auto',
-    files,
+    srcFiles: files,
     coverage,
-    polyfills
+    polyfills,
+    skipTypecheck
   });
 
   // read the project json file to determine the project name to expose resources as `/project/${name}`

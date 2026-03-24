@@ -19,6 +19,7 @@ export interface BedrockSettings {
   readonly verbose: boolean;
   readonly webdriverPort: number;
   readonly useSelenium: boolean;
+  readonly skipTypecheck: boolean;
 }
 
 export type BedrockManualSettings = BedrockSettings;

@@ -57,6 +57,7 @@ describe('Clis.forAuto', () => {
       verbose: false,
       bucket: 1,
       buckets: 1,
+      skipTypecheck: false,
       useSandboxForHeadless: false,
       useSelenium: false,
       extraBrowserCapabilities: '',
@@ -98,6 +99,7 @@ describe('Clis.forAuto', () => {
       verbose: true,
       bucket: 1,
       buckets: 1,
+      skipTypecheck: false,
       useSandboxForHeadless: false,
       useSelenium: false,
       extraBrowserCapabilities: '',
@@ -140,6 +142,7 @@ describe('Clis.forAuto', () => {
       verbose: false,
       bucket: 3,
       buckets: 7,
+      skipTypecheck: false,
       useSandboxForHeadless: false,
       useSelenium: false,
       extraBrowserCapabilities: '',
@@ -181,6 +184,7 @@ describe('Clis.forAuto', () => {
       verbose: false,
       bucket: 1,
       buckets: 1,
+      skipTypecheck: false,
       useSandboxForHeadless: false,
       useSelenium: false,
       extraBrowserCapabilities: ' --some-browser-flag',
@@ -225,6 +229,7 @@ describe('Clis.forAuto', () => {
       verbose: false,
       bucket: 1,
       buckets: 1,
+      skipTypecheck: false,
       useSandboxForHeadless: false,
       useSelenium: false,
       extraBrowserCapabilities: '',
@@ -271,6 +276,7 @@ describe('Clis.forAuto', () => {
       verbose: false,
       bucket: 1,
       buckets: 1,
+      skipTypecheck: false,
       useSandboxForHeadless: false,
       useSelenium: false,
       extraBrowserCapabilities: '',
@@ -303,6 +309,48 @@ describe('Clis.forAuto', () => {
     ], cleanError(actual));
   });
 
+  it('TINY-14141: skips typechecking when requested', () => {
+    const args = [
+      '--browser', 'MicrosoftEdge',
+      '--files', 'src/test/resources/test.file1',
+      '--config', 'src/test/resources/tsconfig.sample.json',
+      '--skipTypecheck'
+    ];
+    const actual = Clis.forAuto(directories, args);
+    AttemptUtils.assertResult({
+      browser: 'MicrosoftEdge',
+      browserVersion: 'latest',
+      bundler: 'webpack',
+      config: 'src/test/resources/tsconfig.sample.json',
+      name: 'bedrock-run',
+      output: 'scratch',
+      help: false,
+      testfiles: [
+        'src/test/resources/test.file1'
+      ],
+      delayExit: false,
+      singleTimeout: 30000,
+      stopOnFailure: false,
+      overallTimeout: 600000,
+      loglevel: 'advanced',
+      version: false,
+      chunk: 2000,
+      retries: 0,
+      polyfills: [ 'Symbol' ],
+      verbose: false,
+      bucket: 1,
+      buckets: 1,
+      skipTypecheck: true,
+      useSandboxForHeadless: false,
+      useSelenium: false,
+      extraBrowserCapabilities: '',
+      skipResetMousePosition: false,
+      wipeBrowserCache: false,
+      remote: '',
+      webdriverPort: 4444
+    }, cleanResult(actual));
+  });
+
   it('fails when browser argument missing', () => {
     const args = [
       '--files', 'src/test/resources/test.file1',
@@ -328,6 +376,7 @@ describe('Clis.forManual', () => {
     version: false,
     chunk: 2000,
     polyfills: [ 'Symbol' ],
+    skipTypecheck: false,
     bucket: 1,
     buckets: 1
   };
@@ -402,6 +451,24 @@ describe('Clis.forManual', () => {
       verbose: false,
       bucket: 4,
       buckets: 15
+    }, Attempt.map(actual, exclude(['projectdir', 'basedir'])));
+  });
+
+  it('TINY-14141: skips typechecking when requested', () => {
+    const args = [
+      '--files', 'src/test/resources/test.file1',
+      '--config', 'src/test/resources/tsconfig.sample.json',
+      '--skipTypecheck'
+    ];
+    const actual = Clis.forManual(directories, args);
+    AttemptUtils.assertResult({
+      ...defaultCliOptions,
+      config: 'src/test/resources/tsconfig.sample.json',
+      skipTypecheck: true,
+      verbose: false,
+      testfiles: [
+        'src/test/resources/test.file1'
+      ]
     }, Attempt.map(actual, exclude(['projectdir', 'basedir'])));
   });
 });

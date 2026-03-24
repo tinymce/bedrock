@@ -8,7 +8,7 @@ import { rspack, RspackOptions } from '@rspack/core';
 import { RspackDevServer } from '@rspack/dev-server';
 import { RspackCompileInfo, DevServerServeSettings, CompileFn } from './Types';
 
-const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, manualMode: boolean, basedir: string): RspackOptions => {
+const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, manualMode: boolean, basedir: string, skipTypecheck: boolean): RspackOptions => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { TsCheckerRspackPlugin } = require('ts-checker-rspack-plugin');
 
@@ -105,14 +105,14 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
       new rspack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('development')
       }),
-      new TsCheckerRspackPlugin({
+      ...(!skipTypecheck ? [ new TsCheckerRspackPlugin({
         async: manualMode,
         typescript: {
           memoryLimit: manualMode ? 4096 : 2048,
           configFile: getTsConfigFile(),
           build: true
         }
-      })
+      }) ] : [])
     ],
 
     output: {
@@ -150,7 +150,7 @@ const compileTests = (compileInfo: RspackCompileInfo, exitOnCompileError: boolea
   });
 };
 
-const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean): Promise<RspackCompileInfo> => {
+const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean, skipTypecheck: boolean): Promise<RspackCompileInfo> => {
   return new Promise((resolve, reject) => {
     const scratchFile = path.join(scratchDir, 'compiled/tests-imports.ts');
     const dest = path.join(scratchDir, 'compiled/tests.js');
@@ -158,18 +158,26 @@ const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: str
     if (!fs.existsSync(tsConfigFile)) {
       reject(`Could not find the required tsconfig file: ${tsConfigFile}`);
     } else {
-      const config = getWebPackConfigTs(tsConfigFile, scratchFile, dest, manualMode, basedir);
+      const config = getWebPackConfigTs(tsConfigFile, scratchFile, dest, manualMode, basedir, skipTypecheck);
       resolve({ scratchFile, dest, config });
     }
   });
 };
 
-const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean): Promise<RspackCompileInfo> => {
-  return getTsCompileInfo(tsConfigFile, scratchDir, basedir, manualMode);
+const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean, skipTypecheck: boolean): Promise<RspackCompileInfo> => {
+  return getTsCompileInfo(tsConfigFile, scratchDir, basedir, manualMode, skipTypecheck);
 };
 
-export const compile: CompileFn = async (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], _coverage: string[], polyfills: string[]): Promise<string> => {
-  const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, basedir, false);
+export const compile: CompileFn = async ({
+  tsConfigFile,
+  scratchDir,
+  basedir,
+  exitOnCompileError,
+  srcFiles,
+  polyfills,
+  skipTypecheck
+}): Promise<string> => {
+  const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, basedir, false, skipTypecheck);
   return compileTests(compileInfo, exitOnCompileError, srcFiles, polyfills);
 };
 
@@ -178,8 +186,9 @@ const isCompiledRequest = (url?: string) => url && url.startsWith('/compiled/');
 export const devserver = async (settings: DevServerServeSettings): Promise<Serve.ServeService> => {
   const scratchDir = path.resolve('scratch');
   const tsConfigFile = settings.config;
+  const skipTypecheck = settings.skipTypecheck;
 
-  const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, settings.basedir, true);
+  const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, settings.basedir, true, skipTypecheck);
   return Serve.startCustom(settings, (port, handler) => {
     const scratchFile = compileInfo.scratchFile;
     console.log(`Loading ${settings.testfiles.length} test files...`);

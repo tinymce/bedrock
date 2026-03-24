@@ -6,6 +6,22 @@ export interface DevServerServeSettings extends Serve.ServeSettings {
   readonly config: string;
   readonly coverage: string[];
   readonly polyfills: string[];
+  readonly skipTypecheck: boolean;
+}
+
+export interface CompileArgs {
+  readonly tsConfigFile: string;
+  readonly scratchDir: string;
+  readonly basedir: string;
+  readonly exitOnCompileError: boolean;
+  readonly srcFiles: string[];
+  readonly coverage: string[];
+  readonly polyfills: string[];
+  readonly skipTypecheck: boolean;
+}
+
+export interface CompilerArgs extends CompileArgs {
+  readonly bundler: Bundler;
 }
 
 export type WebpackCompileInfo = CompileInfo<Configuration>;
@@ -17,14 +33,6 @@ export interface CompileInfo<T> {
   readonly config: T;
 }
 
-export type CompileFn = (
-  tsConfigFile: string,
-  scratchDir: string,
-  basedir: string,
-  exitOnCompileError: boolean,
-  srcFiles: string[],
-  coverage: string[],
-  polyfills: string[]
-) => Promise<string>;
+export type CompileFn = (args: CompileArgs) => Promise<string>;
 
 export type Bundler = 'rspack' | 'webpack';
