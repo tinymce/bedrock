@@ -7,17 +7,10 @@ export interface Compiler {
   readonly generate: () => Promise<Buffer | string>;
 }
 
-export const compile = (args: { bundler: Types.Bundler; tsConfigFile: string; scratchDir: string; basedir: string; exitOnCompileError: boolean; files: string[]; coverage: string[]; polyfills: string[];
-}): Compiler => {
+export const compile = (args: Types.CompilerArgs): Compiler => {
   const {
     bundler,
-    tsConfigFile,
-    scratchDir,
-    basedir,
-    exitOnCompileError,
-    files,
-    coverage,
-    polyfills
+    ...compileArgs
   } = args;
 
   const getCompileFunc = (): Types.CompileFn => {
@@ -31,15 +24,7 @@ export const compile = (args: { bundler: Types.Bundler; tsConfigFile: string; sc
 
   const generate = async (): Promise<Buffer | string> => {
     const compile = getCompileFunc();
-    const compiledJsFilePath = await compile(
-      tsConfigFile,
-      scratchDir,
-      basedir,
-      exitOnCompileError,
-      files,
-      coverage,
-      polyfills
-    );
+    const compiledJsFilePath = await compile(compileArgs);
     return fs.readFileSync(compiledJsFilePath);
   };
 

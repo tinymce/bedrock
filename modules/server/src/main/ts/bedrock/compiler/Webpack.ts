@@ -40,7 +40,7 @@ const webpackSharedRules = ([] as any[]).concat([
   }
 ]);
 
-const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, coverage: string[], manualMode: boolean, basedir: string): webpack.Configuration => {
+const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, coverage: string[], manualMode: boolean, basedir: string, skipTypecheck: boolean): webpack.Configuration => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -116,14 +116,14 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
     },
 
     plugins: [
-      new ForkTsCheckerWebpackPlugin({
+      ...(!skipTypecheck ? [ new ForkTsCheckerWebpackPlugin({
         async: manualMode,
         typescript: {
           memoryLimit: manualMode ? 4096 : 2048,
           configFile: tsConfigFile,
           build: true
         }
-      }),
+      }) ] : []),
       new webpack.WatchIgnorePlugin({
         paths: [
           // Ignore generated files. See https://github.com/TypeStrong/ts-loader#usage-with-webpack-watch
@@ -228,7 +228,7 @@ const compileTests = (compileInfo: WebpackCompileInfo, exitOnCompileError: boole
   });
 };
 
-const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean, coverage: string[]): Promise<WebpackCompileInfo> => {
+const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean, coverage: string[], skipTypecheck: boolean): Promise<WebpackCompileInfo> => {
   return new Promise((resolve, reject) => {
     const scratchFile = path.join(scratchDir, 'compiled/tests-imports.ts');
     const dest = path.join(scratchDir, 'compiled/tests.js');
@@ -236,7 +236,7 @@ const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: str
     if (!fs.existsSync(tsConfigFile)) {
       reject(`Could not find the required tsconfig file: ${tsConfigFile}`);
     } else {
-      const config = getWebPackConfigTs(tsConfigFile, scratchFile, dest, coverage, manualMode, basedir);
+      const config = getWebPackConfigTs(tsConfigFile, scratchFile, dest, coverage, manualMode, basedir, skipTypecheck);
       resolve({ scratchFile, dest, config });
     }
   });
@@ -250,16 +250,25 @@ const getJsCompileInfo = (scratchDir: string, basedir: string, manualMode: boole
   return Promise.resolve({ scratchFile, dest, config });
 };
 
-const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean, srcFiles: string[], coverage: string[]): Promise<WebpackCompileInfo> => {
+const getCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: string, manualMode: boolean, srcFiles: string[], coverage: string[], skipTypecheck: boolean): Promise<WebpackCompileInfo> => {
   if (hasTs(srcFiles)) {
-    return getTsCompileInfo(tsConfigFile, scratchDir, basedir, manualMode, coverage);
+    return getTsCompileInfo(tsConfigFile, scratchDir, basedir, manualMode, coverage, skipTypecheck);
   } else {
     return getJsCompileInfo(scratchDir, basedir, manualMode, coverage);
   }
 };
 
-export const compile: CompileFn = async (tsConfigFile: string, scratchDir: string, basedir: string, exitOnCompileError: boolean, srcFiles: string[], coverage: string[], polyfills: string[]): Promise<string> => {
-  const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, basedir, false, srcFiles, coverage);
+export const compile: CompileFn = async ({
+  tsConfigFile,
+  scratchDir,
+  basedir,
+  exitOnCompileError,
+  srcFiles,
+  coverage,
+  polyfills,
+  skipTypecheck
+}): Promise<string> => {
+  const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, basedir, false, srcFiles, coverage, skipTypecheck);
   return compileTests(compileInfo, exitOnCompileError, srcFiles, polyfills);
 };
 
@@ -268,8 +277,9 @@ const isCompiledRequest = (request: { url: string }) => request.url.startsWith('
 export const devserver = async (settings: DevServerServeSettings): Promise<Serve.ServeService> => {
   const scratchDir = path.resolve('scratch');
   const tsConfigFile = settings.config;
+  const skipTypecheck = settings.skipTypecheck;
 
-  const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, settings.basedir, true, settings.testfiles, settings.coverage);
+  const compileInfo = await getCompileInfo(tsConfigFile, scratchDir, settings.basedir, true, settings.testfiles, settings.coverage, skipTypecheck);
   return Serve.startCustom(settings, (port, handler) => {
     const scratchFile = compileInfo.scratchFile;
     console.log(`Loading ${settings.testfiles.length} test files...`);

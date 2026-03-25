@@ -52,6 +52,14 @@ export const browser: ClOption = {
   ])
 };
 
+export const skipTypecheck: ClOption = {
+  name: 'skipTypecheck',
+  type: Boolean,
+  defaultValue: false,
+  description: 'Skip typechecking before tests',
+  validate: Extraction.any
+};
+
 export const bundler: ClOption = {
   name: 'bundler',
   type: String,
