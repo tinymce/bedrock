@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+- A rejected promise or exception in a `before` or `after` hook aborted the entire run instead of being reported as a failure. #TINYMCE-14759
+- An error arriving after the test that caused it had finished was silently discarded, it is now reported against the most recent test. #TINYMCE-14759
+- A test that timed out no longer hides the error from work that was still in flight, it is reported as `<test> (error after test)`. #TINYMCE-14759
+- A promise rejected without a reason was treated as a pass. #TINYMCE-14759
+- An `after` or `afterEach` hook failure replaced the error of the test that had already failed. #TINYMCE-14759
+
 ## 16.2.0 - 2026-03-25
 
 ### Added

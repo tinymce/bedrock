@@ -1,12 +1,27 @@
-import { Context, ExecuteFn, Failure, Runnable, RunnableState, TestThrowable } from '@ephox/bedrock-common';
+import { Context, ExecuteFn, Failure, LoggedError, Runnable, RunnableState, TestThrowable, Type } from '@ephox/bedrock-common';
 import { isInternalError, MultipleDone, SkipError } from '../errors/Errors';
 import { ErrorCatcher } from '../errors/ErrorCatcher';
 import { Timer } from './Timer';
 
+type LoggedError = LoggedError.LoggedError;
+
 const isPromiseLike = (value: unknown | undefined): value is PromiseLike<any> =>
   value !== undefined && (value as PromiseLike<any>).then !== undefined;
 
+// Promises can be rejected, and values thrown, with anything at all - including nothing - so
+// substitute an error for the values that can't be reported on
+const normalizeThrowable = (e: unknown): TestThrowable =>
+  Type.isObject(e) || Type.isString(e) || typeof e === 'function'
+    ? e as TestThrowable
+    : new Error(`Failed with no or falsy error: ${e}`);
+
 const errorCatcher = ErrorCatcher();
+
+// Errors that arrive while no runnable is executing are otherwise lost, as there's nothing left to
+// fail. They still need reporting, so hand them to the runner to attribute to whatever ran last.
+export const catchStrayErrors = (onError: (e: LoggedError) => void): void => {
+  errorCatcher.bindFallback((e) => onError(Failure.prepFailure(e)));
+};
 
 export const runWithErrorCatcher = <T>(runnable: Runnable, fn: () => Promise<T>): Promise<T> => {
   return new Promise((resolve, reject) => {
@@ -53,13 +68,13 @@ const runExecFn = (fn: ExecuteFn, context: Context): Promise<void> => {
       const retValue: any = fn.call(context, done);
       if (fn.length === 0) {
         if (isPromiseLike(retValue)) {
-          retValue.then(() => done(), done);
+          retValue.then(() => done(), (e) => done(normalizeThrowable(e)));
         } else {
           resolve();
         }
       }
     } catch (e) {
-      const err = isInternalError(e) ? e : Failure.prepFailure(e);
+      const err = isInternalError(e) ? e : Failure.prepFailure(normalizeThrowable(e));
       reject(err);
     }
   });

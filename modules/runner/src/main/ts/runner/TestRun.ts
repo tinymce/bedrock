@@ -1,13 +1,13 @@
-import { Failure, LoggedError, RunnableState, Suite, Test } from '@ephox/bedrock-common';
+import { Failure, HookType, LoggedError, RunnableState, Suite, Test } from '@ephox/bedrock-common';
 import * as Context from '../core/Context';
 import { InternalError, isInternalError, SkipError } from '../errors/Errors';
 import { Reporter, TestReporter } from '../reporter/Reporter';
 import * as Hooks from './Hooks';
 import { runWithErrorCatcher, runWithTimeout } from './Run';
-import { countTests, loop } from './Utils';
+import { countTests, getTests, loop } from './Utils';
 
 type LoggedError = LoggedError.LoggedError;
-type RunReporter = Pick<Reporter, 'test'>;
+type RunReporter = Pick<Reporter, 'test' | 'strayFailure'>;
 
 export interface RunState {
   readonly totalTests: number;
@@ -15,6 +15,8 @@ export interface RunState {
   readonly chunk: number;
   readonly timeout: number;
   testCount: number;
+  // the test that is running, or the last one to have run, so stray errors have something to blame
+  currentTest?: Test;
   readonly checkSiblings: () => string[];
   readonly auto: boolean;
 }
@@ -31,8 +33,12 @@ const runTestWithRetry = (test: Test, state: RunState, testReport: TestReporter,
   if (test.isSkipped()) {
     return Promise.reject(new SkipError());
   } else {
+    // Keep the original error if we already have one, so the failure that caused it isn't hidden
     const runAfterHooks = <T>(error: boolean) => (result: T): Promise<T> =>
-      Hooks.runAfterEach(test).then(() => error ? Promise.reject(result) : Promise.resolve(result));
+      Hooks.runAfterEach(test).then(
+        () => error ? Promise.reject(result) : Promise.resolve(result),
+        (e) => Promise.reject(error ? result : e)
+      );
 
     return Hooks.runBeforeEach(test)
       .then(() => runWithErrorCatcher(test, () => runWithTimeout(test, Context.createContext(test, test), state.timeout)))
@@ -86,6 +92,7 @@ export const runTest = (test: Test, state: RunState, actions: RunActions, report
   } else {
     const testReport = reporter.test(test.file || 'Unknown', test.fullTitle(), state.totalTests);
 
+    state.currentTest = test;
     actions.onStart(test);
     if (!state.auto) {
       console.log(`Starting test ${state.testCount} of ${state.totalTests}: ${test.fullTitle()} (${test.file})`);
@@ -135,16 +142,53 @@ const checkSiblings = (suite: Suite, state: RunState, actions: RunActions, repor
   return Promise.reject();
 };
 
+// An error that lands while nothing is running belongs to whatever ran last. A test that hasn't failed
+// yet is failed by it, but one that has already been reported keeps its own error and the stray one is
+// reported alongside - a timeout says far less about what went wrong than the rejection that follows it.
+export const reportStrayError = (state: RunState, reporter: RunReporter) => (e: LoggedError): void => {
+  const test = state.currentTest;
+  console.error(e);
+  if (test === undefined) {
+    reporter.strayFailure('Unknown', 'Unknown', e);
+  } else if (test.isFailed()) {
+    reporter.strayFailure(test.file || 'Unknown', `${test.fullTitle()} (error after test)`, e);
+  } else {
+    test.setResult(RunnableState.Failed, e);
+    reporter.strayFailure(test.file || 'Unknown', test.fullTitle(), e);
+  }
+};
+
+// A suite hook isn't a test, but it's reported as one so the failure goes through the same retry and
+// reporting machinery instead of aborting the entire run as an unexpected bedrock error
+const failHook = (suite: Suite, type: HookType, state: RunState, actions: RunActions, reporter: RunReporter) => (e: LoggedError | InternalError): Promise<never> => {
+  const file = getTests(suite)[0]?.file || 'Unknown';
+  const hookReport = reporter.test(file, `${suite.fullTitle()} "${type}" hook`, state.totalTests);
+  const error = Failure.prepFailure(e);
+
+  hookReport.start();
+  console.error(error);
+  hookReport.fail(error);
+  actions.onFailure();
+  // Test failures must be an empty reject, otherwise the error management thinks it's a bedrock error
+  return Promise.reject();
+};
+
 export const runSuite = (suite: Suite, state: RunState, actions: RunActions, reporter: RunReporter): Promise<void> => {
   const numTests = countTests(suite);
   if (state.testCount + numTests <= state.offset) {
     state.testCount += numTests;
     return Promise.resolve();
   } else {
+    const onAfterFailure = failHook(suite, HookType.After, state, actions, reporter);
+    // Keep the original error if we already have one, as that failure has already been reported
     const runAfterHooks = <T>(error: boolean) => (result: T): Promise<T> =>
-      Hooks.runAfter(suite).then(() => error ? Promise.reject(result) : Promise.resolve(result));
+      Hooks.runAfter(suite).then(
+        () => error ? Promise.reject(result) : Promise.resolve(result),
+        (e) => error ? Promise.reject(result) : onAfterFailure(e)
+      );
 
     return Hooks.runBefore(suite)
+      .catch(failHook(suite, HookType.Before, state, actions, reporter))
       .then(() => runTests(suite.tests, state, actions, reporter))
       .then(() => runSuites(suite.suites, state, actions, reporter))
       .then(checkSiblings(suite, state, actions, reporter))

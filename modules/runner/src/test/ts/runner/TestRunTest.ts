@@ -1,10 +1,10 @@
-import { Context, HookType, RunnableState, Suite, Test } from '@ephox/bedrock-common';
+import { Context, ExecuteFn, HookType, LoggedError, RunnableState, Suite, Test } from '@ephox/bedrock-common';
 import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { beforeEach, describe, it } from 'mocha';
-import { createRootSuite } from '../../../main/ts/core/Suite';
+import { createHook } from '../../../main/ts/core/Hook';
+import { createRootSuite, createSuite } from '../../../main/ts/core/Suite';
 import { createTest } from '../../../main/ts/core/Test';
-import { Reporter } from '../../../main/ts/reporter/Reporter';
 import * as TestRun from '../../../main/ts/runner/TestRun';
 import { noop } from '../TestUtils';
 import { MockReporter } from './RunnerTestUtils';
@@ -16,6 +16,18 @@ interface MockTest extends Test {
 
 const sleep = (time: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, time));
+
+const addHook = (suite: Suite, type: HookType, fn: ExecuteFn): void => {
+  suite.hooks[type].push(createHook(type, fn));
+};
+
+const expectReportedFailure = (promise: Promise<void>, assertions: () => void): Promise<void> =>
+  promise.then(() => {
+    assert.fail('Expected the run to reject');
+  }, (e) => {
+    assert.isUndefined(e, 'A reported failure must reject with no error, otherwise it is treated as a bedrock error');
+    assertions();
+  });
 
 const createMockTest = (name: string, suite: Suite, testFn?: (this: Context) => Promise<void>) => {
   const test: MockTest = createTest(name, function (this: Context) {
@@ -276,22 +288,125 @@ describe('TestRun.runTest', () => {
       assert.deepEqual(states, [ RunnableState.NotRun, RunnableState.Failed ]);
     });
   });
+
+  it('should report a failure when a beforeEach hook rejects', () => {
+    addHook(suite, HookType.BeforeEach, () => Promise.reject(new Error('beforeEach died')));
+
+    const test: MockTest = createMockTest('test', suite);
+    const state = RunnerTestUtils.createRunState(0, 100, 0);
+    return expectReportedFailure(TestRun.runTest(test, state, actions, reporter), () => {
+      assert.isNotTrue(test.hasRun);
+      assert.isTrue(onFailureRun);
+      assert.equal(reporter.failures()[0].message, 'beforeEach died');
+    });
+  });
+
+  it('should report a failure when a beforeEach hook throws', () => {
+    addHook(suite, HookType.BeforeEach, () => {
+      throw new Error('beforeEach died');
+    });
+
+    const test: MockTest = createMockTest('test', suite);
+    const state = RunnerTestUtils.createRunState(0, 100, 0);
+    return expectReportedFailure(TestRun.runTest(test, state, actions, reporter), () => {
+      assert.isNotTrue(test.hasRun);
+      assert.isTrue(onFailureRun);
+      assert.equal(reporter.failures()[0].message, 'beforeEach died');
+    });
+  });
+
+  it('should report a failure when an afterEach hook rejects', () => {
+    addHook(suite, HookType.AfterEach, () => Promise.reject(new Error('afterEach died')));
+
+    const test: MockTest = createMockTest('test', suite);
+    const state = RunnerTestUtils.createRunState(0, 100, 0);
+    return expectReportedFailure(TestRun.runTest(test, state, actions, reporter), () => {
+      assert.isTrue(test.hasRun);
+      assert.isTrue(onFailureRun);
+      assert.equal(reporter.failures()[0].message, 'afterEach died');
+    });
+  });
+
+  it('should keep the test error when an afterEach hook fails as well', () => {
+    addHook(suite, HookType.AfterEach, () => Promise.reject(new Error('afterEach died')));
+
+    const test: MockTest = createMockTest('test', suite, () => Promise.reject(new Error('test died')));
+    const state = RunnerTestUtils.createRunState(0, 100, 0);
+    return expectReportedFailure(TestRun.runTest(test, state, actions, reporter), () => {
+      assert.lengthOf(reporter.failures(), 1);
+      assert.equal(reporter.failures()[0].message, 'test died');
+    });
+  });
+
+  it('should report a failure when a hook rejects without a reason', () => {
+    addHook(suite, HookType.BeforeEach, () => Promise.reject());
+
+    const test: MockTest = createMockTest('test', suite);
+    const state = RunnerTestUtils.createRunState(0, 100, 0);
+    return expectReportedFailure(TestRun.runTest(test, state, actions, reporter), () => {
+      assert.isNotTrue(test.hasRun);
+      assert.equal(reporter.failures()[0].message, 'Failed with no or falsy error: undefined');
+    });
+  });
+});
+
+describe('TestRun.reportStrayError', () => {
+  let reporter: MockReporter;
+  let suite: Suite;
+  let state: TestRun.RunState;
+  const error = LoggedError.loggedError(new Error('landed after the test'), []);
+
+  beforeEach(() => {
+    reporter = RunnerTestUtils.MockReporter();
+    suite = createRootSuite('root');
+    state = RunnerTestUtils.createRunState(0, 100, 0);
+  });
+
+  it('should fail the test it is attributed to', () => {
+    const test = createMockTest('test', suite);
+    state.currentTest = test;
+
+    TestRun.reportStrayError(state, reporter)(error);
+
+    assert.isTrue(test.isFailed(), 'The test should be marked as failed');
+    assert.deepEqual(reporter.failedNames(), [ 'root - test' ]);
+  });
+
+  it('should not replace the error of a test that already failed', () => {
+    const test = createMockTest('test', suite);
+    test.setResult(RunnableState.Failed, new Error('Test ran too long'));
+    state.currentTest = test;
+
+    TestRun.reportStrayError(state, reporter)(error);
+
+    assert.deepEqual(reporter.failedNames(), [ 'root - test (error after test)' ], 'The name must differ so the reported failure is kept');
+    assert.equal(test.error?.message, 'Test ran too long');
+  });
+
+  it('should still report an error that arrives before any test has run', () => {
+    TestRun.reportStrayError(state, reporter)(error);
+
+    assert.deepEqual(reporter.failedNames(), [ 'Unknown' ]);
+    assert.equal(reporter.failures()[0].message, 'landed after the test');
+  });
 });
 
 describe('TestRun.runSuite', () => {
-  let reporter: Reporter;
+  let reporter: MockReporter;
   let suite: Suite;
   let test: MockTest;
   let actions: TestRun.RunActions;
+  let onFailureRun: boolean;
 
   beforeEach(() => {
+    onFailureRun = false;
     reporter = RunnerTestUtils.MockReporter();
     suite = createRootSuite('root');
     test = createMockTest('test', suite);
     suite.tests.push(test);
     actions = {
       onStart: noop,
-      onFailure: noop,
+      onFailure: () => onFailureRun = true,
       onPass: noop,
       onSkip: noop,
       runNextChunk: noop
@@ -352,6 +467,96 @@ describe('TestRun.runSuite', () => {
       assert.isTrue(test.hasRun);
       assert.isTrue(failingTest.hasRun);
       assert.deepEqual(hooks, [ HookType.Before, HookType.BeforeEach, HookType.AfterEach, HookType.BeforeEach, HookType.AfterEach, HookType.After ]);
+    });
+  });
+
+  it('should report a failure when a before hook rejects', () => {
+    addHook(suite, HookType.Before, () => Promise.reject(new Error('before died')));
+
+    const state = RunnerTestUtils.createRunState(0, 100, 0);
+    return expectReportedFailure(TestRun.runSuite(suite, state, actions, reporter), () => {
+      assert.isNotTrue(test.hasRun);
+      assert.isTrue(onFailureRun);
+      assert.deepEqual(reporter.failedNames(), [ 'root "before" hook' ]);
+      assert.equal(reporter.failures()[0].message, 'before died');
+    });
+  });
+
+  it('should report a failure when a before hook throws', () => {
+    addHook(suite, HookType.Before, () => {
+      throw new Error('before died');
+    });
+
+    const state = RunnerTestUtils.createRunState(0, 100, 0);
+    return expectReportedFailure(TestRun.runSuite(suite, state, actions, reporter), () => {
+      assert.isNotTrue(test.hasRun);
+      assert.isTrue(onFailureRun);
+      assert.deepEqual(reporter.failedNames(), [ 'root "before" hook' ]);
+      assert.equal(reporter.failures()[0].message, 'before died');
+    });
+  });
+
+  it('should still run the after hooks when a before hook fails', () => {
+    const hooks: HookType[] = [];
+    RunnerTestUtils.populateHooks(suite, 1, (_idx, type) => {
+      hooks.push(type);
+    });
+    addHook(suite, HookType.Before, () => Promise.reject(new Error('before died')));
+
+    const state = RunnerTestUtils.createRunState(0, 100, 0);
+    return expectReportedFailure(TestRun.runSuite(suite, state, actions, reporter), () => {
+      assert.deepEqual(hooks, [ HookType.Before, HookType.After ]);
+    });
+  });
+
+  it('should report a failure when an after hook rejects', () => {
+    addHook(suite, HookType.After, () => Promise.reject(new Error('after died')));
+
+    const state = RunnerTestUtils.createRunState(0, 100, 0);
+    return expectReportedFailure(TestRun.runSuite(suite, state, actions, reporter), () => {
+      assert.isTrue(test.hasRun);
+      assert.isTrue(onFailureRun);
+      assert.deepEqual(reporter.failedNames(), [ 'root "after" hook' ]);
+      assert.equal(reporter.failures()[0].message, 'after died');
+    });
+  });
+
+  it('should report a failure when an after hook throws', () => {
+    addHook(suite, HookType.After, () => {
+      throw new Error('after died');
+    });
+
+    const state = RunnerTestUtils.createRunState(0, 100, 0);
+    return expectReportedFailure(TestRun.runSuite(suite, state, actions, reporter), () => {
+      assert.isTrue(test.hasRun);
+      assert.isTrue(onFailureRun);
+      assert.deepEqual(reporter.failedNames(), [ 'root "after" hook' ]);
+      assert.equal(reporter.failures()[0].message, 'after died');
+    });
+  });
+
+  it('should keep the test failure when an after hook fails as well', () => {
+    const failingTest = createMockTest('fail test', suite, () => Promise.reject(new Error('test died')));
+    suite.tests.push(failingTest);
+    addHook(suite, HookType.After, () => Promise.reject(new Error('after died')));
+
+    const state = RunnerTestUtils.createRunState(0, 100, 0);
+    return expectReportedFailure(TestRun.runSuite(suite, state, actions, reporter), () => {
+      assert.deepEqual(reporter.failedNames(), [ 'root - fail test' ]);
+      assert.equal(reporter.failures()[0].message, 'test died');
+    });
+  });
+
+  it('should report a failure when a nested suite before hook fails, without failing the parent', () => {
+    const nested = createSuite('nested', suite);
+    suite.suites.push(nested);
+    nested.tests.push(createMockTest('nested test', nested));
+    addHook(nested, HookType.Before, () => Promise.reject(new Error('before died')));
+
+    const state = RunnerTestUtils.createRunState(0, 100, 0);
+    return expectReportedFailure(TestRun.runSuite(suite, state, actions, reporter), () => {
+      assert.isTrue(test.hasRun);
+      assert.deepEqual(reporter.failedNames(), [ 'root / nested "before" hook' ]);
     });
   });
 });
