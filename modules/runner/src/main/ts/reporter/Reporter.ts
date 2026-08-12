@@ -16,6 +16,7 @@ export interface TestReporter {
 export interface Reporter {
   readonly summary: () => { offset: number; passed: number; failed: number; skipped: number };
   readonly test: (file: string, name: string, totalNumTests: number) => TestReporter;
+  readonly strayFailure: (file: string, name: string, e: LoggedError) => void;
   readonly waitForResults: () => Promise<void>;
   readonly retry: () => Promise<void>;
   readonly done: (error?: LoggedError) => void;
@@ -28,6 +29,7 @@ export interface ReporterUi {
     readonly skip: (testTime: string, currentCount: number) => void;
     readonly fail: (e: LoggedError, testTime: string, currentCount: number) => void;
   };
+  readonly error: (e: LoggedError) => void;
   readonly done: (totalTime: string) => void;
 }
 
@@ -53,6 +55,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
   let passCount = 0;
   let skipCount = 0;
   let failCount = 0;
+  let finished = false;
 
   // A list of test results we are going to send as a batch to the server
   const testResults: TestReport[] = [];
@@ -74,6 +77,30 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
       forceReportResults();
       timeOfLastReport = Date.now();
     }
+  };
+
+  const reportFailure = (file: string, name: string, testTime: string, e: LoggedError, onReported: (err: LoggedError) => void): void => {
+    failCount++;
+
+    // `sourcemapped-stacktrace` is async, so we need to wait for it
+    requestsInFlight.push(mapError(e).then((err) => {
+      const errorData = ErrorReporter.data(err);
+      const error = {
+        data: errorData,
+        text: ErrorReporter.dataText(errorData)
+      };
+
+      reportResult({
+        file,
+        name,
+        passed: false,
+        time: testTime,
+        error,
+        skipped: null,
+      });
+
+      onReported(err);
+    }));
   };
 
   const summary = () => ({
@@ -154,29 +181,8 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     const fail = (e: LoggedError): void => {
       if (!reported) {
         reported = true;
-        failCount++;
-
         const testTime = elapsed(starttime);
-
-        // `sourcemapped-stacktrace` is async, so we need to wait for it
-        requestsInFlight.push(mapError(e).then((err) => {
-          const errorData = ErrorReporter.data(err);
-          const error = {
-            data: errorData,
-            text: ErrorReporter.dataText(errorData)
-          };
-
-          reportResult({
-            file,
-            name,
-            passed: false,
-            time: testTime,
-            error,
-            skipped: null,
-          });
-
-          testUi.fail(err, testTime, currentCount);
-        }));
+        reportFailure(file, name, testTime, e, (err) => testUi.fail(err, testTime, currentCount));
       }
     };
 
@@ -187,6 +193,23 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
       skip,
       fail
     };
+  };
+
+  // An error that arrives outside of a test is attributed to whichever test ran most recently, which
+  // replaces that test's result on the server. It deliberately doesn't advance the test count - the
+  // run is still going, and moving the count on would make the next page load skip a test.
+  const strayFailure = (file: string, name: string, e: LoggedError): void => {
+    // once the run is over there's nothing left to attribute this to, and sending more results would
+    // reopen the session on the server
+    if (finished) {
+      ui.error(e);
+    } else {
+      reportFailure(file, name, elapsed(Date.now()), e, (err) => {
+        ui.error(err);
+        // nothing is waiting on this result and the page may be about to reload, so send it now
+        forceReportResults();
+      });
+    }
   };
 
   const waitForResults = async (): Promise<void> => {
@@ -212,6 +235,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
   };
 
   const done = (error?: LoggedError): void => {
+    finished = true;
     const setAsDone = (): void => {
       const totalTime = elapsed(initial);
       ui.done(totalTime);
@@ -228,6 +252,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
   return {
     summary,
     test,
+    strayFailure,
     retry,
     waitForResults,
     done
