@@ -25,8 +25,7 @@ export const ErrorCatcher = (): ErrorCatcher => {
   let bound = false;
 
   const createHandler = <T extends Event>(extractError: (e: T) => Error) => (e: T) => {
-    // Errors can arrive while nothing is running, such as a promise that rejects after the test that
-    // created it has settled, so fall back to the handlers that deal with those
+    // Unhandled errors that arrive either between tests after the test suite will have no handlers available, use the fallback
     const handlers = onErrorHandlers.size > 0 ? onErrorHandlers : fallbackHandlers;
     if (handlers.size > 0) {
       const error = extractError(e);
