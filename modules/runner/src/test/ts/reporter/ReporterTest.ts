@@ -2,6 +2,7 @@ import { Failure, LoggedError } from '@ephox/bedrock-common';
 import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { beforeEach, describe, it } from 'mocha';
+import { MouseWatch } from '../../../main/ts/core/MouseWatch';
 import { UrlParams } from '../../../main/ts/core/UrlParams';
 import { Callbacks, TestErrorData } from '../../../main/ts/reporter/Callbacks';
 import { Reporter } from '../../../main/ts/reporter/Reporter';
@@ -48,6 +49,13 @@ const ui = {
 describe('Reporter.test', () => {
   let reporter: Reporter, startTestData: StartTestData[], endTestData: EndTestData[];
   let doneCalled: boolean, doneError: string | undefined, offset: number;
+  let mouseMoved: boolean;
+  const mouse: MouseWatch = {
+    hasMoved: () => mouseMoved,
+    clear: () => {
+      mouseMoved = false;
+    }
+  };
   const callbacks: Callbacks = {
     loadHarness: () => Promise.resolve({ retries: 0, chunk: 100, stopOnFailure: true, mode: 'manual', timeout: 10000 }),
     sendKeepAlive: () => Promise.resolve(),
@@ -69,7 +77,8 @@ describe('Reporter.test', () => {
 
   const reset = (newOffset: number = Math.floor(Math.random() * 1000)) => {
     offset = newOffset;
-    reporter = Reporter({ ...params, offset }, callbacks, ui);
+    mouseMoved = false;
+    reporter = Reporter({ ...params, offset }, callbacks, ui, mouse);
     startTestData = [];
     endTestData = [];
     doneCalled = false;
@@ -104,6 +113,20 @@ describe('Reporter.test', () => {
         assert.isFalse(doneCalled);
       });
     }));
+  });
+
+  it('should only send a test start mid-run when the mouse has moved', () => {
+    reset(5);
+    const first = reporter.test('SomeTest.ts', 'first', 10);
+    return first.start().then(() => {
+      assert.equal(startTestData.length, 0, 'Checking no start test data was sent');
+      mouseMoved = true;
+      return reporter.test('SomeTest.ts', 'second', 10).start();
+    }).then(() => {
+      assert.equal(startTestData.length, 1, 'Checking start test data was sent');
+      assert.equal(startTestData[0].currentCount, 7, 'Checking the test number');
+      assert.isFalse(mouseMoved, 'Checking the mouse watch was cleared');
+    });
   });
 
   it('should report the session id, file, name, passed state and time on a skipped test', () => {

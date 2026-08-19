@@ -97,8 +97,8 @@ export const runTest = (test: Test, state: RunState, actions: RunActions, report
     if (!state.auto) {
       console.log(`Starting test ${state.testCount} of ${state.totalTests}: ${test.fullTitle()} (${test.file})`);
     }
-    testReport.start();
-    return runTestWithRetry(test, state, testReport, 0)
+    return testReport.start()
+      .then(() => runTestWithRetry(test, state, testReport, 0))
       .then(() => pass(testReport), (e: LoggedError | InternalError) => {
         if (e instanceof SkipError) {
           return skip(testReport);

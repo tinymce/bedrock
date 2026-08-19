@@ -1,12 +1,13 @@
 import { LoggedError, Reporter as ErrorReporter } from '@ephox/bedrock-common';
 import { Callbacks, TestReport } from './Callbacks';
+import { MouseWatch } from '../core/MouseWatch';
 import { UrlParams } from '../core/UrlParams';
 import { formatElapsedTime, mapStackTrace, setStack } from '../core/Utils';
 
 type LoggedError = LoggedError.LoggedError;
 
 export interface TestReporter {
-  readonly start: () => void;
+  readonly start: () => Promise<void>;
   readonly retry: () => void;
   readonly pass: () => void;
   readonly skip: (reason: string) => void;
@@ -48,7 +49,7 @@ const mapError = (e: LoggedError) => mapStackTrace(e.stack).then((mappedStack) =
   return e;
 });
 
-export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi): Reporter => {
+export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi, mouse: MouseWatch): Reporter => {
   const initial = Date.now();
   let timeOfLastReport = initial;
   let currentCount = params.offset || 0;
@@ -116,18 +117,37 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     let started = false;
     const testUi = ui.test();
 
-    const start = (): void => {
+    const sendStart = (): Promise<void> => {
+      if (currentCount === 1) {
+        // we need to send test start once to establish the session
+        requestsInFlight.push(callbacks.sendTestStart(params.session, currentCount, totalNumTests, file, name));
+        return Promise.resolve();
+      } else if (mouse.hasMoved()) {
+        // Send a new test start so the server resets the mouse - and wait for it
+        return callbacks.sendTestStart(params.session, currentCount, totalNumTests, file, name).then(() => {
+          mouse.clear();
+        }, (e) => {
+          // ignore, will try again later (because `mouse.clear()` hasn't run)
+          console.error('Failed to reset the mouse position', e);
+        });
+      } else {
+        return Promise.resolve();
+      }
+    };
+
+    const start = (): Promise<void> => {
       if (!started) {
         started = true;
-        starttime = Date.now();
         currentCount++;
 
         testUi.start(file, name);
 
-        if (currentCount === 1) {
-          // we need to send test start once to establish the session
-          requestsInFlight.push(callbacks.sendTestStart(params.session, currentCount, totalNumTests, file, name));
-        }
+        // remove mouse reset time from test records
+        return sendStart().then(() => {
+          starttime = Date.now();
+        });
+      } else {
+        return Promise.resolve();
       }
     };
 

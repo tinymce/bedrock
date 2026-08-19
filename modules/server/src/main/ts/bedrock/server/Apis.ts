@@ -47,6 +47,7 @@ const maxInvalidAttempts = 300;
 export const create = (master: DriverMaster | null, pMaybeDriver: Promise<Attempt<unknown, Browser>>, projectdir: string, basedir: string, stickyFirstSession: boolean, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced', resetMousePosition: boolean): Apis => {
   let pageHasLoaded = false;
   let needsMousePositionReset = true;
+  let mousePositionResetSupported = true;
 
   // On IE, the webdriver seems to load the page before it's ready to start
   // responding to commands. If the testing page itself tries to interact with
@@ -113,17 +114,26 @@ export const create = (master: DriverMaster | null, pMaybeDriver: Promise<Attemp
           () => Promise.reject('Resetting mouse position not supported without webdriver running. Use bedrock-auto to get this feature.'),
           (driver) => waitForDriverReady(maxInvalidAttempts, async () => {
             const shouldResetMousePos = force || needsMousePositionReset;
-            // TODO re-enable resetting the mouse on other browsers when mouseMove gets fixed on Firefox/IE
-            const browserName = (driver.capabilities as Record<string, any>).browserName;
-            if (shouldResetMousePos && (browserName === 'chrome' || browserName === 'msedge')) {
-              // Reset the mouse position to the top left of the window
-              await driver.performActions([{
-                type: 'pointer',
-                id: 'finger1',
-                parameters: { pointerType: 'mouse' },
-                actions: [{ type: 'pointerMove', duration: 0, x: 0, y: 0 }]
-              }]);
-              needsMousePositionReset = false;
+            if (shouldResetMousePos && mousePositionResetSupported) {
+              try {
+                // Park the mouse in the top left corner, out of the way of the browser.
+				// Use two actions to account for drivers thinking this is a no-op; it still only
+				// sends one driver request to the browser.
+                await driver.performActions([{
+                  type: 'pointer',
+                  id: 'finger1',
+                  parameters: { pointerType: 'mouse' },
+                  actions: [
+                    { type: 'pointerMove', duration: 0, x: 1, y: 1 },
+                    { type: 'pointerMove', duration: 0, x: 0, y: 0 }
+                  ]
+                }]);
+                needsMousePositionReset = false;
+              } catch (e) {
+                // Log the failure instead of crashing the whole test run
+                mousePositionResetSupported = false;
+                console.error('Unable to reset the mouse position, continuing without it: ', e);
+              }
             }
           })
         );
