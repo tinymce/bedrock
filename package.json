@@ -56,7 +56,7 @@
     "typescript": "^6.0.3"
   },
   "engines": {
-    "node": ">=10.0.0"
+    "node": "^22.13.0 || ^24.0.0 || ^26.0.0"
   },
   "author": "Tiny Technologies Inc",
   "license": "Apache-2.0",
