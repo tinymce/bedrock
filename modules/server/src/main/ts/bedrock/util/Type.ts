@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-wrapper-object-types, @typescript-eslint/no-unsafe-function-type */
 
 const typeOf = (x: any): string => {
   if (x === null) {

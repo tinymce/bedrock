@@ -1,4 +1,3 @@
-import { Capabilities } from '@wdio/types';
 import { Browser, Element } from 'webdriverio';
 import * as EffectUtils from './EffectUtils';
 
@@ -133,7 +132,7 @@ const performAction = async (driver: Browser, target: Element, actions: Action[]
   if (isW3C) {
     // TINY-8944: Since Safari has issues with using elementSendKeys we use a different method for combo keys.
     // So to simulate the same behaviour, ensure the target is scrolled in view and focused as per https://w3c.github.io/webdriver/#element-send-keys
-    const isSafari = (driver.capabilities as Capabilities.DesiredCapabilities).browserName?.toLowerCase() === 'safari';
+    const isSafari = driver.capabilities.browserName?.toLowerCase() === 'safari';
     const hasComboAction = actions.some((action) => action.type === 'combo');
     if (isSafari && hasComboAction) {
       await scrollToAndFocus(driver, target);

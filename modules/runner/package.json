@@ -11,14 +11,14 @@
   },
   "dependencies": {
     "@ephox/bedrock-common": "^16.0.0",
-    "jquery": "^3.4.1",
-    "querystringify": "^2.1.1"
+    "jquery": "^4.0.0",
+    "querystringify": "^2.2.0"
   },
   "devDependencies": {
-    "@types/diff": "^5.0.0",
-    "@types/jquery": "^3.5.3",
-    "@types/querystringify": "^2.0.0",
-    "rollup": "^4.30.1",
+    "@types/diff": "^8.0.0",
+    "@types/jquery": "^4.0.1",
+    "@types/querystringify": "^2.0.2",
+    "rollup": "^4.62.4",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-sourcemaps": "^0.6.3",

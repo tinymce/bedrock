@@ -1,8 +1,8 @@
-import * as webpack from 'webpack';
+import webpack from 'webpack';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as mkdirp from 'mkdirp';
-import * as WebpackDevServer from 'webpack-dev-server';
+import { mkdirp } from 'mkdirp';
+import WebpackDevServer, { NextHandleFunction } from 'webpack-dev-server';
 import * as Serve from '../server/Serve';
 import { ExitCodes } from '../util/ExitCodes';
 import * as Imports from './Imports';
@@ -41,9 +41,9 @@ const webpackSharedRules = ([] as any[]).concat([
 ]);
 
 const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, coverage: string[], manualMode: boolean, basedir: string, skipTypecheck: boolean): webpack.Configuration => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
   return {
@@ -147,7 +147,6 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
 };
 
 const getWebPackConfigJs = (scratchFile: string, dest: string, coverage: string[], manualMode: boolean, basedir: string): webpack.Configuration => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   return {
     stats: 'none',
     entry: scratchFile,
@@ -272,7 +271,7 @@ export const compile: CompileFn = async ({
   return compileTests(compileInfo, exitOnCompileError, srcFiles, polyfills);
 };
 
-const isCompiledRequest = (request: { url: string }) => request.url.startsWith('/compiled/');
+const isCompiledRequest = (request: { url?: string }) => !!request.url?.startsWith('/compiled/');
 
 export const devserver = async (settings: DevServerServeSettings): Promise<Serve.ServeService> => {
   const scratchDir = path.resolve('scratch');
@@ -327,7 +326,7 @@ export const devserver = async (settings: DevServerServeSettings): Promise<Serve
       // Static content is handled via the bedrock middleware below
       static: false,
       setupMiddlewares: (middlewares) => {
-        const bedrockHandler: WebpackDevServer.RequestHandler = (request, response, next) => {
+        const bedrockHandler: NextHandleFunction = (request, response, next) => {
           return isCompiledRequest(request) ? next() : handler(request, response);
         };
         return [

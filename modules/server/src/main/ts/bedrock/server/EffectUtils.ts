@@ -29,7 +29,7 @@ const getTargetFromFrame = async (driver: Browser, selector: string): Promise<El
   await driver.waitUntil(frameSelected(driver, frame), { timeout: 500 });
   const target = await driver.$(targetSelector);
   await target.waitForDisplayed({ timeout: 500 });
-  return target as ElementWithActions;
+  return target as unknown as ElementWithActions;
 };
 
 const performActionOnFrame = async <T>(driver: Browser, selector: string, action: (target: ElementWithActions) => Promise<T>): Promise<T> => {
@@ -47,7 +47,8 @@ const performActionOnFrame = async <T>(driver: Browser, selector: string, action
 };
 
 const getTargetFromMain = async (driver: Browser, selector: string): Promise<ElementWithActions> => {
-  return driver.$(selector);
+  const target = await driver.$(selector);
+  return target as unknown as ElementWithActions;
 };
 
 const performActionOnMain = async <T>(driver: Browser, selector: string, action: (target: ElementWithActions) => Promise<T>) => {

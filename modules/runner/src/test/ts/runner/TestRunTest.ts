@@ -54,7 +54,7 @@ describe('TestRun.runTest', () => {
   });
 
   it('should not run when offset is higher than the current test count', () => {
-    return fc.assert(fc.asyncProperty(fc.integer(0, 100), fc.integer(1, 100), (count, startOffset) => {
+    return fc.assert(fc.asyncProperty(fc.integer({ min: 0, max: 100 }), fc.integer({ min: 1, max: 100 }), (count, startOffset) => {
       const test: MockTest = createMockTest('test', suite);
       const state = RunnerTestUtils.createRunState(count + startOffset, 10, count);
       return TestRun.runTest(test, state, actions, reporter).then(() => {
@@ -69,7 +69,7 @@ describe('TestRun.runTest', () => {
   });
 
   it('should load next chunk when count is higher than the start offset + chunk', () => {
-    return fc.assert(fc.asyncProperty(fc.integer(0, 100), fc.integer(1, 100), (startOffset, chunk) => {
+    return fc.assert(fc.asyncProperty(fc.integer({ min: 0, max: 100 }), fc.integer({ min: 1, max: 100 }), (startOffset, chunk) => {
       const test: MockTest = createMockTest('test', suite);
       const state = RunnerTestUtils.createRunState(startOffset, chunk, startOffset + chunk);
       return TestRun.runTest(test, state, actions, reporter).catch(() => {
@@ -84,7 +84,7 @@ describe('TestRun.runTest', () => {
   });
 
   it('should run when count is higher than offset', () => {
-    return fc.assert(fc.asyncProperty(fc.integer(0, 100), fc.integer(0, 100), (count, offset) => {
+    return fc.assert(fc.asyncProperty(fc.integer({ min: 0, max: 100 }), fc.integer({ min: 0, max: 100 }), (count, offset) => {
       const test: MockTest = createMockTest('test', suite);
       const state = RunnerTestUtils.createRunState(offset, 200, offset + count);
       return TestRun.runTest(test, state, actions, reporter).then(() => {
@@ -99,7 +99,7 @@ describe('TestRun.runTest', () => {
   });
 
   it('should not run when test is skipped', () => {
-    return fc.assert(fc.asyncProperty(fc.integer(0, 100), fc.integer(0, 100), (count, offset) => {
+    return fc.assert(fc.asyncProperty(fc.integer({ min: 0, max: 100 }), fc.integer({ min: 0, max: 100 }), (count, offset) => {
       const test: MockTest = createMockTest('test', suite);
       test.setResult(RunnableState.Skipped);
       const state = RunnerTestUtils.createRunState(offset, 200, offset + count);
@@ -302,7 +302,7 @@ describe('TestRun.runSuite', () => {
     let hasRunSuite = false;
     RunnerTestUtils.populateHooks(suite, 1, () => hasRunSuite = true);
 
-    return fc.assert(fc.asyncProperty(fc.integer(0, 100), fc.integer(1, 100), (count, startOffset) => {
+    return fc.assert(fc.asyncProperty(fc.integer({ min: 0, max: 100 }), fc.integer({ min: 1, max: 100 }), (count, startOffset) => {
       const state = RunnerTestUtils.createRunState(count + startOffset, 200, 0);
       return TestRun.runSuite(suite, state, actions, reporter).then(() => {
         assert.isNotTrue(test.hasRun);

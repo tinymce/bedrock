@@ -78,7 +78,7 @@ describe('Reporter.test', () => {
   beforeEach(() => reset());
 
   it('should report the session id, number tests, file and name on start', () => {
-    return fc.assert(fc.asyncProperty(fc.hexaString(), fc.asciiString(), fc.integer(offset), (fileName, testName, testCount) => {
+    return fc.assert(fc.asyncProperty(fc.string(), fc.string(), fc.integer({ max: offset }), (fileName, testName, testCount) => {
       reset(0);
       const test = reporter.test(fileName + 'Test.ts', testName, testCount);
       test.start();
@@ -106,7 +106,7 @@ describe('Reporter.test', () => {
   });
 
   it('should report the session id, file, name, passed state and time on a skipped test', () => {
-    return fc.assert(fc.asyncProperty(fc.hexaString(), fc.asciiString(), fc.asciiString(), fc.integer(offset), (fileName, testName, skippedMessage, testCount) => {
+    return fc.assert(fc.asyncProperty(fc.string(), fc.string(), fc.string(), fc.integer({ max: offset }), (fileName, testName, skippedMessage, testCount) => {
       reset();
       const test = reporter.test(fileName + 'Test.ts', testName, testCount);
       test.start();
@@ -136,7 +136,7 @@ describe('Reporter.test', () => {
   });
 
   it('should report the session id, file, name, passed state, time and error on a test failure', () => {
-    return fc.assert(fc.asyncProperty(fc.hexaString(), fc.asciiString(), fc.integer(offset), (fileName, testName, testCount) => {
+    return fc.assert(fc.asyncProperty(fc.string(), fc.string(), fc.integer({ max: offset }), (fileName, testName, testCount) => {
       reset();
       const test = reporter.test(fileName + 'Test.ts', testName, testCount);
       const error = LoggedError.loggedError(new Error('Failed'), [ 'Log Message' ]);

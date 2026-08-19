@@ -1,4 +1,4 @@
-import * as usage from 'command-line-usage';
+import usage from 'command-line-usage';
 import { ClOption } from './ClOptions';
 
 export const generateUsage = (command: string, desc: string, definitions: ClOption[]): string => {

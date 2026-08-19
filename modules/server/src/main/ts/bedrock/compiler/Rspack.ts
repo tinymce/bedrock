@@ -4,12 +4,12 @@ import * as mkdirp from 'mkdirp';
 import * as Serve from '../server/Serve';
 import { ExitCodes } from '../util/ExitCodes';
 import * as Imports from './Imports';
-import { rspack, RspackOptions } from '@rspack/core';
+import { rspack, RspackOptions, DevServerMiddlewareHandler } from '@rspack/core';
 import { RspackDevServer } from '@rspack/dev-server';
 import { RspackCompileInfo, DevServerServeSettings, CompileFn } from './Types';
 
 const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, manualMode: boolean, basedir: string, skipTypecheck: boolean): RspackOptions => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { TsCheckerRspackPlugin } = require('ts-checker-rspack-plugin');
 
    const getTsConfigFile = () => path.isAbsolute(tsConfigFile) ? tsConfigFile : path.resolve(process.cwd(), tsConfigFile);
@@ -234,12 +234,11 @@ export const devserver = async (settings: DevServerServeSettings): Promise<Serve
       // Static content is handled via the bedrock middleware below
       static: false,
       setupMiddlewares: (middlewares) => {
+        const bedrockMiddleware: DevServerMiddlewareHandler = (req, res, next) => {
+          return isCompiledRequest(req.url) ? next() : handler(req, res);
+        };
         return [
-          {
-            name: 'bedrock', middleware: (req, res, next) => {
-              return isCompiledRequest(req.url) ? next() : handler(req, res);
-            }
-          },
+          { name: 'bedrock', middleware: bedrockMiddleware },
           ...middlewares
         ];
       }

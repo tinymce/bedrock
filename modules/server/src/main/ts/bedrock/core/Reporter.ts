@@ -1,4 +1,4 @@
-import XMLWriter = require('xml-writer');
+import XMLWriter from 'xml-writer';
 import * as fs from 'fs';
 import { TestResults, TestResult } from '../server/Controller';
 import { Attempt } from './Attempt';
@@ -100,7 +100,7 @@ export const write = (settings: ReporterSettings, data: TestResults): Attempt<st
 
   try {
     fs.accessSync(settings.output);
-  } catch (err) {
+  } catch (_err) {
     fs.mkdirSync(settings.output);
   }
 

@@ -76,7 +76,7 @@ export interface Runnable extends Common<Runnable> {
   readonly _onChange: (type: 'retries' | 'slow' | 'timeout', callback: (value: number) => void) => () => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Hook extends Runnable {}
 
 export interface Test extends Runnable {
