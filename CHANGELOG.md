@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+- Updated various dependencies, including webdriverio, rspack, webpack-dev-server and eslint. #TINYMCE-14572
+- Changed the default bundler to rspack. #TINYMCE-14649
+
 ## 16.2.0 - 2026-03-25
 
 ### Added
