@@ -63,7 +63,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
               target: 'es2022',
               transform: {
                 react: {
-                  runtime: 'automatic',
+                  runtime: 'classic',
                 },
               },
             },
