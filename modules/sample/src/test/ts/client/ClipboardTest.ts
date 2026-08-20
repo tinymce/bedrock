@@ -7,7 +7,7 @@ UnitTest.asynctest('Clipboard Test', (success, failure) => {
     return post('/clipboard', { import: fileName });
   };
 
-  const pasteInto = function (elm) {
+  const pasteInto = function (elm: HTMLElement) {
     return sendKeyCombo('#' + elm.id, 'v', { ctrlKey: true });
   };
 
