@@ -10,6 +10,7 @@
     "lib": ["es2022", "dom"],
     "declaration": true,
     "outDir": "scratch/dist",
+    "rootDir": "src/test/ts",
     "sourceMap": true,
     "types": []
   },
