@@ -1,5 +1,4 @@
 import { IncomingMessage } from 'http';
-import * as url from 'url';
 import * as Cmp from '../util/Cmp';
 import * as Obj from '../util/Obj';
 
@@ -25,7 +24,7 @@ export const urlMatch = (url: string): Matcher => {
 
 export const pathMatch = (path: string): Matcher => {
   return (request) => {
-    return url.parse(request.originalUrl).pathname === path;
+    return new URL(request.originalUrl, 'http://localhost').pathname === path;
   };
 };
 
@@ -38,7 +37,7 @@ export const headersMatch = (headers: Record<string, string>): Matcher => {
 
 export const queryMatch = (query: Record<string, string>): Matcher => {
   return (request) => {
-    const reqQuery = url.parse(request.originalUrl, true).query;
+    const reqQuery = Object.fromEntries(new URL(request.originalUrl, 'http://localhost').searchParams);
     return Cmp.hasAllOf(reqQuery, query);
   };
 };
