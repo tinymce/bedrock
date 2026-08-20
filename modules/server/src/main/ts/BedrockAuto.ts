@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import * as Serve from './bedrock/server/Serve';
 import { Attempt } from './bedrock/core/Attempt';
 import * as Version from './bedrock/core/Version';
@@ -147,8 +146,7 @@ export const go = async (bedrockAutoSettings: BedrockAutoSettings): Promise<void
       return Lifecycle.error(e as any, webdriver, shutdown(shutdownServices), settings.gruntDone, settings.delayExit);
     }
   } catch(err) {
-    // Chalk does not use a formatter. Using node's built-in to expand Objects, etc.
-    console.error(chalk.red('Error creating webdriver', format(err)));
+    console.error('Error creating webdriver', format(err));
     // Shutdown tunnels in case webdriver fails
     await shutdown(shutdownServices)(true);
     return Lifecycle.exit(settings.gruntDone, ExitCodes.failures.unexpected);

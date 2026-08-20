@@ -27,7 +27,6 @@
     "@rspack/dev-server": "^2.2.0",
     "@wdio/globals": "^9.29.1",
     "async": "^3.2.6",
-    "chalk": "^6.0.0",
     "cli-highlight": "^2.1.11",
     "command-line-args": "^6.0.2",
     "command-line-usage": "^7.0.4",
