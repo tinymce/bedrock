@@ -18,7 +18,8 @@
     "@ephox/bedrock-client": "^16.0.0"
   },
   "devDependencies": {
-    "@ephox/bedrock-server": "^16.2.0"
+    "@ephox/bedrock-server": "^16.2.0",
+    "preact": "^10.28.3"
   },
   "files": [],
   "private": true,
