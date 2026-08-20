@@ -37,7 +37,7 @@ describe('Clis.forAuto', () => {
     AttemptUtils.assertResult({
       browser: 'MicrosoftEdge',
       browserVersion: 'latest',
-      bundler: 'webpack',
+      bundler: 'rspack',
       config: 'src/test/resources/tsconfig.sample.json',
       name: 'bedrock-run',
       output: 'scratch',
@@ -79,7 +79,7 @@ describe('Clis.forAuto', () => {
     AttemptUtils.assertResult({
       browser: 'MicrosoftEdge',
       browserVersion: 'latest',
-      bundler: 'webpack',
+      bundler: 'rspack',
       config: 'src/test/resources/tsconfig.sample.json',
       name: 'bedrock-run',
       output: 'scratch',
@@ -122,7 +122,7 @@ describe('Clis.forAuto', () => {
     AttemptUtils.assertResult({
       browser: 'MicrosoftEdge',
       browserVersion: 'latest',
-      bundler: 'webpack',
+      bundler: 'rspack',
       config: 'src/test/resources/tsconfig.sample.json',
       name: 'bedrock-run',
       output: 'scratch',
@@ -164,7 +164,7 @@ describe('Clis.forAuto', () => {
     AttemptUtils.assertResult({
       browser: 'chrome-headless',
       browserVersion: 'latest',
-      bundler: 'webpack',
+      bundler: 'rspack',
       config: 'src/test/resources/tsconfig.sample.json',
       name: 'bedrock-run',
       output: 'scratch',
@@ -209,7 +209,7 @@ describe('Clis.forAuto', () => {
     AttemptUtils.assertResult({
       browser: 'chrome-headless',
       browserVersion: '117.0',
-      bundler: 'webpack',
+      bundler: 'rspack',
       config: 'tsconfig.json',
       name: 'bedrock-run',
       output: 'scratch',
@@ -256,7 +256,7 @@ describe('Clis.forAuto', () => {
     AttemptUtils.assertResult({
       browser: 'chrome-headless',
       browserVersion: 'latest',
-      bundler: 'webpack',
+      bundler: 'rspack',
       config: 'tsconfig.json',
       name: 'bedrock-run',
       output: 'scratch',
@@ -320,7 +320,7 @@ describe('Clis.forAuto', () => {
     AttemptUtils.assertResult({
       browser: 'MicrosoftEdge',
       browserVersion: 'latest',
-      bundler: 'webpack',
+      bundler: 'rspack',
       config: 'src/test/resources/tsconfig.sample.json',
       name: 'bedrock-run',
       output: 'scratch',
@@ -368,7 +368,7 @@ describe('Clis.forManual', () => {
     config: 'tsconfig.json',
     testfiles: [],
     help: false,
-    bundler: 'webpack',
+    bundler: 'rspack',
     singleTimeout: 30000,
     stopOnFailure: false,
     overallTimeout: 600000,

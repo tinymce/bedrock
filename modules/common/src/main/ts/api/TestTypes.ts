@@ -1,14 +1,14 @@
 import { TestError } from './TestError';
 import { TestLabel } from './TestLabel';
 
-export const enum HookType {
+export enum HookType {
   Before = 'before',
   BeforeEach = 'beforeEach',
   After = 'after',
   AfterEach = 'afterEach'
 }
 
-export const enum RunnableState {
+export enum RunnableState {
   NotRun = 'notrun',
   Passed = 'passed',
   Skipped = 'skipped',

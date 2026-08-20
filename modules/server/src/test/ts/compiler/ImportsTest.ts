@@ -10,8 +10,11 @@ const convertPolyfillName = (name: string) => {
     name.slice(1).replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 };
 
+// Filter out path separators.
+const filenameArb = fc.string({ minLength: 1, maxLength: 20 }).filter((s) => !s.includes('/') && !s.includes('\\'));
+
 const withGenerateFilenames = (useRequire: boolean, extension: string, test: (imports: string, filenames: string[]) => void) => {
-  fc.assert(fc.property(fc.array(fc.string({ minLength: 1, maxLength: 20 }), { maxLength: 50 }), (filenames) => {
+  fc.assert(fc.property(fc.array(filenameArb, { maxLength: 50 }), (filenames) => {
     const filepaths = filenames.map((name) => `/${name}.${extension}`);
     const imports = generateImports(useRequire, `/scratch.${extension}`, filepaths, []);
     test(imports, filenames);

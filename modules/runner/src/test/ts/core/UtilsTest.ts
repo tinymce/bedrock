@@ -45,7 +45,7 @@ describe('Utils.formatElapsedTime', () => {
   it('should be larger than 0', () => {
     const now = new Date();
     const fiveSeconds = new Date(now.getTime() + 5000);
-    fc.assert(fc.property(fc.date({ max: now }), fc.date({ min: fiveSeconds }), (start, end) => {
+    fc.assert(fc.property(fc.date({ max: now, noInvalidDate: true }), fc.date({ min: fiveSeconds, noInvalidDate: true }), (start, end) => {
       const result = parseFloat(Utils.formatElapsedTime(start.getTime(), end.getTime()));
       assert.isAtLeast(result, 5.0);
     }));
