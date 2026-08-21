@@ -7,7 +7,7 @@ describe('Effects', () => {
   const isMac = navigator.platform.indexOf('Mac') > -1;
 
   context('keys', () => {
-    const ctrlKeyModifier = isMac && !isPhantom ? { metaKey: true } : { ctrlKey: true };
+    const ctrlKeyModifier: Record<string, boolean> = isMac && !isPhantom ? { metaKey: true } : { ctrlKey: true };
     let textarea: HTMLTextAreaElement;
 
     before(() => {

@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+- Updated various dependencies, including webdriverio, rspack, webpack-dev-server and eslint. #TINYMCE-14572
+- Changed the default bundler to rspack. #TINYMCE-14649
+
 ### Fixed
 - A rejected promise or exception in a `before` or `after` hook aborted the entire run instead of being reported as a failure. #TINYMCE-14759
 - An error arriving after the test that caused it had finished was silently discarded, it is now reported against the most recent test. #TINYMCE-14759

@@ -6,12 +6,12 @@
   "scripts": {
     "prepublishOnly": "tsc -b",
     "build": "yarn prepublishOnly",
-    "test": "mocha -r esm 'lib/test/ts/**/*Test.js'",
+    "test": "mocha -r tsx/cjs 'lib/test/ts/**/*Test.js'",
     "buildAndTest": "yarn prepublishOnly && yarn test"
   },
   "dependencies": {
     "@ephox/bedrock-common": "^16.0.0",
-    "@ephox/dispute": "^1.0.3"
+    "@ephox/dispute": "^1.0.16"
   },
   "main": "./lib/main/ts/api/Main.js",
   "module": "./lib/main/ts/api/Main.js",

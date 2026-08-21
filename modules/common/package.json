@@ -6,7 +6,7 @@
   "scripts": {
     "prepublishOnly": "tsc -b",
     "build": "yarn prepublishOnly",
-    "test": "mocha -r esm 'lib/test/ts/**/*Test.js'",
+    "test": "mocha -r tsx/cjs 'lib/test/ts/**/*Test.js'",
     "buildAndTest": "yarn prepublishOnly && yarn test"
   },
   "main": "./lib/main/ts/api/Main.js",
@@ -21,6 +21,6 @@
     "registry": "https://registry.npmjs.org"
   },
   "dependencies": {
-    "diff": "^5.0.0"
+    "diff": "^9.0.0"
   }
 }

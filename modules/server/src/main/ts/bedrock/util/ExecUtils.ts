@@ -1,9 +1,9 @@
-import * as which from 'which';
+import which from 'which';
 import * as Arr from './Arr';
-import * as crossSpawn from 'cross-spawn';
+import crossSpawn from 'cross-spawn';
 import { ChildProcess } from 'child_process';
 import * as http from 'http';
-import * as deepmerge from 'deepmerge';
+import deepmerge from 'deepmerge';
 
 export interface ChildAPI {
   start: (...args: any[]) => Promise<ChildProcess | null> | ChildProcess | null;
@@ -62,8 +62,9 @@ const childAPIWrapper = (startFunc: ChildAPI['start'], isNpm: boolean, ...defaul
 
 const findNpmPackage = (driverDeps: string[]): any => Arr.findMap(driverDeps, (driverDep) => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       return require(driverDep);
-    } catch (e) {
+    } catch (_e) {
       return null;
     }
 });
@@ -96,7 +97,6 @@ export const waitForAlive = (proc: ChildProcess | null, url: string, timeout: nu
       if (Date.now() - start > timeout) {
         reject('Timed out waiting for the webdriver server. Error: ' + err);
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         timeoutId = setTimeout(checkServerStatus, 50);
       }
     };
@@ -120,7 +120,7 @@ export const waitForAlive = (proc: ChildProcess | null, url: string, timeout: nu
               }
             } catch (e) {
               onServerError(e.message);
-            } 
+            }
           });
         } else {
           onServerError('Received non 200 status (' + res.statusCode + ')');
@@ -137,4 +137,3 @@ export const waitForAlive = (proc: ChildProcess | null, url: string, timeout: nu
     checkServerStatus();
   });
 };
-  

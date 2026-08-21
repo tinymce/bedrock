@@ -1,4 +1,4 @@
-import * as finalhandler from 'finalhandler';
+import finalhandler from 'finalhandler';
 import * as http from 'http';
 import { Browser} from 'webdriverio';
 import { Attempt } from '../core/Attempt';
@@ -130,7 +130,11 @@ export const start = (settings: ServeSettings): Promise<ServeService> => {
       },
       stop: () => new Promise((resolve, reject) => {
         server.close((err?) => {
-          err ? reject(err) : resolve();
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
         });
       })
     };

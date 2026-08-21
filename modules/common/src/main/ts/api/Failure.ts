@@ -29,7 +29,11 @@ const cleanStack = (error: Error, linesToRemove = 1) => {
 };
 
 export const normalizeError = (err: TestThrowable): TestError => {
-  if (typeof err === 'string') {
+  if (err === null || err === undefined) {
+    const error = new Error('Test failed with no error (rejected with ' + String(err) + ')');
+    error.stack = cleanStack(error, 2);
+    return error;
+  } else if (typeof err === 'string') {
     // Create an error object, but strip the stack of the 2 latest calls as it'll
     // just be this function and the previous function that called this (ie asyncTest)
     const error = new Error(err);

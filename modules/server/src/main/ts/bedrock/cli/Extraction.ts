@@ -1,6 +1,6 @@
 import * as fs from 'fs';
-import glob = require('glob');
-import readdirSyncRec = require('recursive-readdir-sync');
+import { globSync } from 'glob';
+import readdirSyncRec from 'recursive-readdir-sync';
 import { Attempt } from '../core/Attempt';
 import * as Qstring from '../util/Qstring';
 
@@ -14,7 +14,7 @@ export const file = (name: string, rawValue: string): Attempt<string[], string> 
       return Attempt.failed([`Property: ${name} => Value: ${value} was not a file`]);
     }
     return Attempt.passed(parsed.original);
-  } catch (err) {
+  } catch (_err) {
     return Attempt.failed([`Property [${name}] has value: [${value}]. This file does not exist`]);
   }
 };
@@ -55,14 +55,14 @@ export const directory = (name: string, value: string): Attempt<string[], string
     } else {
       return Attempt.passed(value);
     }
-  } catch (err) {
+  } catch (_err) {
     return Attempt.failed([`[${value}] is not a directory`]);
   }
 };
 
 export const files = (patterns: string[]) => {
   return (name: string, value: string): Attempt<string[], string[]> => {
-    const dirs = glob.sync(value);
+    const dirs = globSync(value);
 
     if (dirs.length === 0) {
       return Attempt.failed([`[${value}] does not match any directories`]);
@@ -78,7 +78,7 @@ export const files = (patterns: string[]) => {
           return matches.length > 0 && fs.lstatSync(f).isFile();
         });
         return Attempt.passed(filtered);
-      } catch (err) {
+      } catch (_err) {
         return Attempt.failed([
           `Error scanning [${value}] for files matching pattern: [${patterns.join(', ')}]`
         ]);

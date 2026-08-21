@@ -1,14 +1,14 @@
 import { TestError } from './TestError';
 import { TestLabel } from './TestLabel';
 
-export const enum HookType {
+export enum HookType {
   Before = 'before',
   BeforeEach = 'beforeEach',
   After = 'after',
   AfterEach = 'afterEach'
 }
 
-export const enum RunnableState {
+export enum RunnableState {
   NotRun = 'notrun',
   Passed = 'passed',
   Skipped = 'skipped',
@@ -76,7 +76,7 @@ export interface Runnable extends Common<Runnable> {
   readonly _onChange: (type: 'retries' | 'slow' | 'timeout', callback: (value: number) => void) => () => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Hook extends Runnable {}
 
 export interface Test extends Runnable {

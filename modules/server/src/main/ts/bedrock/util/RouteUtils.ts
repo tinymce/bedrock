@@ -1,5 +1,5 @@
-import * as etag from 'etag';
-import * as fresh from 'fresh';
+import etag from 'etag';
+import fresh from 'fresh';
 import { IncomingMessage, ServerResponse } from 'http';
 
 export const generateETag = (data: any, weak = true): string =>

@@ -16,19 +16,23 @@ export {
   Global,
   TestError,
   LoggedError,
-  ErrorData,
   Reporter,
   TestLabel,
   TestLogs,
-  TestThrowable,
   Type,
+
+  HookType,
+  RunnableState
+};
+
+export type {
+  ErrorData,
+  TestThrowable,
 
   Context,
   ExecuteFn,
   Hook,
-  HookType,
   Runnable,
-  RunnableState,
   Suite,
   Test,
   TestGlobals

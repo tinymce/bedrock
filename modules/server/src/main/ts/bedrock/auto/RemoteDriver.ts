@@ -1,5 +1,5 @@
 import * as WebdriverIO from 'webdriverio';
-import * as deepmerge from 'deepmerge';
+import deepmerge from 'deepmerge';
 import { CreateTestGridUrlCommand, DeviceFarmClient } from '@aws-sdk/client-device-farm';
 import { Driver, DriverSettings } from './Driver';
 

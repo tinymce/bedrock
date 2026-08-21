@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Browser } from 'webdriverio';
 import { TestResult } from '../server/Controller';
 import { ExitCodes } from '../util/ExitCodes';
@@ -32,11 +31,11 @@ export const done = async (result: Attempt<string[], TestResult[]>, driver: Brow
   const exitCode = await Attempt.cata(result, async (errs) => {
     await markLambdaTest(driver, 'failed');
     await exitDelay(driver, delayExiting);
-    console.log(chalk.red(errs.join('\n')));
+    console.log(errs.join('\n'));
     return ExitCodes.failures.tests;
   }, async () => {
     await markLambdaTest(driver, 'passed');
-    console.log(chalk.green('All tests passed.'));
+    console.log('All tests passed.');
     return ExitCodes.success;
   });
   await shutdown();
@@ -45,7 +44,7 @@ export const done = async (result: Attempt<string[], TestResult[]>, driver: Brow
 
 export const error = async (err: Error | string, driver: Browser, shutdown: ShutdownFn, gruntDone: GruntDoneFn, delayExiting: boolean): Promise<void> => {
   await exitDelay(driver, delayExiting);
-  console.error(chalk.red('********** Unexpected Bedrock Error -> Server Quitting **********'));
+  console.error('********** Unexpected Bedrock Error -> Server Quitting **********');
   console.error(err);
   await shutdown(true);
   exit(gruntDone, ExitCodes.failures.unexpected);
@@ -58,7 +57,7 @@ export const cancel = (driver: Browser, shutdown: ShutdownFn, gruntDone: GruntDo
       return;
     }
     cancelled = true;
-    console.error(chalk.red('********** Cancelling test run **********'));
+    console.error('********** Cancelling test run **********');
     await shutdown(true);
     exit(gruntDone, ExitCodes.failures.unexpected);
   };

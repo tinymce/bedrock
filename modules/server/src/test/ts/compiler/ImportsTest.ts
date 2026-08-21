@@ -10,8 +10,11 @@ const convertPolyfillName = (name: string) => {
     name.slice(1).replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 };
 
+// Filter out path separators.
+const filenameArb = fc.string({ minLength: 1, maxLength: 20 }).filter((s) => !s.includes('/') && !s.includes('\\'));
+
 const withGenerateFilenames = (useRequire: boolean, extension: string, test: (imports: string, filenames: string[]) => void) => {
-  fc.assert(fc.property(fc.array(fc.hexaString(1, 20), 50), (filenames) => {
+  fc.assert(fc.property(fc.array(filenameArb, { maxLength: 50 }), (filenames) => {
     const filepaths = filenames.map((name) => `/${name}.${extension}`);
     const imports = generateImports(useRequire, `/scratch.${extension}`, filepaths, []);
     test(imports, filenames);
@@ -135,7 +138,7 @@ describe('Imports.convertPolyfillNameToPath', () => {
   });
 
   it('should convert PascalCase names to hyphen case and prefix `core-js/es/`', () => {
-    fc.assert(fc.property(fc.char().filter((c) => /[a-zA-Z]/.test(c)), fc.string(), fc.string(), (char, word1, word2) => {
+    fc.assert(fc.property(fc.string({ minLength: 1, maxLength: 1 }).filter((c) => /[a-zA-Z]/.test(c)), fc.string(), fc.string(), (char, word1, word2) => {
       const singleWord = char.toUpperCase() + word1.toLowerCase();
       const multiWord = char.toUpperCase() + word2.toLowerCase() + singleWord;
 

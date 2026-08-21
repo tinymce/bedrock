@@ -1,4 +1,4 @@
-import * as commandLineArgs from 'command-line-args';
+import commandLineArgs from 'command-line-args';
 import { Attempt } from '../core/Attempt';
 import * as Version from '../core/Version';
 import * as Validation from './Validation';

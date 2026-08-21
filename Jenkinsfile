@@ -7,7 +7,7 @@ standardProperties()
 
 timestamps {
   tinyPods.nodeBrowser(
-    tag: '20',
+    tag: '24',
     resourceRequestMemory: '4Gi',
     resourceLimitMemory: '4Gi'
 ) {

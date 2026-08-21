@@ -2,13 +2,12 @@ import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
 import * as WebdriverIO from 'webdriverio';
-import { RemoteOptions } from 'webdriverio';
 import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
 import * as DriverLoader from './DriverLoader';
 import * as RemoteDriver from './RemoteDriver';
 import { Tunnel } from './Tunnel';
-import deepmerge = require('deepmerge');
+import deepmerge from 'deepmerge';
 
 export interface DriverSettings {
   basedir: string;
@@ -154,7 +153,7 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
         hostname: '127.0.0.1',
         port
       }
-  ) as RemoteOptions;
+  ) as WebdriverIO.RemoteOptions;
 };
 
 const logDriverDetails = (driver: WebdriverIO.Browser, headless: boolean, debuggingPort: number) => {

@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import * as server from 'serve-static';
+import server from 'serve-static';
 import * as path from 'path';
 import * as RouteUtils from '../util/RouteUtils';
 import * as Matchers from './Matchers';
@@ -204,7 +204,7 @@ export const nodeResolve = (method: HTTPMethod, prefix: string, source: string):
       } else {
         failure(500, `Invalid node module path`);
       }
-    } catch (e) {
+    } catch (_e) {
       failure(404, `Failed to resolve node module path: ${modulePath}`);
     }
   };
@@ -227,7 +227,7 @@ export const nodeResolveFile = (method: HTTPMethod, url: string, projectDir: str
       const router = createServer(path.dirname(moduleResolvedPath));
       request.url = '/' + subPath;
       router(request, response, done);
-    } catch (e) {
+    } catch (_e) {
       failure(404, `Failed to resolve static node file for module path: ${moduleName}/${subPath}`);
     }
   };

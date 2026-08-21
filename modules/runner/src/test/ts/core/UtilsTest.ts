@@ -14,13 +14,13 @@ describe('Utils.makeQueryParams', () => {
   });
 
   it('should always include a session, offset and failed params if offset > 0', () => {
-    fc.assert(fc.property(fc.hexaString(), fc.integer(1, 1000), fc.nat(), (session, offset, failed) => {
+    fc.assert(fc.property(fc.string(), fc.integer({ min: 1, max: 1000 }), fc.nat(), (session, offset, failed) => {
       assert.equal(Utils.makeQueryParams(session, offset, failed, 0, 0), '?session=' + session + '&offset=' + offset + '&failed=' + failed);
     }));
   });
 
   it('should always include a session, offset and failed params if retries > 0', () => {
-    fc.assert(fc.property(fc.hexaString(), fc.integer(1, 1000), fc.nat(), (session, retries, failed) => {
+    fc.assert(fc.property(fc.string(), fc.integer({ min: 1, max: 1000 }), fc.nat(), (session, retries, failed) => {
       assert.equal(Utils.makeQueryParams(session, 0, failed, 0, retries), '?session=' + session + '&offset=' + 0 + '&failed=' + failed + '&retry=' + retries);
     }));
   });
@@ -45,7 +45,7 @@ describe('Utils.formatElapsedTime', () => {
   it('should be larger than 0', () => {
     const now = new Date();
     const fiveSeconds = new Date(now.getTime() + 5000);
-    fc.assert(fc.property(fc.date({ max: now }), fc.date({ min: fiveSeconds }), (start, end) => {
+    fc.assert(fc.property(fc.date({ max: now, noInvalidDate: true }), fc.date({ min: fiveSeconds, noInvalidDate: true }), (start, end) => {
       const result = parseFloat(Utils.formatElapsedTime(start.getTime(), end.getTime()));
       assert.isAtLeast(result, 5.0);
     }));
