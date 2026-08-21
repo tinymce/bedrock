@@ -64,10 +64,16 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
   // A global list of requests that were sent to the server, we must wait for these before sending `/done` or it may confuse the HUD
   const requestsInFlight: Promise<void>[] = [];
 
-  const forceReportResults = (): void => {
+  const takeResults = (): TestReport[] => {
+    // Assume the results will be posted once they are returned
+    timeOfLastReport = Date.now();
+    // splice deletes the values specified and returns them
+    return testResults.splice(0, testResults.length);
+  };
+
+  const reportResults = (): void => {
     if (testResults.length > 0) {
-      requestsInFlight.push(callbacks.sendTestResults(params.session, testResults));
-      testResults.length = 0;
+      requestsInFlight.push(callbacks.sendTestResults(params.session, takeResults()));
     }
   };
 
@@ -75,8 +81,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     testResults.push(result);
     if (Date.now() - timeOfLastReport > 30 * 1000) {
       // ping the server with results every 30 seconds or so, as a form of keep-alive
-      forceReportResults();
-      timeOfLastReport = Date.now();
+      reportResults();
     }
   };
 
@@ -120,14 +125,16 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     const sendStart = (): Promise<void> => {
       if (currentCount === 1) {
         // we need to send test start once to establish the session
-        requestsInFlight.push(callbacks.sendTestStart(params.session, currentCount, totalNumTests, file, name));
+        requestsInFlight.push(callbacks.sendTestStart(params.session, currentCount, totalNumTests, file, name, takeResults()));
         return Promise.resolve();
       } else if (mouse.hasMoved()) {
         // Send a new test start so the server resets the mouse - and wait for it
-        return callbacks.sendTestStart(params.session, currentCount, totalNumTests, file, name).then(() => {
+        const pending = takeResults();
+        return callbacks.sendTestStart(params.session, currentCount, totalNumTests, file, name, pending).then(() => {
           mouse.clear();
         }, (e) => {
-          // ignore, will try again later (because `mouse.clear()` hasn't run)
+          // Assume failures are temporary. `mouse.clear()` hasn't run so the next test will try again. requeue the results.
+          testResults.unshift(...pending);
           console.error('Failed to reset the mouse position', e);
         });
       } else {
@@ -174,7 +181,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
         if (params.retry > 0) {
           // a test that was under reload/retry status has now passed.
           // this needs to be reported immediately, otherwise we might bump up against server timeouts.
-          forceReportResults();
+          reportResults();
         }
       }
     };
@@ -227,13 +234,13 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
       reportFailure(file, name, elapsed(Date.now()), e, (err) => {
         ui.error(err);
         // nothing is waiting on this result and the page may be about to reload, so send it now
-        forceReportResults();
+        reportResults();
       });
     }
   };
 
   const waitForResults = async (): Promise<void> => {
-    forceReportResults();
+    reportResults();
     if (requestsInFlight.length > 0) {
       const currentRequests = requestsInFlight.slice(0);
       requestsInFlight.length = 0;

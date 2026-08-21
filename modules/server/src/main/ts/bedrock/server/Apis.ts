@@ -25,6 +25,7 @@ interface StartData {
   readonly file: string;
   readonly number: number;
   readonly totalTests: number;
+  readonly results: Controller.TestResult[];
 }
 
 export interface ResultsData {
@@ -117,8 +118,8 @@ export const create = (master: DriverMaster | null, pMaybeDriver: Promise<Attemp
             if (shouldResetMousePos && mousePositionResetSupported) {
               try {
                 // Park the mouse in the top left corner, out of the way of the browser.
-				// Use two actions to account for drivers thinking this is a no-op; it still only
-				// sends one driver request to the browser.
+                // Use two actions to account for drivers thinking this is a no-op; it still only
+                // sends one driver request to the browser.
                 await driver.performActions([{
                   type: 'pointer',
                   id: 'finger1',
@@ -163,6 +164,7 @@ export const create = (master: DriverMaster | null, pMaybeDriver: Promise<Attemp
       }),
       Routes.effect('POST', '/tests/init', () => resetMousePositionAction(true)),
       Routes.effect('POST', '/tests/start', (data: StartData) => {
+        c.recordTestResults(data.session, data.results);
         c.recordTestStart(data.session, data.name, data.file, data.number, data.totalTests);
         return resetMousePositionAction();
       }),

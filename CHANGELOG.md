@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Updated various dependencies, including webdriverio, rspack, webpack-dev-server and eslint. #TINYMCE-14572
 - Changed the default bundler to rspack. #TINYMCE-14649
+- Batched test results are now posted with the next test start instead of waiting for their own request. #TINYMCE-14795
 
 ### Fixed
 - A rejected promise or exception in a `before` or `after` hook aborted the entire run instead of being reported as a failure. #TINYMCE-14759
