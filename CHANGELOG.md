@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+- The rspack bundler now logs when test compilation starts and how long it took. #TINYMCE-14795
+
 ### Changed
 - Updated various dependencies, including webdriverio, rspack, webpack-dev-server and eslint. #TINYMCE-14572
 - Changed the default bundler to rspack. #TINYMCE-14649
