@@ -6,6 +6,7 @@ type ErrorHandler = (error: Error) => void
 
 export interface ErrorCatcher {
   readonly bind: (onError: ErrorHandler) => { unbind: () => void };
+  readonly bindFallback: (onError: ErrorHandler) => { unbind: () => void };
   readonly destroy: () => void;
 }
 
@@ -20,12 +21,15 @@ const isError = (e: unknown): e is Error =>
 export const ErrorCatcher = (): ErrorCatcher => {
   const supportsGlobalEventListeners = Global.addEventListener !== undefined;
   const onErrorHandlers: Set<ErrorHandler> = new Set();
+  const fallbackHandlers: Set<ErrorHandler> = new Set();
   let bound = false;
 
   const createHandler = <T extends Event>(extractError: (e: T) => Error) => (e: T) => {
-    if (onErrorHandlers.size > 0) {
+    // Unhandled errors that arrive either between tests after the test suite will have no handlers available, use the fallback
+    const handlers = onErrorHandlers.size > 0 ? onErrorHandlers : fallbackHandlers;
+    if (handlers.size > 0) {
       const error = extractError(e);
-      onErrorHandlers.forEach((onError) => onError(error));
+      handlers.forEach((onError) => onError(error));
       e.preventDefault();
       return false;
     } else {
@@ -73,17 +77,18 @@ export const ErrorCatcher = (): ErrorCatcher => {
     }
   };
 
-  const addHandler = (onError: ErrorHandler) => {
-    onErrorHandlers.add(onError);
+  const addHandler = (handlers: Set<ErrorHandler>) => (onError: ErrorHandler) => {
+    handlers.add(onError);
     bind();
 
     return {
-      unbind: () => onErrorHandlers.delete(onError)
+      unbind: () => handlers.delete(onError)
     };
   };
 
   return {
-    bind: addHandler,
+    bind: addHandler(onErrorHandlers),
+    bindFallback: addHandler(fallbackHandlers),
     destroy: unbind
   };
 };

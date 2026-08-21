@@ -8,6 +8,7 @@ type LoggedError = LoggedError.LoggedError;
 
 export interface MockReporter extends Reporter {
   readonly failures: () => LoggedError[];
+  readonly failedNames: () => string[];
 }
 
 export const TEST_TIMEOUT = 200;
@@ -30,8 +31,9 @@ export const MockReporter = (): MockReporter => {
   let passed = 0;
   let skipped = 0;
   const failures: LoggedError[] = [];
+  const failedNames: string[] = [];
 
-  const test = (): TestReporter => ({
+  const test = (_file: string, name: string): TestReporter => ({
     start: () => Promise.resolve(),
     retry: () => Promise.resolve(),
     pass: () => {
@@ -40,6 +42,7 @@ export const MockReporter = (): MockReporter => {
     },
     fail: (e) => {
       failures.push(e);
+      failedNames.push(name);
       return Promise.resolve();
     },
     skip: () => {
@@ -50,11 +53,16 @@ export const MockReporter = (): MockReporter => {
 
   return {
     test,
+    strayFailure: (_file, name, e) => {
+      failures.push(e);
+      failedNames.push(name);
+    },
     summary: () => ({ offset: 0, passed, failed: failures.length, skipped }),
     done: noop,
     waitForResults: Promise.resolve,
     retry: Promise.resolve,
-    failures: () => failures
+    failures: () => failures,
+    failedNames: () => failedNames
   };
 };
 

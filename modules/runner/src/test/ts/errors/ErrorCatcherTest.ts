@@ -113,6 +113,32 @@ describe('ErrorCatcher', () => {
     assert.isFalse(prevented, 'Event should not be prevented from running the default action');
   });
 
+  it('should notify the fallback handler when nothing else is bound', () => {
+    let prevented = false;
+    const fallbackErrors: Error[] = [];
+    const fallback = errorCatcher.bindFallback((e) => fallbackErrors.push(e));
+    const unhandledPromiseRejection = {
+      reason: new Error('message'),
+      preventDefault: () => {
+        prevented = true;
+      }
+    } as PromiseRejectionEvent;
+
+    // while a runnable is bound the fallback should be left alone
+    fireEvent('unhandledrejection', unhandledPromiseRejection);
+    assert.lengthOf(errors, 1, 'The bound handler should be notified');
+    assert.lengthOf(fallbackErrors, 0, 'The fallback should not be notified');
+
+    unbind();
+    fireEvent('unhandledrejection', unhandledPromiseRejection);
+    assert.lengthOf(errors, 1, 'The unbound handler should not be notified again');
+    assert.lengthOf(fallbackErrors, 1, 'The fallback should be notified');
+    assert.equal(fallbackErrors[0].message, 'Unhandled promise rejection: message');
+    assert.isTrue(prevented, 'Event should be prevented from running the default action');
+
+    fallback.unbind();
+  });
+
   it('should handle cross frame errors', () => {
     let prevented = false;
     // Note: As this doesn't run in the browser we can't do a proper cross frame check so simulate an Error

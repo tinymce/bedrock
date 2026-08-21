@@ -41,6 +41,7 @@ const ui = {
     skip: noop,
     fail: noop,
   }),
+  error: noop,
   done: noop
 };
 
@@ -165,6 +166,42 @@ describe('Reporter.test', () => {
           assert.isFalse(doneCalled);
         });
     }));
+  });
+
+  it('should report a stray failure against the given test without advancing the test count', () => {
+    reset(0);
+    const test = reporter.test('StrayTest.ts', 'stray - test', 1);
+    const error = LoggedError.loggedError(new Error('Rejected after the test finished'), []);
+
+    test.start();
+    test.pass();
+    reporter.strayFailure('StrayTest.ts', 'stray - test', error);
+
+    return reporter.waitForResults().then(() => {
+      assert.equal(endTestData.length, 2, 'Checking the pass and the stray failure were both reported');
+      const data = endTestData[1];
+      assert.equal(data.file, 'StrayTest.ts', 'Checking filename');
+      assert.equal(data.name, 'stray - test', 'Checking testname');
+      assert.isFalse(data.passed, 'Checking passed state');
+      assert.include(data.error?.text, 'Error: Rejected after the test finished', 'Checking error text');
+
+      assert.deepEqual(reporter.summary(), {
+        offset: 0,
+        passed: 1,
+        failed: 1,
+        skipped: 0
+      }, 'The stray failure is counted, but the offset is left where the test left it');
+    });
+  });
+
+  it('should not report a stray failure once the run is done', async () => {
+    reset(0);
+    reporter.done();
+    reporter.strayFailure('StrayTest.ts', 'stray - test', LoggedError.loggedError(new Error('Too late'), []));
+
+    await wait(150);
+    await reporter.waitForResults();
+    assert.equal(endTestData.length, 0, 'The stray failure should not reopen the session');
   });
 
   it('should report done', async () => {

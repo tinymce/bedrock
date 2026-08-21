@@ -6,7 +6,8 @@ import { Callbacks } from '../reporter/Callbacks';
 import { Reporter } from '../reporter/Reporter';
 import { Actions } from '../ui/Actions';
 import { Ui } from '../ui/Ui';
-import { RunActions, RunState, runSuite } from './TestRun';
+import { catchStrayErrors } from './Run';
+import { reportStrayError, RunActions, RunState, runSuite } from './TestRun';
 import { countTests, filterOnly } from './Utils';
 
 export interface Runner {
@@ -110,6 +111,9 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
       onStart: noop,
       runNextChunk
     };
+
+    // Don't let an error that lands between tests take down the run
+    catchStrayErrors(reportStrayError(runState, reporter));
 
     ui.setStopOnFailure(stopOnFailure);
     return runSuite(rootSuite, runState, runActions, reporter)
