@@ -114,7 +114,7 @@ export const create = (master: DriverMaster | null, pMaybeDriver: Promise<Attemp
           (driver) => waitForDriverReady(maxInvalidAttempts, async () => {
             const shouldResetMousePos = force || needsMousePositionReset;
             // TODO re-enable resetting the mouse on other browsers when mouseMove gets fixed on Firefox/IE
-            const browserName = driver.capabilities.browserName;
+            const browserName = (driver.capabilities as Record<string, any>).browserName;
             if (shouldResetMousePos && (browserName === 'chrome' || browserName === 'msedge')) {
               // Reset the mouse position to the top left of the window
               await driver.performActions([{

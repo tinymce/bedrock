@@ -2,7 +2,6 @@ import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
 import * as WebdriverIO from 'webdriverio';
-import { Capabilities } from '@wdio/types';
 import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
 import * as DriverLoader from './DriverLoader';
@@ -93,8 +92,8 @@ const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
   }
 };
 
-const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): Capabilities.WebdriverIOConfig => {
-  const options: Capabilities.WebdriverIOConfig = {
+const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): WebdriverIO.RemoteOptions => {
+  const options: WebdriverIO.RemoteOptions = {
     logLevel: 'warn' as const,
     // if the parallel count is full this timeout is how long WDIO waits for LambdaTest to spin up.
     // 10 minute timeout, defaults to 3 connection attempts
@@ -154,7 +153,7 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
         hostname: '127.0.0.1',
         port
       }
-  ) as Capabilities.WebdriverIOConfig;
+  ) as WebdriverIO.RemoteOptions;
 };
 
 const logDriverDetails = (driver: WebdriverIO.Browser, headless: boolean, debuggingPort: number) => {
