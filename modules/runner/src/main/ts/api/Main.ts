@@ -1,5 +1,6 @@
 import { Failure, Global } from '@ephox/bedrock-common';
 import * as Globals from '../core/Globals';
+import { MouseWatch } from '../core/MouseWatch';
 import * as TestLoader from '../core/TestLoader';
 import { UrlParams } from '../core/UrlParams';
 import { makeSessionId } from '../core/Utils';
@@ -14,11 +15,14 @@ declare const $: JQueryStatic;
 // Setup the globals
 Globals.setup();
 
+// Watch for mouse effects globally, before tests load
+const mouse = MouseWatch();
+
 const setupAndRun = (loadError?: Error) => {
   const params = UrlParams.parse(window.location.search, makeSessionId);
   const ui = Ui($('body'));
   const callbacks = Callbacks();
-  const reporter = Reporter(params, callbacks, ui);
+  const reporter = Reporter(params, callbacks, ui, mouse);
 
   const runner = Runner(Globals.rootSuite(), params, callbacks, reporter, ui);
   runner.init().then((data) => {

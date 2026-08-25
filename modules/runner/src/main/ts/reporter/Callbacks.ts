@@ -20,7 +20,7 @@ export interface Callbacks {
   readonly loadHarness: () => Promise<HarnessResponse>
   readonly sendKeepAlive: (session: string) => Promise<void>;
   readonly sendInit: (session: string) => Promise<void>;
-  readonly sendTestStart: (session: string, number: number, totalTests: number, file: string, name: string) => Promise<void>;
+  readonly sendTestStart: (session: string, number: number, totalTests: number, file: string, name: string, results: TestReport[]) => Promise<void>;
   readonly sendTestResults: (session: string, results: TestReport[]) => Promise<void>;
   readonly sendDone: (session: string, error?: string) => Promise<void>;
 }
@@ -82,13 +82,15 @@ export const Callbacks = (): Callbacks => {
     });
   };
 
-  const sendTestStart = (session: string, number: number, totalTests: number, file: string, name: string): Promise<void> => {
+  // any results batched up so far ride along, so the server gets them without a second request
+  const sendTestStart = (session: string, number: number, totalTests: number, file: string, name: string, results: TestReport[]): Promise<void> => {
     return sendJson('/tests/start', {
       number,
       totalTests,
       session,
       file,
       name,
+      results,
     });
   };
 

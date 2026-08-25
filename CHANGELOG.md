@@ -6,9 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+- The rspack bundler now logs when test compilation starts and how long it took. #TINYMCE-14795
+
 ### Changed
 - Updated various dependencies, including webdriverio, rspack, webpack-dev-server and eslint. #TINYMCE-14572
 - Changed the default bundler to rspack. #TINYMCE-14649
+- Batched test results are now posted with the next test start instead of waiting for their own request. #TINYMCE-14795
 
 ### Fixed
 - A rejected promise or exception in a `before` or `after` hook aborted the entire run instead of being reported as a failure. #TINYMCE-14759
@@ -16,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A test that timed out no longer hides the error from work that was still in flight, it is reported as `<test> (error after test)`. #TINYMCE-14759
 - A promise rejected without a reason was treated as a pass. #TINYMCE-14759
 - An `after` or `afterEach` hook failure replaced the error of the test that had already failed. #TINYMCE-14759
+- The mouse position reset code was only running on page load due to the reduced network traffic in v15.0.0. #TINYMCE-14795
+- The mouse position reset logic now works on Firefox and Safari. #TINYMCE-14795
 
 ## 16.2.0 - 2026-03-25
 

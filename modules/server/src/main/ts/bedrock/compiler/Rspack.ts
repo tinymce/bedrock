@@ -124,6 +124,8 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
 
 const compileTests = (compileInfo: RspackCompileInfo, exitOnCompileError: boolean, srcFiles: string[], polyfills: string[]): Promise<string> => {
   return new Promise((resolve) => {
+    console.log(`Compiling ${srcFiles.length} tests...`);
+    const start = Date.now();
 
     mkdirp.sync(path.dirname(compileInfo.scratchFile));
     fs.writeFileSync(compileInfo.scratchFile, Imports.generateImports(true, compileInfo.scratchFile, srcFiles, polyfills));
@@ -145,6 +147,7 @@ const compileTests = (compileInfo: RspackCompileInfo, exitOnCompileError: boolea
         }
       }
 
+      console.log(`Compiled ${srcFiles.length} tests in ${Date.now() - start}ms`);
       resolve(compileInfo.dest);
     });
   });

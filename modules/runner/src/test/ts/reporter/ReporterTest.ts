@@ -2,8 +2,9 @@ import { Failure, LoggedError } from '@ephox/bedrock-common';
 import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { beforeEach, describe, it } from 'mocha';
+import { MouseWatch } from '../../../main/ts/core/MouseWatch';
 import { UrlParams } from '../../../main/ts/core/UrlParams';
-import { Callbacks, TestErrorData } from '../../../main/ts/reporter/Callbacks';
+import { Callbacks, TestErrorData, TestReport } from '../../../main/ts/reporter/Callbacks';
 import { Reporter } from '../../../main/ts/reporter/Reporter';
 import { noop, wait } from '../TestUtils';
 
@@ -13,6 +14,7 @@ interface StartTestData {
   readonly totalTests: number;
   readonly file: string;
   readonly name: string;
+  readonly results: TestReport[];
 }
 
 interface EndTestData {
@@ -48,12 +50,23 @@ const ui = {
 describe('Reporter.test', () => {
   let reporter: Reporter, startTestData: StartTestData[], endTestData: EndTestData[];
   let doneCalled: boolean, doneError: string | undefined, offset: number;
+  let mouseMoved: boolean, startFails: boolean;
+  const mouse: MouseWatch = {
+    hasMoved: () => mouseMoved,
+    clear: () => {
+      mouseMoved = false;
+    }
+  };
   const callbacks: Callbacks = {
     loadHarness: () => Promise.resolve({ retries: 0, chunk: 100, stopOnFailure: true, mode: 'manual', timeout: 10000 }),
     sendKeepAlive: () => Promise.resolve(),
     sendInit: () => Promise.resolve(),
-    sendTestStart: (session, currentCount, totalTests, file, name) => {
-      startTestData.push({ session, currentCount, totalTests, file, name });
+    sendTestStart: (session, currentCount, totalTests, file, name, results) => {
+      if (startFails) {
+        return Promise.reject(new Error('start failed'));
+      }
+      startTestData.push({ session, currentCount, totalTests, file, name, results });
+      results.forEach(r => endTestData.push({ session, ...r }));
       return Promise.resolve();
     },
     sendTestResults: (session, results) => {
@@ -69,7 +82,9 @@ describe('Reporter.test', () => {
 
   const reset = (newOffset: number = Math.floor(Math.random() * 1000)) => {
     offset = newOffset;
-    reporter = Reporter({ ...params, offset }, callbacks, ui);
+    mouseMoved = false;
+    startFails = false;
+    reporter = Reporter({ ...params, offset }, callbacks, ui, mouse);
     startTestData = [];
     endTestData = [];
     doneCalled = false;
@@ -90,7 +105,8 @@ describe('Reporter.test', () => {
           session: sessionId,
           totalTests: testCount,
           file: fileName + 'Test.ts',
-          name: testName
+          name: testName,
+          results: []
         }, 'Checking start test data contents');
 
         assert.equal(endTestData.length, 0, 'Checking there is no end test data');
@@ -104,6 +120,54 @@ describe('Reporter.test', () => {
         assert.isFalse(doneCalled);
       });
     }));
+  });
+
+  it('should send batched results along with a test start', () => {
+    reset(5);
+    const first = reporter.test('SomeTest.ts', 'first', 10);
+    return first.start().then(() => {
+      first.pass();
+      mouseMoved = true;
+      return reporter.test('SomeTest.ts', 'second', 10).start();
+    }).then(() => {
+      assert.equal(startTestData.length, 1, 'Checking start test data was sent');
+      assert.deepEqual(startTestData[0].results.map((r) => r.name), [ 'first' ], 'Checking the batch rode along');
+      assert.equal(endTestData.length, 1, 'Checking the result was recorded');
+      return reporter.waitForResults().then(() => {
+        assert.equal(endTestData.length, 1, 'Checking the result was not also sent separately');
+      });
+    });
+  });
+
+  it('should keep batched results when a test start fails', () => {
+    reset(5);
+    const first = reporter.test('SomeTest.ts', 'first', 10);
+    return first.start().then(() => {
+      first.pass();
+      mouseMoved = true;
+      startFails = true;
+      return reporter.test('SomeTest.ts', 'second', 10).start();
+    }).then(() => {
+      assert.equal(startTestData.length, 0, 'Checking the start was not recorded');
+      assert.isTrue(mouseMoved, 'Checking the mouse watch was not cleared');
+      return reporter.waitForResults().then(() => {
+        assert.deepEqual(endTestData.map((r) => r.name), [ 'first' ], 'Checking the result was sent later instead of lost');
+      });
+    });
+  });
+
+  it('should only send a test start mid-run when the mouse has moved', () => {
+    reset(5);
+    const first = reporter.test('SomeTest.ts', 'first', 10);
+    return first.start().then(() => {
+      assert.equal(startTestData.length, 0, 'Checking no start test data was sent');
+      mouseMoved = true;
+      return reporter.test('SomeTest.ts', 'second', 10).start();
+    }).then(() => {
+      assert.equal(startTestData.length, 1, 'Checking start test data was sent');
+      assert.equal(startTestData[0].currentCount, 7, 'Checking the test number');
+      assert.isFalse(mouseMoved, 'Checking the mouse watch was cleared');
+    });
   });
 
   it('should report the session id, file, name, passed state and time on a skipped test', () => {
