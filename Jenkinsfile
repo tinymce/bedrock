@@ -56,7 +56,7 @@ timestamps {
             // We need to tell git to ignore the changes to .npmrc when publishing
             exec('git update-index --assume-unchanged .npmrc')
             // Re-evaluate whether we still need the `--no-verify-access` flag after upgrading Lerna (TINY-13539)
-            exec('yarn lerna publish from-package --yes --no-git-reset --ignore @ephox/bedrock-sample --no-verify-access')
+            exec('yarn lerna publish from-package --yes --no-git-reset --ignore-changes @ephox/bedrock-sample --no-verify-access')
           }
         }
       }

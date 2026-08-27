@@ -3,5 +3,6 @@
   "version": "17.0.0",
   "publish": {
     "push": false
-  }
+  },
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json"
 }
