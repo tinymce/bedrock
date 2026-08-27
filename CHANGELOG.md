@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+- Tests using JSX failed with `React is not defined` when compiled with the rspack bundler. #TINYMCE-14841
+
 ## 17.0.0 - 2026-08-27
 
 ### Added
