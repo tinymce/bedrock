@@ -43,6 +43,7 @@
     "jquery": "^4.0.0",
     "mime-types": "^3.0.2",
     "mkdirp": "^3.0.1",
+    "playwright": "^1.50.0",
     "portfinder": "^1.0.38",
     "recursive-readdir-sync": "^1.0.6",
     "serve-static": "^2.2.1",

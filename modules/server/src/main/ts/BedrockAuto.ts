@@ -5,6 +5,7 @@ import * as RunnerRoutes from './bedrock/server/RunnerRoutes';
 import * as Reporter from './bedrock/core/Reporter';
 import * as DriverMaster from './bedrock/server/DriverMaster';
 import * as Driver from './bedrock/auto/Driver';
+import * as PlaywrightDriver from './bedrock/auto/PlaywrightDriver';
 import * as Tunnel from './bedrock/auto/Tunnel';
 import * as Lifecycle from './bedrock/core/Lifecycle';
 import { BedrockAutoSettings } from './bedrock/core/Settings';
@@ -14,6 +15,18 @@ import * as SettingsResolver from './bedrock/core/SettingsResolver';
 import { format } from 'node:util';
 import { Browser } from 'webdriverio';
 import { defer } from './bedrock/util/Waiter';
+
+async function makePlaywrightDriver(settings: BedrockAutoSettings, servicePort: number, shutdownServices: ((immediate?: boolean) => Promise<void>)[], isHeadless: boolean) {
+  const location = `http://localhost:${servicePort}`;
+  const driver = await PlaywrightDriver.create({
+    browser: settings.browser,
+    headless: isHeadless,
+    verbose: settings.verbose,
+    name: settings.name ? settings.name : 'bedrock-auto'
+  });
+  shutdownServices.push(driver.shutdown);
+  return { location, webdriver: driver.webdriver };
+}
 
 async function makeWebDriver(settings: BedrockAutoSettings, servicePort: number, shutdownServices: ((immediate?: boolean) => Promise<void>)[], browserName: string, isHeadless: boolean) {
   // Remote settings
@@ -66,7 +79,8 @@ export const go = async (bedrockAutoSettings: BedrockAutoSettings): Promise<void
   console.log('bedrock-auto ' + Version.get() + ' starting...');
 
   const settings = SettingsResolver.resolveAndLog(bedrockAutoSettings);
-  const master = DriverMaster.create();
+  const isPlaywright = PlaywrightDriver.isPlaywrightBrowser(settings.browser);
+  const master = isPlaywright ? null : DriverMaster.create();
   const browserName = settings.browser.replace('-headless', '');
   const isPhantom = browserName === 'phantomjs';
   const isHeadless = settings.browser.endsWith('-headless') || isPhantom;
@@ -100,14 +114,22 @@ export const go = async (bedrockAutoSettings: BedrockAutoSettings): Promise<void
 
     const service = await Serve.start({
       ...settings,
+      // Playwright mode has no real webdriver — mouse-position reset would always reject.
+      skipResetMousePosition: isPlaywright ? true : settings.skipResetMousePosition,
       driver: driverDeferred.promise,
       master,
       runner: routesPromise,
       stickyFirstSession: true,
     });
-    const driverPromise = makeWebDriver(settings, service.port, shutdownServices, browserName, isHeadless);
+    const driverPromise = isPlaywright
+      ? makePlaywrightDriver(settings, service.port, shutdownServices, isHeadless)
+      : makeWebDriver(settings, service.port, shutdownServices, browserName, isHeadless);
     driverPromise.then(({ webdriver }) => {
-      driverDeferred.resolve(Attempt.passed(webdriver));
+      // In playwright mode, the wrapper isn't a real webdriver — flag it as failed so
+      // /keys, /mouse and /clipboard routes return their unsupported error.
+      driverDeferred.resolve(isPlaywright
+        ? Attempt.failed('Playwright mode: webdriver-driven effects (keys/mouse/clipboard) are not supported.')
+        : Attempt.passed(webdriver));
     }).catch((e) => {
       driverDeferred.reject(Attempt.failed(e));
     });

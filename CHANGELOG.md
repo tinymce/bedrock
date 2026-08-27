@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added a `--pageHost` CLI option to `bedrock-auto`. This can be useful to set `host.docker.internal` when the browser is in a docker container. #TINYMCE-14879
+- Added `playwright-chromium`, `playwright-firefox` and `playwright-webkit` values (each with a `-headless` variant) to the `--browser` option in `bedrock-auto` so tests can be loaded into a Playwright-launched browser without a webdriver. Server-driven effects (`/keys`, `/mouse`, `/clipboard`) are not supported in this mode.
 
 ### Fixed
 - The grunt task passed config values to bedrock without type coercion, so string values for `Number` or `Boolean` options (e.g. `--webdriverPort=14444` or `--useSelenium=false` via `grunt.option`) were rejected or misread. #TINYMCE-14879

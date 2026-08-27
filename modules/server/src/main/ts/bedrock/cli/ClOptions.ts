@@ -48,7 +48,13 @@ export const browser: ClOption = {
     'chrome',
     'chrome-headless',
     'safari',
-    'phantomjs'
+    'phantomjs',
+    'playwright-chromium',
+    'playwright-chromium-headless',
+    'playwright-firefox',
+    'playwright-firefox-headless',
+    'playwright-webkit',
+    'playwright-webkit-headless'
   ])
 };
 
