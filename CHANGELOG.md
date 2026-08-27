@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 17.0.0 - 2026-08-27
+
 ### Added
 - The rspack bundler now logs when test compilation starts and how long it took. #TINYMCE-14795
 
