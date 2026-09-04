@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added a `--pageHost` CLI option to `bedrock-auto` for the hostname the browser uses to reach the bedrock server, e.g. `host.docker.internal` when the browser runs in a docker container. #TINYMCE-14879
 
+### Fixed
+- The grunt task passed config values to bedrock without type coercion, so string values for `Number` or `Boolean` options (e.g. `--webdriverPort=14444` or `--useSelenium=false` via `grunt.option`) were rejected or misread. #TINYMCE-14879
+
 ## 17.0.1 - 2026-08-28
 
 ### Fixed
