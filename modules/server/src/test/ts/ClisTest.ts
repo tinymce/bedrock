@@ -64,7 +64,8 @@ describe('Clis.forAuto', () => {
       skipResetMousePosition: false,
       wipeBrowserCache: false,
       remote: '',
-      webdriverPort: 4444
+      webdriverPort: 4444,
+      pageHost: 'localhost'
     }, cleanResult(actual));
   });
 
@@ -106,7 +107,8 @@ describe('Clis.forAuto', () => {
       skipResetMousePosition: false,
       wipeBrowserCache: false,
       remote: '',
-      webdriverPort: 4444
+      webdriverPort: 4444,
+      pageHost: 'localhost'
     }, cleanResult(actual));
   });
 
@@ -149,7 +151,8 @@ describe('Clis.forAuto', () => {
       skipResetMousePosition: false,
       wipeBrowserCache: false,
       remote: '',
-      webdriverPort: 4444
+      webdriverPort: 4444,
+      pageHost: 'localhost'
     }, cleanResult(actual));
   });
 
@@ -191,7 +194,8 @@ describe('Clis.forAuto', () => {
       skipResetMousePosition: false,
       wipeBrowserCache: false,
       remote: '',
-      webdriverPort: 4444
+      webdriverPort: 4444,
+      pageHost: 'localhost'
     }, cleanResult(actual));
   });
 
@@ -239,6 +243,7 @@ describe('Clis.forAuto', () => {
       username: 'lt_username',
       accesskey: 'lt_access_key',
       webdriverPort: 4444,
+      pageHost: 'localhost',
       platformName: 'macOS Catalina'
     }, cleanResult(actual));
   });
@@ -286,7 +291,8 @@ describe('Clis.forAuto', () => {
       sishDomain: 'sish.osu.tiny.work',
       devicefarmRegion: 'us-west-2',
       devicefarmArn: 'arn:aws:devicefarm:us-west-2:123123123123:project-name:123a123b-123c-123d-1234a-123a123b123c',
-      webdriverPort: 4444
+      webdriverPort: 4444,
+      pageHost: 'localhost'
     }, cleanResult(actual));
   });
 
@@ -347,7 +353,51 @@ describe('Clis.forAuto', () => {
       skipResetMousePosition: false,
       wipeBrowserCache: false,
       remote: '',
-      webdriverPort: 4444
+      webdriverPort: 4444,
+      pageHost: 'localhost'
+    }, cleanResult(actual));
+  });
+
+  it('TINYMCE-14879: parses a custom page host', () => {
+    const args = [
+      '--browser', 'chrome-headless',
+      '--files', 'src/test/resources/test.file1',
+      '--config', 'src/test/resources/tsconfig.sample.json',
+      '--pageHost', 'host.docker.internal'
+    ];
+    const actual = Clis.forAuto(directories, args);
+    AttemptUtils.assertResult({
+      browser: 'chrome-headless',
+      browserVersion: 'latest',
+      bundler: 'rspack',
+      config: 'src/test/resources/tsconfig.sample.json',
+      name: 'bedrock-run',
+      output: 'scratch',
+      help: false,
+      testfiles: [
+        'src/test/resources/test.file1'
+      ],
+      delayExit: false,
+      singleTimeout: 30000,
+      stopOnFailure: false,
+      overallTimeout: 600000,
+      loglevel: 'advanced',
+      version: false,
+      chunk: 2000,
+      retries: 0,
+      polyfills: [ 'Symbol' ],
+      verbose: false,
+      bucket: 1,
+      buckets: 1,
+      skipTypecheck: false,
+      useSandboxForHeadless: false,
+      useSelenium: false,
+      extraBrowserCapabilities: '',
+      skipResetMousePosition: false,
+      wipeBrowserCache: false,
+      remote: '',
+      webdriverPort: 4444,
+      pageHost: 'host.docker.internal'
     }, cleanResult(actual));
   });
 

@@ -127,11 +127,18 @@ const createTunnel = async (port: number, domain: string | undefined, credential
  * @param port Dev server connection port
  * @param remote Name of remote service or undefined
  * @param domain Domain for sish connection or undefined
+ * @param pageHost Hostname the browser uses to reach the bedrock server
  * @returns Connection tunnel
  */
-export const prepareConnection = async (port: number, remote: string | undefined, domain: string | undefined, credentials: LambdaCredentials ): Promise<Tunnel> => {
-  return remote ? createTunnel(port, domain, credentials) : Promise.resolve({
-    url: new URL('http://localhost:' + port),
+export const prepareConnection = async (port: number, remote: string | undefined, domain: string | undefined, credentials: LambdaCredentials, pageHost: string): Promise<Tunnel> => {
+  if (remote) {
+    if (pageHost !== 'localhost') {
+      console.warn('--pageHost is ignored with --remote; the tunnel determines the page URL.');
+    }
+    return createTunnel(port, domain, credentials);
+  }
+  return Promise.resolve({
+    url: new URL('http://' + pageHost + ':' + port),
     shutdown: () => Promise.resolve()
   });
 };

@@ -403,3 +403,12 @@ export const webdriverPort: ClOption = {
   defaultValue: 4444,
   uncommon: true
 };
+
+export const pageHost: ClOption = {
+  name: 'pageHost',
+  type: String,
+  defaultValue: 'localhost',
+  description: 'Hostname the browser uses to reach the bedrock server. Useful when the browser runs in a container or VM (e.g. host.docker.internal for a dockerized selenium grid). Ignored with --remote.',
+  validate: Extraction.any,
+  uncommon: true
+};
