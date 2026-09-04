@@ -51,6 +51,7 @@ export const forAuto = (directories: Directories, argv: string[] = process.argv)
     ClOptions.wipeBrowserCache,
     ClOptions.remote,
     ClOptions.webdriverPort,
+    ClOptions.pageHost,
     ClOptions.sishDomain,
     ClOptions.username,
     ClOptions.accesskey,

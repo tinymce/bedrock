@@ -44,4 +44,5 @@ export interface BedrockAutoSettings extends BedrockSettings {
   readonly devicefarmArn: string;
   readonly browserVersion: string;
   readonly platformName?: string;
+  readonly pageHost: string;
 }

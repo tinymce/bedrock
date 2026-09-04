@@ -26,7 +26,7 @@ async function makeWebDriver(settings: BedrockAutoSettings, servicePort: number,
     key: accesskey
   };
 
-  const tunnel = await Tunnel.prepareConnection(servicePort, remoteWebdriver, sishDomain, tunnelCredentials);
+  const tunnel = await Tunnel.prepareConnection(servicePort, remoteWebdriver, sishDomain, tunnelCredentials, settings.pageHost);
   shutdownServices.push(tunnel.shutdown);
   const location = tunnel.url.href;
 
