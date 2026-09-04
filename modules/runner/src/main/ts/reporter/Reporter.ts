@@ -57,6 +57,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
   let skipCount = 0;
   let failCount = 0;
   let finished = false;
+  let sentPageStart = false;
 
   // A list of test results we are going to send as a batch to the server
   const testResults: TestReport[] = [];
@@ -123,8 +124,10 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     const testUi = ui.test();
 
     const sendStart = (): Promise<void> => {
-      if (currentCount === 1) {
-        // we need to send test start once to establish the session
+      if (!sentPageStart) {
+        // We don't want one start notification per test, these are blocking which is very slow over remote connections.
+        // This is a balance; once every page load (initial and chunk/retry loads).
+        sentPageStart = true;
         requestsInFlight.push(callbacks.sendTestStart(params.session, currentCount, totalNumTests, file, name, takeResults()));
         return Promise.resolve();
       } else if (mouse.hasMoved()) {
