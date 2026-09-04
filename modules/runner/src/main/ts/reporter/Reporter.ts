@@ -57,6 +57,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
   let skipCount = 0;
   let failCount = 0;
   let finished = false;
+  let sentPageStart = false;
 
   // A list of test results we are going to send as a batch to the server
   const testResults: TestReport[] = [];
@@ -123,8 +124,13 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
     const testUi = ui.test();
 
     const sendStart = (): Promise<void> => {
-      if (currentCount === 1) {
-        // we need to send test start once to establish the session
+      if (!sentPageStart) {
+        // The first start after a page load establishes the session and resets the server's
+        // no-updates watchdog, which keeps running through a chunk or retry reload. This is
+        // once per page load, not per test: a post per test blocks each test on a server
+        // round trip, which is far too slow over remote tunnels. Fire and forget so it adds
+        // no latency to the test.
+        sentPageStart = true;
         requestsInFlight.push(callbacks.sendTestStart(params.session, currentCount, totalNumTests, file, name, takeResults()));
         return Promise.resolve();
       } else if (mouse.hasMoved()) {

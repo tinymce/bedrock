@@ -51,6 +51,7 @@ describe('Reporter.test', () => {
   let reporter: Reporter, startTestData: StartTestData[], endTestData: EndTestData[];
   let doneCalled: boolean, doneError: string | undefined, offset: number;
   let mouseMoved: boolean, startFails: boolean;
+  let startGate: Promise<void> | null;
   const mouse: MouseWatch = {
     hasMoved: () => mouseMoved,
     clear: () => {
@@ -67,7 +68,7 @@ describe('Reporter.test', () => {
       }
       startTestData.push({ session, currentCount, totalTests, file, name, results });
       results.forEach(r => endTestData.push({ session, ...r }));
-      return Promise.resolve();
+      return startGate !== null ? startGate : Promise.resolve();
     },
     sendTestResults: (session, results) => {
       results.forEach(r => endTestData.push({session, ...r}));
@@ -84,6 +85,7 @@ describe('Reporter.test', () => {
     offset = newOffset;
     mouseMoved = false;
     startFails = false;
+    startGate = null;
     reporter = Reporter({ ...params, offset }, callbacks, ui, mouse);
     startTestData = [];
     endTestData = [];
@@ -130,8 +132,9 @@ describe('Reporter.test', () => {
       mouseMoved = true;
       return reporter.test('SomeTest.ts', 'second', 10).start();
     }).then(() => {
-      assert.equal(startTestData.length, 1, 'Checking start test data was sent');
-      assert.deepEqual(startTestData[0].results.map((r) => r.name), [ 'first' ], 'Checking the batch rode along');
+      assert.equal(startTestData.length, 2, 'Checking both test starts were sent');
+      assert.deepEqual(startTestData[0].results, [], 'Checking the page load start had nothing to send');
+      assert.deepEqual(startTestData[1].results.map((r) => r.name), [ 'first' ], 'Checking the batch rode along');
       assert.equal(endTestData.length, 1, 'Checking the result was recorded');
       return reporter.waitForResults().then(() => {
         assert.equal(endTestData.length, 1, 'Checking the result was not also sent separately');
@@ -148,7 +151,7 @@ describe('Reporter.test', () => {
       startFails = true;
       return reporter.test('SomeTest.ts', 'second', 10).start();
     }).then(() => {
-      assert.equal(startTestData.length, 0, 'Checking the start was not recorded');
+      assert.equal(startTestData.length, 1, 'Checking only the page load start was recorded');
       assert.isTrue(mouseMoved, 'Checking the mouse watch was not cleared');
       return reporter.waitForResults().then(() => {
         assert.deepEqual(endTestData.map((r) => r.name), [ 'first' ], 'Checking the result was sent later instead of lost');
@@ -160,13 +163,37 @@ describe('Reporter.test', () => {
     reset(5);
     const first = reporter.test('SomeTest.ts', 'first', 10);
     return first.start().then(() => {
-      assert.equal(startTestData.length, 0, 'Checking no start test data was sent');
-      mouseMoved = true;
+      assert.equal(startTestData.length, 1, 'Checking only the page load start was sent');
       return reporter.test('SomeTest.ts', 'second', 10).start();
     }).then(() => {
-      assert.equal(startTestData.length, 1, 'Checking start test data was sent');
-      assert.equal(startTestData[0].currentCount, 7, 'Checking the test number');
+      assert.equal(startTestData.length, 1, 'Checking no start was sent while the mouse was still');
+      mouseMoved = true;
+      return reporter.test('SomeTest.ts', 'third', 10).start();
+    }).then(() => {
+      assert.equal(startTestData.length, 2, 'Checking start test data was sent');
+      assert.equal(startTestData[1].currentCount, 8, 'Checking the test number');
       assert.isFalse(mouseMoved, 'Checking the mouse watch was cleared');
+    });
+  });
+
+  it('TINYMCE-14879: posts a start for the first test after a page reload without awaiting it', () => {
+    reset(5);
+    let releaseStart: () => void = noop;
+    startGate = new Promise((resolve) => {
+      releaseStart = resolve;
+    });
+    return reporter.test('SomeTest.ts', 'first', 10).start().then(() => {
+      assert.equal(startTestData.length, 1, 'Checking the start was posted before its request resolved');
+      assert.deepEqual(startTestData[0], {
+        currentCount: offset + 1,
+        session: sessionId,
+        totalTests: 10,
+        file: 'SomeTest.ts',
+        name: 'first',
+        results: []
+      }, 'Checking start test data contents');
+      releaseStart();
+      return reporter.waitForResults();
     });
   });
 

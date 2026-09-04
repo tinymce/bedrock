@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - The grunt task passed config values to bedrock without type coercion, so string values for `Number` or `Boolean` options (e.g. `--webdriverPort=14444` or `--useSelenium=false` via `grunt.option`) were rejected or misread. #TINYMCE-14879
+- The runner sent no updates to the server during a chunk or retry reload, so a slow reload or a hang early in the new page could trip the server's no-updates watchdog, killing the session with no error record. The first test after every page load now posts a test start, which resets the watchdog and updates the HUD. #TINYMCE-14879
 
 ## 17.0.1 - 2026-08-28
 

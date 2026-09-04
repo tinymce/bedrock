@@ -125,7 +125,7 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
     session.totalTests = totalTests;
     session.currentTest = currentCount;
     session.done = false;
-    // a bit of a lie, but we only ever get 1 start now
+    // after a start this names the test about to run, not the last one that completed
     session.previous = {
       name,
       file,
