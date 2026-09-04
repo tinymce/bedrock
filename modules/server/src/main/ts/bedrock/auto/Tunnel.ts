@@ -81,10 +81,15 @@ const createSSH = async (port: number | string, domain: string): Promise<Tunnel>
   }
 };
 
+// Safari 26 cannot load `localhost` through the LambdaTest tunnel. LambdaTest publish
+// localhost.lambdatest.com as a public DNS alias for 127.0.0.1, which every browser
+// resolves, so the alias is applied for all of them rather than special-casing Safari.
+const LAMBDA_LOCALHOST_ALIAS = 'localhost.lambdatest.com';
+
 // LambdaTest supplied tunnel
 // @lambdatest/nodetunnel has some weird quasi-overriden promise-based versions of functions
 // and no proper typing for it. Excuse the hard type casting
-const createLambda = async (port: number | string, credentials: LambdaCredentials): Promise<Tunnel> => {
+const createLambda = async (port: number | string, credentials: LambdaCredentials, pageHost: string): Promise<Tunnel> => {
   const tunnel = new LambdaTunnel();
   const suffix = crypto.randomUUID();
   const tunnelName = 'bedrock-tunnel-' + suffix;
@@ -101,8 +106,9 @@ const createLambda = async (port: number | string, credentials: LambdaCredential
     return tunnel.stop(null as unknown as ((_: boolean) => void));
   };
 
+  const host = pageHost === 'localhost' ? LAMBDA_LOCALHOST_ALIAS : pageHost;
   const result: Tunnel = {
-    url: new URL('http://localhost:' + port),
+    url: new URL('http://' + host + ':' + port),
     name: tunnelName,
     shutdown
   };
@@ -117,8 +123,8 @@ const createLambda = async (port: number | string, credentials: LambdaCredential
     });
 };
 
-const createTunnel = async (port: number, domain: string | undefined, credentials: LambdaCredentials): Promise<Tunnel> => {
-  return domain ? createSSH(port, domain) : createLambda(port, credentials);
+const createTunnel = async (port: number, domain: string | undefined, credentials: LambdaCredentials, pageHost: string): Promise<Tunnel> => {
+  return domain ? createSSH(port, domain) : createLambda(port, credentials, pageHost);
 };
 
 /**
@@ -132,10 +138,10 @@ const createTunnel = async (port: number, domain: string | undefined, credential
  */
 export const prepareConnection = async (port: number, remote: string | undefined, domain: string | undefined, credentials: LambdaCredentials, pageHost: string): Promise<Tunnel> => {
   if (remote) {
-    if (pageHost !== 'localhost') {
-      console.warn('--pageHost is ignored with --remote; the tunnel determines the page URL.');
+    if (domain && pageHost !== 'localhost') {
+      console.warn('--pageHost is ignored with a sish tunnel; the tunnel determines the page URL.');
     }
-    return createTunnel(port, domain, credentials);
+    return createTunnel(port, domain, credentials, pageHost);
   }
   return Promise.resolve({
     url: new URL('http://' + pageHost + ':' + port),
