@@ -408,7 +408,7 @@ export const pageHost: ClOption = {
   name: 'pageHost',
   type: String,
   defaultValue: 'localhost',
-  description: 'Hostname the browser uses to reach the bedrock server. Useful when the browser runs in a container or VM (e.g. host.docker.internal for a dockerized selenium grid). Ignored with --remote.',
+  description: 'Hostname the browser uses to reach the bedrock server. Useful when the browser runs in a container or VM (e.g. host.docker.internal for a dockerized selenium grid). With the LambdaTest tunnel, localhost is replaced by the localhost.lambdatest.com alias. Ignored with a sish tunnel.',
   validate: Extraction.any,
   uncommon: true
 };
