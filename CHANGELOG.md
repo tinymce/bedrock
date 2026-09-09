@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+- Added a `--pageHost` CLI option to `bedrock-auto`. This can be useful to set `host.docker.internal` when the browser is in a docker container. #TINYMCE-14879
+
+### Fixed
+- The grunt task passed config values to bedrock without type coercion, so string values for `Number` or `Boolean` options (e.g. `--webdriverPort=14444` or `--useSelenium=false` via `grunt.option`) were rejected or misread. #TINYMCE-14879
+- Extended test start pings to every page load, allowing updates during a chunk or fail-retry reload. This should reduce how often the server's no-updates watchdog is tripped. #TINYMCE-14879
+- Safari 26 failed to load the test page through the LambdaTest tunnel on `localhost`. The LT tunnel URL now uses LambdaTest's `localhost.lambdatest.com` DNS alias for all browsers. #TINYMCE-14879
+
 ## 17.0.1 - 2026-08-28
 
 ### Fixed
