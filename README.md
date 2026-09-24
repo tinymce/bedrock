@@ -1,6 +1,6 @@
 # Description
 
-`bedrock` is a test runner for JavaScript projects. Its primary use is to test Javascript projects, but it also has a `qunit` wrapper. It can run manually (where the user navigates to the browser themselves), or automatically (where `bedrock` starts the browser and runs the tests automatically). Note, in order to run the tests automatically, the appropriate web-drivers need to be installed and available. For more information on setting up web-drivers, see [here](https://www.npmjs.com/package/selenium-webdriver).
+`bedrock` is a test runner for JavaScript projects. Its primary use is to test Javascript projects, but it also has a `qunit` wrapper. It can run manually (where the user navigates to the browser themselves), or automatically (where `bedrock` starts the browser and runs the tests automatically). Note, in order to run the tests automatically, the appropriate web-drivers need to be installed and available. Chrome is handled for you: bedrock downloads a [Chrome for Testing](https://developer.chrome.com/blog/chrome-for-testing) `chromedriver` matching your installed Chrome and caches it (set `BEDROCK_BROWSER_CACHE_DIR` to change where). For other browsers, the matching driver (`geckodriver`, `msedgedriver`, `safaridriver`, ...) needs to be on your `PATH`.
 
 # Installation
 
@@ -39,7 +39,7 @@ Bedrock has two main modes: test and server. These are available through the com
 
 ## Test mode (bedrock-auto)
 
-*Test* mode allows the user to run tests in an automated fashion. Bedrock will spin up the browser itself (assuming the user has the right web-drivers on the path), establish a web-driver connection with this browser and close the browser once the tests have completed. Information on installing web-drivers can be found [here](https://www.npmjs.com/package/selenium-webdriver).
+*Test* mode allows the user to run tests in an automated fashion. Bedrock will spin up the browser itself, establish a web-driver connection with this browser and close the browser once the tests have completed. Chrome's driver is downloaded from Chrome for Testing automatically; other browsers need their driver on the `PATH`.
 
 BROWSER: chrome | firefox | safari | MicrosoftEdge | ie | phantomjs
 

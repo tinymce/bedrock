@@ -12,8 +12,8 @@ describe('PprintAssertionError.toString()', () => {
       'Actual:\n' +
       'a\n' +
       'Diff:\n' +
-      '- | a\n' +
-      '+ | b';
+      '- | b\n' +
+      '+ | a';
 
     assert.deepEqual(actual, expected);
   });

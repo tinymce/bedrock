@@ -6,7 +6,6 @@ import * as Routes from './Routes';
 import * as Compiler from '../compiler/Compiler';
 import * as FileUtils from '../util/FileUtils';
 import * as Arr from '../util/Arr';
-import * as Types from '../compiler/Types';
 
 interface PackageJson {
   readonly name: string;
@@ -24,7 +23,6 @@ interface GenerateArgs {
   readonly basedir: string;
   readonly scratchdir: string;
   readonly configFile: string;
-  readonly bundler: Types.Bundler;
   readonly testfiles: string[];
   readonly chunk: number;
   readonly retries: number;
@@ -43,7 +41,6 @@ export const generate = async (args: GenerateArgs): Promise<Routes.Runner> => {
     basedir,
     scratchdir,
     configFile,
-    bundler,
     testfiles,
     chunk,
     retries,
@@ -60,7 +57,6 @@ export const generate = async (args: GenerateArgs): Promise<Routes.Runner> => {
   });
 
   const testGenerator = Compiler.compile({
-    bundler,
     tsConfigFile: path.join(projectdir, configFile),
     scratchDir: path.join(projectdir, scratchdir),
     basedir,
@@ -74,7 +70,7 @@ export const generate = async (args: GenerateArgs): Promise<Routes.Runner> => {
   // read the project json file to determine the project name to expose resources as `/project/${name}`
   const pkjson: PackageJson = FileUtils.readFileAsJson(`${projectdir}/package.json`);
 
-  // Search for yarn workspace projects to use as resource folders
+  // Search for `workspaces` projects (npm/yarn/bun) to use as resource folders
   const findWorkspaceResources = (moduleFolder: string): Array<WorkspaceRoot> => {
     const moduleJson = `${moduleFolder}/package.json`;
     if (fs.statSync(moduleJson)) {
@@ -128,32 +124,30 @@ export const generate = async (args: GenerateArgs): Promise<Routes.Runner> => {
   const routers = [
     ...nodeModuleRoutes,
     ...resourceRoutes,
-    ...[
-      Routes.nodeResolve('GET', '/project/node_modules', projectdir),
+    Routes.nodeResolve('GET', '/project/node_modules', projectdir),
 
-      // fallback resource route to project root
-      Routes.routing('GET', '/project', projectdir),
+    // fallback resource route to project root
+    Routes.routing('GET', '/project', projectdir),
 
-      // bedrock resources
-      Routes.routing('GET', '/runner', path.join(require.resolve('@ephox/bedrock-runner'), '../../../../../dist')),
-      Routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery'))),
-      Routes.routing('GET', '/lib/core-js-bundle', path.dirname(require.resolve('core-js-bundle'))),
-      Routes.routing('GET', '/css', path.join(basedir, 'src/resources/css')),
-      Routes.nodeResolveFile('GET', '/agar-sw.js', projectdir, '@ephox/agar-sw', 'dist/agar-sw.js'),
+    // bedrock resources
+    Routes.routing('GET', '/runner', path.join(require.resolve('@ephox/bedrock-runner'), '../../../../../dist')),
+    Routes.routing('GET', '/lib/jquery', path.dirname(require.resolve('jquery'))),
+    Routes.routing('GET', '/lib/core-js-bundle', path.dirname(require.resolve('core-js-bundle'))),
+    Routes.routing('GET', '/css', path.join(basedir, 'src/resources/css')),
+    Routes.nodeResolveFile('GET', '/agar-sw.js', projectdir, '@ephox/agar-sw', 'dist/agar-sw.js'),
 
-      // test code
-      Routes.asyncJs('GET', '/compiled/tests.js', compiledTests),
-      Routes.routing('GET', '/compiled', path.join(projectdir, scratchdir, 'compiled')),
+    // test code
+    Routes.asyncJs('GET', '/compiled/tests.js', compiledTests),
+    Routes.routing('GET', '/compiled', path.join(projectdir, scratchdir, 'compiled')),
 
-      // harness API
-      Routes.json('GET', '/harness', {
-        stopOnFailure,
-        chunk,
-        retries,
-        timeout: singleTimeout,
-        mode
-      })
-    ]
+    // harness API
+    Routes.json('GET', '/harness', {
+      stopOnFailure,
+      chunk,
+      retries,
+      timeout: singleTimeout,
+      mode
+    })
   ];
 
   const fallback = Routes.constant('GET', basedir, basePage);

@@ -1,8 +1,7 @@
-FROM node:10-stretch
-RUN apt-get update && apt-get install -y chromium chromedriver
+FROM oven/bun:1.3.12-debian
+RUN apt-get update && apt-get install -y chromium
 
 WORKDIR /app/
-RUN npm install -g yarn
 COPY / /app/
-RUN yarn install
-CMD bin/bedrock-auto.js -b chrome-headless --files sample/ts/client/SyncPassTest.ts sample/ts/client/SyncFailTest.ts --useSandboxForHeadless
+RUN bun install
+CMD bun run bedrock-auto -b chrome-headless --files sample/ts/client/SyncPassTest.ts sample/ts/client/SyncFailTest.ts --useSandboxForHeadless

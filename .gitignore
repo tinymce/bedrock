@@ -7,7 +7,6 @@ lib
 package-lock.json
 /.idea
 dist
-yarn-error.log
 scratch
 .lambdatest
 *.tsbuildinfo

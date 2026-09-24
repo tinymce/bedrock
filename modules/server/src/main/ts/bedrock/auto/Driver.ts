@@ -2,12 +2,16 @@ import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
 import * as WebdriverIO from 'webdriverio';
+import type { Capabilities } from '@wdio/types';
 import * as portfinder from 'portfinder';
 import * as Shutdown from '../util/Shutdown';
 import * as DriverLoader from './DriverLoader';
 import * as RemoteDriver from './RemoteDriver';
 import { Tunnel } from './Tunnel';
 import deepmerge from 'deepmerge';
+
+// WebdriverIO v9 dropped the `RemoteOptions` alias in favour of the shared capabilities type
+export type RemoteOptions = Capabilities.WebdriverIOConfig;
 
 export interface DriverSettings {
   basedir: string;
@@ -92,8 +96,8 @@ const getExtraBrowserCapabilities = (settings: DriverSettings): string[] => {
   }
 };
 
-const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): WebdriverIO.RemoteOptions => {
-  const options: WebdriverIO.RemoteOptions = {
+const getOptions = (port: number, browserName: string, settings: DriverSettings, debuggingPort: number): RemoteOptions => {
+  const options: RemoteOptions = {
     logLevel: 'warn' as const,
     // if the parallel count is full this timeout is how long WDIO waits for LambdaTest to spin up.
     // 10 minute timeout, defaults to 3 connection attempts
@@ -153,7 +157,7 @@ const getOptions = (port: number, browserName: string, settings: DriverSettings,
         hostname: '127.0.0.1',
         port
       }
-  ) as WebdriverIO.RemoteOptions;
+  ) as RemoteOptions;
 };
 
 const logDriverDetails = (driver: WebdriverIO.Browser, headless: boolean, debuggingPort: number) => {
@@ -223,7 +227,7 @@ const getPort = async (port: number | undefined, fallbackPort: number): Promise<
   }
 };
 
-const getDriverSpec = (settings: DriverSettings, browserName: string): DriverLoader.DriverSpec => {
+const getDriverSpec = async (settings: DriverSettings, browserName: string): Promise<DriverLoader.DriverSpec> => {
   if (settings.useSelenium) {
     return {
       driverApi: DriverLoader.makeDriverStub(),
@@ -231,7 +235,7 @@ const getDriverSpec = (settings: DriverSettings, browserName: string): DriverLoa
     };
   }
   return {
-    driverApi: DriverLoader.loadDriver(browserName, settings),
+    driverApi: await DriverLoader.loadDriver(browserName, settings),
     path: ''
   };
 };
@@ -280,7 +284,7 @@ export const create = async (settings: DriverSettings): Promise<Driver> => {
     return remoteDriver;
   } else {
     // Local
-    const driverSpec = getDriverSpec(settings, browserName);
+    const driverSpec = await getDriverSpec(settings, browserName);
     try {
 
       if (settings.verbose) {

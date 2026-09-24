@@ -86,7 +86,6 @@ export const go = async (bedrockAutoSettings: BedrockAutoSettings): Promise<void
       basedir: settings.basedir,
       scratchdir: scratchDir,
       configFile: settings.config,
-      bundler: settings.bundler,
       testfiles: settings.testfiles,
       chunk: settings.chunk,
       retries: settings.retries,

@@ -2,7 +2,6 @@ import { Attempt } from './bedrock/core/Attempt';
 import * as portfinder from 'portfinder';
 import * as Version from './bedrock/core/Version';
 import * as RunnerRoutes from './bedrock/server/RunnerRoutes';
-import * as Webpack from './bedrock/compiler/Webpack';
 import * as Rspack from './bedrock/compiler/Rspack';
 import { BedrockManualSettings } from './bedrock/core/Settings';
 import { ExitCodes } from './bedrock/util/ExitCodes';
@@ -20,7 +19,6 @@ export const go = async (bedrockManualSettings: BedrockManualSettings): Promise<
     basedir: settings.basedir,
     scratchdir: 'scratch',
     configFile: settings.config,
-    bundler: settings.bundler,
     testfiles: settings.testfiles,
     chunk: settings.chunk,
     retries: 0,
@@ -50,8 +48,7 @@ export const go = async (bedrockManualSettings: BedrockManualSettings): Promise<
   };
 
   try {
-    const devServer = settings.bundler === 'rspack' ? Rspack.devserver : Webpack.devserver;
-    const service = await devServer(serveSettings);
+    const service = await Rspack.devserver(serveSettings);
     service.enableHud();
     console.log('bedrock-manual ' + Version.get() + ' available at: http://localhost:' + service.port);
   } catch (err) {

@@ -10,7 +10,7 @@ type PprintAssertionError = TestError.PprintAssertionError;
 type BasicErrorData = ErrorExtractor.BasicErrorData;
 type ErrorData = ErrorExtractor.ErrorData;
 
-type DifferFn = (actual: string, expected: string, comparison?: string) => string;
+type DifferFn = (expected: string, actual: string, comparison?: string) => string;
 
 const identity = <T>(val: T): T => val;
 
@@ -35,7 +35,7 @@ const pprintExtra = (e: ErrorData): string => {
 const pprintDiff = (e: BasicErrorData, escape: (value: string) => string, diff: DifferFn) => {
   if (e.diff) {
     const comparison = e.type === 'HtmlAssertion' ? escape(e.diff.comparison) : undefined;
-    const dh = diff(e.diff.actual, e.diff.expected, comparison);
+    const dh = diff(e.diff.expected, e.diff.actual, comparison);
     return `Expected:
 ${escape(e.diff.expected)}
 Actual:
@@ -72,14 +72,14 @@ export const data = (err: LoggedError): ErrorData =>
   ErrorExtractor.getErrorData(err);
 
 export const dataHtml = (err: ErrorData): string =>
-  pprintError(err, htmlentities, (actual, expected, comparison) => {
-    return comparison !== undefined ? processQUnit(comparison) : Differ.diffPrettyHtml(actual, expected);
+  pprintError(err, htmlentities, (expected, actual, comparison) => {
+    return comparison !== undefined ? processQUnit(comparison) : Differ.diffPrettyHtml(expected, actual);
   });
 
 export const dataText = (err: ErrorData): string =>
-  pprintError(err, identity, (actual, expected, comparison) => {
+  pprintError(err, identity, (expected, actual, comparison) => {
     // TODO: get rid of the <ins> and <del> in the comparison. Probably need to change the code that throws HtmlAssertionError.
-    return comparison !== undefined ? comparison : Differ.diffPrettyText(actual, expected);
+    return comparison !== undefined ? comparison : Differ.diffPrettyText(expected, actual);
   });
 
 export const html = (err: LoggedError): string => {

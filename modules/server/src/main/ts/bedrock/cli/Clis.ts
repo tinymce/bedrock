@@ -22,7 +22,6 @@ const commonOptions = (directories: Directories) => {
     ClOptions.help,
     ClOptions.logging,
     ClOptions.version,
-    ClOptions.bundler,
     ClOptions.config,
     ClOptions.files,
     ClOptions.testdir,
@@ -33,7 +32,8 @@ const commonOptions = (directories: Directories) => {
     ClOptions.buckets,
     ClOptions.stopOnFailure,
     ClOptions.verbose,
-    ClOptions.skipTypecheck
+    ClOptions.skipTypecheck,
+    ClOptions.bundler
   ];
 };
 

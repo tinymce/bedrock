@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
-    "ignoreDeprecations": "6.0",
-    "skipLibCheck": true,
+    "moduleResolution": "bundler",
     "strict": true,
     "noUnusedLocals": true,
     "useUnknownInCatchVariables": false,
     "target": "es2019",
-    "module": "es2020",
-    "lib": ["es2022", "dom"],
+    "module": "esnext",
+    "lib": [
+      "es2022",
+      "dom"
+    ],
     "declaration": true,
     "sourceMap": true,
     "outDir": "lib",

@@ -1,13 +1,14 @@
 import { DriverSettings } from './Driver';
 import * as ExecUtils from '../util/ExecUtils';
+import * as ChromeForTesting from './ChromeForTesting';
 
 export interface DriverSpec {
   driverApi: DriverAPI;
   path: string;
 }
 
+// Note: chrome is deliberately absent - its driver comes from Chrome for Testing.
 const browserModules: Record<string, string[]> = {
-  'chrome': [ 'chromedriver' ],
   'firefox': [ 'geckodriver' ],
   'internet explorer': [ 'iedriver' ],
   'MicrosoftEdge': [ 'msedgedriver', 'edgedriver' ]
@@ -43,7 +44,16 @@ export const makeDriverStub = (): ExecUtils.ChildAPI => {
   };
 };
 
-export const loadDriver = (browserName: string, settings: DriverSettings): ExecUtils.ChildAPI => {
+export const loadDriver = async (browserName: string, settings: DriverSettings): Promise<ExecUtils.ChildAPI> => {
+  // Chrome's driver is published by Chrome for Testing, matched to the installed browser
+  if (browserName === 'chrome') {
+    const chromedriverPath = await ChromeForTesting.resolveChromedriver();
+    if (chromedriverPath !== null) {
+      return ExecUtils.execLoader(chromedriverPath);
+    }
+    console.log('Falling back to a chromedriver on the system path...');
+  }
+
   const driverDeps = browserModules[browserName] || [];
   if (driverDeps.length === 0) {
     console.log('Not loading a local driver for browser ' + browserName);

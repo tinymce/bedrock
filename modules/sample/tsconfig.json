@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "moduleResolution": "node",
-    "ignoreDeprecations": "6.0",
-    "skipLibCheck": true,
+    "moduleResolution": "bundler",
     "target": "es2019",
     "jsx": "react",
-    "module": "es2020",
-    "lib": ["es2022", "dom"],
+    "module": "esnext",
+    "lib": [
+      "es2022",
+      "dom"
+    ],
     "declaration": true,
     "outDir": "scratch/dist",
     "rootDir": "src/test/ts",

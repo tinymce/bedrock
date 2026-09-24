@@ -1,17 +1,17 @@
 # Contributing to Bedrock
 
-Bedrock is a mini-monorepo managed by yarn workspaces and lerna. 
+Bedrock is a mini-monorepo managed by bun workspaces and lerna. 
 
 To build:
   
-    yarn install
-    yarn build
+    bun install
+    bun run build
 
 To test:
 
-    yarn test
+    bun run test
     
-There are specific yarn scripts to test each module.
+There are specific bun scripts to test each module.
 
 # Modules
 
@@ -34,9 +34,9 @@ DO NOT manually edit the `package.json` files. DO NOT manually publish.
 Create feature branches named `feature/XXXX` where XXXX is a Jira issue key or Github issue number.
 
 Feature branches are merged to `master`.
-After merging, run `yarn lerna version` to choose a new version, then push directly to `master`. This will be published by Jenkins.
+After merging, run `bunx lerna version` to choose a new version, then push directly to `master`. This will be published by Jenkins.
 
-To add a dependency to the root package: `yarn add -W package`
-To add a dependency to a module, use `yarn add @ephox/bedrock-XXX package`.
+To add a dependency to the root package: `bun add package`
+To add a dependency to a module, use `bun add --cwd modules/XXX package`.
 Add a `-D` to the above for `devDependencies`
 

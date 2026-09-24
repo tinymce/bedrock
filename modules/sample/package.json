@@ -12,7 +12,7 @@
     "test-samples-pass-manual": "bedrock --config tsconfig.json --customRoutes routes.json -d src/test/ts/**/pass",
     "test-samples-pass-manual-js": "bedrock -d src/test/js/**/pass",
     "test-samples-fail": "bedrock-auto -b chrome-headless --config tsconfig.json -d src/test/ts/**/fail",
-    "test": "yarn test-samples-pass && yarn test-samples-only && yarn test-samples-pass-js"
+    "test": "bun run test-samples-pass && bun run test-samples-only && bun run test-samples-pass-js"
   },
   "dependencies": {
     "@ephox/bedrock-client": "^17.0.0"

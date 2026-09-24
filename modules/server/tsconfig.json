@@ -1,27 +1,36 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
-    "ignoreDeprecations": "6.0",
+    "moduleResolution": "bundler",
     "strict": true,
     "noUnusedLocals": true,
     "useUnknownInCatchVariables": false,
     "target": "es2019",
     "module": "commonjs",
     "esModuleInterop": true,
-    "lib": ["es2019", "dom"],
+    "lib": [
+      "es2019",
+      "dom"
+    ],
     "declaration": true,
     "sourceMap": true,
     "outDir": "lib",
     "types": [
-      "node",
-      "@wdio/globals/types",
+      "node"
     ],
-    "skipLibCheck": true,
-    "rootDir": "src"
+    "rootDir": "src",
+    "paths": {
+      "urlpattern-polyfill": [
+        "./src/typings/shims/urlpattern-polyfill.d.ts"
+      ],
+      "puppeteer-core": [
+        "./src/typings/shims/puppeteer-core.d.ts"
+      ]
+    }
   },
   "include": [
     "src/main/ts",
     "src/test/ts",
-    "src/typings/ts"
+    "src/typings/ts",
+    "src/typings/shims"
   ]
 }

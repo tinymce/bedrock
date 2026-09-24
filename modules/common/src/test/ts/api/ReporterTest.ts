@@ -120,7 +120,7 @@ describe('Reporter', () => {
         'Actual:\n' +
         'ab&quot;hello&quot;\n' +
         'Diff:\n' +
-        '<del style="background:#ffe6e6;">ab&quot;hello&quot;</del><br /><ins style="background:#e6ffe6;">abc&quot;hello&quot;</ins><br />\n' +
+        '<del style="background:#ffe6e6;">abc&quot;hello&quot;</del><br /><ins style="background:#e6ffe6;">ab&quot;hello&quot;</ins><br />\n' +
         '\n' +
         'Stack:\n';
       assert.deepEqual(cleanStack(actual), expected, 'Error message');
@@ -140,8 +140,8 @@ describe('Reporter', () => {
         'Actual:\n' +
         'ab"hello"\n' +
         'Diff:\n' +
-        '- | ab"hello"\n' +
-        '+ | abc"hello"\n' +
+        '- | abc"hello"\n' +
+        '+ | ab"hello"\n' +
         '\n' +
         'Stack:\n';
       assert.deepEqual(cleanStack(actual), expected, 'Error message');

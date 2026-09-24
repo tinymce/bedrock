@@ -50,7 +50,7 @@ const extractStack = (e: TestError): string => {
 const extractErrorData = (e: HtmlDiffAssertionError | PprintAssertionError): BasicErrorData => {
   const actual = e.diff.actual;
   const expected = e.diff.expected;
-  const comparison = TestError.isHTMLDiffError(e) ? e.diff.comparison : Differ.diffPrettyText(actual, expected);
+  const comparison = TestError.isHTMLDiffError(e) ? e.diff.comparison : Differ.diffPrettyText(expected, actual);
   return ({
     type: e.name,
     message: `Test failure: ${e.message}`,
@@ -73,7 +73,7 @@ const extractAssertionErrorData = (e: AssertionError): BasicErrorData => {
       diff: {
         expected,
         actual,
-        comparison: Differ.diffPrettyText(actual, expected)
+        comparison: Differ.diffPrettyText(expected, actual)
       }
     };
   } else {

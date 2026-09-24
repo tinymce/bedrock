@@ -64,8 +64,11 @@ const runExecFn = (fn: ExecuteFn, context: Context): Promise<void> => {
     };
 
     try {
-      // If the function has 1 or more arguments, it's using the async callback
-      const retValue: any = fn.call(context, done);
+      // If the function has 1 or more arguments, it's using the async callback.
+      // ExecuteFn is a union of the callback and promise signatures, so call it through one
+      // that accepts both rather than making TypeScript resolve the union to a single shape.
+      const execute = fn as (this: Context, done: (err?: TestThrowable) => void) => unknown;
+      const retValue: any = execute.call(context, done);
       if (fn.length === 0) {
         if (isPromiseLike(retValue)) {
           retValue.then(() => done(), (e) => done(normalizeThrowable(e)));

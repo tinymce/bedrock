@@ -1,7 +1,7 @@
-diff --git a/node_modules/sourcemapped-stacktrace/dist/sourcemapped-stacktrace.js b/node_modules/sourcemapped-stacktrace/dist/sourcemapped-stacktrace.js
+diff --git a/dist/sourcemapped-stacktrace.js b/dist/sourcemapped-stacktrace.js
 index afb408a..019361a 100644
---- a/node_modules/sourcemapped-stacktrace/dist/sourcemapped-stacktrace.js
-+++ b/node_modules/sourcemapped-stacktrace/dist/sourcemapped-stacktrace.js
+--- a/dist/sourcemapped-stacktrace.js
++++ b/dist/sourcemapped-stacktrace.js
 @@ -116,17 +116,14 @@ return /******/ (function(modules) { // webpackBootstrap
  	    }
  
@@ -50,10 +50,10 @@ index afb408a..019361a 100644
  	  };
  
  	  // xmlhttprequest boilerplate
-diff --git a/node_modules/sourcemapped-stacktrace/index.d.ts b/node_modules/sourcemapped-stacktrace/index.d.ts
+diff --git a/index.d.ts b/index.d.ts
 index 1240936..a4fa66b 100644
---- a/node_modules/sourcemapped-stacktrace/index.d.ts
-+++ b/node_modules/sourcemapped-stacktrace/index.d.ts
+--- a/index.d.ts
++++ b/index.d.ts
 @@ -16,6 +16,9 @@ declare module 'sourcemapped-stacktrace' {
       * @param done Callback invoked with the transformed stacktrace.
       * @param opts Options object.

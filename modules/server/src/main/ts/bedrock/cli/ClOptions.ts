@@ -64,10 +64,11 @@ export const bundler: ClOption = {
   name: 'bundler',
   type: String,
   required: false,
-  defaultValue: 'rspack',
-  description: 'Specify the bundler (webpack, rspack).',
+  // Deliberately has no defaultValue, so it is only present when explicitly passed
+  // and the deprecation warning can be limited to those cases.
+  description: 'Deprecated and ignored. rspack is the only bundler.',
+  uncommon: true,
   validate: Extraction.inSet([
-    'webpack',
     'rspack'
   ])
 };

@@ -1,6 +1,5 @@
 import * as Serve from '../server/Serve';
 import { RspackOptions } from '@rspack/core';
-import { Configuration } from 'webpack';
 
 export interface DevServerServeSettings extends Serve.ServeSettings {
   readonly config: string;
@@ -20,11 +19,6 @@ export interface CompileArgs {
   readonly skipTypecheck: boolean;
 }
 
-export interface CompilerArgs extends CompileArgs {
-  readonly bundler: Bundler;
-}
-
-export type WebpackCompileInfo = CompileInfo<Configuration>;
 export type RspackCompileInfo = CompileInfo<RspackOptions>;
 
 export interface CompileInfo<T> {
@@ -34,5 +28,3 @@ export interface CompileInfo<T> {
 }
 
 export type CompileFn = (args: CompileArgs) => Promise<string>;
-
-export type Bundler = 'rspack' | 'webpack';

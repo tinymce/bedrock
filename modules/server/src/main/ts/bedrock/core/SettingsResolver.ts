@@ -2,6 +2,8 @@ export interface ResolvingSettings {
   readonly bucket: number;
   readonly buckets: number;
   readonly testfiles: string[];
+  /** @deprecated Accepted and ignored. rspack is the only bundler. */
+  readonly bundler?: string;
 }
 
 export const filterBuckets = (bucket: number, buckets: number, testfiles: string[]): string[] =>
@@ -19,6 +21,9 @@ export const resolve = <T extends ResolvingSettings> (t: T): T => {
 export const log = <T extends ResolvingSettings> (t: T): void => {
   if (t.buckets > 1) {
     console.log(`Running bucket ${t.bucket} of ${t.buckets}: ${t.testfiles.length} files.`);
+  }
+  if (t.bundler !== undefined) {
+    console.warn('Warning: --bundler is deprecated and ignored. rspack is the only bundler, so the option can be removed.');
   }
 };
 

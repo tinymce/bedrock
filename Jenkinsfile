@@ -12,19 +12,19 @@ timestamps {
     resourceLimitMemory: '4Gi'
 ) {
     stage("clean") {
-      exec('yarn clean')
+      exec('bun run clean')
     }
 
     stage("install") {
-      yarnInstall()
+      bunInstall()
     }
 
     stage("build") {
-      exec('yarn build')
+      exec('bun run build')
     }
 
     stage("test") {
-      exec('yarn test')
+      exec('bun run test')
     }
 
     def platforms = [
@@ -50,13 +50,13 @@ timestamps {
     if (isReleaseBranch()) {
       stage("publish") {
         tinyPods.node() {
-          yarnInstall()
-          sh 'yarn build'
+          bunInstall()
+          sh 'bun run build'
           tinyNpm.withNpmPublishCredentials {
             // We need to tell git to ignore the changes to .npmrc when publishing
             exec('git update-index --assume-unchanged .npmrc')
             // Re-evaluate whether we still need the `--no-verify-access` flag after upgrading Lerna (TINY-13539)
-            exec('yarn lerna publish from-package --yes --no-git-reset --ignore-changes @ephox/bedrock-sample --no-verify-access')
+            exec('bunx lerna publish from-package --yes --no-git-reset --ignore-changes @ephox/bedrock-sample --no-verify-access')
           }
         }
       }

@@ -9,7 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added a `--pageHost` CLI option to `bedrock-auto`. This can be useful to set `host.docker.internal` when the browser is in a docker container. #TINYMCE-14879
 
+### Changed
+- Chrome's driver is now resolved from Chrome for Testing and matched to the locally installed Chrome, replacing the deprecated `chromedriver` npm package. Set `BEDROCK_BROWSER_CACHE_DIR` to control where it is cached. #TINYMCE-14811
+- Updated to webdriverio 9. #TINYMCE-14811
+- Updated to TypeScript 7 and switched the linter from eslint to oxlint. #TINYMCE-14811
+- Switched the package manager from yarn to bun. #TINYMCE-14811
+- All tests are now compiled with rspack, which has been the default since 17.0.0. #TINYMCE-14811
+- Removed `skipLibCheck` from every module's TypeScript config. #TINYMCE-14811
+
+### Deprecated
+- The `--bundler` CLI option is deprecated and ignored. It still accepts `rspack` so existing commands keep working, and will be removed in a future major version. #TINYMCE-14811
+
+### Removed
+- Removed the `webpack` bundler. rspack is now the only bundler. #TINYMCE-14811
+
 ### Fixed
+- The expected/actual diff in failure output was inverted, marking the actual value as removed (`-`/`<del>`) and the expected value as added (`+`/`<ins>`). #TINYMCE-14811
+- Effects were not sent into iframes under webdriverio 9, which tracks the active browsing context for WebDriver Bidi separately from the classic frame. #TINYMCE-14811
 - The grunt task passed config values to bedrock without type coercion, so string values for `Number` or `Boolean` options (e.g. `--webdriverPort=14444` or `--useSelenium=false` via `grunt.option`) were rejected or misread. #TINYMCE-14879
 - Extended test start pings to every page load, allowing updates during a chunk or fail-retry reload. This should reduce how often the server's no-updates watchdog is tripped. #TINYMCE-14879
 - Safari 26 failed to load the test page through the LambdaTest tunnel on `localhost`. The LT tunnel URL now uses LambdaTest's `localhost.lambdatest.com` DNS alias for all browsers. #TINYMCE-14879

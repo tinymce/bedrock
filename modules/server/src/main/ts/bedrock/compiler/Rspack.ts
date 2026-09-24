@@ -8,7 +8,34 @@ import { rspack, RspackOptions, DevServerMiddlewareHandler } from '@rspack/core'
 import { RspackDevServer } from '@rspack/dev-server';
 import { RspackCompileInfo, DevServerServeSettings, CompileFn } from './Types';
 
-const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, manualMode: boolean, basedir: string, skipTypecheck: boolean): RspackOptions => {
+const getTsCheckerOptions = (tsConfigFile: string, manualMode: boolean): Record<string, unknown> => {
+  const options: Record<string, unknown> = {
+    memoryLimit: manualMode ? 4096 : 2048,
+    configFile: tsConfigFile,
+    build: true
+  };
+
+  // TypeScript 7 is the native compiler and no longer ships the JavaScript API that the
+  // checker uses, so from 7 onwards it has to run in tsgo mode against the package itself.
+  // Resolve from the project being tested so bedrock keeps working for consumers on older
+  // TypeScript versions.
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const typescriptPath = require.resolve('typescript/package.json', { paths: [ process.cwd() ] });
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const version: string = require(typescriptPath).version;
+    if (parseInt(version.split('.')[0], 10) >= 7) {
+      options.tsgo = true;
+      options.typescriptPath = typescriptPath;
+    }
+  } catch {
+    // Leave the checker to resolve TypeScript itself
+  }
+
+  return options;
+};
+
+const getRspackConfigTs = (tsConfigFile: string, scratchFile: string, dest: string, manualMode: boolean, basedir: string, skipTypecheck: boolean): RspackOptions => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { TsCheckerRspackPlugin } = require('ts-checker-rspack-plugin');
 
@@ -34,6 +61,13 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
       conditionNames: [ 'tiny:source', '...' ],
       extensions: ['.ts', '.tsx', '.js', '.mjs'],
       tsConfig: getTsConfigFile(),
+      // Fall back to bedrock's own node_modules so the polyfills bedrock injects (core-js)
+      // resolve even when the project under test doesn't depend on them, and regardless of
+      // whether the package manager hoists them. The project's own modules still win.
+      modules: [
+        'node_modules',
+        path.join(basedir, 'node_modules')
+      ],
       alias: {
         // https://github.com/rspack-contrib/rstack-examples/blob/main/rspack/preact/rspack.config.js
         react: 'preact/compat',
@@ -43,8 +77,8 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
       }
     },
 
-    // Webpack by default only resolves from the ./node_modules directory which will cause issues if the project that uses bedrock
-    // doesn't also depend on the webpack loaders. So we need to add the path to the bedrock node_modules directory as well.
+    // Rspack by default only resolves from the ./node_modules directory which will cause issues if the project that uses bedrock
+    // doesn't also depend on the rspack loaders. So we need to add the path to the bedrock node_modules directory as well.
     resolveLoader: {
       modules: [
         path.join(basedir, 'node_modules'),
@@ -107,11 +141,7 @@ const getWebPackConfigTs = (tsConfigFile: string, scratchFile: string, dest: str
       }),
       ...(!skipTypecheck ? [ new TsCheckerRspackPlugin({
         async: manualMode,
-        typescript: {
-          memoryLimit: manualMode ? 4096 : 2048,
-          configFile: getTsConfigFile(),
-          build: true
-        }
+        typescript: getTsCheckerOptions(getTsConfigFile(), manualMode)
       }) ] : [])
     ],
 
@@ -161,7 +191,7 @@ const getTsCompileInfo = (tsConfigFile: string, scratchDir: string, basedir: str
     if (!fs.existsSync(tsConfigFile)) {
       reject(`Could not find the required tsconfig file: ${tsConfigFile}`);
     } else {
-      const config = getWebPackConfigTs(tsConfigFile, scratchFile, dest, manualMode, basedir, skipTypecheck);
+      const config = getRspackConfigTs(tsConfigFile, scratchFile, dest, manualMode, basedir, skipTypecheck);
       resolve({ scratchFile, dest, config });
     }
   });

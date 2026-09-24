@@ -1,0 +1,44 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [ "typescript", "oxc", "unicorn" ],
+  "categories": {
+    "correctness": "error"
+  },
+  "env": {
+    "browser": true,
+    "es2022": true
+  },
+  "ignorePatterns": [
+    "**/lib/**",
+    "**/dist/**",
+    "**/scratch/**",
+    "**/node_modules/**"
+  ],
+  "rules": {
+    "typescript/no-explicit-any": "off",
+    "typescript/explicit-function-return-type": "off",
+    "typescript/no-use-before-define": "off",
+    "typescript/explicit-module-boundary-types": [ "error", { "allowArgumentsExplicitlyTypedAsAny": true } ],
+    "typescript/no-unused-vars": [ "warn", {
+      "vars": "all",
+      "args": "after-used",
+      "ignoreRestSiblings": true,
+      "argsIgnorePattern": "^_",
+      "caughtErrorsIgnorePattern": "^_"
+    } ],
+    "object-shorthand": "error"
+  },
+  "overrides": [
+    {
+      "files": [ "modules/server/tasks/**/*.js" ],
+      "env": {
+        "node": true
+      },
+      "rules": {
+        "no-var": "error",
+        "prefer-const": "error",
+        "curly": [ "error", "multi-line" ]
+      }
+    }
+  ]
+}

@@ -5,9 +5,9 @@
   "license": "Apache-2.0",
   "scripts": {
     "prepublishOnly": "tsc -b",
-    "build": "yarn prepublishOnly",
+    "build": "bun run prepublishOnly",
     "test": "mocha -r tsx/cjs 'lib/test/ts/**/*Test.js'",
-    "buildAndTest": "yarn prepublishOnly && yarn test"
+    "buildAndTest": "bun run prepublishOnly && bun run test"
   },
   "main": "./lib/main/ts/api/Main.js",
   "module": "./lib/main/ts/api/Main.js",

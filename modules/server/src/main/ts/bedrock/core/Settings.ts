@@ -2,7 +2,8 @@
 
 export interface BedrockSettings {
   readonly basedir: string;
-  readonly bundler: 'webpack' | 'rspack';
+  /** @deprecated Accepted and ignored. rspack is the only bundler. */
+  readonly bundler?: 'rspack';
   readonly chunk: number;
   readonly loglevel: 'simple' | 'advanced';
   readonly overallTimeout: number;

@@ -37,7 +37,6 @@ describe('Clis.forAuto', () => {
     AttemptUtils.assertResult({
       browser: 'MicrosoftEdge',
       browserVersion: 'latest',
-      bundler: 'rspack',
       config: 'src/test/resources/tsconfig.sample.json',
       name: 'bedrock-run',
       output: 'scratch',
@@ -80,7 +79,6 @@ describe('Clis.forAuto', () => {
     AttemptUtils.assertResult({
       browser: 'MicrosoftEdge',
       browserVersion: 'latest',
-      bundler: 'rspack',
       config: 'src/test/resources/tsconfig.sample.json',
       name: 'bedrock-run',
       output: 'scratch',
@@ -124,7 +122,6 @@ describe('Clis.forAuto', () => {
     AttemptUtils.assertResult({
       browser: 'MicrosoftEdge',
       browserVersion: 'latest',
-      bundler: 'rspack',
       config: 'src/test/resources/tsconfig.sample.json',
       name: 'bedrock-run',
       output: 'scratch',
@@ -167,7 +164,6 @@ describe('Clis.forAuto', () => {
     AttemptUtils.assertResult({
       browser: 'chrome-headless',
       browserVersion: 'latest',
-      bundler: 'rspack',
       config: 'src/test/resources/tsconfig.sample.json',
       name: 'bedrock-run',
       output: 'scratch',
@@ -213,7 +209,6 @@ describe('Clis.forAuto', () => {
     AttemptUtils.assertResult({
       browser: 'chrome-headless',
       browserVersion: '117.0',
-      bundler: 'rspack',
       config: 'tsconfig.json',
       name: 'bedrock-run',
       output: 'scratch',
@@ -261,7 +256,6 @@ describe('Clis.forAuto', () => {
     AttemptUtils.assertResult({
       browser: 'chrome-headless',
       browserVersion: 'latest',
-      bundler: 'rspack',
       config: 'tsconfig.json',
       name: 'bedrock-run',
       output: 'scratch',
@@ -326,7 +320,6 @@ describe('Clis.forAuto', () => {
     AttemptUtils.assertResult({
       browser: 'MicrosoftEdge',
       browserVersion: 'latest',
-      bundler: 'rspack',
       config: 'src/test/resources/tsconfig.sample.json',
       name: 'bedrock-run',
       output: 'scratch',
@@ -369,7 +362,6 @@ describe('Clis.forAuto', () => {
     AttemptUtils.assertResult({
       browser: 'chrome-headless',
       browserVersion: 'latest',
-      bundler: 'rspack',
       config: 'src/test/resources/tsconfig.sample.json',
       name: 'bedrock-run',
       output: 'scratch',
@@ -418,7 +410,6 @@ describe('Clis.forManual', () => {
     config: 'tsconfig.json',
     testfiles: [],
     help: false,
-    bundler: 'rspack',
     singleTimeout: 30000,
     stopOnFailure: false,
     overallTimeout: 600000,
@@ -502,6 +493,36 @@ describe('Clis.forManual', () => {
       bucket: 4,
       buckets: 15
     }, Attempt.map(actual, exclude(['projectdir', 'basedir'])));
+  });
+
+  it('TINYMCE-14811: accepts the deprecated --bundler option so existing commands keep working', () => {
+    const args = [
+      '--files', 'src/test/resources/test.file1',
+      '--config', 'src/test/resources/tsconfig.sample.json',
+      '--bundler', 'rspack'
+    ];
+    const actual = Clis.forManual(directories, args);
+    AttemptUtils.assertResult({
+      ...defaultCliOptions,
+      config: 'src/test/resources/tsconfig.sample.json',
+      bundler: 'rspack',
+      verbose: false,
+      testfiles: [
+        'src/test/resources/test.file1'
+      ]
+    }, Attempt.map(actual, exclude(['projectdir', 'basedir'])));
+  });
+
+  it('TINYMCE-14811: rejects --bundler=webpack, as webpack is no longer supported', () => {
+    const args = [
+      '--files', 'src/test/resources/test.file1',
+      '--config', 'src/test/resources/tsconfig.sample.json',
+      '--bundler', 'webpack'
+    ];
+    const actual = Clis.forManual(directories, args);
+    AttemptUtils.assertErrors([
+      'Invalid value for property: bundler. Actual value: webpack. Required value: one of ["rspack"]'
+    ], cleanError(actual));
   });
 
   it('TINY-14141: skips typechecking when requested', () => {

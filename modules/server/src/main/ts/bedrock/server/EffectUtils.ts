@@ -5,11 +5,14 @@ export type ElementWithActions = Element & {
   readonly releaseActions: () => Promise<void>;
 };
 
-type ElementReference = ReturnType<Browser['findElement']>;
-
-const frameSelected = (driver: Browser, frame: ElementReference) => async (): Promise<boolean> => {
+const frameSelected = (driver: Browser, frameSelector: string) => async (): Promise<boolean> => {
   try {
-    await driver.switchToFrame(await frame);
+    // Note: Use switchFrame() rather than the raw switchToFrame() protocol command. From
+    // WebdriverIO v9 the session tracks the active browsing context for WebDriver Bidi
+    // separately, and only switchFrame() keeps that in sync with the classic frame. Calling
+    // switchToFrame() directly leaves Bidi commands (including $ and execute) pointed at the
+    // top level document, so effects get sent outside the iframe.
+    await driver.switchFrame(await driver.$(frameSelector));
     return true;
   } catch (e) {
     if (!(e.name && e.name === 'no such frame')) {
@@ -23,10 +26,7 @@ const getTargetFromFrame = async (driver: Browser, selector: string): Promise<El
   const sections = selector.split('=>');
   const frameSelector = sections[0];
   const targetSelector = sections[1];
-  // Note: Don't use driver.$() here to lookup the frame as the object reference
-  // returned doesn't work when passed to driver.switchToFrame() on Edge.
-  const frame = driver.findElement('css selector', frameSelector);
-  await driver.waitUntil(frameSelected(driver, frame), { timeout: 500 });
+  await driver.waitUntil(frameSelected(driver, frameSelector), { timeout: 500 });
   const target = await driver.$(targetSelector);
   await target.waitForDisplayed({ timeout: 500 });
   return target as unknown as ElementWithActions;
@@ -36,7 +36,7 @@ const performActionOnFrame = async <T>(driver: Browser, selector: string, action
   try {
     const target = await getTargetFromFrame(driver, selector);
     const result = await action(target);
-    await driver.switchToFrame(null);
+    await driver.switchFrame(null);
     return result;
   } catch (err: any) {
     return driver.status().then(status => {

@@ -9,23 +9,22 @@
   },
   "scripts": {
     "prepublishOnly": "tsc -b",
-    "build": "yarn prepublishOnly",
+    "build": "bun run prepublishOnly",
     "test": "mocha -r tsx/cjs 'lib/test/ts/**/*Test.js'",
-    "buildAndTest": "yarn prepublishOnly && yarn test"
+    "buildAndTest": "bun run prepublishOnly && bun run test"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": "^22.13.0 || ^24.0.0 || ^26.0.0"
   },
   "dependencies": {
     "@aws-sdk/client-device-farm": "^3.1110.0",
     "@ephox/bedrock-client": "^17.0.0",
     "@ephox/bedrock-common": "^17.0.0",
     "@ephox/bedrock-runner": "^17.0.0",
-    "@jsdevtools/coverage-istanbul-loader": "^3.0.5",
     "@lambdatest/node-tunnel": "^4.0.12",
+    "@puppeteer/browsers": "^3.2.2",
     "@rspack/core": "^2.1.10",
     "@rspack/dev-server": "^2.2.0",
-    "@wdio/globals": "^8.46.0",
     "async": "^3.2.6",
     "cli-highlight": "^2.1.11",
     "command-line-args": "^6.0.2",
@@ -36,7 +35,6 @@
     "deepmerge": "^4.3.1",
     "etag": "^1.8.1",
     "finalhandler": "^2.1.1",
-    "fork-ts-checker-webpack-plugin": "^9.1.0",
     "fresh": "^0.5.2",
     "glob": "^13.0.6",
     "grunt": "^1.6.3",
@@ -49,11 +47,7 @@
     "source-map-loader": "^5.0.0",
     "split2": "^4.2.0",
     "ts-checker-rspack-plugin": "^1.6.1",
-    "ts-loader": "^9.6.2",
-    "tsconfig-paths-webpack-plugin": "^4.2.0",
-    "webdriverio": "^8.46.0",
-    "webpack": "^5.109.2",
-    "webpack-dev-server": "^6.0.0",
+    "webdriverio": "^9.32.0",
     "which": "^7.0.0",
     "xml-writer": "^1.7.0"
   },
@@ -68,8 +62,9 @@
     "@types/jquery": "^4.0.1",
     "@types/mime-types": "^3.0.1",
     "@types/mkdirp": "^2.0.0",
+    "@types/serve-static": "^2.2.0",
     "@types/split2": "^4.2.3",
-    "@wdio/types": "^8.41.0"
+    "@wdio/types": "^9.32.0"
   },
   "peerDependencies": {
     "typescript": ">=3.8.0"

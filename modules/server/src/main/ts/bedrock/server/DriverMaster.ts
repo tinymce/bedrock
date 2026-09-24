@@ -62,7 +62,7 @@ export const create = (): DriverMaster => {
    * fall out.
    */
 
-  const doWaitForIdle = async <T>(identifier: string, f: Executor<T>, label: string, attempts: number): Promise<T> => {
+  const doWaitForIdle = async <T>(identifier: string, f: Executor<T>, attempts: number): Promise<T> => {
     // Locking has failed many times ... so just assume the lock should have been released.
     if (attempts === 0) return use(f);
     // Nothing has a lock, and there is no queue
@@ -76,7 +76,7 @@ export const create = (): DriverMaster => {
     // so it needs to wait its turn
     } else {
       await Waiter.delay({}, 100);
-      return doWaitForIdle(identifier, f, label, attempts - 1);
+      return doWaitForIdle(identifier, f, attempts - 1);
     }
   };
 
@@ -90,7 +90,7 @@ export const create = (): DriverMaster => {
         label,
         identifier
       });
-      return doWaitForIdle(identifier, f, label, 100);
+      return doWaitForIdle(identifier, f, 100);
     }
   };
 

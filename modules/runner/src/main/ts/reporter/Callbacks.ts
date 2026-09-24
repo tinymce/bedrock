@@ -102,7 +102,7 @@ export const Callbacks = (): Callbacks => {
   };
 
   const sendDone = (session: string, error?: string): Promise<void> => {
-    // webpack makes this available
+    // the bundler makes this available when the tests are instrumented for coverage
     const getCoverage = (): Record<string, any> => typeof Global.__coverage__ === 'undefined' ? {} : Global.__coverage__;
 
     return sendJson('/tests/done', {
