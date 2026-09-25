@@ -51,7 +51,14 @@ export interface Controller {
   readonly awaitDone: () => Promise<TestResults>;
 }
 
-export const create = (stickyFirstSession: boolean, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced'): Controller => {
+/*
+ * How long the browser may go without contacting the server at all before we treat the
+ * driver as dead. Every route bumps `session.alive`, and the runner also sends a payload-free
+ * keep-alive, so silence for this long means nothing is getting through.
+ */
+const LIVENESS_TIMEOUT = 55 * 1000;
+
+export const create = (stickyFirstSession: boolean, overallTimeout: number, progressTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced'): Controller => {
   const hud = Hud.create(testfiles, loglevel);
   const sessions: Record<string, TestSession> = {};
   let stickyId: string | null = null;
@@ -218,9 +225,16 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
             }
             clearInterval(poller);
           } else {
-             if ((now - session.updated) > (55 * 1000)) {
-              // sticky sessions have longer before they time out, but we still can't sit around if the driver has failed
-              const message = `No updates from the browser in ${formatTime(now - session.updated)}, assuming driver has failed.`;
+             if ((now - session.alive) > LIVENESS_TIMEOUT) {
+              // nothing at all is reaching us: the driver really has failed
+              const message = `No updates from the browser in ${formatTime(now - session.alive)}, assuming driver has failed.`;
+              reject({message, results, start, now});
+              clearInterval(poller);
+              timeoutError = true;
+            } else if ((now - session.updated) > progressTimeout) {
+              // the browser is still talking to us, it just isn't finishing tests
+              const message = `No test progress in ${formatTime(now - session.updated)}, but the browser is still responding. ` +
+                  `Assuming the run is stuck. Limit is set to ${formatTime(progressTimeout)}.`;
               reject({message, results, start, now});
               clearInterval(poller);
               timeoutError = true;

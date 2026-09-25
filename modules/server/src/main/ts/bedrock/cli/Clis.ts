@@ -16,6 +16,7 @@ const commonOptions = (directories: Directories) => {
     ClOptions.projectdir(directories.current),
     ClOptions.basedir(directories.bin),
     ClOptions.overallTimeout,
+    ClOptions.progressTimeout,
     ClOptions.singleTimeout,
     ClOptions.customRoutes,
     ClOptions.chunk,

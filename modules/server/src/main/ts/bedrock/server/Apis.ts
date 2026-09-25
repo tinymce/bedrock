@@ -45,7 +45,7 @@ const pollRate = 200;
 const maxInvalidAttempts = 300;
 
 // TODO: Do not use files here.
-export const create = (master: DriverMaster | null, pMaybeDriver: Promise<Attempt<unknown, Browser>>, projectdir: string, basedir: string, stickyFirstSession: boolean, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced', resetMousePosition: boolean): Apis => {
+export const create = (master: DriverMaster | null, pMaybeDriver: Promise<Attempt<unknown, Browser>>, projectdir: string, basedir: string, stickyFirstSession: boolean, overallTimeout: number, progressTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced', resetMousePosition: boolean): Apis => {
   let pageHasLoaded = false;
   let needsMousePositionReset = true;
   let mousePositionResetSupported = true;
@@ -83,7 +83,7 @@ export const create = (master: DriverMaster | null, pMaybeDriver: Promise<Attemp
     pageHasLoaded = true;
   };
 
-  const c = Controller.create(stickyFirstSession, overallTimeout, testfiles, loglevel);
+  const c = Controller.create(stickyFirstSession, overallTimeout, progressTimeout, testfiles, loglevel);
 
   const routers = pMaybeDriver.then((maybeDriver) => {
 
@@ -160,7 +160,9 @@ export const create = (master: DriverMaster | null, pMaybeDriver: Promise<Attemp
       driverRouter('/mouse', 'Mouse', MouseEffects.executor, true),
       Routes.effect('POST', '/tests/alive', (data: { session: string }) => {
         c.recordAlive(data.session);
-        return keepAliveAction();
+        // the runner pings every few seconds, so this must be the throttled variant or every
+        // lane would issue a webdriver command on every ping
+        return maybeSendKeepAlive();
       }),
       Routes.effect('POST', '/tests/init', () => resetMousePositionAction(true)),
       Routes.effect('POST', '/tests/start', (data: StartData) => {
