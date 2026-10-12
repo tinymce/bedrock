@@ -164,7 +164,12 @@ export const create = (master: DriverMaster | null, pMaybeDriver: Promise<Attemp
         // run would issue a webdriver command on every ping
         return maybeSendKeepAlive();
       }),
-      Routes.effect('POST', '/tests/init', () => resetMousePositionAction(true)),
+      // The bundle re-fetch after a chunk or retry reload runs no JS, so without this the whole
+      // reload window looks like silence to the liveness clock.
+      Routes.effect('POST', '/tests/init', (data: { session: string }) => {
+        c.recordAlive(data.session);
+        return resetMousePositionAction(true);
+      }),
       Routes.effect('POST', '/tests/start', (data: StartData) => {
         c.recordTestResults(data.session, data.results);
         c.recordTestStart(data.session, data.name, data.file, data.number, data.totalTests);

@@ -8,14 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added a `--pageHost` CLI option to `bedrock-auto`. This can be useful to set `host.docker.internal` when the browser is in a docker container. #TINYMCE-14879
-- Added a `--progressTimeout` CLI option, defaulting to 5 minutes, controlling how long a browser may go without completing a test while still responding to the server. #TD-2600
 
 ### Fixed
 - The grunt task passed config values to bedrock without type coercion, so string values for `Number` or `Boolean` options (e.g. `--webdriverPort=14444` or `--useSelenium=false` via `grunt.option`) were rejected or misread. #TINYMCE-14879
 - Extended test start pings to every page load, allowing updates during a chunk or fail-retry reload. This should reduce how often the server's no-updates watchdog is tripped. #TINYMCE-14879
 - Safari 26 failed to load the test page through the LambdaTest tunnel on `localhost`. The LT tunnel URL now uses LambdaTest's `localhost.lambdatest.com` DNS alias for all browsers. #TINYMCE-14879
-- The server used a single 55 second budget for both "the browser has stopped responding" and "the browser has not finished a test", so a slow remote browser was killed as if the driver had died. Liveness is now tracked separately from progress: silence from the browser is still caught after 55 seconds, while a browser that is responding but slow gets `--progressTimeout`. #TD-2600
-- The runner only sent keep-alive pings in manual mode, so in auto mode the server had nothing but batched test results to judge the browser by. Auto mode now sends them too, and `/tests/alive` uses the throttled driver keep-alive so the extra pings do not issue a webdriver command each time. #TD-2600
+- The server used a single 55 second budget for both "the browser has stopped responding" and "the browser has not finished a test", so a slow remote browser was killed as if the driver had died. Liveness is now tracked separately from progress: silence from the browser is still caught after 55 seconds, while lack of progress is measured in client pings rather than elapsed time, so a slower connection widens the tolerance by the same factor. #TD-2600
+- The runner only posted to the server when a test finished, so a browser running one slow test looked the same as a browser that had died. It now posts on a fixed heartbeat regardless of test activity, rescheduled after each post completes so a slow connection cannot stack requests. #TD-2600
+- `/tests/init` did not record browser activity, so the bundle re-fetch after a chunk or retry reload counted as silence. #TD-2600
 
 ## 17.0.1 - 2026-08-28
 
