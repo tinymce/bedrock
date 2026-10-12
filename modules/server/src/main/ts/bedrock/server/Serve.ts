@@ -20,7 +20,6 @@ export interface ServeSettings {
   readonly loglevel: 'simple' | 'advanced';
   readonly master: DriverMaster | null;
   readonly overallTimeout: number;
-  readonly progressTimeout: number;
   readonly projectdir: string;
   readonly runner: Promise<Routes.Runner>;
   readonly skipResetMousePosition: boolean;
@@ -66,11 +65,10 @@ export const startCustom = async (settings: ServeSettings, createServer: (port: 
   const master = pref('master');
   const stickyFirstSession = settings.stickyFirstSession;
   const overallTimeout = pref('overallTimeout');
-  const progressTimeout = pref('progressTimeout');
   const resetMousePosition = !pref('skipResetMousePosition');
 
   const runner = pref('runner');
-  const api = Apis.create(master, maybeDriver, projectdir, basedir, stickyFirstSession, overallTimeout, progressTimeout, testfiles, settings.loglevel, resetMousePosition);
+  const api = Apis.create(master, maybeDriver, projectdir, basedir, stickyFirstSession, overallTimeout, testfiles, settings.loglevel, resetMousePosition);
 
   // it is important to not use `await` here so the port opens as fast as possible
   const serverRoutes = runner.then(async r => ({

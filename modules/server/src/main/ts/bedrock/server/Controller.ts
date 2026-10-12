@@ -35,6 +35,8 @@ interface TestSession {
   readonly lookup: Record<string, Record<string, number>>;
   alive: number;
   updated: number;
+  pings: number;
+  pingsAtLastProgress: number;
   previous: PreviousTest | null;
   done: boolean;
   error?: string;
@@ -52,13 +54,21 @@ export interface Controller {
 }
 
 /*
- * How long the browser may go without contacting the server at all before we treat the
- * driver as dead. Every route bumps `session.alive`, and the runner also sends a payload-free
- * keep-alive, so silence for this long means nothing is getting through.
+ * How long the browser may go without contacting the server at all before we treat the driver
+ * as dead. Every route bumps `session.alive`, and the runner posts on a fixed heartbeat whether
+ * or not a test has finished, so silence for this long means nothing is getting through.
  */
 const LIVENESS_TIMEOUT = 55 * 1000;
 
-export const create = (stickyFirstSession: boolean, overallTimeout: number, progressTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced'): Controller => {
+/*
+ * How many client pings may arrive without a single test finishing before we treat the run as
+ * stuck. The runner posts on a fixed interval whether or not a test has completed, so this is
+ * deliberately a count and not a duration: a link that halves in speed stretches the tolerance
+ * by the same factor instead of tripping it, which a wall-clock budget cannot do.
+ */
+const STALE_PINGS = 6;
+
+export const create = (stickyFirstSession: boolean, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced'): Controller => {
   const hud = Hud.create(testfiles, loglevel);
   const sessions: Record<string, TestSession> = {};
   let stickyId: string | null = null;
@@ -91,6 +101,8 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, prog
         id: sessionId,
         alive: now,
         updated: now,
+        pings: 0,
+        pingsAtLastProgress: 0,
         results: [],
         lookup: {},
         previous: null,
@@ -129,6 +141,7 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, prog
     const session = getSession(id);
     const now = Date.now();
     session.updated = now;
+    session.pingsAtLastProgress = session.pings;
     session.totalTests = totalTests;
     session.currentTest = currentCount;
     session.done = false;
@@ -161,9 +174,14 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, prog
   const recordTestResults = (id: string, results: TestResult[]) => {
     const now = Date.now();
     const session = getSession(id);
-    session.updated = now;
-    session.done = false;
+    // Every post counts as a ping, including the empty ones the runner sends on its heartbeat.
+    // Only a post that actually carries results counts as progress, otherwise the heartbeat
+    // would keep feeding the very clock it exists to let us read.
+    session.pings++;
     if (results.length > 0) {
+      session.updated = now;
+      session.done = false;
+      session.pingsAtLastProgress = session.pings;
       const {name, file} = results.slice(-1)[0];
       session.previous = {
         name,
@@ -186,6 +204,7 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, prog
       session.currentTest = session.totalTests;
     }
     session.updated = Date.now();
+    session.pingsAtLastProgress = session.pings;
     updateHud(session);
   };
 
@@ -231,10 +250,11 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, prog
               reject({message, results, start, now});
               clearInterval(poller);
               timeoutError = true;
-            } else if ((now - session.updated) > progressTimeout) {
+            } else if ((session.pings - session.pingsAtLastProgress) >= STALE_PINGS) {
               // the browser is still talking to us, it just isn't finishing tests
-              const message = `No test progress in ${formatTime(now - session.updated)}, but the browser is still responding. ` +
-                  `Assuming the run is stuck. Limit is set to ${formatTime(progressTimeout)}.`;
+              const message = `No test progress for ${session.pings - session.pingsAtLastProgress} client pings ` +
+                  `(${formatTime(now - session.updated)}), but the browser is still responding. ` +
+                  `Assuming the run is stuck. Limit is set to ${STALE_PINGS} pings.`;
               reject({message, results, start, now});
               clearInterval(poller);
               timeoutError = true;

@@ -6,7 +6,6 @@ export interface BedrockSettings {
   readonly chunk: number;
   readonly loglevel: 'simple' | 'advanced';
   readonly overallTimeout: number;
-  readonly progressTimeout: number;
   readonly projectdir: string;
   readonly singleTimeout: number;
   readonly stopOnFailure: boolean;

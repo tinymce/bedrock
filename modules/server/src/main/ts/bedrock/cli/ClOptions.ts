@@ -179,15 +179,6 @@ export const overallTimeout: ClOption = {
   uncommon: true
 };
 
-export const progressTimeout: ClOption = {
-  name: 'progressTimeout',
-  type: Number,
-  description: 'How long in milliseconds a browser may go without completing a test, while still responding to the server, before bedrock gives up. Silence from the browser itself is always caught after 55 seconds regardless of this setting.',
-  validate: Extraction.any,
-  defaultValue: 5 * 60 * 1000,
-  uncommon: true
-};
-
 export const singleTimeout: ClOption = {
   name: 'singleTimeout',
   type: Number,
