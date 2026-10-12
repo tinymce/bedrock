@@ -78,16 +78,20 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
     ui.render(params.offset, numTests, actions.restartTests, retryTest, loadNextTest);
 
     return Promise.all([callbacks.sendInit(params.session), callbacks.loadHarness()]).then(([_, harness]) => {
-      // Auto mode needs this as much as manual mode does. Results are batched, and a page
-      // reload posts nothing at all, so without a keep-alive the server cannot tell a browser
-      // that has died from one that is merely slow, and has to assume the worst.
-      // delay this ajax call until after the reporter status elements are in the page
-      const keepAliveTimer = setInterval(() => {
-        callbacks.sendKeepAlive(params.session).catch(() => {
-          // if the server shuts down stop trying to send messages
-          clearInterval(keepAliveTimer);
-        });
-      }, KEEP_ALIVE_INTERVAL);
+      // The server counts these to tell a slow browser from a dead one, so it runs in both
+      // modes and regardless of whether any test is finishing.
+      reporter.startHeartbeat();
+
+      // we don't need a keep-alive timer in auto mode,
+      if (harness.mode === 'manual') {
+        // delay this ajax call until after the reporter status elements are in the page
+        const keepAliveTimer = setInterval(() => {
+          callbacks.sendKeepAlive(params.session).catch(() => {
+            // if the server shuts down stop trying to send messages
+            clearInterval(keepAliveTimer);
+          });
+        }, KEEP_ALIVE_INTERVAL);
+      }
 
       return harness;
     });

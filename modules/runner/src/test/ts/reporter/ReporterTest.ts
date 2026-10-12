@@ -52,6 +52,7 @@ describe('Reporter.test', () => {
   let doneCalled: boolean, doneError: string | undefined, offset: number;
   let mouseMoved: boolean, startFails: boolean;
   let startGate: Promise<void> | null;
+  let resultsPosts: number;
   const mouse: MouseWatch = {
     hasMoved: () => mouseMoved,
     clear: () => {
@@ -71,6 +72,7 @@ describe('Reporter.test', () => {
       return startGate !== null ? startGate : Promise.resolve();
     },
     sendTestResults: (session, results) => {
+      resultsPosts++;
       results.forEach(r => endTestData.push({session, ...r}));
       return Promise.resolve();
     },
@@ -86,6 +88,7 @@ describe('Reporter.test', () => {
     mouseMoved = false;
     startFails = false;
     startGate = null;
+    resultsPosts = 0;
     reporter = Reporter({ ...params, offset }, callbacks, ui, mouse);
     startTestData = [];
     endTestData = [];
@@ -94,6 +97,18 @@ describe('Reporter.test', () => {
   };
 
   beforeEach(() => reset());
+
+  it('TD-2668: the heartbeat posts even when no test has finished', () => {
+    reset(0);
+    // The server counts these posts to tell a slow browser from a dead one, so an empty batch
+    // still has to go out. Without that there is nothing to count while one slow test runs.
+    reporter.startHeartbeat(10);
+    return new Promise<void>((resolve) => setTimeout(resolve, 60)).then(() => {
+      assert.isAtLeast(resultsPosts, 2, 'Checking the heartbeat posted repeatedly with nothing to send');
+      assert.lengthOf(endTestData, 0, 'Checking the posts carried no results');
+      reporter.done();
+    });
+  });
 
   it('should report the session id, number tests, file and name on start', () => {
     return fc.assert(fc.asyncProperty(fc.string(), fc.string(), fc.integer({ max: offset }), (fileName, testName, testCount) => {
