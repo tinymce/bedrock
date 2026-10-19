@@ -64,9 +64,11 @@ const LIVENESS_TIMEOUT = 55 * 1000;
  * How many client pings may arrive without a single test finishing before we treat the run as
  * stuck. The runner posts on a fixed interval whether or not a test has completed, so this is
  * deliberately a count and not a duration: a link that halves in speed stretches the tolerance
- * by the same factor instead of tripping it, which a wall-clock budget cannot do.
+ * by the same factor instead of tripping it, which a wall-clock budget cannot do. The count times
+ * the heartbeat interval must stay above the longest single-test timeout in use, or one
+ * slow-but-legal test would be mistaken for a stuck run.
  */
-const STALE_PINGS = 6;
+const STALE_PINGS = 4;
 
 export const create = (stickyFirstSession: boolean, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced'): Controller => {
   const hud = Hud.create(testfiles, loglevel);
