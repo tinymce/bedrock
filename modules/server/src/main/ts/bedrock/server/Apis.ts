@@ -160,9 +160,14 @@ export const create = (master: DriverMaster | null, pMaybeDriver: Promise<Attemp
       driverRouter('/mouse', 'Mouse', MouseEffects.executor, true),
       Routes.effect('POST', '/tests/alive', (data: { session: string }) => {
         c.recordAlive(data.session);
-        return keepAliveAction();
+        // manual mode pings this every few seconds, so it must be the throttled variant or a
+        // run would issue a webdriver command on every ping
+        return maybeSendKeepAlive();
       }),
-      Routes.effect('POST', '/tests/init', () => resetMousePositionAction(true)),
+      Routes.effect('POST', '/tests/init', (data: { session: string }) => {
+        c.recordAlive(data.session);
+        return resetMousePositionAction(true);
+      }),
       Routes.effect('POST', '/tests/start', (data: StartData) => {
         c.recordTestResults(data.session, data.results);
         c.recordTestStart(data.session, data.name, data.file, data.number, data.totalTests);

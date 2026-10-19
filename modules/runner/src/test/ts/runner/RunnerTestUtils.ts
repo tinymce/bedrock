@@ -53,6 +53,7 @@ export const MockReporter = (): MockReporter => {
 
   return {
     test,
+    startHeartbeat: noop,
     strayFailure: (_file, name, e) => {
       failures.push(e);
       failedNames.push(name);

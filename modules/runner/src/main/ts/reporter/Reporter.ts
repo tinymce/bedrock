@@ -17,6 +17,7 @@ export interface TestReporter {
 export interface Reporter {
   readonly summary: () => { offset: number; passed: number; failed: number; skipped: number };
   readonly test: (file: string, name: string, totalNumTests: number) => TestReporter;
+  readonly startHeartbeat: (intervalMs?: number) => void;
   readonly strayFailure: (file: string, name: string, e: LoggedError) => void;
   readonly waitForResults: () => Promise<void>;
   readonly retry: () => Promise<void>;
@@ -49,9 +50,16 @@ const mapError = (e: LoggedError) => mapStackTrace(e.stack).then((mappedStack) =
   return e;
 });
 
+/*
+ * How often the runner posts to the server whether or not a test has finished. The server counts
+ * these to decide whether a run has stalled, so the value is a cadence and not a budget: slowing
+ * the connection slows the pings and widens the server's tolerance by the same factor.
+ */
+const HEARTBEAT_INTERVAL = 20 * 1000;
+
 export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi, mouse: MouseWatch): Reporter => {
   const initial = Date.now();
-  let timeOfLastReport = initial;
+  let heartbeatTimer: ReturnType<typeof setTimeout> | null = null;
   let currentCount = params.offset || 0;
   let passCount = 0;
   let skipCount = 0;
@@ -66,8 +74,6 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
   const requestsInFlight: Promise<void>[] = [];
 
   const takeResults = (): TestReport[] => {
-    // Assume the results will be posted once they are returned
-    timeOfLastReport = Date.now();
     // splice deletes the values specified and returns them
     return testResults.splice(0, testResults.length);
   };
@@ -80,9 +86,33 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
 
   const reportResult = (result: TestReport): void => {
     testResults.push(result);
-    if (Date.now() - timeOfLastReport > 30 * 1000) {
-      // ping the server with results every 30 seconds or so, as a form of keep-alive
-      reportResults();
+  };
+
+  // Posts even when the batch is empty. An empty post is how the server tells a browser that is
+  // slow from one that is gone, so this must not be skipped when nothing has finished.
+  const reportProgress = (): Promise<void> => {
+    const sent = callbacks.sendTestResults(params.session, takeResults());
+    requestsInFlight.push(sent);
+    return sent;
+  };
+
+  // Rescheduled only once the previous post settles, so a slow connection stretches the gap
+  // instead of stacking requests on top of one that has not come back.
+  const scheduleHeartbeat = (intervalMs: number = HEARTBEAT_INTERVAL): void => {
+    heartbeatTimer = setTimeout(() => {
+      const again = (): void => {
+        if (!finished) {
+          scheduleHeartbeat(intervalMs);
+        }
+      };
+      reportProgress().then(again, again);
+    }, intervalMs);
+  };
+
+  const stopHeartbeat = (): void => {
+    if (heartbeatTimer !== null) {
+      clearTimeout(heartbeatTimer);
+      heartbeatTimer = null;
     }
   };
 
@@ -266,6 +296,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
 
   const done = (error?: LoggedError): void => {
     finished = true;
+    stopHeartbeat();
     const setAsDone = (): void => {
       const totalTime = elapsed(initial);
       ui.done(totalTime);
@@ -282,6 +313,7 @@ export const Reporter = (params: UrlParams, callbacks: Callbacks, ui: ReporterUi
   return {
     summary,
     test,
+    startHeartbeat: scheduleHeartbeat,
     strayFailure,
     retry,
     waitForResults,

@@ -78,7 +78,6 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
     ui.render(params.offset, numTests, actions.restartTests, retryTest, loadNextTest);
 
     return Promise.all([callbacks.sendInit(params.session), callbacks.loadHarness()]).then(([_, harness]) => {
-      // we don't need a keep-alive timer in auto mode,
       if (harness.mode === 'manual') {
         // delay this ajax call until after the reporter status elements are in the page
         const keepAliveTimer = setInterval(() => {
@@ -87,6 +86,9 @@ export const Runner = (rootSuite: Suite, params: UrlParams, callbacks: Callbacks
             clearInterval(keepAliveTimer);
           });
         }, KEEP_ALIVE_INTERVAL);
+      } else {
+        // only auto mode has the watchdog that counts these pings; manual keeps its keep-alive
+        reporter.startHeartbeat();
       }
 
       return harness;

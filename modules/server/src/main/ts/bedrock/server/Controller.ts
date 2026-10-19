@@ -35,6 +35,8 @@ interface TestSession {
   readonly lookup: Record<string, Record<string, number>>;
   alive: number;
   updated: number;
+  pings: number;
+  pingsAtLastProgress: number;
   previous: PreviousTest | null;
   done: boolean;
   error?: string;
@@ -50,6 +52,23 @@ export interface Controller {
   readonly recordDone: (id: string, error?: string) => void;
   readonly awaitDone: () => Promise<TestResults>;
 }
+
+/*
+ * How long the browser may go without contacting the server at all before we treat the driver
+ * as dead. Every route bumps `session.alive`, and the runner posts on a fixed heartbeat whether
+ * or not a test has finished, so silence for this long means nothing is getting through.
+ */
+const LIVENESS_TIMEOUT = 55 * 1000;
+
+/*
+ * How many client pings may arrive without a single test finishing before we treat the run as
+ * stuck. The runner posts on a fixed interval whether or not a test has completed, so this is
+ * deliberately a count and not a duration: a link that halves in speed stretches the tolerance
+ * by the same factor instead of tripping it, which a wall-clock budget cannot do. The count times
+ * the heartbeat interval must stay above the longest single-test timeout in use, or one
+ * slow-but-legal test would be mistaken for a stuck run.
+ */
+const STALE_PINGS = 4;
 
 export const create = (stickyFirstSession: boolean, overallTimeout: number, testfiles: string[], loglevel: 'simple' | 'advanced'): Controller => {
   const hud = Hud.create(testfiles, loglevel);
@@ -84,6 +103,8 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
         id: sessionId,
         alive: now,
         updated: now,
+        pings: 0,
+        pingsAtLastProgress: 0,
         results: [],
         lookup: {},
         previous: null,
@@ -122,6 +143,7 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
     const session = getSession(id);
     const now = Date.now();
     session.updated = now;
+    session.pingsAtLastProgress = session.pings;
     session.totalTests = totalTests;
     session.currentTest = currentCount;
     session.done = false;
@@ -154,9 +176,14 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
   const recordTestResults = (id: string, results: TestResult[]) => {
     const now = Date.now();
     const session = getSession(id);
-    session.updated = now;
-    session.done = false;
+    // Every post counts as a ping, including the empty ones the runner sends on its heartbeat.
+    // Only a post that actually carries results counts as progress, otherwise the heartbeat
+    // would keep feeding the very clock it exists to let us read.
+    session.pings++;
     if (results.length > 0) {
+      session.updated = now;
+      session.done = false;
+      session.pingsAtLastProgress = session.pings;
       const {name, file} = results.slice(-1)[0];
       session.previous = {
         name,
@@ -179,6 +206,7 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
       session.currentTest = session.totalTests;
     }
     session.updated = Date.now();
+    session.pingsAtLastProgress = session.pings;
     updateHud(session);
   };
 
@@ -203,6 +231,11 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
       return Promise.reject({message, results, start, now});
     }
     return new Promise((resolve, reject) => {
+      const failRun = (message: string, results: TestResult[], now: number) => {
+        reject({message, results, start, now});
+        clearInterval(poller);
+        timeoutError = true;
+      };
       const poller = setInterval(() => {
         const now = Date.now();
         const allElapsed = now - start;
@@ -218,12 +251,14 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
             }
             clearInterval(poller);
           } else {
-             if ((now - session.updated) > (55 * 1000)) {
-              // sticky sessions have longer before they time out, but we still can't sit around if the driver has failed
-              const message = `No updates from the browser in ${formatTime(now - session.updated)}, assuming driver has failed.`;
-              reject({message, results, start, now});
-              clearInterval(poller);
-              timeoutError = true;
+             if ((now - session.alive) > LIVENESS_TIMEOUT) {
+              // nothing at all is reaching us: the driver really has failed
+              failRun(`No updates from the browser in ${formatTime(now - session.alive)}, assuming driver has failed.`, results, now);
+            } else if ((session.pings - session.pingsAtLastProgress) >= STALE_PINGS) {
+              // the browser is still talking to us, it just isn't finishing tests
+              failRun(`No test progress for ${session.pings - session.pingsAtLastProgress} client pings ` +
+                  `(${formatTime(now - session.updated)}), but the browser is still responding. ` +
+                  `Assuming the run is stuck. Limit is set to ${STALE_PINGS} pings.`, results, now);
             } else if (allElapsed > overallTimeout) {
               // combined tests took too long
               let lastTest;
@@ -240,18 +275,12 @@ export const create = (stickyFirstSession: boolean, overallTimeout: number, test
               const estimatedTotal = Math.ceil(((allElapsed / session.results.length) * testfiles.length) / 1000) * 1000;
               const message = 'Tests timed out: ' + formatTime(allElapsed) + '. Limit is set to ' + formatTime(overallTimeout) +
                   '. Estimated required time ' + formatTime(estimatedTotal) + '.\n' + lastTest + '\nTop 10 longest running tests:\n' + longest;
-              reject({message, results, start, now});
-              clearInterval(poller);
-              timeoutError = true;
+              failRun(message, results, now);
             }
           }
         } else if (allElapsed > overallTimeout) {
           // combined tests took too long
-          const message = 'Tests took too long to start';
-          const results: TestResult[] = [];
-          reject({message, results, start, now});
-          clearInterval(poller);
-          timeoutError = true;
+          failRun('Tests took too long to start', [], now);
         }
       }, 1000);
     });
