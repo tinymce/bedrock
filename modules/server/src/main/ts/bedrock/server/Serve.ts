@@ -1,3 +1,4 @@
+import compression from 'compression';
 import finalhandler from 'finalhandler';
 import * as http from 'http';
 import { Browser} from 'webdriverio';
@@ -79,13 +80,18 @@ export const startCustom = async (settings: ServeSettings, createServer: (port: 
     fallback: r.fallback
   }));
 
+  const compress = compression({
+    filter: (request, response) =>
+      !/^image\/(?!svg\+xml)/i.test(String(response.getHeader('Content-Type') ?? '')) && compression.filter(request, response)
+  });
+
   try {
     const port = settings.port ?? 0;
 
     const server = createServer(port, (request, response) => {
       const done = finalhandler(request, response);
       serverRoutes.then(({ routers, fallback }) => {
-        Routes.route(routers, fallback, request, response, done);
+        compress(request, response, () => Routes.route(routers, fallback, request, response, done));
       });
     });
     const serverPort = await server.start();
