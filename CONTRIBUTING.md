@@ -34,7 +34,7 @@ DO NOT manually edit the `package.json` files.
 Create feature branches named `feature/XXXX` where XXXX is a Jira issue key or Github issue number.
 
 Feature branches are merged to `master`.
-After merging, run `yarn lerna version` to choose a new version, then push directly to `master`. This will be published by Jenkins.
+After merging, run `yarn lerna version` to choose a new version, then push directly to `master`.
 
 To add a dependency to the root package: `yarn add -W package`
 To add a dependency to a module, use `yarn add @ephox/bedrock-XXX package`.
@@ -42,7 +42,7 @@ Add a `-D` to the above for `devDependencies`
 
 # Publishing
 
-To publish manually instead (e.g. if Jenkins is unavailable):
+Packages are published manually:
 
 1. Get temporary generated npm publish keys from the Bitwarden entry `npmjs.com - tinymce - engineering-inbox@tiny.cloud`. Publishing manually requires them.
 2. Log in to npm with those keys (`npm login`).
