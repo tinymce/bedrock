@@ -17,6 +17,7 @@
     "build-runner": "yarn workspace @ephox/bedrock-runner build",
     "build-server": "yarn workspace @ephox/bedrock-server build",
     "build": "yarn lerna run build --ignore @ephox/bedrock-sample",
+    "release": "./publish.sh",
     "test-common": "yarn workspace @ephox/bedrock-common test",
     "test-client": "yarn workspace @ephox/bedrock-client test",
     "test-runner": "yarn workspace @ephox/bedrock-runner test",
